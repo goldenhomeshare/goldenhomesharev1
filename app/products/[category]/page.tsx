@@ -45,11 +45,12 @@ async function getData(category: string) {
   return data;
 }
 
-export default async function CategoryPage({
-  params,
-}: {
-  params: { category: string };
-}) {
+export default async function CategoryPage(
+  props: {
+    params: Promise<{ category: string }>;
+  }
+) {
+  const params = await props.params;
   noStore();
   const data = await getData(params.category);
   return (

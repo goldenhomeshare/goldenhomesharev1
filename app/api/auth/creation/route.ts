@@ -1,4 +1,3 @@
-
 import prisma from "@/app/lib/db";
 import { stripe } from "@/app/lib/stripe";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";

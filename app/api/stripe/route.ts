@@ -5,9 +5,8 @@ import { stripe } from "@/app/lib/stripe";
 import { headers } from "next/headers";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: Request) {
+  const resend = new Resend(process.env.RESEND_API_KEY || "placeholder");
   const body = await req.text();
 
   const signature = (await headers()).get("Stripe-Signature") as string;

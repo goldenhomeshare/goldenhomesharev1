@@ -1,0 +1,155 @@
+---
+description: Apply these rules when creating the project
+globs: 
+alwaysApply: true
+---
+## Project Overview
+
+*   **Type:** cursor_project_rules
+*   **Description:** Golden HomeShare Marketplace is a Next.js application designed to connect older adults with trusted housemates. It provides secure homesharing listings, integrated payments, file uploads, and email notifications, built with modern UI components and a PostgreSQL database.
+*   **Primary Goal:** Simplify homesharing by delivering a secure, responsive listing and booking flow that connects hosts and seekers while handling authentication, uploads, payments, and notifications seamlessly.
+
+## Project Structure
+
+### Framework-Specific Routing
+
+*   **Directory Rules:**
+
+    *   Next.js@14 (App Router): Use `app/[route]/page.tsx`, `app/[route]/layout.tsx` for route components and layouts.
+    *   Next.js@13 (Pages Router): Use `pages/[route].tsx` for routes and `pages/_app.tsx` for global customization.
+    *   React Router@6: Place route definitions in `src/routes/index.tsx` using `createBrowserRouter` and store page components in `src/routes/pages/`.
+
+### Core Directories
+
+*   **Versioned Structure:**
+
+    *   `app/api`: Next.js 14 API routes with Route Handlers for Stripe webhooks, UploadThing callbacks, and Kinde session endpoints.
+    *   `app/auth`: Authentication flows (`login/page.tsx`, `callback/route.ts`) leveraging Kinde server actions.
+    *   `app/listings`: Dynamic segments (`[id]/page.tsx`, `create/page.tsx`) for listing detail and creation flows.
+    *   `app/settings`: User settings and Stripe Connect management pages under App Router.
+    *   `src/lib`: Shared utilities—Prisma client (`prisma.ts`), Stripe and UploadThing wrappers.
+    *   `src/schemas`: Zod schemas for all API route validations.
+    *   `src/components`: Reusable UI components built with Radix UI, Tailwind CSS, Lucide React, Embla, Sonner.
+    *   Note -- you can add new documents when needed, but try to limit this.
+
+### Key Files
+
+*   **Stack-Versioned Patterns:**
+
+    *   `app/layout.tsx`: Next.js 14 root layout with Tailwind CSS and global providers (Theme, Toast).
+    *   `app/page.tsx`: Home page (browse listings) using server components and Prisma.
+    *   `app/listings/[id]/page.tsx`: Dynamic listing detail page with TipTap-rendered description.
+    *   `app/sell/page.tsx`: Sell form using client component, server actions to create listings and upload files.
+    *   `app/api/stripe/webhook/route.ts`: Stripe webhook handler with signature verification and idempotency.
+    *   `app/api/uploadthing/route.ts`: UploadThing server handler for secure file uploads.
+
+## Tech Stack Rules
+
+*   **Version Enforcement:**
+
+    *   next@14: Must use App Router; no `pages/` directory; all data fetching via server components or server actions.
+    *   react@18: Functional components and hooks only; no class components.
+    *   tailwindcss@3: Enable JIT; configure Content paths to include `app/`, `src/`.
+    *   radix-ui@1: Headless components styled exclusively via Tailwind.
+    *   prisma@4: Define schema in `prisma/schema.prisma`; auto-generate types before builds.
+    *   postgresql@13+: Connection via `DATABASE_URL`; no root superuser—use least-privilege user.
+    *   stripe@12: Use Checkout Sessions and Connect; verify webhooks in `app/api/stripe/webhook/route.ts`.
+    *   uploadthing@1: Use `createUploadthing()` in server actions; enforce client-side 50MB size check.
+    *   <resend@0.x>: Use typed email templates stored in `src/lib/emails/`.
+    *   zod@3: Validate all API inputs and server-action parameters.
+
+## PRD Compliance
+
+*   "User sign-up, login, and session management via Kinde": Must implement Kinde middleware in `app/auth` and protect server actions with auth checks.
+*   "Stripe Checkout integration for booking payments": Enforce creation of Checkout session in `app/api/checkout/route.ts`, include application fee and Connect account transfer.
+*   "UploadThing file size limit ~50 MB; implement client-side size checks": Validate file size in the upload form component under `src/components/UploadThing/`.
+
+## App Flow Integration
+
+*   Next.js 14 Auth Flow → `app/auth/login/page.tsx` uses Kinde server actions; `app/auth/callback/route.ts` handles tokens.
+*   Next.js 14 Browse Flow → `app/page.tsx` fetches listings with Prisma in a server component.
+*   Next.js 14 Listing Detail → `app/listings/[id]/page.tsx` uses `generateStaticParams` for pre-rendering popular listings.
+*   Next.js 14 Sell Flow → `app/sell/page.tsx` is a client component; on submit calls a server action to create the listing and upload files.
+*   Next.js 14 Settings → `app/settings/page.tsx` uses server component for profile data and client button to connect Stripe via `app/api/stripe/connect/route.ts`.
+
+## Best Practices
+
+*   Next.js
+
+    *   Use only App Router; prefer server components for data fetching.
+    *   Avoid client-side data fetching unless necessary; use `use client` scope only in forms or interactive UI.
+    *   Leverage `next/image` for optimized images.
+
+*   React
+
+    *   Favor hooks and composable custom hooks in `src/hooks/`.
+    *   Memoize pure computations (`useMemo`, `useCallback`).
+
+*   Tailwind CSS
+
+    *   Enable JIT; configure purge paths.
+    *   Use Class Variance Authority and Tailwind Merge for dynamic classes.
+
+*   Radix UI
+
+    *   Style via Tailwind; wrap headless primitives in local components.
+
+*   Prisma
+
+    *   Always use typed client (`prisma.posting.findMany()`).
+    *   Run migrations with `prisma migrate deploy` in CI.
+
+*   PostgreSQL
+
+    *   Index foreign keys and frequent filters.
+    *   Use connection pooling.
+
+*   Kinde
+
+    *   Secure HTTP-only cookies for tokens.
+    *   Protect all server actions with auth guard.
+
+*   Stripe
+
+    *   Verify webhooks using `stripe.webhooks.constructEvent`.
+    *   Use idempotency keys in API calls.
+
+*   UploadThing
+
+    *   Use signed URLs; restrict file types.
+    *   Show progress indicators in UI.
+
+*   Resend
+
+    *   Precompile templates; handle errors in `app/api/email/route.ts`.
+
+*   TipTap
+
+    *   Dynamically import editor to avoid SSR mismatches.
+
+*   Zod
+
+    *   Define and export all schemas in `src/schemas`; use `.parse()` in routes.
+
+## Rules
+
+*   Derive folder/file patterns **directly** from techStackDoc versions.
+*   If Next.js 14 App Router: Enforce `app/` directory with nested route folders.
+*   If Pages Router: Use `pages/*.tsx` flat structure.
+*   Mirror this logic for React Router, SvelteKit, etc.
+*   Never mix version patterns (e.g., no `pages/` in App Router projects).
+
+## Rules Metrics
+
+Before starting the project development, create a metrics file in the root of the project called `cursor_metrics.md`.
+
+### Instructions:
+
+*   Each time a cursor rule is used as context, update `cursor_metrics.md`.
+
+*   Use the following format for `cursor_metrics.md`: Rules Metrics Usage The number of times rules is used as context
+
+    *   directory-rules.mdc: 0
+    *   tech-stack-rules.mdc: 0
+    *   prd-compliance.mdc: 0
+    *   ...other rules

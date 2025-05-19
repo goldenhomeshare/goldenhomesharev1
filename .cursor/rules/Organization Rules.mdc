@@ -1,0 +1,56 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Code Organization Guidelines
+
+## Modularity First
+Our codebase follows a modular architecture pattern where functionality is split into focused, single-responsibility files. This makes the code more maintainable, testable, and easier to understand.
+
+### Key Principles:
+
+1. **Single Responsibility**: Each file should handle one specific concern or feature
+   - ✅ Separate components into individual files
+   - ❌ Avoid creating "mega-files" that handle multiple unrelated features
+
+2. **Size Guidelines**:
+   - Keep files under 300 lines of code when possible
+   - If a file exceeds 500 lines, consider splitting it into smaller modules
+   - Components should generally be 150 lines or less
+
+3. **Directory Structure**:
+   - Group related files in feature-specific directories
+   - Use clear, descriptive directory names that reflect the domain
+   - Maintain a shallow directory structure (max 3-4 levels deep)
+
+4. **Module Organization**:
+   - Break down large features into smaller, composable modules
+   - Use index files to aggregate and export related modules
+   - Keep implementation details private within their respective modules
+
+### Anti-patterns to Avoid:
+
+- ❌ Creating "god" files that contain multiple unrelated functions or components
+- ❌ Putting all utilities in a single massive utilities file
+- ❌ Nesting components deeply within other component files
+- ❌ Mixing business logic with UI components in the same file
+
+### Best Practices:
+
+- ✅ Create separate files for:
+  - React components
+  - Custom hooks
+  - API services
+  - State management logic
+  - Type definitions
+  - Utility functions
+  - Constants and configurations
+
+- ✅ Use clear file naming conventions:
+  - Components: `ComponentName.tsx`
+  - Hooks: `useHookName.ts`
+  - Services: `serviceName.service.ts`
+  - Types: `types.ts` or `interfaces.ts`
+
+Remember: Smaller, focused modules are easier to understand, test, and maintain. When in doubt, split it out!

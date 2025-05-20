@@ -29,6 +29,7 @@ const productSchema = z.object({
     .string()
     .min(1, { message: "Please upload a zip of your product" }),
   amenities: z.array(z.string()).optional(),
+  supportRequested: z.array(z.string()).optional(),
 });
 
 const userSettingsSchema = z.object({
@@ -62,6 +63,7 @@ export async function SellProduct(prevState: any, formData: FormData) {
     images: JSON.parse(formData.get("images") as string),
     productFile: formData.get("productFile"),
     amenities: formData.get("amenities") ? JSON.parse(formData.get("amenities") as string) : [],
+    supportRequested: formData.get("supportRequested") ? JSON.parse(formData.get("supportRequested") as string) : [],
   });
 
   if (!validateFields.success) {
@@ -94,6 +96,11 @@ export async function SellProduct(prevState: any, formData: FormData) {
   // If we have amenities, update the product to add them
   if (validateFields.data.amenities && validateFields.data.amenities.length > 0) {
     await prisma.$executeRaw`UPDATE "Product" SET amenities = ${JSON.stringify(validateFields.data.amenities)}::jsonb WHERE id = ${data.id}`;
+  }
+
+  // If we have supportRequested options, update the product to add them
+  if (validateFields.data.supportRequested && validateFields.data.supportRequested.length > 0) {
+    await prisma.$executeRaw`UPDATE "Product" SET "supportRequested" = ${JSON.stringify(validateFields.data.supportRequested)}::jsonb WHERE id = ${data.id}`;
   }
 
   return redirect(`/product/${data.id}`);

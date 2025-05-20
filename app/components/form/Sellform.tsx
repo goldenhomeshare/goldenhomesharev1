@@ -20,7 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { TipTapEditor } from "../Editor";
 import { UploadDropzone } from "@/app/lib/uploadthing";
 import { Submitbutton } from "../SubmitButtons";
-import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase } from "lucide-react";
+import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield } from "lucide-react";
 
 export function SellForm() {
   const initalState: State = { message: "", status: undefined };
@@ -29,6 +29,7 @@ export function SellForm() {
   const [images, setImages] = useState<null | string[]>(null);
   const [productFile, SetProductFile] = useState<null | string>(null);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [selectedSupport, setSelectedSupport] = useState<string[]>([]);
 
   const amenities = [
     { id: "parking", label: "Parking", icon: Car },
@@ -45,11 +46,30 @@ export function SellForm() {
     { id: "workspace", label: "Desk/Workspace", icon: Briefcase },
   ];
 
+  const supportOptions = [
+    { id: "cleaning", label: "Cleaning", icon: Sparkles },
+    { id: "cooking", label: "Cooking", icon: Salad },
+    { id: "gardening", label: "Gardening", icon: Flower },
+    { id: "errands", label: "Errands", icon: ShoppingBag },
+    { id: "companionship", label: "Companionship", icon: HeartHandshake },
+    { id: "petCare", label: "Pet Care", icon: Cat },
+    { id: "techSupport", label: "Tech Support", icon: Wrench },
+    { id: "homeSecurity", label: "Home Security", icon: Shield },
+  ];
+
   const toggleAmenity = (amenityId: string) => {
     setSelectedAmenities(prev => 
       prev.includes(amenityId)
         ? prev.filter(id => id !== amenityId)
         : [...prev, amenityId]
+    );
+  };
+
+  const toggleSupport = (supportId: string) => {
+    setSelectedSupport(prev => 
+      prev.includes(supportId)
+        ? prev.filter(id => id !== supportId)
+        : [...prev, supportId]
     );
   };
 
@@ -140,6 +160,32 @@ export function SellForm() {
                       <Icon size={24} className="text-slate-600" />
                     </div>
                     <span className="font-medium text-center">{amenity.label}</span>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-y-2">
+          <input type="hidden" name="supportRequested" value={JSON.stringify(selectedSupport)} />
+          <Label>Support Requested</Label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {supportOptions.map((support) => {
+              const Icon = support.icon;
+              return (
+                <label key={support.id} className="cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={selectedSupport.includes(support.id)}
+                    onChange={() => toggleSupport(support.id)}
+                  />
+                  <div className="flex flex-col items-center p-4 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 h-full">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 mb-3 flex items-center justify-center">
+                      <Icon size={24} className="text-slate-600" />
+                    </div>
+                    <span className="font-medium text-center">{support.label}</span>
                   </div>
                 </label>
               );

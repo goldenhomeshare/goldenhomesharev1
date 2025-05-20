@@ -30,6 +30,7 @@ model Product {
   productFile      String
   category         CategoryTypes
   amenities        Json?         // Array of selected amenities
+  supportRequested Json?         // Array of selected support options
 
   createdAt DateTime @default(now())
   User      User?    @relation(fields: [userId], references: [id])

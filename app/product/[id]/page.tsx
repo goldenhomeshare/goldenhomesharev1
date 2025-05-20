@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/carousel";
 import { JSONContent } from "@tiptap/react";
 import Image from "next/image";
-import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase } from "lucide-react";
+import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield } from "lucide-react";
 
 const amenityIcons: Record<string, any> = {
   parking: { icon: Car, label: "Parking" },
@@ -29,6 +29,17 @@ const amenityIcons: Record<string, any> = {
   patio: { icon: Home, label: "Patio/Balcony" },
   furnished: { icon: Armchair, label: "Furnished Room" },
   workspace: { icon: Briefcase, label: "Desk/Workspace" },
+};
+
+const supportIcons: Record<string, any> = {
+  cleaning: { icon: Sparkles, label: "Cleaning" },
+  cooking: { icon: Salad, label: "Cooking" },
+  gardening: { icon: Flower, label: "Gardening" },
+  errands: { icon: ShoppingBag, label: "Errands" },
+  companionship: { icon: HeartHandshake, label: "Companionship" },
+  petCare: { icon: Cat, label: "Pet Care" },
+  techSupport: { icon: Wrench, label: "Tech Support" },
+  homeSecurity: { icon: Shield, label: "Home Security" },
 };
 
 async function getData(id: string) {
@@ -58,7 +69,11 @@ async function getData(id: string) {
   const amenitiesResult = await prisma.$queryRaw<[{amenities: string[]}]>`SELECT amenities FROM "Product" WHERE id = ${id}`;
   const amenities = amenitiesResult?.[0]?.amenities || [];
   
-  return { ...productData, amenities };
+  // Get supportRequested separately with a raw query
+  const supportResult = await prisma.$queryRaw<[{supportRequested: string[]}]>`SELECT "supportRequested" FROM "Product" WHERE id = ${id}`;
+  const supportRequested = supportResult?.[0]?.supportRequested || [];
+  
+  return { ...productData, amenities, supportRequested };
 }
 
 export default async function ProductPage({
@@ -75,6 +90,7 @@ export default async function ProductPage({
   }
   
   const amenities = data.amenities || [];
+  const supportRequested = data.supportRequested || [];
   
   return (
     <section className="mx-auto px-4  lg:mt-10 max-w-7xl lg:px-8 lg:grid lg:grid-rows-1 lg:grid-cols-7 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
@@ -143,6 +159,30 @@ export default async function ProductPage({
                         <Icon size={16} className="text-slate-600" />
                       </div>
                       <span className="text-sm">{amenity.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
+
+        {supportRequested.length > 0 && (
+          <>
+            <div className="border-t border-gray-200 mt-6 pt-6">
+              <h3 className="text-base font-medium mb-4">Support Requested</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {supportRequested.map((supportId: string) => {
+                  const support = supportIcons[supportId];
+                  if (!support) return null;
+                  
+                  const Icon = support.icon;
+                  return (
+                    <div key={supportId} className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                        <Icon size={16} className="text-slate-600" />
+                      </div>
+                      <span className="text-sm">{support.label}</span>
                     </div>
                   );
                 })}

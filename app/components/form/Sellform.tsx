@@ -29,7 +29,7 @@ export function SellForm() {
   const [images, setImages] = useState<null | string[]>(null);
   const [productFile, SetProductFile] = useState<null | string>(null);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
-  const [selectedSupport, setSelectedSupport] = useState<string[]>([]);
+  const [selectedSupport, setSelectedSupport] = useState<Array<{id: string, hoursPerWeek: number}>>([]);
 
   const amenities = [
     { id: "parking", label: "Parking", icon: Car },
@@ -67,9 +67,19 @@ export function SellForm() {
 
   const toggleSupport = (supportId: string) => {
     setSelectedSupport(prev => 
-      prev.includes(supportId)
-        ? prev.filter(id => id !== supportId)
-        : [...prev, supportId]
+      prev.some(item => item.id === supportId)
+        ? prev.filter(item => item.id !== supportId)
+        : [...prev, { id: supportId, hoursPerWeek: 1 }]
+    );
+  };
+
+  const updateSupportHours = (supportId: string, hours: number) => {
+    setSelectedSupport(prev => 
+      prev.map(item => 
+        item.id === supportId 
+          ? { ...item, hoursPerWeek: hours } 
+          : item
+      )
     );
   };
 
@@ -173,21 +183,40 @@ export function SellForm() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {supportOptions.map((support) => {
               const Icon = support.icon;
+              const isSelected = selectedSupport.some(item => item.id === support.id);
+              const selectedItem = selectedSupport.find(item => item.id === support.id);
+              
               return (
-                <label key={support.id} className="cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={selectedSupport.includes(support.id)}
-                    onChange={() => toggleSupport(support.id)}
-                  />
-                  <div className="flex flex-col items-center p-4 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 h-full">
-                    <div className="w-12 h-12 rounded-full bg-slate-100 mb-3 flex items-center justify-center">
-                      <Icon size={24} className="text-slate-600" />
+                <div key={support.id} className="flex flex-col">
+                  <label className="cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={isSelected}
+                      onChange={() => toggleSupport(support.id)}
+                    />
+                    <div className="flex flex-col items-center p-4 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 h-full">
+                      <div className="w-12 h-12 rounded-full bg-slate-100 mb-3 flex items-center justify-center">
+                        <Icon size={24} className="text-slate-600" />
+                      </div>
+                      <span className="font-medium text-center">{support.label}</span>
                     </div>
-                    <span className="font-medium text-center">{support.label}</span>
-                  </div>
-                </label>
+                  </label>
+                  
+                  {isSelected && (
+                    <div className="mt-2 flex flex-col items-center">
+                      <Label className="text-xs mb-1">Hours/week</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        max={40}
+                        value={selectedItem?.hoursPerWeek || 1}
+                        onChange={(e) => updateSupportHours(support.id, parseInt(e.target.value) || 1)}
+                        className="text-center w-full"
+                      />
+                    </div>
+                  )}
+                </div>
               );
             })}
           </div>

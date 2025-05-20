@@ -29,7 +29,15 @@ const productSchema = z.object({
     .string()
     .min(1, { message: "Please upload a zip of your product" }),
   amenities: z.array(z.string()).optional(),
-  supportRequested: z.array(z.string()).optional(),
+  supportRequested: z.array(
+    z.union([
+      z.string(),
+      z.object({
+        id: z.string(),
+        hoursPerWeek: z.number().min(1).max(40)
+      })
+    ])
+  ).optional(),
 });
 
 const userSettingsSchema = z.object({

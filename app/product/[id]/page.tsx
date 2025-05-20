@@ -172,7 +172,9 @@ export default async function ProductPage({
             <div className="border-t border-gray-200 mt-6 pt-6">
               <h3 className="text-base font-medium mb-4">Support Requested</h3>
               <div className="grid grid-cols-2 gap-4">
-                {supportRequested.map((supportId: string) => {
+                {supportRequested.map((supportItem: any) => {
+                  const supportId = typeof supportItem === 'string' ? supportItem : supportItem.id;
+                  const hoursPerWeek = typeof supportItem === 'string' ? null : supportItem.hoursPerWeek;
                   const support = supportIcons[supportId];
                   if (!support) return null;
                   
@@ -182,7 +184,12 @@ export default async function ProductPage({
                       <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
                         <Icon size={16} className="text-slate-600" />
                       </div>
-                      <span className="text-sm">{support.label}</span>
+                      <div>
+                        <span className="text-sm">{support.label}</span>
+                        {hoursPerWeek && (
+                          <span className="block text-xs text-muted-foreground">{hoursPerWeek} hours/week</span>
+                        )}
+                      </div>
                     </div>
                   );
                 })}

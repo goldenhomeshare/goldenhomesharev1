@@ -1,4 +1,4 @@
-import { DoorClosedLocked, HousePlusIcon, PartyPopper, Users } from "lucide-react";
+import { DoorClosedLocked, HousePlusIcon, Warehouse, Users } from "lucide-react";
 import { ReactNode } from "react";
 
 interface iAppProps {
@@ -12,8 +12,8 @@ export const categoryItems: iAppProps[] = [
   {
     id: 0,
     name: "template",
-    title: "Housemate",
-    image: <Users />,
+    title: "Homeowner with Private Suite",
+    image: <HousePlusIcon />,
   },
   {
     id: 1,
@@ -25,6 +25,6 @@ export const categoryItems: iAppProps[] = [
     id: 2,
     name: "icon",
     title: "Homeowner with ADU",
-    image: <HousePlusIcon />,
+    image: <Warehouse />,
   },
 ];

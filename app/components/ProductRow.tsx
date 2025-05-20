@@ -69,7 +69,7 @@ async function getData({ category }: iAppProps) {
       });
 
       return {
-        title: "Housemates",
+        title: "Private Suites",
         data: data,
         link: "/products/template",
       };

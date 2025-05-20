@@ -12,7 +12,7 @@ export const navbarLinks = [
     },
     {
         id: 1,
-        name: "Housemates",
+        name: "Private Suites",
         href: "/products/template"
     },
     {

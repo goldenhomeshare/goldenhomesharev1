@@ -20,7 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { TipTapEditor } from "../Editor";
 import { UploadDropzone } from "@/app/lib/uploadthing";
 import { Submitbutton } from "../SubmitButtons";
-import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen } from "lucide-react";
+import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase } from "lucide-react";
 
 export function SellForm() {
   const initalState: State = { message: "", status: undefined };
@@ -39,6 +39,10 @@ export function SellForm() {
     { id: "heating", label: "Heating", icon: Sun },
     { id: "privateBathroom", label: "Private Bathroom", icon: Bath },
     { id: "privateEntrance", label: "Private Entrance", icon: DoorOpen },
+    { id: "laundry", label: "Laundry Access", icon: WashingMachine },
+    { id: "patio", label: "Patio/Balcony", icon: Home },
+    { id: "furnished", label: "Furnished Room", icon: Armchair },
+    { id: "workspace", label: "Desk/Workspace", icon: Briefcase },
   ];
 
   const toggleAmenity = (amenityId: string) => {

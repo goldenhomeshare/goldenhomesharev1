@@ -2,7 +2,7 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { ZodStringDef, z } from "zod";
 import prisma from "./lib/db";
-import { type CategoryTypes } from "@prisma/client";
+import { CategoryTypes } from "@prisma/client";
 import { stripe } from "./lib/stripe";
 import { redirect } from "next/navigation";
 
@@ -83,7 +83,6 @@ export async function SellProduct(prevState: any, formData: FormData) {
       images: validateFields.data.images,
       productFile: validateFields.data.productFile,
       description: JSON.parse(validateFields.data.description),
-      amenities: validateFields.data.amenities,
       User: {
         connect: {
           id: user.id
@@ -91,6 +90,11 @@ export async function SellProduct(prevState: any, formData: FormData) {
       }
     },
   });
+
+  // If we have amenities, update the product to add them
+  if (validateFields.data.amenities && validateFields.data.amenities.length > 0) {
+    await prisma.$executeRaw`UPDATE "Product" SET amenities = ${JSON.stringify(validateFields.data.amenities)}::jsonb WHERE id = ${data.id}`;
+  }
 
   return redirect(`/product/${data.id}`);
 }

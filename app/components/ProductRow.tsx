@@ -28,7 +28,7 @@ async function getData({ category }: iAppProps) {
 
       return {
         data: data,
-        title: "Private Rooms",
+        title: "ADUs",
         link: "/products/icon",
       };
     }
@@ -90,7 +90,7 @@ async function getData({ category }: iAppProps) {
       });
 
       return {
-        title: "Housemates",
+        title: "Private Rooms",
         data: data,
         link: "/products/uikit",
       };

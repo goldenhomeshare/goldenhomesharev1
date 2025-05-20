@@ -20,6 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { TipTapEditor } from "../Editor";
 import { UploadDropzone } from "@/app/lib/uploadthing";
 import { Submitbutton } from "../SubmitButtons";
+import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen } from "lucide-react";
 
 export function SellForm() {
   const initalState: State = { message: "", status: undefined };
@@ -27,6 +28,26 @@ export function SellForm() {
   const [json, setJson] = useState<null | JSONContent>(null);
   const [images, setImages] = useState<null | string[]>(null);
   const [productFile, SetProductFile] = useState<null | string>(null);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+
+  const amenities = [
+    { id: "parking", label: "Parking", icon: Car },
+    { id: "wifi", label: "WiFi", icon: Wifi },
+    { id: "kitchen", label: "Kitchen Access", icon: Utensils },
+    { id: "tv", label: "TV", icon: Tv },
+    { id: "ac", label: "Air Conditioning", icon: Snowflake },
+    { id: "heating", label: "Heating", icon: Sun },
+    { id: "privateBathroom", label: "Private Bathroom", icon: Bath },
+    { id: "privateEntrance", label: "Private Entrance", icon: DoorOpen },
+  ];
+
+  const toggleAmenity = (amenityId: string) => {
+    setSelectedAmenities(prev => 
+      prev.includes(amenityId)
+        ? prev.filter(id => id !== amenityId)
+        : [...prev, amenityId]
+    );
+  };
 
   useEffect(() => {
     if (state.status === "success") {
@@ -85,7 +106,7 @@ export function SellForm() {
           <Label>Small Summary</Label>
           <Textarea
             name="smallDescription"
-            placeholder="Please describe your product shortly right here..."
+            placeholder="Please describe your listing shortly right here (e.g., Cozy 1 bedroom, close to public transport, etc.)..."
             required
             minLength={10}
           />
@@ -94,6 +115,32 @@ export function SellForm() {
               {state?.errors?.["smallDescription"]?.[0]}
             </p>
           )}
+        </div>
+
+        <div className="flex flex-col gap-y-2">
+          <input type="hidden" name="amenities" value={JSON.stringify(selectedAmenities)} />
+          <Label>Amenities</Label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {amenities.map((amenity) => {
+              const Icon = amenity.icon;
+              return (
+                <label key={amenity.id} className="cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={selectedAmenities.includes(amenity.id)}
+                    onChange={() => toggleAmenity(amenity.id)}
+                  />
+                  <div className="flex flex-col items-center p-4 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 h-full">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 mb-3 flex items-center justify-center">
+                      <Icon size={24} className="text-slate-600" />
+                    </div>
+                    <span className="font-medium text-center">{amenity.label}</span>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
         </div>
 
         <div className="flex flex-col gap-y-2">
@@ -150,7 +197,7 @@ export function SellForm() {
         </div>
       </CardContent>
       <CardFooter className="mt-5">
-        <Submitbutton title="Create your Product" />
+        <Submitbutton title="Submit your listing" />
       </CardFooter>
     </form>
   );

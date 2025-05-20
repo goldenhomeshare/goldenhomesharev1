@@ -14,6 +14,18 @@ import {
 } from "@/components/ui/carousel";
 import { JSONContent } from "@tiptap/react";
 import Image from "next/image";
+import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen } from "lucide-react";
+
+const amenityIcons: Record<string, any> = {
+  parking: { icon: Car, label: "Parking" },
+  wifi: { icon: Wifi, label: "WiFi" },
+  kitchen: { icon: Utensils, label: "Kitchen Access" },
+  tv: { icon: Tv, label: "TV" },
+  ac: { icon: Snowflake, label: "Air Conditioning" },
+  heating: { icon: Sun, label: "Heating" },
+  privateBathroom: { icon: Bath, label: "Private Bathroom" },
+  privateEntrance: { icon: DoorOpen, label: "Private Entrance" },
+};
 
 async function getData(id: string) {
   const data = await prisma.product.findUnique({
@@ -29,6 +41,7 @@ async function getData(id: string) {
       price: true,
       createdAt: true,
       id: true,
+      amenities: true,
       User: {
         select: {
           profileImage: true,
@@ -47,6 +60,10 @@ export default async function ProductPage({
 }) {
   noStore();
   const data = await getData(params.id);
+  
+  // Extract amenities or use empty array if not available
+  const amenities = (data?.amenities as string[] | null) || [];
+  
   return (
     <section className="mx-auto px-4  lg:mt-10 max-w-7xl lg:px-8 lg:grid lg:grid-rows-1 lg:grid-cols-7 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
       <Carousel className=" lg:row-end-1 lg:col-span-4">
@@ -97,6 +114,30 @@ export default async function ProductPage({
             <h3 className="text-sm font-medium col-span-1">{data?.category}</h3>
           </div>
         </div>
+
+        {amenities.length > 0 && (
+          <>
+            <div className="border-t border-gray-200 mt-6 pt-6">
+              <h3 className="text-base font-medium mb-4">Amenities</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {amenities.map((amenityId) => {
+                  const amenity = amenityIcons[amenityId];
+                  if (!amenity) return null;
+                  
+                  const Icon = amenity.icon;
+                  return (
+                    <div key={amenityId} className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                        <Icon size={16} className="text-slate-600" />
+                      </div>
+                      <span className="text-sm">{amenity.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="border-t border-gray-200 mt-10"></div>
       </div>

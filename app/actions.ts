@@ -28,6 +28,7 @@ const productSchema = z.object({
   productFile: z
     .string()
     .min(1, { message: "Please upload a zip of your product" }),
+  amenities: z.array(z.string()).optional(),
 });
 
 const userSettingsSchema = z.object({
@@ -60,6 +61,7 @@ export async function SellProduct(prevState: any, formData: FormData) {
     description: formData.get("description"),
     images: JSON.parse(formData.get("images") as string),
     productFile: formData.get("productFile"),
+    amenities: formData.get("amenities") ? JSON.parse(formData.get("amenities") as string) : [],
   });
 
   if (!validateFields.success) {
@@ -80,8 +82,13 @@ export async function SellProduct(prevState: any, formData: FormData) {
       price: validateFields.data.price,
       images: validateFields.data.images,
       productFile: validateFields.data.productFile,
-      userId: user.id,
       description: JSON.parse(validateFields.data.description),
+      amenities: validateFields.data.amenities,
+      User: {
+        connect: {
+          id: user.id
+        }
+      }
     },
   });
 

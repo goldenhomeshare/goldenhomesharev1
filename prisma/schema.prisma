@@ -29,6 +29,7 @@ model Product {
   images           String[]
   productFile      String
   category         CategoryTypes
+  amenities        Json?         // Array of selected amenities
 
   createdAt DateTime @default(now())
   User      User?    @relation(fields: [userId], references: [id])

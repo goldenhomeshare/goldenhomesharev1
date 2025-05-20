@@ -33,7 +33,7 @@ export function BuyButton({ price }: { price: number }) {
         </Button>
       ) : (
         <Button type="submit" size="lg" className="w-full mt-10">
-          Buy for ${price}
+          Process Rent Payment for ${price}
         </Button>
       )}
     </>

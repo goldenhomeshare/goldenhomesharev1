@@ -20,7 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { TipTapEditor } from "../Editor";
 import { UploadDropzone } from "@/app/lib/uploadthing";
 import { Submitbutton } from "../SubmitButtons";
-import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield } from "lucide-react";
+import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, Clock, VolumeX, Cigarette, CigaretteOff, Wine, GlassWater, Users, UserMinus } from "lucide-react";
 
 export function SellForm() {
   const initalState: State = { message: "", status: undefined };
@@ -30,6 +30,7 @@ export function SellForm() {
   const [productFile, SetProductFile] = useState<null | string>(null);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [selectedSupport, setSelectedSupport] = useState<Array<{id: string, hoursPerWeek: number}>>([]);
+  const [selectedHouseRules, setSelectedHouseRules] = useState<Array<{id: string, value?: string}>>([]);
 
   const amenities = [
     { id: "parking", label: "Parking", icon: Car },
@@ -57,6 +58,17 @@ export function SellForm() {
     { id: "homeSecurity", label: "Home Security", icon: Shield },
   ];
 
+  const houseRulesOptions = [
+    { id: "quietHours", label: "Quiet Hours", icon: Clock, hasValue: true, defaultValue: "10 PM - 7 AM" },
+    { id: "noLoudMusic", label: "No Loud Music", icon: VolumeX },
+    { id: "noSmoking", label: "No Smoking", icon: CigaretteOff },
+    { id: "smokingAllowed", label: "Smoking Allowed", icon: Cigarette },
+    { id: "noAlcohol", label: "No Alcohol", icon: Wine },
+    { id: "cleanUpAfterSelf", label: "Clean Up After Self", icon: Sparkles },
+    { id: "noOvernight", label: "No Overnight Guests", icon: UserMinus },
+    { id: "guestsAllowed", label: "Guests Allowed", icon: Users },
+  ];
+
   const toggleAmenity = (amenityId: string) => {
     setSelectedAmenities(prev => 
       prev.includes(amenityId)
@@ -70,6 +82,29 @@ export function SellForm() {
       prev.some(item => item.id === supportId)
         ? prev.filter(item => item.id !== supportId)
         : [...prev, { id: supportId, hoursPerWeek: 1 }]
+    );
+  };
+
+  const toggleHouseRule = (ruleId: string, defaultValue?: string) => {
+    setSelectedHouseRules(prev => {
+      const isSelected = prev.some(rule => rule.id === ruleId);
+      if (isSelected) {
+        return prev.filter(rule => rule.id !== ruleId);
+      } else {
+        const newRule: {id: string, value?: string} = { id: ruleId };
+        if (defaultValue) {
+          newRule.value = defaultValue;
+        }
+        return [...prev, newRule];
+      }
+    });
+  };
+
+  const updateHouseRuleValue = (ruleId: string, value: string) => {
+    setSelectedHouseRules(prev =>
+      prev.map(rule =>
+        rule.id === ruleId ? { ...rule, value } : rule
+      )
     );
   };
 
@@ -212,6 +247,50 @@ export function SellForm() {
                         max={40}
                         value={selectedItem?.hoursPerWeek || 1}
                         onChange={(e) => updateSupportHours(support.id, parseInt(e.target.value) || 1)}
+                        className="text-center w-full"
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-y-2">
+          <input type="hidden" name="houseRules" value={JSON.stringify(selectedHouseRules)} />
+          <Label>House Rules</Label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {houseRulesOptions.map((ruleOpt) => {
+              const Icon = ruleOpt.icon;
+              const isSelected = selectedHouseRules.some(r => r.id === ruleOpt.id);
+              const selectedRule = selectedHouseRules.find(r => r.id === ruleOpt.id);
+
+              return (
+                <div key={ruleOpt.id} className="flex flex-col">
+                  <label className="cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={isSelected}
+                      onChange={() => toggleHouseRule(ruleOpt.id, ruleOpt.hasValue ? ruleOpt.defaultValue : undefined)}
+                    />
+                    <div className="flex flex-col items-center p-4 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 h-full">
+                      <div className="w-12 h-12 rounded-full bg-slate-100 mb-3 flex items-center justify-center">
+                        <Icon size={24} className="text-slate-600" />
+                      </div>
+                      <span className="font-medium text-center">{ruleOpt.label}</span>
+                    </div>
+                  </label>
+                  {isSelected && ruleOpt.hasValue && (
+                    <div className="mt-2 flex flex-col items-center">
+                      <Label htmlFor={`rule-${ruleOpt.id}-value`} className="text-xs mb-1">{ruleOpt.label} Details</Label>
+                      <Input
+                        id={`rule-${ruleOpt.id}-value`}
+                        type="text"
+                        value={selectedRule?.value || ""}
+                        onChange={(e) => updateHouseRuleValue(ruleOpt.id, e.target.value)}
+                        placeholder={ruleOpt.defaultValue}
                         className="text-center w-full"
                       />
                     </div>

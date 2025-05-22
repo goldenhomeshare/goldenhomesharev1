@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/carousel";
 import { JSONContent } from "@tiptap/react";
 import Image from "next/image";
-import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield } from "lucide-react";
+import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, Clock, VolumeX, Cigarette, CigaretteOff, Wine, GlassWater, Users, UserMinus } from "lucide-react";
 
 const amenityIcons: Record<string, any> = {
   parking: { icon: Car, label: "Parking" },
@@ -40,6 +40,17 @@ const supportIcons: Record<string, any> = {
   petCare: { icon: Cat, label: "Pet Care" },
   techSupport: { icon: Wrench, label: "Tech Support" },
   homeSecurity: { icon: Shield, label: "Home Security" },
+};
+
+const houseRulesIcons: Record<string, any> = {
+  quietHours: { icon: Clock, label: "Quiet Hours" },
+  noLoudMusic: { icon: VolumeX, label: "No Loud Music" },
+  noSmoking: { icon: CigaretteOff, label: "No Smoking" },
+  smokingAllowed: { icon: Cigarette, label: "Smoking Allowed" },
+  noAlcohol: { icon: Wine, label: "No Alcohol" },
+  cleanUpAfterSelf: { icon: Sparkles, label: "Clean Up After Self" },
+  noOvernight: { icon: UserMinus, label: "No Overnight Guests" },
+  guestsAllowed: { icon: Users, label: "Guests Allowed" },
 };
 
 async function getData(id: string) {
@@ -73,7 +84,11 @@ async function getData(id: string) {
   const supportResult = await prisma.$queryRaw<[{supportRequested: string[]}]>`SELECT "supportRequested" FROM "Product" WHERE id = ${id}`;
   const supportRequested = supportResult?.[0]?.supportRequested || [];
   
-  return { ...productData, amenities, supportRequested };
+  // Get houseRules separately with a raw query
+  const rulesResult = await prisma.$queryRaw<[{houseRules: string[]}]>`SELECT "houseRules" FROM "Product" WHERE id = ${id}`;
+  const houseRules = rulesResult?.[0]?.houseRules || [];
+  
+  return { ...productData, amenities, supportRequested, houseRules };
 }
 
 export default async function ProductPage({
@@ -91,6 +106,7 @@ export default async function ProductPage({
   
   const amenities = data.amenities || [];
   const supportRequested = data.supportRequested || [];
+  const houseRules = data.houseRules || [];
   
   return (
     <section className="mx-auto px-4  lg:mt-10 max-w-7xl lg:px-8 lg:grid lg:grid-rows-1 lg:grid-cols-7 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
@@ -188,6 +204,37 @@ export default async function ProductPage({
                         <span className="text-sm">{support.label}</span>
                         {hoursPerWeek && (
                           <span className="block text-xs text-muted-foreground">{hoursPerWeek} hours/week</span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        )}
+
+        {houseRules.length > 0 && (
+          <>
+            <div className="border-t border-gray-200 mt-6 pt-6">
+              <h3 className="text-base font-medium mb-4">House Rules</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {houseRules.map((ruleItem: any) => {
+                  const ruleId = typeof ruleItem === 'string' ? ruleItem : ruleItem.id;
+                  const ruleValue = typeof ruleItem === 'string' ? null : ruleItem.value;
+                  const rule = houseRulesIcons[ruleId];
+                  if (!rule) return null;
+                  
+                  const Icon = rule.icon;
+                  return (
+                    <div key={ruleId} className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                        <Icon size={16} className="text-slate-600" />
+                      </div>
+                      <div>
+                        <span className="text-sm">{rule.label}</span>
+                        {ruleValue && (
+                          <span className="block text-xs text-muted-foreground">{ruleValue}</span>
                         )}
                       </div>
                     </div>

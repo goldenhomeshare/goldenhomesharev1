@@ -38,6 +38,12 @@ const productSchema = z.object({
       })
     ])
   ).optional(),
+  houseRules: z.array(
+    z.object({
+      id: z.string(),
+      value: z.string().optional(),
+    })
+  ).optional(),
 });
 
 const userSettingsSchema = z.object({
@@ -72,6 +78,7 @@ export async function SellProduct(prevState: any, formData: FormData) {
     productFile: formData.get("productFile"),
     amenities: formData.get("amenities") ? JSON.parse(formData.get("amenities") as string) : [],
     supportRequested: formData.get("supportRequested") ? JSON.parse(formData.get("supportRequested") as string) : [],
+    houseRules: formData.get("houseRules") ? JSON.parse(formData.get("houseRules") as string) : [],
   });
 
   if (!validateFields.success) {
@@ -84,32 +91,36 @@ export async function SellProduct(prevState: any, formData: FormData) {
     return state;
   }
 
-  const data = await prisma.product.create({
-    data: {
-      name: validateFields.data.name,
-      category: validateFields.data.category as CategoryTypes,
-      smallDescription: validateFields.data.smallDescription,
-      price: validateFields.data.price,
-      images: validateFields.data.images,
-      productFile: validateFields.data.productFile,
-      description: JSON.parse(validateFields.data.description),
-      User: {
-        connect: {
-          id: user.id
-        }
+  const productData: any = {
+    name: validateFields.data.name,
+    category: validateFields.data.category as CategoryTypes,
+    smallDescription: validateFields.data.smallDescription,
+    price: validateFields.data.price,
+    images: validateFields.data.images,
+    productFile: validateFields.data.productFile,
+    description: JSON.parse(validateFields.data.description),
+    User: {
+      connect: {
+        id: user.id
       }
-    },
-  });
+    }
+  };
 
-  // If we have amenities, update the product to add them
   if (validateFields.data.amenities && validateFields.data.amenities.length > 0) {
-    await prisma.$executeRaw`UPDATE "Product" SET amenities = ${JSON.stringify(validateFields.data.amenities)}::jsonb WHERE id = ${data.id}`;
+    productData.amenities = validateFields.data.amenities;
   }
 
-  // If we have supportRequested options, update the product to add them
   if (validateFields.data.supportRequested && validateFields.data.supportRequested.length > 0) {
-    await prisma.$executeRaw`UPDATE "Product" SET "supportRequested" = ${JSON.stringify(validateFields.data.supportRequested)}::jsonb WHERE id = ${data.id}`;
+    productData.supportRequested = validateFields.data.supportRequested;
   }
+
+  if (validateFields.data.houseRules && validateFields.data.houseRules.length > 0) {
+    productData.houseRules = validateFields.data.houseRules;
+  }
+
+  const data = await prisma.product.create({
+    data: productData,
+  });
 
   return redirect(`/product/${data.id}`);
 }

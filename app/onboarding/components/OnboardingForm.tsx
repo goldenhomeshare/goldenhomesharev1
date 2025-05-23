@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { completeOnboarding } from "../actions";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, Home, User } from "lucide-react";
 
 type UserType = "HOMEOWNER" | "HOUSEMATE" | "ADMIN";
 
@@ -49,17 +49,12 @@ export function OnboardingForm({ userId }: { userId: string }) {
           }`}
           onClick={() => setSelectedRole("HOMEOWNER")}
         >
-          <CardHeader>
+          <CardHeader className="flex flex-col items-center">
+            <Home className="w-10 h-10 text-primary mb-2" />
             <CardTitle className="text-center">I'm a Homeowner</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-center mb-4">I want to share my home with trusted housemates</p>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• List your property</li>
-              <li>• Screen potential housemates</li>
-              <li>• Earn rental income</li>
-              <li>• Build community</li>
-            </ul>
           </CardContent>
         </Card>
         
@@ -69,17 +64,12 @@ export function OnboardingForm({ userId }: { userId: string }) {
           }`}
           onClick={() => setSelectedRole("HOUSEMATE")}
         >
-          <CardHeader>
+          <CardHeader className="flex flex-col items-center">
+            <User className="w-10 h-10 text-primary mb-2" />
             <CardTitle className="text-center">I'm Looking for Housing</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-center mb-4">I want to find a welcoming home to share</p>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Browse verified listings</li>
-              <li>• Connect with homeowners</li>
-              <li>• Find affordable housing</li>
-              <li>• Join a community</li>
-            </ul>
           </CardContent>
         </Card>
       </div>

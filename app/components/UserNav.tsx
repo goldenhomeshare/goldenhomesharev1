@@ -16,9 +16,36 @@ interface iAppProps {
   email: string;
   name: string;
   userImage: string | undefined;
+  userType?: "HOMEOWNER" | "HOUSEMATE" | "ADMIN" | null;
 }
 
-export function UserNav({ email, name, userImage }: iAppProps) {
+export function UserNav({ email, name, userImage, userType }: iAppProps) {
+  const getDashboardLink = () => {
+    switch (userType) {
+      case "HOMEOWNER":
+        return "/homeowner/dashboard";
+      case "HOUSEMATE":
+        return "/housemate/dashboard";
+      case "ADMIN":
+        return "/admin/dashboard";
+      default:
+        return "/onboarding";
+    }
+  };
+
+  const getDashboardLabel = () => {
+    switch (userType) {
+      case "HOMEOWNER":
+        return "Homeowner Dashboard";
+      case "HOUSEMATE":
+        return "Housemate Dashboard";
+      case "ADMIN":
+        return "Admin Dashboard";
+      default:
+        return "Complete Setup";
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -40,6 +67,9 @@ export function UserNav({ email, name, userImage }: iAppProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link href={getDashboardLink()}>{getDashboardLabel()}</Link>
+          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/sell">Make a Listing</Link>
           </DropdownMenuItem>

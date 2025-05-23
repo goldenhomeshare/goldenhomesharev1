@@ -1,6 +1,7 @@
 import { BuyProduct } from "@/app/actions";
 import { ProductDescription } from "@/app/components/ProductDescription";
 import { BuyButton } from "@/app/components/SubmitButtons";
+import { HomeownerProfileCard } from "@/app/components/HomeownerProfileCard";
 import prisma from "@/app/lib/db";
 import { Button } from "@/components/ui/button";
 import { unstable_noStore as noStore } from "next/cache";
@@ -83,12 +84,33 @@ async function getData(id: string) {
       id: true,
       User: {
         select: {
+          id: true,
           profileImage: true,
           firstName: true,
+          lastName: true,
         },
       },
     },
   });
+
+  // Get homeowner profile separately
+  let homeownerProfile = null;
+  if (productData?.User?.id) {
+    const profileResult = await prisma.$queryRaw<[{
+      profilePicture: string | null;
+      bio: string | null;
+      gender: string | null;
+      ageRange: string | null;
+      schedule: string | null;
+      socialPreference: string | null;
+      hobbies: any | null;
+    }]>`
+      SELECT "profilePicture", bio, gender, "ageRange", schedule, "socialPreference", hobbies 
+      FROM "HomeownerProfile" 
+      WHERE "userId" = ${productData.User.id}
+    `;
+    homeownerProfile = profileResult?.[0] || null;
+  }
   
   // Get amenities separately with a raw query
   const amenitiesResult = await prisma.$queryRaw<[{amenities: string[]}]>`SELECT amenities FROM "Product" WHERE id = ${id}`;
@@ -102,7 +124,16 @@ async function getData(id: string) {
   const rulesResult = await prisma.$queryRaw<[{houseRules: string[]}]>`SELECT "houseRules" FROM "Product" WHERE id = ${id}`;
   const houseRules = rulesResult?.[0]?.houseRules || [];
   
-  return { ...productData, amenities, supportRequested, houseRules };
+  return { 
+    ...productData, 
+    User: productData?.User ? {
+      ...productData.User,
+      homeownerProfile,
+    } : null,
+    amenities, 
+    supportRequested, 
+    houseRules 
+  };
 }
 
 export default async function ProductPage({
@@ -271,6 +302,17 @@ export default async function ProductPage({
 
       <div className="w-full max-w-2xl mx-auto mt-16 lg:max-w-none lg:mt-0 lg:col-span-4">
         <ProductDescription content={data.description as JSONContent} />
+        
+        {data.User && (
+          <HomeownerProfileCard 
+            homeowner={{
+              firstName: data.User.firstName,
+              lastName: data.User.lastName,
+              profileImage: data.User.profileImage,
+              homeownerProfile: data.User.homeownerProfile,
+            }}
+          />
+        )}
       </div>
     </section>
   );

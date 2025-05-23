@@ -16,8 +16,99 @@ model User {
   profileImage          String
   connectedAccountId    String  @unique
   stripeConnectedLinked Boolean @default(false)
+  userType              UserType? // New field - nullable initially for existing users
+  isVerified            Boolean @default(false)
+  onboardingCompleted   Boolean @default(false)
+
+  // Profile extensions
+  homeownerProfile      HomeownerProfile?
+  housemateProfile      HousemateProfile?
 
   Product Product[]
+  Applications Application[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserType {
+  HOMEOWNER
+  HOUSEMATE
+  ADMIN
+}
+
+// Homeowner-specific profile
+model HomeownerProfile {
+  id                String @id @default(uuid())
+  userId            String @unique
+  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  profilePicture    String? // URL to uploaded profile picture
+  propertyCount     Int    @default(0)
+  averageRating     Float? 
+  bio               String?
+  emergencyContact  Json?  // Contact details for emergencies
+  backgroundCheck   Boolean @default(false)
+  
+  // New profile fields
+  gender            String? // Male, Female, Other
+  ageRange          String? // 18–24, 25–34, 35–44, 45–54, 55–64, 65+
+  schedule          String? // Early Riser, Night Owl, Flexible
+  socialPreference  String? // Social, Independent, Balanced
+  hobbies           Json?   // Array of selected hobbies
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Housemate-specific profile  
+model HousemateProfile {
+  id                String @id @default(uuid())
+  userId            String @unique
+  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  profilePicture    String? // URL to uploaded profile picture
+  age               Int?
+  occupation        String?
+  bio               String?
+  lifestyle         Json?  // Preferences, habits, etc.
+  references        Json?  // Previous landlord/housemate references
+  budgetRange       Json?  // Min/max budget
+  backgroundCheck   Boolean @default(false)
+  
+  // New profile fields
+  gender            String? // Male, Female, Other
+  ageRange          String? // 18–24, 25–34, 35–44, 45–54, 55–64, 65+
+  schedule          String? // Early Riser, Night Owl, Flexible
+  socialPreference  String? // Social, Independent, Balanced
+  hobbies           Json?   // Array of selected hobbies
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Applications from housemates to homeowners
+model Application {
+  id              String @id @default(uuid())
+  housemateId     String
+  housemate       User   @relation(fields: [housemateId], references: [id])
+  productId       String
+  product         Product @relation(fields: [productId], references: [id])
+  
+  status          ApplicationStatus @default(PENDING)
+  message         String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([housemateId, productId])
+}
+
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  WITHDRAWN
 }
 
 model Product {
@@ -36,6 +127,9 @@ model Product {
   createdAt DateTime @default(now())
   User      User?    @relation(fields: [userId], references: [id])
   userId    String?
+  
+  // New field for applications
+  applications    Application[]
 }
 
 enum CategoryTypes {

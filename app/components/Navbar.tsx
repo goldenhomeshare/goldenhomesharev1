@@ -5,11 +5,14 @@ import { MobileMenu } from "./MobileMenu";
 import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { UserNav } from "./UserNav";
+import { getCurrentUser } from "@/lib/auth";
 
 
 export async function Navbar() {
     const {getUser} = getKindeServerSession()
-    const user = await getUser(); 
+    const kindeUser = await getUser(); 
+    const user = await getCurrentUser();
+    
     return (
         <nav className="relative max-w-7xl w-full flex md:grid md:grid-cols-12 items-center px-4 md:px-8 mx-auto py-7">
             <div className="md:col-span-3">
@@ -24,14 +27,14 @@ export async function Navbar() {
         <NavbarLinks />
 
         <div className="flex items-center gap-x-2 ms-auto md:col-span-3">
-        {user ? (
+        {kindeUser ? (
           <UserNav
-            email={user.email as string}
-            name={user.given_name as string}
+            email={kindeUser.email as string}
+            name={kindeUser.given_name as string}
             userImage={
-              user.picture ?? `https://avatar.vercel.sh/${user.given_name}`
+              kindeUser.picture ?? `https://avatar.vercel.sh/${kindeUser.given_name}`
             }
-
+            userType={(user as any)?.userType || null}
                      />
             ) : (
                 <div className="flex items-center gap-x-2">

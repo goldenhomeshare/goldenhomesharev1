@@ -59,14 +59,43 @@ export function SellForm() {
   ];
 
   const houseRulesOptions = [
-    { id: "quietHours", label: "Quiet Hours", icon: Clock, hasValue: true, defaultValue: "10 PM - 7 AM" },
-    { id: "noLoudMusic", label: "No Loud Music", icon: VolumeX },
-    { id: "noSmoking", label: "No Smoking", icon: CigaretteOff },
-    { id: "smokingAllowed", label: "Smoking Allowed", icon: Cigarette },
-    { id: "noAlcohol", label: "No Alcohol", icon: Wine },
-    { id: "cleanUpAfterSelf", label: "Clean Up After Self", icon: Sparkles },
-    { id: "noOvernight", label: "No Overnight Guests", icon: UserMinus },
-    { id: "guestsAllowed", label: "Guests Allowed", icon: Users },
+    { 
+      id: "guestPolicy", 
+      label: "Guest Policy", 
+      icon: Users, 
+      options: [
+        { value: "dayNightApproval", label: "Day and night with approval" },
+        { value: "dayOnly", label: "Day only" },
+        { value: "no", label: "No" }
+      ]
+    },
+    { 
+      id: "smokingPolicy", 
+      label: "Smoking Policy", 
+      icon: CigaretteOff, 
+      options: [
+        { value: "yes", label: "Yes" },
+        { value: "no", label: "No" },
+        { value: "designatedAreas", label: "Designated areas" }
+      ]
+    },
+    { 
+      id: "petPolicy", 
+      label: "Pet Policy", 
+      icon: Cat, 
+      options: [
+        { value: "yes", label: "Yes" },
+        { value: "no", label: "No" },
+        { value: "discussionRequired", label: "Discussion required" }
+      ]
+    },
+    { 
+      id: "quietHours", 
+      label: "Quiet Hours", 
+      icon: Clock, 
+      hasCustomInput: true, 
+      defaultValue: "10 PM - 7 AM" 
+    },
   ];
 
   const toggleAmenity = (amenityId: string) => {
@@ -85,15 +114,27 @@ export function SellForm() {
     );
   };
 
-  const toggleHouseRule = (ruleId: string, defaultValue?: string) => {
+  const toggleHouseRule = (ruleId: string, value?: string) => {
     setSelectedHouseRules(prev => {
-      const isSelected = prev.some(rule => rule.id === ruleId);
-      if (isSelected) {
-        return prev.filter(rule => rule.id !== ruleId);
+      const existingIndex = prev.findIndex(rule => rule.id === ruleId);
+      if (existingIndex >= 0) {
+        if (value) {
+          // Update existing rule
+          return prev.map(rule => 
+            rule.id === ruleId ? { ...rule, value } : rule
+          );
+        } else {
+          // Remove rule
+          return prev.filter(rule => rule.id !== ruleId);
+        }
       } else {
+        // Add new rule
+        const rule = houseRulesOptions.find(opt => opt.id === ruleId);
         const newRule: {id: string, value?: string} = { id: ruleId };
-        if (defaultValue) {
-          newRule.value = defaultValue;
+        if (value) {
+          newRule.value = value;
+        } else if (rule?.hasCustomInput && rule?.defaultValue) {
+          newRule.value = rule.defaultValue;
         }
         return [...prev, newRule];
       }
@@ -260,41 +301,66 @@ export function SellForm() {
         <div className="flex flex-col gap-y-2">
           <input type="hidden" name="houseRules" value={JSON.stringify(selectedHouseRules)} />
           <Label>House Rules</Label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {houseRulesOptions.map((ruleOpt) => {
               const Icon = ruleOpt.icon;
-              const isSelected = selectedHouseRules.some(r => r.id === ruleOpt.id);
               const selectedRule = selectedHouseRules.find(r => r.id === ruleOpt.id);
+              const isSelected = !!selectedRule;
 
               return (
-                <div key={ruleOpt.id} className="flex flex-col">
-                  <label className="cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={isSelected}
-                      onChange={() => toggleHouseRule(ruleOpt.id, ruleOpt.hasValue ? ruleOpt.defaultValue : undefined)}
-                    />
-                    <div className="flex flex-col items-center p-4 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 h-full">
-                      <div className="w-12 h-12 rounded-full bg-slate-100 mb-3 flex items-center justify-center">
-                        <Icon size={24} className="text-slate-600" />
-                      </div>
-                      <span className="font-medium text-center">{ruleOpt.label}</span>
+                <div key={ruleOpt.id} className="flex flex-col space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
+                      <Icon size={20} className="text-slate-600" />
                     </div>
-                  </label>
-                  {isSelected && ruleOpt.hasValue && (
-                    <div className="mt-2 flex flex-col items-center">
-                      <Label htmlFor={`rule-${ruleOpt.id}-value`} className="text-xs mb-1">{ruleOpt.label} Details</Label>
-                      <Input
-                        id={`rule-${ruleOpt.id}-value`}
-                        type="text"
-                        value={selectedRule?.value || ""}
-                        onChange={(e) => updateHouseRuleValue(ruleOpt.id, e.target.value)}
-                        placeholder={ruleOpt.defaultValue}
-                        className="text-center w-full"
+                    <Label className="font-medium">{ruleOpt.label}</Label>
+                  </div>
+                  
+                  {ruleOpt.options ? (
+                    <select
+                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
+                      value={selectedRule?.value || ""}
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          toggleHouseRule(ruleOpt.id, e.target.value);
+                        } else {
+                          toggleHouseRule(ruleOpt.id);
+                        }
+                      }}
+                    >
+                      <option value="">Select an option</option>
+                      {ruleOpt.options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : ruleOpt.hasCustomInput ? (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => {
+                          if (isSelected) {
+                            toggleHouseRule(ruleOpt.id);
+                          } else {
+                            toggleHouseRule(ruleOpt.id, ruleOpt.defaultValue);
+                          }
+                        }}
+                        className="rounded border-gray-300 text-primary focus:ring-primary"
                       />
+                      <span className="text-sm">Enable quiet hours</span>
+                      {isSelected && (
+                        <Input
+                          type="text"
+                          value={selectedRule?.value || ""}
+                          onChange={(e) => updateHouseRuleValue(ruleOpt.id, e.target.value)}
+                          placeholder={ruleOpt.defaultValue}
+                          className="flex-1"
+                        />
+                      )}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               );
             })}

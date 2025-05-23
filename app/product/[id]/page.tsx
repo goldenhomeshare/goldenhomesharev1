@@ -43,14 +43,28 @@ const supportIcons: Record<string, any> = {
 };
 
 const houseRulesIcons: Record<string, any> = {
+  guestPolicy: { icon: Users, label: "Guest Policy" },
+  smokingPolicy: { icon: CigaretteOff, label: "Smoking Policy" },
+  petPolicy: { icon: Cat, label: "Pet Policy" },
   quietHours: { icon: Clock, label: "Quiet Hours" },
-  noLoudMusic: { icon: VolumeX, label: "No Loud Music" },
-  noSmoking: { icon: CigaretteOff, label: "No Smoking" },
-  smokingAllowed: { icon: Cigarette, label: "Smoking Allowed" },
-  noAlcohol: { icon: Wine, label: "No Alcohol" },
-  cleanUpAfterSelf: { icon: Sparkles, label: "Clean Up After Self" },
-  noOvernight: { icon: UserMinus, label: "No Overnight Guests" },
-  guestsAllowed: { icon: Users, label: "Guests Allowed" },
+};
+
+const houseRulesValueLabels: Record<string, Record<string, string>> = {
+  guestPolicy: {
+    dayNightApproval: "Day and night with approval",
+    dayOnly: "Day only",
+    no: "No"
+  },
+  smokingPolicy: {
+    yes: "Yes",
+    no: "No",
+    designatedAreas: "Designated areas"
+  },
+  petPolicy: {
+    yes: "Yes",
+    no: "No",
+    discussionRequired: "Discussion required"
+  }
 };
 
 async function getData(id: string) {
@@ -218,7 +232,7 @@ export default async function ProductPage({
           <>
             <div className="border-t border-gray-200 mt-6 pt-6">
               <h3 className="text-base font-medium mb-4">House Rules</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 {houseRules.map((ruleItem: any) => {
                   const ruleId = typeof ruleItem === 'string' ? ruleItem : ruleItem.id;
                   const ruleValue = typeof ruleItem === 'string' ? null : ruleItem.value;
@@ -226,15 +240,22 @@ export default async function ProductPage({
                   if (!rule) return null;
                   
                   const Icon = rule.icon;
+                  let displayValue = ruleValue;
+                  
+                  // Get human-readable label for dropdown values
+                  if (ruleValue && houseRulesValueLabels[ruleId] && houseRulesValueLabels[ruleId][ruleValue]) {
+                    displayValue = houseRulesValueLabels[ruleId][ruleValue];
+                  }
+                  
                   return (
-                    <div key={ruleId} className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    <div key={ruleId} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
                         <Icon size={16} className="text-slate-600" />
                       </div>
-                      <div>
-                        <span className="text-sm">{rule.label}</span>
-                        {ruleValue && (
-                          <span className="block text-xs text-muted-foreground">{ruleValue}</span>
+                      <div className="flex-1">
+                        <span className="text-sm font-medium">{rule.label}</span>
+                        {displayValue && (
+                          <span className="block text-sm text-muted-foreground">{displayValue}</span>
                         )}
                       </div>
                     </div>

@@ -2,9 +2,11 @@ import { BuyProduct } from "@/app/actions";
 import { ProductDescription } from "@/app/components/ProductDescription";
 import { BuyButton } from "@/app/components/SubmitButtons";
 import { HomeownerProfileCard } from "@/app/components/HomeownerProfileCard";
+import { MessageHostButton } from "@/app/components/chat/MessageHostButton";
 import prisma from "@/app/lib/db";
 import { Button } from "@/components/ui/button";
 import { unstable_noStore as noStore } from "next/cache";
+import { getCurrentUser } from "@/lib/auth";
 
 import {
   Carousel,
@@ -143,6 +145,7 @@ export default async function ProductPage({
 }) {
   noStore();
   const data = await getData(params.id);
+  const currentUser = await getCurrentUser();
   
   // Safety check to ensure data exists
   if (!data) {
@@ -152,6 +155,11 @@ export default async function ProductPage({
   const amenities = data.amenities || [];
   const supportRequested = data.supportRequested || [];
   const houseRules = data.houseRules || [];
+  
+  // Check if current user is a housemate and not the owner of this listing
+  const canMessageHost = currentUser && 
+    (currentUser as any).userType === "HOUSEMATE" && 
+    currentUser.id !== data.User?.id;
   
   return (
     <section className="mx-auto px-4  lg:mt-10 max-w-7xl lg:px-8 lg:grid lg:grid-rows-1 lg:grid-cols-7 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
@@ -184,6 +192,15 @@ export default async function ProductPage({
           <input type="hidden" name="id" value={data.id} />
           <BuyButton price={data.price as number} />
         </form>
+
+        {canMessageHost && data.User && data.User.firstName && data.User.lastName && (
+          <MessageHostButton
+            productId={data.id}
+            hostId={data.User.id}
+            hostName={`${data.User.firstName as string} ${data.User.lastName as string}`}
+            productName={data.name}
+          />
+        )}
 
         <div className="border-t border-gray-200 mt-10 pt-10">
           <div className="grid grid-cols-2 w-full gap-y-3">

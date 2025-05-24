@@ -26,6 +26,11 @@ model User {
 
   Product Product[]
   Applications Application[]
+  
+  // Chat relations
+  homeownerChats        ChatRoom[] @relation("HomeownerChats")
+  housemateChats        ChatRoom[] @relation("HousemateChats")
+  sentMessages          Message[]  @relation("SentMessages")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -111,6 +116,40 @@ enum ApplicationStatus {
   WITHDRAWN
 }
 
+// Chat-related models for realtime messaging
+model ChatRoom {
+  id          String @id @default(uuid())
+  homeownerId String
+  housemateId String
+  productId   String
+  
+  homeowner   User    @relation("HomeownerChats", fields: [homeownerId], references: [id])
+  housemate   User    @relation("HousemateChats", fields: [housemateId], references: [id])
+  product     Product @relation(fields: [productId], references: [id])
+  
+  messages    Message[]
+  
+  lastMessageAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([homeownerId, housemateId, productId])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String
+  senderId   String
+  chatRoomId String
+  
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
 model Product {
   id               String        @id @default(uuid())
   name             String
@@ -130,6 +169,7 @@ model Product {
   
   // New field for applications
   applications    Application[]
+  chatRooms       ChatRoom[]
 }
 
 enum CategoryTypes {

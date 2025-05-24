@@ -85,6 +85,18 @@ export default async function HomeownerDashboardPage() {
 
         <Card>
           <CardHeader>
+            <CardTitle>Messages</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">Chat with potential housemates</p>
+            <Button asChild>
+              <Link href="/homeowner/messages">View Messages</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
             <CardTitle>Edit Profile</CardTitle>
           </CardHeader>
           <CardContent>

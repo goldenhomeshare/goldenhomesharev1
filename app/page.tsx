@@ -10,7 +10,7 @@ export default function Home() {
       <div className="relative w-full h-[500px] md:h-[600px] mb-6 overflow-hidden rounded-b-[120px] md:rounded-b-[144px]">
         {/* Background Image */}
         <Image 
-          src="/old-young-happy.jpg" 
+          src="/old-young-hero.jpg" 
           alt="Homeowner and homesharer together" 
           fill
           style={{ objectFit: "cover" }}

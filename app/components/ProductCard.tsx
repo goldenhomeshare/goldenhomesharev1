@@ -7,6 +7,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Edit } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,6 +17,7 @@ interface iAppProps {
   price: number;
   smallDescription: string;
   id: string;
+  showEditButton?: boolean;
 }
 
 export function ProductCard({
@@ -24,6 +26,7 @@ export function ProductCard({
   price,
   smallDescription,
   name,
+  showEditButton = false,
 }: iAppProps) {
   return (
     <div className="rounded-lg">
@@ -57,9 +60,22 @@ export function ProductCard({
         {smallDescription}
       </p>
 
-      <Button asChild className="w-full mt-5">
-        <Link href={`/product/${id}`}>Learn More!</Link>
-      </Button>
+      {showEditButton ? (
+        <div className="flex gap-2 mt-5">
+          <Button asChild className="flex-1">
+            <Link href={`/product/${id}`}>View Listing</Link>
+          </Button>
+          <Button asChild variant="outline" size="icon">
+            <Link href={`/sell/edit/${id}`}>
+              <Edit className="h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+      ) : (
+        <Button asChild className="w-full mt-5">
+          <Link href={`/product/${id}`}>Learn More!</Link>
+        </Button>
+      )}
     </div>
   );
 }

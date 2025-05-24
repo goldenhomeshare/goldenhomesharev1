@@ -125,6 +125,88 @@ export async function SellProduct(prevState: any, formData: FormData) {
   return redirect(`/product/${data.id}`);
 }
 
+export async function EditProduct(prevState: any, formData: FormData) {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error("Something went wrong");
+  }
+
+  const productId = formData.get("productId") as string;
+
+  if (!productId) {
+    throw new Error("Product ID is required");
+  }
+
+  // Check if user owns this product
+  const existingProduct = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { userId: true },
+  });
+
+  if (!existingProduct || existingProduct.userId !== user.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const validateFields = productSchema.safeParse({
+    name: formData.get("name"),
+    category: formData.get("category"),
+    price: Number(formData.get("price")),
+    smallDescription: formData.get("smallDescription"),
+    description: formData.get("description"),
+    images: JSON.parse(formData.get("images") as string),
+    productFile: formData.get("productFile"),
+    amenities: formData.get("amenities") ? JSON.parse(formData.get("amenities") as string) : [],
+    supportRequested: formData.get("supportRequested") ? JSON.parse(formData.get("supportRequested") as string) : [],
+    houseRules: formData.get("houseRules") ? JSON.parse(formData.get("houseRules") as string) : [],
+  });
+
+  if (!validateFields.success) {
+    const state: State = {
+      status: "error",
+      errors: validateFields.error.flatten().fieldErrors,
+      message: "Oops, I think there is a mistake with your inputs.",
+    };
+
+    return state;
+  }
+
+  const productData: any = {
+    name: validateFields.data.name,
+    category: validateFields.data.category as CategoryTypes,
+    smallDescription: validateFields.data.smallDescription,
+    price: validateFields.data.price,
+    images: validateFields.data.images,
+    productFile: validateFields.data.productFile,
+    description: JSON.parse(validateFields.data.description),
+  };
+
+  if (validateFields.data.amenities && validateFields.data.amenities.length > 0) {
+    productData.amenities = validateFields.data.amenities;
+  }
+
+  if (validateFields.data.supportRequested && validateFields.data.supportRequested.length > 0) {
+    productData.supportRequested = validateFields.data.supportRequested;
+  }
+
+  if (validateFields.data.houseRules && validateFields.data.houseRules.length > 0) {
+    productData.houseRules = validateFields.data.houseRules;
+  }
+
+  await prisma.product.update({
+    where: { id: productId },
+    data: productData,
+  });
+
+  const state: State = {
+    status: "success",
+    message: "Your listing has been updated successfully!",
+  };
+
+  return state;
+}
+
 export async function UpdateUserSettings(prevState: any, formData: FormData) {
   const { getUser } = getKindeServerSession();
   const user = await getUser();

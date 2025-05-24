@@ -358,14 +358,32 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                 <Label htmlFor="instagram" className="text-sm">Instagram</Label>
                 <Input
                   id="instagram"
-                  placeholder="https://instagram.com/username"
+                  placeholder="https://instagram.com/username or @username"
                   value={formData.socialMedia.instagram}
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
                     socialMedia: { ...prev.socialMedia, instagram: e.target.value }
                   }))}
+                  onBlur={(e) => {
+                    const value = e.target.value.trim();
+                    if (value && !value.startsWith('http')) {
+                      let formattedValue = value;
+                      if (value.startsWith('@')) {
+                        formattedValue = `https://instagram.com/${value.substring(1)}`;
+                      } else if (!value.includes('instagram.com')) {
+                        formattedValue = `https://instagram.com/${value}`;
+                      } else if (!value.startsWith('https://')) {
+                        formattedValue = `https://${value}`;
+                      }
+                      setFormData(prev => ({
+                        ...prev,
+                        socialMedia: { ...prev.socialMedia, instagram: formattedValue }
+                      }));
+                    }
+                  }}
                   className="mt-1"
                 />
+                <p className="text-xs text-muted-foreground mt-1">Enter your Instagram URL or username</p>
               </div>
 
               <div>
@@ -378,8 +396,24 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                     ...prev,
                     socialMedia: { ...prev.socialMedia, facebook: e.target.value }
                   }))}
+                  onBlur={(e) => {
+                    const value = e.target.value.trim();
+                    if (value && !value.startsWith('http')) {
+                      let formattedValue = value;
+                      if (!value.includes('facebook.com')) {
+                        formattedValue = `https://facebook.com/${value}`;
+                      } else if (!value.startsWith('https://')) {
+                        formattedValue = `https://${value}`;
+                      }
+                      setFormData(prev => ({
+                        ...prev,
+                        socialMedia: { ...prev.socialMedia, facebook: formattedValue }
+                      }));
+                    }
+                  }}
                   className="mt-1"
                 />
+                <p className="text-xs text-muted-foreground mt-1">Enter your Facebook URL or username</p>
               </div>
 
               <div>
@@ -392,8 +426,24 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                     ...prev,
                     socialMedia: { ...prev.socialMedia, linkedin: e.target.value }
                   }))}
+                  onBlur={(e) => {
+                    const value = e.target.value.trim();
+                    if (value && !value.startsWith('http')) {
+                      let formattedValue = value;
+                      if (!value.includes('linkedin.com')) {
+                        formattedValue = `https://linkedin.com/in/${value}`;
+                      } else if (!value.startsWith('https://')) {
+                        formattedValue = `https://${value}`;
+                      }
+                      setFormData(prev => ({
+                        ...prev,
+                        socialMedia: { ...prev.socialMedia, linkedin: formattedValue }
+                      }));
+                    }
+                  }}
                   className="mt-1"
                 />
+                <p className="text-xs text-muted-foreground mt-1">Enter your LinkedIn URL or username</p>
               </div>
             </div>
           </div>

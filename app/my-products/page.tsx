@@ -42,6 +42,7 @@ export default async function MyProductsRoute() {
             name={item.name}
             price={item.price}
             smallDescription={item.smallDescription}
+            showEditButton={true}
           />
         ))}
       </div>

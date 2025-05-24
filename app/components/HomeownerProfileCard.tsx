@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, UserCircle, CircleDashed, GraduationCap, Briefcase, UserCheck, Users, Crown, Sunrise, Moon, Clock, CircleDot, Flower, ChefHat, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Dice6 } from "lucide-react";
+import { User, UserCircle, CircleDashed, GraduationCap, Briefcase, UserCheck, Users, Crown, Sunrise, Moon, Clock, CircleDot, Flower, ChefHat, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Dice6, Heart, Cigarette, CigaretteOff, Dog } from "lucide-react";
 import { Instagram, Facebook, Linkedin } from "lucide-react";
 
 interface HomeownerProfile {
@@ -11,10 +11,18 @@ interface HomeownerProfile {
   schedule?: string | null;
   socialPreference?: string | null;
   hobbies?: string[] | null;
+  preferredAgeRanges?: string[] | null;
+  preferredGender?: string | null;
   socialMedia?: {
     instagram?: string | null;
     facebook?: string | null;
     linkedin?: string | null;
+  } | null;
+  lifestyle?: {
+    hasPets?: boolean;
+    petDescription?: string;
+    numberOfPeople?: string;
+    smokingStatus?: string;
   } | null;
 }
 
@@ -69,6 +77,44 @@ const hobbiesIcons = {
   games: { icon: Dice6, label: "Board Games" },
 };
 
+const smokingIcons = {
+  "yes": { icon: Cigarette, label: "Smoking Allowed" },
+  "no": { icon: CigaretteOff, label: "No Smoking" },
+  "designated": { icon: Cigarette, label: "Designated Areas Only" },
+};
+
+const peopleCountIcons = {
+  "1": { icon: User, label: "Living Alone" },
+  "2": { icon: Users, label: "2 People" },
+  "3": { icon: Users, label: "3 People" },
+  "4+": { icon: Users, label: "4+ People" },
+};
+
+// Helper function to ensure URLs have proper protocol
+const ensureHttps = (url: string): string => {
+  if (!url) return "";
+  // If URL already has protocol, return as is
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  // If URL starts with www., add https://
+  if (url.startsWith("www.")) {
+    return `https://${url}`;
+  }
+  // For social media platforms, add the base URL if it's just a username
+  if (url.includes("instagram.com/") && !url.startsWith("http")) {
+    return `https://${url}`;
+  }
+  if (url.includes("facebook.com/") && !url.startsWith("http")) {
+    return `https://${url}`;
+  }
+  if (url.includes("linkedin.com/") && !url.startsWith("http")) {
+    return `https://${url}`;
+  }
+  // For other cases, assume https://
+  return `https://${url}`;
+};
+
 export function HomeownerProfileCard({ homeowner }: HomeownerProfileCardProps) {
   const profile = homeowner.homeownerProfile;
 
@@ -112,7 +158,7 @@ export function HomeownerProfileCard({ homeowner }: HomeownerProfileCardProps) {
             <div className="flex gap-3">
               {profile.socialMedia.instagram && (
                 <a 
-                  href={profile.socialMedia.instagram} 
+                  href={ensureHttps(profile.socialMedia.instagram)} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 text-white hover:scale-110 transition-transform duration-200"
@@ -123,7 +169,7 @@ export function HomeownerProfileCard({ homeowner }: HomeownerProfileCardProps) {
               )}
               {profile.socialMedia.facebook && (
                 <a 
-                  href={profile.socialMedia.facebook} 
+                  href={ensureHttps(profile.socialMedia.facebook)} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white hover:scale-110 transition-transform duration-200"
@@ -134,7 +180,7 @@ export function HomeownerProfileCard({ homeowner }: HomeownerProfileCardProps) {
               )}
               {profile.socialMedia.linkedin && (
                 <a 
-                  href={profile.socialMedia.linkedin} 
+                  href={ensureHttps(profile.socialMedia.linkedin)} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-700 text-white hover:scale-110 transition-transform duration-200"
@@ -206,6 +252,94 @@ export function HomeownerProfileCard({ homeowner }: HomeownerProfileCardProps) {
             )}
           </div>
         </div>
+
+        {/* Housemate Preferences */}
+        {(profile?.preferredGender || profile?.preferredAgeRanges) && (
+          <div>
+            <h4 className="font-medium mb-3">Looking For</h4>
+            <div className="space-y-3">
+              {profile.preferredGender && (
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    <Heart size={16} className="text-slate-600" />
+                  </div>
+                  <span className="text-sm">Prefers {profile.preferredGender} housemates</span>
+                </div>
+              )}
+              
+              {profile.preferredAgeRanges && (() => {
+                let ageRangesArray: string[] = [];
+                if (typeof profile.preferredAgeRanges === 'string') {
+                  try {
+                    ageRangesArray = JSON.parse(profile.preferredAgeRanges);
+                  } catch {
+                    ageRangesArray = [];
+                  }
+                } else if (Array.isArray(profile.preferredAgeRanges)) {
+                  ageRangesArray = profile.preferredAgeRanges;
+                }
+                
+                if (ageRangesArray.length > 0) {
+                  return (
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                        <Users size={16} className="text-slate-600" />
+                      </div>
+                      <span className="text-sm">Age preference: {ageRangesArray.join(', ')}</span>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+            </div>
+          </div>
+        )}
+
+        {/* Lifestyle */}
+        {profile?.lifestyle && (
+          <div>
+            <h4 className="font-medium mb-3">Lifestyle</h4>
+            <div className="space-y-3">
+              {profile.lifestyle.hasPets && (
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    <Dog size={16} className="text-slate-600" />
+                  </div>
+                  <div>
+                    <span className="text-sm">Has pets</span>
+                    {profile.lifestyle.petDescription && (
+                      <span className="block text-xs text-muted-foreground">{profile.lifestyle.petDescription}</span>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {profile.lifestyle.numberOfPeople && peopleCountIcons[profile.lifestyle.numberOfPeople as keyof typeof peopleCountIcons] && (
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    {(() => {
+                      const Icon = peopleCountIcons[profile.lifestyle.numberOfPeople as keyof typeof peopleCountIcons].icon;
+                      return <Icon size={16} className="text-slate-600" />;
+                    })()}
+                  </div>
+                  <span className="text-sm">{peopleCountIcons[profile.lifestyle.numberOfPeople as keyof typeof peopleCountIcons].label}</span>
+                </div>
+              )}
+              
+              {profile.lifestyle.smokingStatus && smokingIcons[profile.lifestyle.smokingStatus as keyof typeof smokingIcons] && (
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    {(() => {
+                      const Icon = smokingIcons[profile.lifestyle.smokingStatus as keyof typeof smokingIcons].icon;
+                      return <Icon size={16} className="text-slate-600" />;
+                    })()}
+                  </div>
+                  <span className="text-sm">{smokingIcons[profile.lifestyle.smokingStatus as keyof typeof smokingIcons].label}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Hobbies */}
         {profile?.hobbies && (

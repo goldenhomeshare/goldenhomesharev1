@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { updateHomeownerProfile } from "@/app/actions/profile-actions";
 import { useRouter } from "next/navigation";
-import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed, Camera, Upload, CigaretteOff } from "lucide-react";
+import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed, Camera, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useUploadThing } from "@/app/lib/uploadthing";
 import Image from "next/image";
@@ -47,7 +47,6 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
       hasPets: initialData?.lifestyle?.hasPets || false,
       petDescription: initialData?.lifestyle?.petDescription || "",
       numberOfPeople: initialData?.lifestyle?.numberOfPeople || "1",
-      smokingStatus: initialData?.lifestyle?.smokingStatus || "",
     },
   });
   
@@ -343,14 +342,32 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
                 <Label htmlFor="instagram" className="text-sm">Instagram</Label>
                 <Input
                   id="instagram"
-                  placeholder="https://instagram.com/username"
+                  placeholder="https://instagram.com/username or @username"
                   value={formData.socialMedia.instagram}
                   onChange={(e) => setFormData(prev => ({
                     ...prev,
                     socialMedia: { ...prev.socialMedia, instagram: e.target.value }
                   }))}
+                  onBlur={(e) => {
+                    const value = e.target.value.trim();
+                    if (value && !value.startsWith('http')) {
+                      let formattedValue = value;
+                      if (value.startsWith('@')) {
+                        formattedValue = `https://instagram.com/${value.substring(1)}`;
+                      } else if (!value.includes('instagram.com')) {
+                        formattedValue = `https://instagram.com/${value}`;
+                      } else if (!value.startsWith('https://')) {
+                        formattedValue = `https://${value}`;
+                      }
+                      setFormData(prev => ({
+                        ...prev,
+                        socialMedia: { ...prev.socialMedia, instagram: formattedValue }
+                      }));
+                    }
+                  }}
                   className="mt-1"
                 />
+                <p className="text-xs text-muted-foreground mt-1">Enter your Instagram URL or username</p>
               </div>
 
               <div>
@@ -363,8 +380,24 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
                     ...prev,
                     socialMedia: { ...prev.socialMedia, facebook: e.target.value }
                   }))}
+                  onBlur={(e) => {
+                    const value = e.target.value.trim();
+                    if (value && !value.startsWith('http')) {
+                      let formattedValue = value;
+                      if (!value.includes('facebook.com')) {
+                        formattedValue = `https://facebook.com/${value}`;
+                      } else if (!value.startsWith('https://')) {
+                        formattedValue = `https://${value}`;
+                      }
+                      setFormData(prev => ({
+                        ...prev,
+                        socialMedia: { ...prev.socialMedia, facebook: formattedValue }
+                      }));
+                    }
+                  }}
                   className="mt-1"
                 />
+                <p className="text-xs text-muted-foreground mt-1">Enter your Facebook URL or username</p>
               </div>
 
               <div>
@@ -377,8 +410,24 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
                     ...prev,
                     socialMedia: { ...prev.socialMedia, linkedin: e.target.value }
                   }))}
+                  onBlur={(e) => {
+                    const value = e.target.value.trim();
+                    if (value && !value.startsWith('http')) {
+                      let formattedValue = value;
+                      if (!value.includes('linkedin.com')) {
+                        formattedValue = `https://linkedin.com/in/${value}`;
+                      } else if (!value.startsWith('https://')) {
+                        formattedValue = `https://${value}`;
+                      }
+                      setFormData(prev => ({
+                        ...prev,
+                        socialMedia: { ...prev.socialMedia, linkedin: formattedValue }
+                      }));
+                    }
+                  }}
                   className="mt-1"
                 />
+                <p className="text-xs text-muted-foreground mt-1">Enter your LinkedIn URL or username</p>
               </div>
             </div>
           </div>
@@ -680,17 +729,17 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
               <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
                 <Users size={24} className="text-slate-600" />
               </div>
-              <Label className="text-base font-medium">Number of People to House</Label>
+              <Label className="text-base font-medium">Number of People in Household</Label>
             </div>
             
             <div className="space-y-2">
               <p className="text-sm text-muted-foreground">
-                How many people are you looking to accommodate in your home?
+                How many people currently live in your household?
               </p>
               
               <div className="space-y-2">
                 {[
-                  { value: "1", label: "1 person" },
+                  { value: "1", label: "1 person (just me)" },
                   { value: "2", label: "2 people" },
                   { value: "3+", label: "3 or more people" }
                 ].map((option) => {
@@ -725,55 +774,6 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
                   );
                 })}
               </div>
-            </div>
-          </div>
-
-          {/* Home Smoking Policy */}
-          <div className="border border-gray-200 rounded-lg p-6 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
-                <CigaretteOff size={24} className="text-slate-600" />
-              </div>
-              <Label className="text-base font-medium">Home Smoking Policy</Label>
-            </div>
-            
-            <div className="space-y-2">
-              {[
-                { value: "no-smoking", label: "No smoking allowed" },
-                { value: "outside-only", label: "Smoking allowed outside only" },
-                { value: "designated-areas", label: "Smoking allowed in designated areas" },
-                { value: "smoking-allowed", label: "Smoking allowed anywhere" }
-              ].map((option) => {
-                const isSelected = formData.lifestyle.smokingStatus === option.value;
-                
-                return (
-                  <div key={option.value}>
-                    <label className="cursor-pointer">
-                      <input
-                        type="radio"
-                        name="homeSmokingPolicy"
-                        className="sr-only peer"
-                        checked={isSelected}
-                        onChange={() => handleLifestyleChange("smokingStatus", option.value)}
-                      />
-                      <div className="flex items-center p-3 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 transition-colors">
-                        <div className="flex-1">
-                          <span className="font-medium text-sm">{option.label}</span>
-                        </div>
-                        <div className={`w-4 h-4 rounded-full border-2 transition-colors ${
-                          isSelected 
-                            ? 'border-primary bg-primary' 
-                            : 'border-gray-300'
-                        }`}>
-                          {isSelected && (
-                            <div className="w-full h-full rounded-full bg-white scale-50"></div>
-                          )}
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </CardContent>

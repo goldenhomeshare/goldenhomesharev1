@@ -107,8 +107,12 @@ async function getData(id: string) {
       socialPreference: string | null;
       hobbies: any | null;
       socialMedia: any | null;
+      preferredAgeRanges: any | null;
+      preferredGender: string | null;
+      lifestyle: any | null;
     }]>`
-      SELECT "profilePicture", bio, gender, "ageRange", schedule, "socialPreference", hobbies, "socialMedia"
+      SELECT "profilePicture", bio, gender, "ageRange", schedule, "socialPreference", hobbies, "socialMedia",
+             "preferredAgeRanges", "preferredGender", lifestyle
       FROM "HomeownerProfile" 
       WHERE "userId" = ${productData.User.id}
     `;

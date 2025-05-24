@@ -4,8 +4,12 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { categoryItems } from "../lib/categoryitems";
 import { useState } from "react";
 
-export function SelectCategory() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+interface SelectCategoryProps {
+  defaultValue?: string;
+}
+
+export function SelectCategory({ defaultValue }: SelectCategoryProps = {}) {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(defaultValue || null);
   return (
     <div className="grid gird-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
       <input type="hidden" name="category" value={selectedCategory || ""} />

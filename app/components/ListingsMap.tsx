@@ -14,8 +14,7 @@ interface Listing {
 interface ListingsMapProps {
   listings: Listing[];
   className?: string;
-  onBoundsChange?: (bounds: google.maps.LatLngBounds) => void;
-  onMarkersReady?: (markers: { listing: Listing; position: google.maps.LatLng }[]) => void;
+  onVisibleListingsChange?: (visibleListings: Listing[]) => void;
 }
 
 // Global variables to track script loading state
@@ -83,28 +82,32 @@ function loadGoogleMapsScript(): Promise<void> {
   });
 }
 
-export function ListingsMap({ listings, className = "", onBoundsChange, onMarkersReady }: ListingsMapProps) {
+export function ListingsMap({ listings, className = "", onVisibleListingsChange }: ListingsMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapError, setMapError] = useState<string | null>(null);
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const infoWindowsRef = useRef<google.maps.InfoWindow[]>([]);
-  const markersDataRef = useRef<{ listing: Listing; position: google.maps.LatLng }[]>([]);
-  const boundsListenerRef = useRef<google.maps.MapsEventListener | null>(null);
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const listingsWithPositionsRef = useRef<(Listing & { position: google.maps.LatLng })[]>([]);
 
-  // Debounced bounds change handler
-  const debouncedBoundsChange = (bounds: google.maps.LatLngBounds) => {
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
+  // Function to check if a position is within map bounds and notify parent
+  const updateVisibleListings = () => {
+    if (!mapInstanceRef.current || !onVisibleListingsChange) return;
     
-    debounceTimeoutRef.current = setTimeout(() => {
-      if (onBoundsChange) {
-        onBoundsChange(bounds);
-      }
-    }, 300); // 300ms debounce
+    const bounds = mapInstanceRef.current.getBounds();
+    if (!bounds) return;
+
+    const visibleListings = listingsWithPositionsRef.current
+      .filter(listing => bounds.contains(listing.position))
+      .map(({ position, ...listing }) => listing); // Remove position from the returned object
+    
+    // Deduplicate by ID to prevent duplicate keys in React
+    const uniqueVisibleListings = visibleListings.filter((listing, index, array) => 
+      array.findIndex(l => l.id === listing.id) === index
+    );
+    
+    onVisibleListingsChange(uniqueVisibleListings);
   };
 
   useEffect(() => {
@@ -119,7 +122,7 @@ export function ListingsMap({ listings, className = "", onBoundsChange, onMarker
         infoWindowsRef.current.forEach(infoWindow => infoWindow.close());
         markersRef.current = [];
         infoWindowsRef.current = [];
-        markersDataRef.current = [];
+        listingsWithPositionsRef.current = [];
 
         // Default center (can be updated based on listings)
         const defaultCenter = { lat: 38.9517, lng: -92.3341 }; // Columbia, MO
@@ -140,15 +143,11 @@ export function ListingsMap({ listings, className = "", onBoundsChange, onMarker
               }
             ]
           });
-        }
 
-        // Add bounds change listener only once
-        if (onBoundsChange && !boundsListenerRef.current && mapInstanceRef.current) {
-          boundsListenerRef.current = mapInstanceRef.current.addListener('bounds_changed', () => {
-            const bounds = mapInstanceRef.current?.getBounds();
-            if (bounds) {
-              debouncedBoundsChange(bounds);
-            }
+          // Add map bounds change listener
+          mapInstanceRef.current.addListener('bounds_changed', () => {
+            // Use a small delay to avoid too frequent updates during dragging
+            setTimeout(updateVisibleListings, 100);
           });
         }
 
@@ -185,9 +184,9 @@ export function ListingsMap({ listings, className = "", onBoundsChange, onMarker
             
             const offsetPosition = new google.maps.LatLng(lat + offsetLat, lng + offsetLng);
 
-            // Store marker data for bounds checking
-            markersDataRef.current.push({
-              listing,
+            // Store listing with its position for bounds checking
+            listingsWithPositionsRef.current.push({
+              ...listing,
               position: offsetPosition
             });
 
@@ -400,7 +399,12 @@ export function ListingsMap({ listings, className = "", onBoundsChange, onMarker
           const listener = google.maps.event.addListener(map, "idle", () => {
             if (map.getZoom()! > 16) map.setZoom(16);
             google.maps.event.removeListener(listener);
+            // Initial call to update visible listings after map is ready
+            updateVisibleListings();
           });
+        } else {
+          // If no markers, still call updateVisibleListings to show empty array
+          updateVisibleListings();
         }
 
         // Add map click listener to close info windows
@@ -408,11 +412,6 @@ export function ListingsMap({ listings, className = "", onBoundsChange, onMarker
           infoWindowsRef.current.forEach(infoWindow => infoWindow.close());
           setSelectedListing(null);
         });
-
-        // Notify parent component of markers ready
-        if (onMarkersReady) {
-          onMarkersReady(markersDataRef.current);
-        }
 
       } catch (error) {
         console.error('Error loading map:', error);
@@ -423,30 +422,11 @@ export function ListingsMap({ listings, className = "", onBoundsChange, onMarker
     if (typeof window !== 'undefined') {
       initializeMap();
     }
-  }, [listings]); // Only depend on listings, not the callbacks
-
-  // Separate effect to handle callback updates
-  useEffect(() => {
-    if (onMarkersReady && markersDataRef.current.length > 0) {
-      onMarkersReady(markersDataRef.current);
-    }
-  }, [onMarkersReady]);
+  }, [listings]);
 
   // Clean up on unmount
   useEffect(() => {
     return () => {
-      // Clear debounce timeout
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-      
-      // Remove bounds listener
-      if (boundsListenerRef.current) {
-        google.maps.event.removeListener(boundsListenerRef.current);
-        boundsListenerRef.current = null;
-      }
-      
-      // Clear markers and info windows
       markersRef.current.forEach(marker => marker.setMap(null));
       infoWindowsRef.current.forEach(infoWindow => infoWindow.close());
     };
@@ -475,4 +455,4 @@ declare global {
   interface Window {
     google: any;
   }
-}
+} 

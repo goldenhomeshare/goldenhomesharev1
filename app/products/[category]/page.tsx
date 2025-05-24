@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { ListingsMap } from "@/app/components/ListingsMap";
 import { ListingCard } from "@/app/components/ListingCard";
 import { ProductCard } from "@/app/components/ProductCard";
@@ -40,7 +40,6 @@ export default function CategoryPage() {
   const [loading, setLoading] = useState(true);
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
   const [visibleListings, setVisibleListings] = useState<Listing[]>([]);
-  const [allMarkers, setAllMarkers] = useState<{ listing: Listing; position: google.maps.LatLng }[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -55,32 +54,19 @@ export default function CategoryPage() {
       setLoading(true);
       const result = await getData(category);
       setData(result);
-      setVisibleListings(result); // Initially show all listings
       setLoading(false);
     }
     
     fetchData();
   }, [category]);
 
-  // Handle map bounds change to filter visible listings
-  const handleBoundsChange = useCallback((bounds: google.maps.LatLngBounds) => {
-    if (!allMarkers.length) return;
-
-    const listenersInBounds = allMarkers.filter(marker => 
-      bounds.contains(marker.position)
+  const handleVisibleListingsChange = (newVisibleListings: Listing[]) => {
+    // Deduplicate listings by ID to prevent duplicate keys
+    const uniqueListings = newVisibleListings.filter((listing, index, array) => 
+      array.findIndex(l => l.id === listing.id) === index
     );
-
-    setVisibleListings(listenersInBounds.map(marker => marker.listing));
-  }, [allMarkers]);
-
-  // Handle markers ready callback
-  const handleMarkersReady = useCallback((markers: { listing: Listing; position: google.maps.LatLng }[]) => {
-    setAllMarkers(markers);
-    // Initially trigger bounds change with current map bounds if available
-    if (markers.length > 0) {
-      setVisibleListings(markers.map(marker => marker.listing));
-    }
-  }, []);
+    setVisibleListings(uniqueListings);
+  };
 
   if (loading) {
     return (
@@ -100,7 +86,7 @@ export default function CategoryPage() {
         <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-10">
           <h1 className="text-2xl font-bold text-gray-900">Available Homeshares</h1>
           <p className="text-gray-600 mt-1">
-            {visibleListings.length} of {data.length} listing{data.length !== 1 ? 's' : ''} visible
+            {visibleListings.length} of {data.length} listing{data.length !== 1 ? 's' : ''} visible on map
           </p>
         </div>
         
@@ -111,8 +97,7 @@ export default function CategoryPage() {
             <ListingsMap 
               listings={data} 
               className="w-full h-full"
-              onBoundsChange={handleBoundsChange}
-              onMarkersReady={handleMarkersReady}
+              onVisibleListingsChange={handleVisibleListingsChange}
             />
           </div>
           
@@ -121,21 +106,25 @@ export default function CategoryPage() {
             <div className="p-4 border-b border-gray-200">
               <h2 className="font-semibold text-gray-900">Visible Listings</h2>
               <p className="text-sm text-gray-500 mt-1">
-                Showing {visibleListings.length} listing{visibleListings.length !== 1 ? 's' : ''} in current map view
+                Showing listings currently visible on the map
               </p>
             </div>
             <div className="flex-1 overflow-y-auto">
               <div className="p-4">
                 {visibleListings.length === 0 ? (
                   <div className="text-center py-8">
-                    <p className="text-gray-500">No listings visible in current map area</p>
-                    <p className="text-sm text-gray-400 mt-2">Try zooming out or moving the map</p>
+                    <p className="text-gray-500">
+                      {data.length === 0 
+                        ? "No listings available" 
+                        : "Pan or zoom the map to see listings in this area"
+                      }
+                    </p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-4">
-                    {visibleListings.map((listing) => (
+                    {visibleListings.map((listing, index) => (
                       <ListingCard
-                        key={listing.id}
+                        key={`visible-${index}-${listing.id}`}
                         {...listing}
                         isSelected={selectedListing === listing.id}
                         onClick={() => setSelectedListing(listing.id)}

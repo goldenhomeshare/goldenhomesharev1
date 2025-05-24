@@ -139,7 +139,7 @@ export default function Home() {
                       </div>
                       <div>
                         <h3 className="text-xl text-gray-900">
-                          Complete platform with chat, video calls, and secure agreements
+                          Complete platform with chat, payment, and secure agreements
                         </h3>
                       </div>
                     </div>

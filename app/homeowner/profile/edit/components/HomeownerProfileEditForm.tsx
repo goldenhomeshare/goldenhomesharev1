@@ -8,10 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { updateHomeownerProfile } from "@/app/actions/profile-actions";
 import { useRouter } from "next/navigation";
-import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed } from "lucide-react";
+import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed, Camera, Upload } from "lucide-react";
 import { toast } from "sonner";
-import { UploadDropzone } from "@/app/lib/uploadthing";
+import { useUploadThing } from "@/app/lib/uploadthing";
 import Image from "next/image";
+import { useCallback } from "react";
+import React from "react";
 
 interface HomeownerProfileEditFormProps {
   userId: string;
@@ -120,6 +122,85 @@ export function HomeownerProfileEditForm({ userId, initialData }: HomeownerProfi
     }));
   };
 
+  const ProfilePictureUpload = useCallback(({ currentPicture, onUploadComplete, onRemove }: { currentPicture: string; onUploadComplete: (url: string) => void; onRemove: () => void }) => {
+    const { startUpload, isUploading } = useUploadThing("profilePictureUpload", {
+      onClientUploadComplete: (res) => {
+        if (res && res[0]) {
+          onUploadComplete(res[0].url);
+        }
+      },
+      onUploadError: (error: Error) => {
+        toast.error("Upload failed. Please try again.");
+      },
+    });
+
+    const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        await startUpload([file]);
+      }
+      // Reset the input so the same file can be selected again
+      event.target.value = '';
+    };
+
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    return (
+      <div className="space-y-4">
+        <div 
+          className={`relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 cursor-pointer group hover:border-primary transition-colors ${isUploading ? 'opacity-50' : ''}`}
+          onClick={() => fileInputRef.current?.click()}
+        >
+          {currentPicture ? (
+            <>
+              <Image
+                src={currentPicture}
+                alt="Profile picture"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="w-8 h-8 text-white" />
+              </div>
+            </>
+          ) : (
+            <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center group-hover:bg-gray-200 transition-colors">
+              {isUploading ? (
+                <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+              ) : (
+                <>
+                  <Camera className="w-8 h-8 text-gray-400 mb-1" />
+                  <span className="text-xs text-gray-500">Add Photo</span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+        
+        {currentPicture && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onRemove}
+            disabled={isUploading}
+          >
+            Remove Picture
+          </Button>
+        )}
+        
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleUpload}
+          className="hidden"
+          disabled={isUploading}
+        />
+      </div>
+    );
+  }, []);
+
   return (
     <form onSubmit={handleSubmit}>
       <Card>
@@ -130,43 +211,14 @@ export function HomeownerProfileEditForm({ userId, initialData }: HomeownerProfi
           <div>
             <Label>Profile Picture</Label>
             <div className="mt-4">
-              {formData.profilePicture ? (
-                <div className="space-y-4">
-                  <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200">
-                    <Image
-                      src={formData.profilePicture}
-                      alt="Profile picture"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setFormData(prev => ({ ...prev, profilePicture: "" }))}
-                  >
-                    Remove Picture
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center">
-                    <User className="w-16 h-16 text-gray-400" />
-                  </div>
-                  <UploadDropzone
-                    endpoint="profilePictureUpload"
-                    onClientUploadComplete={(res) => {
-                      if (res && res[0]) {
-                        setFormData(prev => ({ ...prev, profilePicture: res[0].url }));
-                        toast.success("Profile picture uploaded successfully!");
-                      }
-                    }}
-                    onUploadError={(error: Error) => {
-                      toast.error("Upload failed. Please try again.");
-                    }}
-                  />
-                </div>
-              )}
+              <ProfilePictureUpload 
+                currentPicture={formData.profilePicture}
+                onUploadComplete={(url) => {
+                  setFormData(prev => ({ ...prev, profilePicture: url }));
+                  toast.success("Profile picture uploaded successfully!");
+                }}
+                onRemove={() => setFormData(prev => ({ ...prev, profilePicture: "" }))}
+              />
             </div>
           </div>
         </CardContent>

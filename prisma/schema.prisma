@@ -106,7 +106,7 @@ model Application {
   housemateId     String
   housemate       User   @relation(fields: [housemateId], references: [id])
   productId       String
-  product         Product @relation(fields: [productId], references: [id])
+  product         Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   
   status          ApplicationStatus @default(PENDING)
   message         String?
@@ -133,7 +133,7 @@ model ChatRoom {
   
   homeowner   User    @relation("HomeownerChats", fields: [homeownerId], references: [id])
   housemate   User    @relation("HousemateChats", fields: [housemateId], references: [id])
-  product     Product @relation(fields: [productId], references: [id])
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   
   messages    Message[]
   
@@ -167,6 +167,7 @@ model Product {
   images           String[]
   productFile      String
   category         CategoryTypes
+  address          String?       // Address of the property
   amenities        Json?         // Array of selected amenities
   supportRequested Json?         // Array of objects with id and hoursPerWeek fields for support options
   houseRules       Json?         // Array of house rules

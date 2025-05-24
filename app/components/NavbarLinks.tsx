@@ -12,17 +12,17 @@ export const navbarLinks = [
     },
     {
         id: 1,
-        name: "Private Suites",
+        name: "View Listings",
         href: "/products/template"
     },
     {
         id: 2, 
-        name: "Private Rooms", 
+        name: "View Housemates", 
         href: "/products/icon"
     },
     {
         id: 3,
-        name: "ADUs",
+        name: "About",
         href: "/products/uikit" 
     }, 
 ];

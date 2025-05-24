@@ -28,6 +28,7 @@ const productSchema = z.object({
   productFile: z
     .string()
     .min(1, { message: "Please upload a zip of your product" }),
+  address: z.string().min(5, { message: "Please provide a valid address" }).optional(),
   amenities: z.array(z.string()).optional(),
   supportRequested: z.array(
     z.union([
@@ -76,6 +77,7 @@ export async function SellProduct(prevState: any, formData: FormData) {
     description: formData.get("description"),
     images: JSON.parse(formData.get("images") as string),
     productFile: formData.get("productFile"),
+    address: formData.get("address"),
     amenities: formData.get("amenities") ? JSON.parse(formData.get("amenities") as string) : [],
     supportRequested: formData.get("supportRequested") ? JSON.parse(formData.get("supportRequested") as string) : [],
     houseRules: formData.get("houseRules") ? JSON.parse(formData.get("houseRules") as string) : [],
@@ -98,6 +100,7 @@ export async function SellProduct(prevState: any, formData: FormData) {
     price: validateFields.data.price,
     images: validateFields.data.images,
     productFile: validateFields.data.productFile,
+    address: validateFields.data.address,
     description: JSON.parse(validateFields.data.description),
     User: {
       connect: {
@@ -157,6 +160,7 @@ export async function EditProduct(prevState: any, formData: FormData) {
     description: formData.get("description"),
     images: JSON.parse(formData.get("images") as string),
     productFile: formData.get("productFile"),
+    address: formData.get("address"),
     amenities: formData.get("amenities") ? JSON.parse(formData.get("amenities") as string) : [],
     supportRequested: formData.get("supportRequested") ? JSON.parse(formData.get("supportRequested") as string) : [],
     houseRules: formData.get("houseRules") ? JSON.parse(formData.get("houseRules") as string) : [],
@@ -179,6 +183,7 @@ export async function EditProduct(prevState: any, formData: FormData) {
     price: validateFields.data.price,
     images: validateFields.data.images,
     productFile: validateFields.data.productFile,
+    address: validateFields.data.address,
     description: JSON.parse(validateFields.data.description),
   };
 
@@ -364,4 +369,30 @@ export async function GetStripeDashboardLink() {
   );
 
   return redirect(loginLink.url);
+}
+
+export async function DeleteProduct(productId: string) {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  // Check if user owns this product
+  const existingProduct = await prisma.product.findUnique({
+    where: { id: productId },
+    select: { userId: true },
+  });
+
+  if (!existingProduct || existingProduct.userId !== user.id) {
+    throw new Error("Unauthorized - You can only delete your own listings");
+  }
+
+  // Delete the product
+  await prisma.product.delete({
+    where: { id: productId },
+  });
+
+  return { success: true };
 }

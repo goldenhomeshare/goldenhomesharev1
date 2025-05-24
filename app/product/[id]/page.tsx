@@ -3,6 +3,7 @@ import { ProductDescription } from "@/app/components/ProductDescription";
 import { BuyButton } from "@/app/components/SubmitButtons";
 import { HomeownerProfileCard } from "@/app/components/HomeownerProfileCard";
 import { MessageHostButton } from "@/app/components/chat/MessageHostButton";
+import { ApproximateLocationMap } from "@/app/components/ApproximateLocationMap";
 import prisma from "@/app/lib/db";
 import { Button } from "@/components/ui/button";
 import { unstable_noStore as noStore } from "next/cache";
@@ -82,6 +83,7 @@ async function getData(id: string) {
       name: true,
       images: true,
       price: true,
+      address: true,
       createdAt: true,
       id: true,
       User: {
@@ -146,10 +148,11 @@ async function getData(id: string) {
 export default async function ProductPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   noStore();
-  const data = await getData(params.id);
+  const resolvedParams = await params;
+  const data = await getData(resolvedParams.id);
   const currentUser = await getCurrentUser();
   
   // Safety check to ensure data exists
@@ -165,177 +168,200 @@ export default async function ProductPage({
   const canMessageHost = currentUser && 
     (currentUser as any).userType === "HOUSEMATE" && 
     currentUser.id !== data.User?.id;
-  
+
   return (
-    <section className="mx-auto px-4  lg:mt-10 max-w-7xl lg:px-8 lg:grid lg:grid-rows-1 lg:grid-cols-7 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
-      <Carousel className=" lg:row-end-1 lg:col-span-4">
-        <CarouselContent>
-          {data.images?.map((item, index) => (
-            <CarouselItem key={index}>
-              <div className="aspect-w-4 aspect-h-3 rounded-lg bg-gray-100 overflow-hidden">
-                <Image
-                  src={item as string}
-                  alt="yoo"
-                  fill
-                  className="object-cover w-full h-full rounded-lg"
-                />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="ml-16" />
-        <CarouselNext className="mr-16" />
-      </Carousel>
+    <>
+      <section className="mx-auto px-4  lg:mt-10 max-w-7xl lg:px-8 lg:grid lg:grid-rows-1 lg:grid-cols-7 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
+        <Carousel className=" lg:row-end-1 lg:col-span-4">
+          <CarouselContent>
+            {data.images?.map((item, index) => (
+              <CarouselItem key={index}>
+                <div className="aspect-w-4 aspect-h-3 rounded-lg bg-gray-100 overflow-hidden">
+                  <Image
+                    src={item as string}
+                    alt="yoo"
+                    fill
+                    className="object-cover w-full h-full rounded-lg"
+                  />
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="ml-16" />
+          <CarouselNext className="mr-16" />
+        </Carousel>
 
-      <div className="max-w-2xl mx-auto mt-5 lg:max-w-none lg:mt-0 lg:row-end-2 lg:row-span-2 lg:col-span-3">
-        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
-          {data.name}
-        </h1>
+        <div className="max-w-2xl mx-auto mt-5 lg:max-w-none lg:mt-0 lg:row-end-2 lg:row-span-2 lg:col-span-3">
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
+            {data.name}
+          </h1>
 
-        <p className="mt-2 text-muted-foreground">{data.smallDescription}</p>
-        <form action={BuyProduct}>
-          <input type="hidden" name="id" value={data.id} />
-          <BuyButton price={data.price as number} />
-        </form>
+          <p className="mt-2 text-muted-foreground">{data.smallDescription}</p>
+          <form action={BuyProduct}>
+            <input type="hidden" name="id" value={data.id} />
+            <BuyButton price={data.price as number} />
+          </form>
 
-        {canMessageHost && data.User && data.User.firstName && data.User.lastName && (
-          <MessageHostButton
-            productId={data.id}
-            hostId={data.User.id}
-            hostName={`${data.User.firstName as string} ${data.User.lastName as string}`}
-            productName={data.name}
-          />
-        )}
+          {canMessageHost && 
+           data.User && 
+           data.User.firstName && 
+           data.User.lastName && 
+           data.User.id && 
+           data.id &&
+           data.name && (
+            <MessageHostButton
+              productId={data.id}
+              hostId={data.User.id}
+              hostName={`${data.User.firstName} ${data.User.lastName}`}
+              productName={data.name}
+            />
+          )}
 
-        <div className="border-t border-gray-200 mt-10 pt-10">
-          <div className="grid grid-cols-2 w-full gap-y-3">
-            <h3 className="text-sm font-medium text-muted-foreground col-span-1">
-              Released:
-            </h3>
-            <h3 className="text-sm font-medium col-span-1">
-              {new Intl.DateTimeFormat("en-US", {
-                dateStyle: "long",
-              }).format(data.createdAt)}
-            </h3>
+          <div className="border-t border-gray-200 mt-10 pt-10">
+            <div className="grid grid-cols-2 w-full gap-y-3">
+              <h3 className="text-sm font-medium text-muted-foreground col-span-1">
+                Released:
+              </h3>
+              <h3 className="text-sm font-medium col-span-1">
+                {new Intl.DateTimeFormat("en-US", {
+                  dateStyle: "long",
+                }).format(data.createdAt)}
+              </h3>
 
-            <h3 className="text-sm font-medium text-muted-foreground col-span-1">
-              Category:
-            </h3>
+              <h3 className="text-sm font-medium text-muted-foreground col-span-1">
+                Category:
+              </h3>
 
-            <h3 className="text-sm font-medium col-span-1">{data.category}</h3>
+              <h3 className="text-sm font-medium col-span-1">{data.category}</h3>
+            </div>
           </div>
+
+          {amenities.length > 0 && (
+            <>
+              <div className="border-t border-gray-200 mt-6 pt-6">
+                <h3 className="text-base font-medium mb-4">Amenities</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {amenities.map((amenityId: string) => {
+                    const amenity = amenityIcons[amenityId];
+                    if (!amenity) return null;
+                    
+                    const Icon = amenity.icon;
+                    return (
+                      <div key={amenityId} className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                          <Icon size={16} className="text-slate-600" />
+                        </div>
+                        <span className="text-sm">{amenity.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+
+          {supportRequested.length > 0 && (
+            <>
+              <div className="border-t border-gray-200 mt-6 pt-6">
+                <h3 className="text-base font-medium mb-4">Support Requested</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {supportRequested.map((supportItem: any) => {
+                    const supportId = typeof supportItem === 'string' ? supportItem : supportItem.id;
+                    const hoursPerWeek = typeof supportItem === 'string' ? null : supportItem.hoursPerWeek;
+                    const support = supportIcons[supportId];
+                    if (!support) return null;
+                    
+                    const Icon = support.icon;
+                    return (
+                      <div key={supportId} className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                          <Icon size={16} className="text-slate-600" />
+                        </div>
+                        <div>
+                          <span className="text-sm">{support.label}</span>
+                          {hoursPerWeek && (
+                            <span className="block text-xs text-muted-foreground">{hoursPerWeek} hours/week</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+
+          {houseRules.length > 0 && (
+            <>
+              <div className="border-t border-gray-200 mt-6 pt-6">
+                <h3 className="text-base font-medium mb-4">House Rules</h3>
+                <div className="grid grid-cols-1 gap-4">
+                  {houseRules.map((ruleItem: any) => {
+                    const ruleId = typeof ruleItem === 'string' ? ruleItem : ruleItem.id;
+                    const ruleValue = typeof ruleItem === 'string' ? null : ruleItem.value;
+                    const rule = houseRulesIcons[ruleId];
+                    if (!rule) return null;
+                    
+                    const Icon = rule.icon;
+                    let displayValue = ruleValue;
+                    
+                    // Get human-readable label for dropdown values
+                    if (ruleValue && houseRulesValueLabels[ruleId] && houseRulesValueLabels[ruleId][ruleValue]) {
+                      displayValue = houseRulesValueLabels[ruleId][ruleValue];
+                    }
+                    
+                    return (
+                      <div key={ruleId} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                          <Icon size={16} className="text-slate-600" />
+                        </div>
+                        <div className="flex-1">
+                          <span className="text-sm font-medium">{rule.label}</span>
+                          {displayValue && (
+                            <span className="block text-sm text-muted-foreground">{displayValue}</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="border-t border-gray-200 mt-10"></div>
         </div>
 
-        {amenities.length > 0 && (
-          <>
-            <div className="border-t border-gray-200 mt-6 pt-6">
-              <h3 className="text-base font-medium mb-4">Amenities</h3>
-              <div className="grid grid-cols-2 gap-4">
-                {amenities.map((amenityId: string) => {
-                  const amenity = amenityIcons[amenityId];
-                  if (!amenity) return null;
-                  
-                  const Icon = amenity.icon;
-                  return (
-                    <div key={amenityId} className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                        <Icon size={16} className="text-slate-600" />
-                      </div>
-                      <span className="text-sm">{amenity.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
+        <div className="w-full max-w-2xl mx-auto mt-16 lg:max-w-none lg:mt-0 lg:col-span-4">
+          <ProductDescription content={data.description as JSONContent} />
+          
+          {data.User && (
+            <HomeownerProfileCard 
+              homeowner={{
+                firstName: data.User.firstName,
+                lastName: data.User.lastName,
+                profileImage: data.User.profileImage,
+                homeownerProfile: data.User.homeownerProfile,
+              }}
+            />
+          )}
+        </div>
+      </section>
+
+      {/* Property Location Map */}
+      {data.address && (
+        <section className="mx-auto px-4 max-w-7xl lg:px-8 mt-16 mb-16">
+          <div className="border-t border-gray-200 pt-10">
+            <h2 className="text-2xl font-bold mb-6">Property Location</h2>
+            <div className="w-full">
+              <ApproximateLocationMap address={data.address} className="w-full h-96" />
             </div>
-          </>
-        )}
-
-        {supportRequested.length > 0 && (
-          <>
-            <div className="border-t border-gray-200 mt-6 pt-6">
-              <h3 className="text-base font-medium mb-4">Support Requested</h3>
-              <div className="grid grid-cols-2 gap-4">
-                {supportRequested.map((supportItem: any) => {
-                  const supportId = typeof supportItem === 'string' ? supportItem : supportItem.id;
-                  const hoursPerWeek = typeof supportItem === 'string' ? null : supportItem.hoursPerWeek;
-                  const support = supportIcons[supportId];
-                  if (!support) return null;
-                  
-                  const Icon = support.icon;
-                  return (
-                    <div key={supportId} className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                        <Icon size={16} className="text-slate-600" />
-                      </div>
-                      <div>
-                        <span className="text-sm">{support.label}</span>
-                        {hoursPerWeek && (
-                          <span className="block text-xs text-muted-foreground">{hoursPerWeek} hours/week</span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </>
-        )}
-
-        {houseRules.length > 0 && (
-          <>
-            <div className="border-t border-gray-200 mt-6 pt-6">
-              <h3 className="text-base font-medium mb-4">House Rules</h3>
-              <div className="grid grid-cols-1 gap-4">
-                {houseRules.map((ruleItem: any) => {
-                  const ruleId = typeof ruleItem === 'string' ? ruleItem : ruleItem.id;
-                  const ruleValue = typeof ruleItem === 'string' ? null : ruleItem.value;
-                  const rule = houseRulesIcons[ruleId];
-                  if (!rule) return null;
-                  
-                  const Icon = rule.icon;
-                  let displayValue = ruleValue;
-                  
-                  // Get human-readable label for dropdown values
-                  if (ruleValue && houseRulesValueLabels[ruleId] && houseRulesValueLabels[ruleId][ruleValue]) {
-                    displayValue = houseRulesValueLabels[ruleId][ruleValue];
-                  }
-                  
-                  return (
-                    <div key={ruleId} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-                        <Icon size={16} className="text-slate-600" />
-                      </div>
-                      <div className="flex-1">
-                        <span className="text-sm font-medium">{rule.label}</span>
-                        {displayValue && (
-                          <span className="block text-sm text-muted-foreground">{displayValue}</span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </>
-        )}
-
-        <div className="border-t border-gray-200 mt-10"></div>
-      </div>
-
-      <div className="w-full max-w-2xl mx-auto mt-16 lg:max-w-none lg:mt-0 lg:col-span-4">
-        <ProductDescription content={data.description as JSONContent} />
-        
-        {data.User && (
-          <HomeownerProfileCard 
-            homeowner={{
-              firstName: data.User.firstName,
-              lastName: data.User.lastName,
-              profileImage: data.User.profileImage,
-              homeownerProfile: data.User.homeownerProfile,
-            }}
-          />
-        )}
-      </div>
-    </section>
+            <p className="text-sm text-muted-foreground mt-4 text-center">
+              🗺️ Approximate area shown for privacy - exact address shared upon booking
+            </p>
+          </div>
+        </section>
+      )}
+    </>
   );
 }

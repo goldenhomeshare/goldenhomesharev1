@@ -19,6 +19,7 @@ async function getData(listingId: string, userId: string) {
       images: true,
       productFile: true,
       category: true,
+      address: true,
       amenities: true,
       supportRequested: true,
       houseRules: true,

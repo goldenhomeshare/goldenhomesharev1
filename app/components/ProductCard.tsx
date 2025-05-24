@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Edit } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { DeleteProductButton } from "./DeleteProductButton";
 
 interface iAppProps {
   images: string[];
@@ -70,6 +71,7 @@ export function ProductCard({
               <Edit className="h-4 w-4" />
             </Link>
           </Button>
+          <DeleteProductButton productId={id} productName={name} />
         </div>
       ) : (
         <Button asChild className="w-full mt-5">

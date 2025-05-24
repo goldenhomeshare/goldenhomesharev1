@@ -26,6 +26,8 @@ import Image from "next/image";
 import { useDropzone } from "@uploadthing/react";
 import { generateClientDropzoneAccept, generatePermittedFileTypes } from "uploadthing/client";
 import { useUploadThing } from "@/app/lib/uploadthing";
+import { AddressMap } from "../AddressMap";
+import { AddressAutocomplete } from "../AddressAutocomplete";
 
 interface EditListingFormProps {
   listing: {
@@ -37,6 +39,7 @@ interface EditListingFormProps {
     images: string[];
     productFile: string;
     category: string;
+    address: string | null;
     amenities: any;
     supportRequested: any;
     houseRules: any;
@@ -49,6 +52,7 @@ export function EditListingForm({ listing }: EditListingFormProps) {
   const [json, setJson] = useState<null | JSONContent>(listing.description as JSONContent || null);
   const [images, setImages] = useState<null | string[]>(listing.images || null);
   const [productFile, SetProductFile] = useState<null | string>(listing.productFile || null);
+  const [address, setAddress] = useState<string>(listing.address || "");
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>(listing.amenities || []);
   const [selectedSupport, setSelectedSupport] = useState<Array<{id: string, hoursPerWeek: number}>>(listing.supportRequested || []);
   const [selectedHouseRules, setSelectedHouseRules] = useState<Array<{id: string, value?: string}>>(listing.houseRules || []);
@@ -289,6 +293,26 @@ export function EditListingForm({ listing }: EditListingFormProps) {
               {state.errors["smallDescription"][0]}
             </p>
           )}
+        </div>
+
+        <div className="flex flex-col gap-y-2">
+          <div className="flex items-center gap-2">
+            <Label>Property Address</Label>
+            <span className="text-xs text-muted-foreground italic">don't worry, no one will see this</span>
+          </div>
+          <AddressAutocomplete
+            value={address}
+            onChange={(value) => setAddress(value)}
+            className="mb-4"
+          />
+          {state?.errors?.["address"]?.[0] && (
+            <p className="text-destructive">{state.errors["address"][0]}</p>
+          )}
+          
+          {/* Map Component */}
+          <div className="mt-2">
+            <AddressMap address={address} className="w-full" />
+          </div>
         </div>
 
         <div className="flex flex-col gap-y-2">

@@ -43,6 +43,15 @@ export function AddressAutocomplete({
 
         await loader.load();
         
+        // Check if Google Maps and Places library are properly loaded
+        if (typeof google === 'undefined' || 
+            typeof google.maps === 'undefined' || 
+            typeof google.maps.places === 'undefined' ||
+            typeof google.maps.places.Autocomplete === 'undefined') {
+          setError("Google Places API failed to load");
+          return;
+        }
+        
         if (inputRef.current && !autocompleteRef.current) {
           // Initialize the autocomplete with updated options
           autocompleteRef.current = new google.maps.places.Autocomplete(
@@ -79,7 +88,7 @@ export function AddressAutocomplete({
 
     // Cleanup
     return () => {
-      if (autocompleteRef.current && typeof google !== 'undefined') {
+      if (autocompleteRef.current && typeof google !== 'undefined' && google.maps && google.maps.event) {
         google.maps.event.clearInstanceListeners(autocompleteRef.current);
       }
     };

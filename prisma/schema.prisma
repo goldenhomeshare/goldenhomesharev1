@@ -55,12 +55,16 @@ model HomeownerProfile {
   emergencyContact  Json?  // Contact details for emergencies
   backgroundCheck   Boolean @default(false)
   
-  // New profile fields
+  // Profile fields
   gender            String? // Male, Female, Other
   ageRange          String? // 18–24, 25–34, 35–44, 45–54, 55–64, 65+
   schedule          String? // Early Riser, Night Owl, Flexible
   socialPreference  String? // Social, Independent, Balanced
   hobbies           Json?   // Array of selected hobbies
+  preferredAgeRanges Json?  // Array of preferred age ranges for housemates
+  preferredGender   String? // Preferred gender for housemates
+  socialMedia       Json?   // Social media links (instagram, facebook, linkedin)
+  lifestyle         Json?   // Lifestyle preferences (pets, smoking policy, etc.)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -79,14 +83,18 @@ model HousemateProfile {
   lifestyle         Json?  // Preferences, habits, etc.
   references        Json?  // Previous landlord/housemate references
   budgetRange       Json?  // Min/max budget
+  maxBudget         Int?   // Maximum budget
   backgroundCheck   Boolean @default(false)
   
-  // New profile fields
+  // Profile fields
   gender            String? // Male, Female, Other
   ageRange          String? // 18–24, 25–34, 35–44, 45–54, 55–64, 65+
   schedule          String? // Early Riser, Night Owl, Flexible
   socialPreference  String? // Social, Independent, Balanced
   hobbies           Json?   // Array of selected hobbies
+  preferredAgeRanges Json?  // Array of preferred age ranges for living companions
+  preferredGender   String? // Preferred gender for living companions
+  socialMedia       Json?   // Social media links (instagram, facebook, linkedin)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

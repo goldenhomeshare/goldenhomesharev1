@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, UserCircle, CircleDashed, GraduationCap, Briefcase, UserCheck, Users, Crown, Sunrise, Moon, Clock, CircleDot, Flower, ChefHat, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Dice6 } from "lucide-react";
+import { Instagram, Facebook, Linkedin } from "lucide-react";
 
 interface HomeownerProfile {
   profilePicture?: string | null;
@@ -10,6 +11,11 @@ interface HomeownerProfile {
   schedule?: string | null;
   socialPreference?: string | null;
   hobbies?: string[] | null;
+  socialMedia?: {
+    instagram?: string | null;
+    facebook?: string | null;
+    linkedin?: string | null;
+  } | null;
 }
 
 interface HomeownerProfileCardProps {
@@ -96,6 +102,48 @@ export function HomeownerProfileCard({ homeowner }: HomeownerProfileCardProps) {
           <div>
             <h4 className="font-medium mb-2">About</h4>
             <p className="text-muted-foreground">{profile.bio}</p>
+          </div>
+        )}
+
+        {/* Social Media Links */}
+        {profile?.socialMedia && (profile.socialMedia.instagram || profile.socialMedia.facebook || profile.socialMedia.linkedin) && (
+          <div>
+            <h4 className="font-medium mb-3">Connect</h4>
+            <div className="flex gap-3">
+              {profile.socialMedia.instagram && (
+                <a 
+                  href={profile.socialMedia.instagram} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-yellow-500 text-white hover:scale-110 transition-transform duration-200"
+                  title="Instagram"
+                >
+                  <Instagram size={20} />
+                </a>
+              )}
+              {profile.socialMedia.facebook && (
+                <a 
+                  href={profile.socialMedia.facebook} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-600 text-white hover:scale-110 transition-transform duration-200"
+                  title="Facebook"
+                >
+                  <Facebook size={20} />
+                </a>
+              )}
+              {profile.socialMedia.linkedin && (
+                <a 
+                  href={profile.socialMedia.linkedin} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-700 text-white hover:scale-110 transition-transform duration-200"
+                  title="LinkedIn"
+                >
+                  <Linkedin size={20} />
+                </a>
+              )}
+            </div>
           </div>
         )}
 

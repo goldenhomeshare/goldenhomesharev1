@@ -346,56 +346,108 @@ export function SellForm() {
               const isSelected = !!selectedRule;
 
               return (
-                <div key={ruleOpt.id} className="flex flex-col space-y-3">
+                <div key={ruleOpt.id} className="border border-gray-200 rounded-lg p-6 space-y-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center">
-                      <Icon size={20} className="text-slate-600" />
+                    <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+                      <Icon size={24} className="text-slate-600" />
                     </div>
-                    <Label className="font-medium">{ruleOpt.label}</Label>
+                    <Label className="text-base font-medium">{ruleOpt.label}</Label>
                   </div>
                   
                   {ruleOpt.options ? (
-                    <select
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent"
-                      value={selectedRule?.value || ""}
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          toggleHouseRule(ruleOpt.id, e.target.value);
-                        } else {
-                          toggleHouseRule(ruleOpt.id);
-                        }
-                      }}
-                    >
-                      <option value="">Select an option</option>
-                      {ruleOpt.options.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
+                    <div className="space-y-2">
+                      {ruleOpt.options.map((option) => {
+                        const isOptionSelected = selectedRule?.value === option.value;
+                        
+                        return (
+                          <div key={option.value}>
+                            <label className="cursor-pointer">
+                              <input
+                                type="radio"
+                                name={`house-rule-${ruleOpt.id}`}
+                                className="sr-only peer"
+                                checked={isOptionSelected}
+                                onChange={() => toggleHouseRule(ruleOpt.id, option.value)}
+                              />
+                              <div className="flex items-center p-3 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 transition-colors">
+                                <div className="flex-1">
+                                  <span className="font-medium text-sm">{option.label}</span>
+                                </div>
+                                <div className={`w-4 h-4 rounded-full border-2 transition-colors ${
+                                  isOptionSelected 
+                                    ? 'border-primary bg-primary' 
+                                    : 'border-gray-300'
+                                }`}>
+                                  {isOptionSelected && (
+                                    <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                                  )}
+                                </div>
+                              </div>
+                            </label>
+                          </div>
+                        );
+                      })}
+                      
+                      {selectedRule && (
+                        <div className="mt-3">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => toggleHouseRule(ruleOpt.id)}
+                            className="text-xs"
+                          >
+                            Clear Selection
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   ) : ruleOpt.hasCustomInput ? (
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => {
-                          if (isSelected) {
-                            toggleHouseRule(ruleOpt.id);
-                          } else {
-                            toggleHouseRule(ruleOpt.id, ruleOpt.defaultValue);
-                          }
-                        }}
-                        className="rounded border-gray-300 text-primary focus:ring-primary"
-                      />
-                      <span className="text-sm">Enable quiet hours</span>
-                      {isSelected && (
-                        <Input
-                          type="text"
-                          value={selectedRule?.value || ""}
-                          onChange={(e) => updateHouseRuleValue(ruleOpt.id, e.target.value)}
-                          placeholder={ruleOpt.defaultValue}
-                          className="flex-1"
+                    <div className="space-y-3">
+                      <label className="cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={isSelected}
+                          onChange={() => {
+                            if (isSelected) {
+                              toggleHouseRule(ruleOpt.id);
+                            } else {
+                              toggleHouseRule(ruleOpt.id, ruleOpt.defaultValue);
+                            }
+                          }}
                         />
+                        <div className="flex items-center p-3 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 transition-colors">
+                          <div className="flex-1">
+                            <span className="font-medium text-sm">Enable quiet hours</span>
+                          </div>
+                          <div className={`w-4 h-4 rounded border transition-colors ${
+                            isSelected 
+                              ? 'border-primary bg-primary' 
+                              : 'border-gray-300'
+                          }`}>
+                            {isSelected && (
+                              <svg className="w-3 h-3 text-white ml-0.5 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                              </svg>
+                            )}
+                          </div>
+                        </div>
+                      </label>
+                      
+                      {isSelected && (
+                        <div className="ml-3">
+                          <Label className="text-sm text-muted-foreground mb-2 block">
+                            Specify quiet hours:
+                          </Label>
+                          <Input
+                            type="text"
+                            value={selectedRule?.value || ""}
+                            onChange={(e) => updateHouseRuleValue(ruleOpt.id, e.target.value)}
+                            placeholder={ruleOpt.defaultValue}
+                            className="px-3 py-2 text-sm border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                          />
+                        </div>
                       )}
                     </div>
                   ) : null}

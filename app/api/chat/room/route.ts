@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
               select: {
                 firstName: true,
                 lastName: true,
+                profileImage: true,
               },
             },
           },
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
                 select: {
                   firstName: true,
                   lastName: true,
+                  profileImage: true,
                 },
               },
             },

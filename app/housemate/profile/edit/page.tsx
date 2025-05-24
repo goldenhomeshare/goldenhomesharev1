@@ -1,6 +1,22 @@
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { HousemateProfileEditForm } from "./components/HousemateProfileEditForm";
+import prisma from "@/app/lib/db";
+
+async function getUserData(userId: string) {
+  const userData = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      firstName: true,
+      lastName: true,
+      email: true,
+    },
+  });
+
+  return userData;
+}
 
 export default async function EditHousemateProfilePage() {
   const user = await getCurrentUser();
@@ -16,6 +32,11 @@ export default async function EditHousemateProfilePage() {
   }
   
   const housemateProfile = (user as any).housemateProfile;
+  const userData = await getUserData(user.id);
+  
+  if (!userData) {
+    redirect("/api/auth/login");
+  }
   
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -29,6 +50,9 @@ export default async function EditHousemateProfilePage() {
       <HousemateProfileEditForm 
         userId={user.id}
         initialData={housemateProfile}
+        firstName={userData.firstName || ""}
+        lastName={userData.lastName || ""}
+        email={userData.email || ""}
       />
     </div>
   );

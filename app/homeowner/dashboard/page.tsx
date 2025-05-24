@@ -1,10 +1,8 @@
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
-import { User } from "lucide-react";
+import { User, Home, Plus, FileText, MessageCircle, Settings, CreditCard, Users } from "lucide-react";
 
 export default async function HomeownerDashboardPage() {
   const user = await getCurrentUser();
@@ -21,9 +19,54 @@ export default async function HomeownerDashboardPage() {
 
   const homeownerProfile = (user as any).homeownerProfile;
 
+  const dashboardItems = [
+    {
+      icon: Home,
+      title: "My Listings",
+      description: "Manage your property listings",
+      href: "/my-products",
+      color: "text-blue-600"
+    },
+    {
+      icon: Plus,
+      title: "Create New Listing",
+      description: "List a new property for homesharing",
+      href: "/sell",
+      color: "text-green-600"
+    },
+    {
+      icon: Users,
+      title: "Applications",
+      description: "Review applications from potential housemates",
+      href: "/homeowner/applications",
+      color: "text-purple-600"
+    },
+    {
+      icon: MessageCircle,
+      title: "Messages",
+      description: "Chat with potential housemates",
+      href: "/homeowner/messages",
+      color: "text-orange-600"
+    },
+    {
+      icon: User,
+      title: "Edit Profile",
+      description: "Update your information and preferences",
+      href: "/homeowner/profile/edit",
+      color: "text-purple-600"
+    },
+    {
+      icon: CreditCard,
+      title: "Billing",
+      description: "Manage payments and payouts",
+      href: "/billing",
+      color: "text-emerald-600"
+    }
+  ];
+
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-      <div className="mb-8 flex items-center gap-4">
+      <div className="mb-12 flex items-center gap-4">
         <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200">
           {homeownerProfile?.profilePicture ? (
             <Image
@@ -46,90 +89,27 @@ export default async function HomeownerDashboardPage() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>My Listings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">Manage your property listings</p>
-            <Button asChild>
-              <Link href="/my-products">View Listings</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Create New Listing</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">List a new property for homesharing</p>
-            <Button asChild>
-              <Link href="/sell">Create Listing</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Applications</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">Review applications from potential housemates</p>
-            <Button asChild>
-              <Link href="/homeowner/applications">View Applications</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Messages</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">Chat with potential housemates</p>
-            <Button asChild>
-              <Link href="/homeowner/messages">View Messages</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Edit Profile</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">Update your bio and preferences</p>
-            <Button asChild>
-              <Link href="/homeowner/profile/edit">Edit Profile</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Settings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">Manage your account and profile</p>
-            <Button asChild>
-              <Link href="/settings">Account Settings</Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Billing</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-4">Manage payments and payouts</p>
-            <Button asChild>
-              <Link href="/billing">Billing & Payouts</Link>
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        {dashboardItems.map((item) => {
+          const IconComponent = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="group flex flex-col items-center text-center p-6 rounded-xl hover:bg-gray-50 transition-all duration-200 hover:scale-105 hover:shadow-lg"
+            >
+              <div className={`p-4 rounded-full bg-gray-100 group-hover:bg-white transition-colors duration-200 mb-4`}>
+                <IconComponent className={`w-12 h-12 ${item.color} group-hover:scale-110 transition-transform duration-200`} />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-gray-700">
+                {item.title}
+              </h3>
+              <p className="text-sm text-muted-foreground group-hover:text-gray-600">
+                {item.description}
+              </p>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

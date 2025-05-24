@@ -46,6 +46,17 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
     }
   };
 
+  const getProfileEditLink = () => {
+    switch (userType) {
+      case "HOMEOWNER":
+        return "/homeowner/profile/edit";
+      case "HOUSEMATE":
+        return "/housemate/profile/edit";
+      default:
+        return "/onboarding";
+    }
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -74,7 +85,7 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
             <Link href="/sell">Make a Listing</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/settings">Settings</Link>
+            <Link href={getProfileEditLink()}>Edit Profile</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="my-products">My Products</Link>

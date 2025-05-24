@@ -5,9 +5,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Send, X } from "lucide-react";
+import { Send, X, User } from "lucide-react";
 // import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import Image from "next/image";
 
 interface Message {
   id: string;
@@ -17,6 +18,7 @@ interface Message {
   sender: {
     firstName: string;
     lastName: string;
+    profileImage?: string;
   };
 }
 
@@ -211,6 +213,10 @@ export function HomeownerChatModal({
     }
   };
 
+  const handleViewProfile = () => {
+    window.open(`/profile/${housemateId}`, '_blank');
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -221,15 +227,20 @@ export function HomeownerChatModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
-        <DialogHeader className="flex flex-row items-center justify-between">
+        <DialogHeader>
           <DialogTitle>Chat with {housemateName}</DialogTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="w-4 h-4" />
-          </Button>
         </DialogHeader>
         
-        <div className="text-sm text-muted-foreground mb-4">
-          Property: {productName}
+        <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+          <span>Property: {productName}</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleViewProfile}
+            className="text-xs px-2 py-1 h-auto"
+          >
+            View Profile
+          </Button>
         </div>
 
         <ScrollArea className="flex-1 min-h-[300px] max-h-[400px] pr-4">
@@ -246,10 +257,28 @@ export function HomeownerChatModal({
               messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${
+                  className={`flex gap-3 ${
                     message.senderId === currentUser?.id ? "justify-end" : "justify-start"
                   }`}
                 >
+                  {/* Profile picture - show on left for others, right for current user */}
+                  {message.senderId !== currentUser?.id && (
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 mt-1">
+                      {message.sender.profileImage ? (
+                        <Image
+                          src={message.sender.profileImage}
+                          alt={`${message.sender.firstName}'s profile`}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                          <User className="w-4 h-4 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
                   <div
                     className={`max-w-[70%] rounded-lg px-3 py-2 ${
                       message.senderId === currentUser?.id
@@ -265,6 +294,24 @@ export function HomeownerChatModal({
                       {new Date(message.createdAt).toLocaleTimeString()}
                     </div>
                   </div>
+
+                  {/* Profile picture for current user on the right */}
+                  {message.senderId === currentUser?.id && (
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 mt-1">
+                      {currentUser?.profileImage ? (
+                        <Image
+                          src={currentUser.profileImage}
+                          alt="Your profile"
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                          <User className="w-4 h-4 text-gray-400" />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))
             )}

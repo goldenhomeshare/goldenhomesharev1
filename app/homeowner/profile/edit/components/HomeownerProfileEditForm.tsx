@@ -8,31 +8,47 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { updateHomeownerProfile } from "@/app/actions/profile-actions";
 import { useRouter } from "next/navigation";
-import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed, Camera, Upload } from "lucide-react";
+import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed, Camera, Upload, CigaretteOff } from "lucide-react";
 import { toast } from "sonner";
 import { useUploadThing } from "@/app/lib/uploadthing";
 import Image from "next/image";
 import { useCallback } from "react";
 import React from "react";
+import { UpdateUserSettings } from "@/app/actions";
 
 interface HomeownerProfileEditFormProps {
   userId: string;
   initialData: any;
+  firstName: string;
+  lastName: string;
+  email: string;
 }
 
-export function HomeownerProfileEditForm({ userId, initialData }: HomeownerProfileEditFormProps) {
+export function HomeownerProfileEditForm({ userId, initialData, firstName, lastName, email }: HomeownerProfileEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
+    firstName: firstName || "",
+    lastName: lastName || "",
     bio: initialData?.bio || "",
     profilePicture: initialData?.profilePicture || "",
-    emergencyContactName: initialData?.emergencyContact?.name || "",
-    emergencyContactPhone: initialData?.emergencyContact?.phone || "",
-    emergencyContactRelationship: initialData?.emergencyContact?.relationship || "",
     gender: initialData?.gender || "",
     ageRange: initialData?.ageRange || "",
     schedule: initialData?.schedule || "",
     socialPreference: initialData?.socialPreference || "",
     hobbies: initialData?.hobbies || [],
+    preferredAgeRanges: initialData?.preferredAgeRanges || [],
+    preferredGender: initialData?.preferredGender || "",
+    socialMedia: {
+      instagram: initialData?.socialMedia?.instagram || "",
+      facebook: initialData?.socialMedia?.facebook || "",
+      linkedin: initialData?.socialMedia?.linkedin || "",
+    },
+    lifestyle: {
+      hasPets: initialData?.lifestyle?.hasPets || false,
+      petDescription: initialData?.lifestyle?.petDescription || "",
+      numberOfPeople: initialData?.lifestyle?.numberOfPeople || "1",
+      smokingStatus: initialData?.lifestyle?.smokingStatus || "",
+    },
   });
   
   const router = useRouter();
@@ -84,7 +100,34 @@ export function HomeownerProfileEditForm({ userId, initialData }: HomeownerProfi
     setIsSubmitting(true);
 
     try {
-      const result = await updateHomeownerProfile(formData);
+      // Update basic user info (firstName, lastName) if changed
+      if (formData.firstName !== firstName || formData.lastName !== lastName) {
+        const formDataForUser = new FormData();
+        formDataForUser.append("firstName", formData.firstName);
+        formDataForUser.append("lastName", formData.lastName);
+        
+        const userResult = await UpdateUserSettings(null, formDataForUser);
+        if (userResult.status === "error") {
+          throw new Error(userResult.message || "Failed to update basic information");
+        }
+      }
+
+      // Update profile-specific info
+      const profileData = {
+        bio: formData.bio,
+        profilePicture: formData.profilePicture,
+        gender: formData.gender,
+        ageRange: formData.ageRange,
+        schedule: formData.schedule,
+        socialPreference: formData.socialPreference,
+        hobbies: formData.hobbies,
+        preferredAgeRanges: formData.preferredAgeRanges,
+        preferredGender: formData.preferredGender,
+        socialMedia: formData.socialMedia,
+        lifestyle: formData.lifestyle,
+      };
+      
+      const result = await updateHomeownerProfile(profileData);
       
       if (result.success) {
         toast.success("Profile updated successfully!");
@@ -119,6 +162,25 @@ export function HomeownerProfileEditForm({ userId, initialData }: HomeownerProfi
       hobbies: prev.hobbies.includes(hobbyId)
         ? prev.hobbies.filter((id: string) => id !== hobbyId)
         : [...prev.hobbies, hobbyId]
+    }));
+  };
+
+  const handlePreferredAgeRangeToggle = (ageRangeId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      preferredAgeRanges: prev.preferredAgeRanges.includes(ageRangeId)
+        ? prev.preferredAgeRanges.filter((id: string) => id !== ageRangeId)
+        : [...prev.preferredAgeRanges, ageRangeId]
+    }));
+  };
+
+  const handleLifestyleChange = (field: string, value: string | boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      lifestyle: {
+        ...prev.lifestyle,
+        [field]: value
+      }
     }));
   };
 
@@ -230,6 +292,37 @@ export function HomeownerProfileEditForm({ userId, initialData }: HomeownerProfi
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
+            <Label htmlFor="firstName">First Name</Label>
+            <Input
+              id="firstName"
+              placeholder="First name"
+              value={formData.firstName}
+              onChange={(e) => handleInputChange("firstName", e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="lastName">Last Name</Label>
+            <Input
+              id="lastName"
+              placeholder="Last name"
+              value={formData.lastName}
+              onChange={(e) => handleInputChange("lastName", e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              disabled
+              className="bg-muted text-muted-foreground"
+            />
+            <p className="text-sm text-muted-foreground mt-1">
+              Email cannot be changed from here
+            </p>
+          </div>
+          <div>
             <Label htmlFor="bio">Bio</Label>
             <Textarea
               id="bio"
@@ -238,6 +331,56 @@ export function HomeownerProfileEditForm({ userId, initialData }: HomeownerProfi
               onChange={(e) => handleInputChange("bio", e.target.value)}
               rows={4}
             />
+          </div>
+
+          <div>
+            <Label className="text-base font-medium mb-4 block">Social Media Links</Label>
+            <p className="text-sm text-muted-foreground mb-4">
+              Optional: Add your social media profiles to help potential housemates get to know you better
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="instagram" className="text-sm">Instagram</Label>
+                <Input
+                  id="instagram"
+                  placeholder="https://instagram.com/username"
+                  value={formData.socialMedia.instagram}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    socialMedia: { ...prev.socialMedia, instagram: e.target.value }
+                  }))}
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="facebook" className="text-sm">Facebook</Label>
+                <Input
+                  id="facebook"
+                  placeholder="https://facebook.com/username"
+                  value={formData.socialMedia.facebook}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    socialMedia: { ...prev.socialMedia, facebook: e.target.value }
+                  }))}
+                  className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="linkedin" className="text-sm">LinkedIn</Label>
+                <Input
+                  id="linkedin"
+                  placeholder="https://linkedin.com/in/username"
+                  value={formData.socialMedia.linkedin}
+                  onChange={(e) => setFormData(prev => ({
+                    ...prev,
+                    socialMedia: { ...prev.socialMedia, linkedin: e.target.value }
+                  }))}
+                  className="mt-1"
+                />
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -401,43 +544,237 @@ export function HomeownerProfileEditForm({ userId, initialData }: HomeownerProfi
               })}
             </div>
           </div>
+
+          {/* Preferred Age Ranges */}
+          <div>
+            <Label className="text-base font-medium mb-4 block">Preferred Age Ranges</Label>
+            <p className="text-sm text-muted-foreground mb-4">Select the age ranges you'd prefer to live with (select all that apply)</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                ...ageRangeOptions,
+                { id: "no-preference", label: "No Preference", icon: Users }
+              ].map((option) => {
+                const Icon = option.icon;
+                const isSelected = formData.preferredAgeRanges.includes(option.id);
+                
+                return (
+                  <div key={option.id}>
+                    <label className="cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={isSelected}
+                        onChange={() => handlePreferredAgeRangeToggle(option.id)}
+                      />
+                      <div className="flex flex-col items-center p-4 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 h-full">
+                        <div className="w-12 h-12 rounded-full bg-slate-100 mb-3 flex items-center justify-center">
+                          <Icon size={24} className="text-slate-600" />
+                        </div>
+                        <span className="font-medium text-center text-sm">{option.label}</span>
+                      </div>
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Preferred Gender */}
+          <div>
+            <Label className="text-base font-medium mb-4 block">Preferred Gender</Label>
+            <p className="text-sm text-muted-foreground mb-4">Select your preferred gender for living companions</p>
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { id: "male", label: "Male", icon: UserCircle },
+                { id: "female", label: "Female", icon: User },
+                { id: "no-preference", label: "No Preference", icon: Users }
+              ].map((option) => {
+                const Icon = option.icon;
+                const isSelected = formData.preferredGender === option.id;
+                
+                return (
+                  <div key={option.id}>
+                    <label className="cursor-pointer">
+                      <input
+                        type="radio"
+                        name="preferredGender"
+                        className="sr-only peer"
+                        checked={isSelected}
+                        onChange={() => handleSingleSelect("preferredGender", option.id)}
+                      />
+                      <div className="flex flex-col items-center p-4 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 h-full">
+                        <div className="w-12 h-12 rounded-full bg-slate-100 mb-3 flex items-center justify-center">
+                          <Icon size={24} className="text-slate-600" />
+                        </div>
+                        <span className="font-medium text-center text-sm">{option.label}</span>
+                      </div>
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </CardContent>
       </Card>
 
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle>Emergency Contact</CardTitle>
+          <CardTitle>Lifestyle Preferences</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="emergencyContactName">Contact Name</Label>
-            <Input
-              id="emergencyContactName"
-              placeholder="Full name"
-              value={formData.emergencyContactName}
-              onChange={(e) => handleInputChange("emergencyContactName", e.target.value)}
-            />
+        <CardContent className="space-y-8">
+          {/* Pet Information */}
+          <div className="border border-gray-200 rounded-lg p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+                <PawPrint size={24} className="text-slate-600" />
+              </div>
+              <Label className="text-base font-medium">Pets</Label>
+            </div>
+            
+            <div className="space-y-3">
+              <label className="cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={formData.lifestyle.hasPets}
+                  onChange={(e) => handleLifestyleChange("hasPets", e.target.checked)}
+                />
+                <div className="flex items-center p-3 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 transition-colors">
+                  <div className="flex-1">
+                    <span className="font-medium text-sm">I have pets in the home</span>
+                  </div>
+                  <div className={`w-4 h-4 rounded border transition-colors ${
+                    formData.lifestyle.hasPets 
+                      ? 'border-primary bg-primary' 
+                      : 'border-gray-300'
+                  }`}>
+                    {formData.lifestyle.hasPets && (
+                      <svg className="w-3 h-3 text-white ml-0.5 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                      </svg>
+                    )}
+                  </div>
+                </div>
+              </label>
+              
+              {formData.lifestyle.hasPets && (
+                <div className="ml-3">
+                  <Label className="text-sm text-muted-foreground mb-2 block">
+                    Please describe your pets (type, size, behavior, etc.):
+                  </Label>
+                  <Textarea
+                    placeholder="e.g., Small, friendly dog that is house-trained and quiet"
+                    value={formData.lifestyle.petDescription}
+                    onChange={(e) => handleLifestyleChange("petDescription", e.target.value)}
+                    rows={3}
+                    className="border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                  />
+                </div>
+              )}
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="emergencyContactPhone">Phone Number</Label>
-            <Input
-              id="emergencyContactPhone"
-              type="tel"
-              placeholder="Phone number"
-              value={formData.emergencyContactPhone}
-              onChange={(e) => handleInputChange("emergencyContactPhone", e.target.value)}
-            />
+          {/* Number of People */}
+          <div className="border border-gray-200 rounded-lg p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+                <Users size={24} className="text-slate-600" />
+              </div>
+              <Label className="text-base font-medium">Number of People to House</Label>
+            </div>
+            
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                How many people are you looking to accommodate in your home?
+              </p>
+              
+              <div className="space-y-2">
+                {[
+                  { value: "1", label: "1 person" },
+                  { value: "2", label: "2 people" },
+                  { value: "3+", label: "3 or more people" }
+                ].map((option) => {
+                  const isSelected = formData.lifestyle.numberOfPeople === option.value;
+                  
+                  return (
+                    <div key={option.value}>
+                      <label className="cursor-pointer">
+                        <input
+                          type="radio"
+                          name="numberOfPeopleToHouse"
+                          className="sr-only peer"
+                          checked={isSelected}
+                          onChange={() => handleLifestyleChange("numberOfPeople", option.value)}
+                        />
+                        <div className="flex items-center p-3 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 transition-colors">
+                          <div className="flex-1">
+                            <span className="font-medium text-sm">{option.label}</span>
+                          </div>
+                          <div className={`w-4 h-4 rounded-full border-2 transition-colors ${
+                            isSelected 
+                              ? 'border-primary bg-primary' 
+                              : 'border-gray-300'
+                          }`}>
+                            {isSelected && (
+                              <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                            )}
+                          </div>
+                        </div>
+                      </label>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
-          <div>
-            <Label htmlFor="emergencyContactRelationship">Relationship</Label>
-            <Input
-              id="emergencyContactRelationship"
-              placeholder="e.g., Family member, friend, colleague"
-              value={formData.emergencyContactRelationship}
-              onChange={(e) => handleInputChange("emergencyContactRelationship", e.target.value)}
-            />
+          {/* Home Smoking Policy */}
+          <div className="border border-gray-200 rounded-lg p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+                <CigaretteOff size={24} className="text-slate-600" />
+              </div>
+              <Label className="text-base font-medium">Home Smoking Policy</Label>
+            </div>
+            
+            <div className="space-y-2">
+              {[
+                { value: "no-smoking", label: "No smoking allowed" },
+                { value: "outside-only", label: "Smoking allowed outside only" },
+                { value: "designated-areas", label: "Smoking allowed in designated areas" },
+                { value: "smoking-allowed", label: "Smoking allowed anywhere" }
+              ].map((option) => {
+                const isSelected = formData.lifestyle.smokingStatus === option.value;
+                
+                return (
+                  <div key={option.value}>
+                    <label className="cursor-pointer">
+                      <input
+                        type="radio"
+                        name="homeSmokingPolicy"
+                        className="sr-only peer"
+                        checked={isSelected}
+                        onChange={() => handleLifestyleChange("smokingStatus", option.value)}
+                      />
+                      <div className="flex items-center p-3 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 transition-colors">
+                        <div className="flex-1">
+                          <span className="font-medium text-sm">{option.label}</span>
+                        </div>
+                        <div className={`w-4 h-4 rounded-full border-2 transition-colors ${
+                          isSelected 
+                            ? 'border-primary bg-primary' 
+                            : 'border-gray-300'
+                        }`}>
+                          {isSelected && (
+                            <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                          )}
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </CardContent>
       </Card>

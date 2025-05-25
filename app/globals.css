@@ -123,3 +123,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide scrollbars for horizontal scrolling */
+@layer utilities {
+  .scrollbar-hide {
+    /* Firefox */
+    scrollbar-width: none;
+    /* Safari and Chrome */
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}

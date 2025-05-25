@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase } from "lucide-react";
+import { Heart, Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,15 @@ interface AirbnbStyleCardProps {
   showEditButton?: boolean;
   location?: string;
   amenities?: string[];
+  linkPath?: string;
+  availabilityText?: string;
+  priceLabel?: string;
+  // Demographic information for housemates
+  demographics?: {
+    age?: string;
+    gender?: string;
+    occupation?: string;
+  };
 }
 
 // Amenity icons mapping (same as ListingCard)
@@ -30,6 +39,39 @@ const amenityIcons: Record<string, any> = {
   patio: { icon: Home, label: "Patio/Balcony" },
   furnished: { icon: Armchair, label: "Furnished Room" },
   workspace: { icon: Briefcase, label: "Desk/Workspace" },
+  // Housemate lifestyle preferences
+  "early-riser": { icon: Sun, label: "Early Riser" },
+  "night-owl": { icon: Snowflake, label: "Night Owl" },
+  "flexible": { icon: Car, label: "Flexible Schedule" },
+  "social": { icon: User, label: "Social" },
+  "independent": { icon: Home, label: "Independent" },
+  "balanced": { icon: Heart, label: "Balanced" },
+  // Common hobbies
+  "gardening": { icon: Home, label: "Gardening" },
+  "cooking": { icon: Utensils, label: "Cooking" },
+  "reading": { icon: Briefcase, label: "Reading" },
+  "movies": { icon: Tv, label: "Movies/TV" },
+  "volunteering": { icon: Heart, label: "Volunteering" },
+  "fitness": { icon: User, label: "Fitness" },
+  "church": { icon: Home, label: "Church" },
+  "crafting": { icon: Armchair, label: "Arts & Crafts" },
+  "music": { icon: Heart, label: "Music" },
+  "tech": { icon: Briefcase, label: "Technology" },
+  "pets": { icon: Heart, label: "Pet Lover" },
+  "games": { icon: Armchair, label: "Board Games" },
+};
+
+// Gender and occupation labels for display
+const genderLabels: Record<string, string> = {
+  "male": "Male",
+  "female": "Female",
+  "other": "Other",
+};
+
+const occupationLabels: Record<string, string> = {
+  "student": "Student",
+  "professional": "Professional",
+  "retired": "Retired",
 };
 
 export function AirbnbStyleCard({
@@ -40,7 +82,11 @@ export function AirbnbStyleCard({
   name,
   showEditButton = false,
   location = "Columbia, MO",
-  amenities = []
+  amenities = [],
+  linkPath,
+  availabilityText = "Available now",
+  priceLabel = "month",
+  demographics
 }: AirbnbStyleCardProps) {
   // Use the first image as the main image
   const mainImage = images[0] || "/placeholder-house.svg";
@@ -49,8 +95,11 @@ export function AirbnbStyleCard({
   const displayAmenities = amenities.slice(0, 3);
   const remainingCount = amenities.length - displayAmenities.length;
   
+  // Determine the link path - use custom linkPath if provided, otherwise default to product link
+  const href = linkPath || `/product/${id}`;
+  
   return (
-    <Link href={`/product/${id}`} className="group cursor-pointer">
+    <Link href={href} className="group cursor-pointer">
       <div className="relative w-full h-full flex flex-col">
         {/* Main Image */}
         <div className="relative h-[280px] w-full overflow-hidden rounded-xl flex-shrink-0">
@@ -75,59 +124,133 @@ export function AirbnbStyleCard({
           </button>
         </div>
         
-        {/* Card Content - Fixed height to ensure consistency */}
-        <div className="mt-3 flex-1 flex flex-col min-h-[120px]">
-          {/* Location */}
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="font-medium text-gray-900 truncate pr-2">{location}</h3>
-          </div>
-          
-          {/* Property Type/Name */}
-          <p className="text-gray-600 text-sm truncate mb-1">{name}</p>
-          
-          {/* Amenities - Fixed height container */}
-          <div className="flex-1 min-h-[40px] flex items-start mb-2">
-            {amenities.length > 0 ? (
-              <div className="w-full">
-                <div className="flex flex-wrap items-center gap-1">
-                  {displayAmenities.map((amenityId) => {
-                    const amenity = amenityIcons[amenityId];
-                    if (!amenity) return null;
-                    
-                    const Icon = amenity.icon;
-                    return (
-                      <div 
-                        key={amenityId} 
-                        className="flex items-center gap-1 bg-gray-100 rounded-full px-2 py-1 text-xs"
-                        title={amenity.label}
-                      >
-                        <Icon size={12} className="text-gray-600" />
-                        <span className="text-gray-700 font-medium">{amenity.label}</span>
-                      </div>
-                    );
-                  })}
-                  {remainingCount > 0 && (
-                    <div className="flex items-center bg-gray-100 rounded-full px-2 py-1 text-xs">
-                      <span className="text-gray-700 font-medium">+{remainingCount} more</span>
-                    </div>
-                  )}
-                </div>
+        {/* Card Content - Improved layout for housemates */}
+        <div className="mt-3 flex-1 flex flex-col">
+          {/* For housemates: Combine location and name in one line, otherwise keep separate */}
+          {demographics ? (
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-medium text-gray-900 truncate pr-2">{name}</h3>
+            </div>
+          ) : (
+            <>
+              {/* Location */}
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium text-gray-900 truncate pr-2">{location}</h3>
               </div>
-            ) : (
+              
+              {/* Property Type/Name */}
+              <p className="text-gray-600 text-sm truncate mb-2">{name}</p>
+            </>
+          )}
+          
+          {/* Demographics for housemates - Combined with amenities on same line */}
+          {demographics && (
+            <div className="mb-2">
+              <div className="flex items-center gap-2 text-sm text-gray-700 flex-wrap">
+                {demographics.age && (
+                  <span className="flex items-center gap-1">
+                    <User size={12} />
+                    {demographics.age}
+                  </span>
+                )}
+                {demographics.gender && (
+                  <span className="font-medium">
+                    {genderLabels[demographics.gender] || demographics.gender}
+                  </span>
+                )}
+                {demographics.occupation && (
+                  <span className="flex items-center gap-1">
+                    <Briefcase size={12} />
+                    {occupationLabels[demographics.occupation] || demographics.occupation}
+                  </span>
+                )}
+                {/* Add amenities to the same line */}
+                {amenities.slice(0, 2).map((amenityId) => {
+                  const amenity = amenityIcons[amenityId];
+                  if (!amenity) return null;
+                  
+                  const Icon = amenity.icon;
+                  return (
+                    <div 
+                      key={amenityId} 
+                      className="flex items-center gap-1 bg-gray-100 rounded-full px-2 py-0.5 text-xs"
+                      title={amenity.label}
+                    >
+                      <Icon size={10} className="text-gray-600" />
+                      <span className="text-gray-700 font-medium">{amenity.label}</span>
+                    </div>
+                  );
+                })}
+                {amenities.length > 2 && (
+                  <div className="flex items-center bg-gray-100 rounded-full px-2 py-0.5 text-xs">
+                    <span className="text-gray-700 font-medium">+{amenities.length - 2} more</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {/* Amenities - Only show for non-housemate cards since housemates have them combined above */}
+          {!demographics && amenities.length > 0 ? (
+            <div className="mb-2">
+              <div className="flex flex-wrap items-center gap-1">
+                {amenities.slice(0, 2).map((amenityId) => {
+                  const amenity = amenityIcons[amenityId];
+                  if (!amenity) return null;
+                  
+                  const Icon = amenity.icon;
+                  return (
+                    <div 
+                      key={amenityId} 
+                      className="flex items-center gap-1 bg-gray-100 rounded-full px-2 py-0.5 text-xs"
+                      title={amenity.label}
+                    >
+                      <Icon size={10} className="text-gray-600" />
+                      <span className="text-gray-700 font-medium">{amenity.label}</span>
+                    </div>
+                  );
+                })}
+                {amenities.length > 2 && (
+                  <div className="flex items-center bg-gray-100 rounded-full px-2 py-0.5 text-xs">
+                    <span className="text-gray-700 font-medium">+{amenities.length - 2} more</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : demographics && amenities.length === 0 ? (
+            // For housemates without amenities, show bio
+            <div className="mb-2 flex-1">
+              <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                {smallDescription}
+              </p>
+            </div>
+          ) : !demographics ? (
+            // Standard layout for non-housemate cards
+            <div className="flex-1 min-h-[40px] flex items-start mb-2">
               <p className="text-xs text-gray-600 line-clamp-2">
                 {smallDescription}
               </p>
-            )}
-          </div>
+            </div>
+          ) : null}
           
-          {/* Available text */}
-          <p className="text-gray-600 text-sm mb-1 flex-shrink-0">Available now</p>
-          
-          {/* Price */}
-          <div className="flex items-baseline gap-1 flex-shrink-0">
-            <span className="font-semibold text-gray-900">${price}</span>
-            <span className="text-gray-600 text-sm">month</span>
-          </div>
+          {/* For housemates: Combine availability and price, otherwise keep separate */}
+          {demographics ? (
+            <div className="flex items-center justify-between flex-shrink-0">
+              <span className="text-gray-600 text-sm">{availabilityText}</span>
+              <div className="flex items-baseline gap-1">
+                <span className="font-semibold text-gray-900">${price}</span>
+                <span className="text-gray-600 text-sm">{priceLabel}</span>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Price only - no availability text for home listings */}
+              <div className="flex items-baseline gap-1 flex-shrink-0">
+                <span className="font-semibold text-gray-900">${price}</span>
+                <span className="text-gray-600 text-sm">{priceLabel}</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </Link>

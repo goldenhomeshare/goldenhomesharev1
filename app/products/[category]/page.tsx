@@ -289,12 +289,6 @@ export default function CategoryPage() {
           
           {/* Listings Sidebar - Right side with grid layout */}
           <div className="w-[600px] bg-white border-l border-gray-200 flex flex-col">
-            <div className="p-4 border-b border-gray-200">
-              <h2 className="font-semibold text-gray-900">Visible Listings</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Showing listings currently visible on the map
-              </p>
-            </div>
             <div className="flex-1 overflow-y-auto">
               <div className="p-4">
                 {visibleListings.length === 0 ? (

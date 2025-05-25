@@ -13,7 +13,28 @@ interface iAppProps {
   category: "newest" | "templates" | "uikits" | "icons" | "rooms" | "housemates";
 }
 
-async function getData({ category }: iAppProps) {
+interface ProductData {
+  id: string;
+  name: string;
+  price: number;
+  smallDescription: string;
+  images: string[];
+  amenities?: any;
+  demographics?: {
+    age?: string;
+    gender?: string;
+    occupation?: string;
+  };
+}
+
+interface GetDataResult {
+  data: ProductData[];
+  title: string;
+  link: string;
+  isHousemates?: boolean;
+}
+
+async function getData({ category }: iAppProps): Promise<GetDataResult> {
   switch (category) {
     case "rooms": {
       // Combine all room types (templates, uikits, icons) into one category
@@ -151,47 +172,49 @@ async function getData({ category }: iAppProps) {
       };
     }
     case "housemates": {
-      // For now, create placeholder data for housemates searching for rooms
-      // This will be replaced with actual housemate profile data later
-      const placeholderHousemates = [
-        {
-          id: "housemate-1",
-          name: "Looking for housemates...",
-          price: 0,
-          smallDescription: "Connect with potential housemates",
-          images: ["/placeholder-house.svg"],
-          amenities: ["friendly", "clean", "quiet"]
+      // Fetch real housemate profiles from the database
+      const housemateProfiles = await prisma.housemateProfile.findMany({
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            }
+          }
         },
-        {
-          id: "housemate-2", 
-          name: "Coming soon...",
-          price: 0,
-          smallDescription: "Housemate profiles will appear here",
-          images: ["/placeholder-house.svg"],
-          amenities: ["verified", "background-checked"]
+        orderBy: {
+          createdAt: 'desc'
         },
-        {
-          id: "housemate-3",
-          name: "Find your match",
-          price: 0,
-          smallDescription: "Browse compatible housemate profiles",
-          images: ["/placeholder-house.svg"],
-          amenities: ["compatible", "reliable"]
+        take: 4,
+      });
+
+      // Transform the data to work with AirbnbStyleCard (similar to other categories)
+      const transformedProfiles = housemateProfiles.map(profile => ({
+        id: profile.user.id, // Use userId as the id for profile links
+        name: `${profile.user.firstName} ${profile.user.lastName}`,
+        price: profile.maxBudget || 0,
+        smallDescription: profile.bio || 'No bio available',
+        images: profile.profilePicture ? [profile.profilePicture] : [],
+        // Create amenities array from preferences and lifestyle attributes (not demographics)
+        amenities: [
+          ...(profile.schedule ? [profile.schedule] : []),
+          ...(profile.socialPreference ? [profile.socialPreference] : []),
+        ].filter(Boolean), // Remove any falsy values, simplified to just 2 key preferences
+        // Demographics information
+        demographics: {
+          age: profile.ageRange || undefined,
+          gender: profile.gender || undefined,
+          occupation: profile.occupation || undefined,
         },
-        {
-          id: "housemate-4",
-          name: "Safe connections",
-          price: 0,
-          smallDescription: "All profiles are verified and screened",
-          images: ["/placeholder-house.svg"],
-          amenities: ["verified", "safe", "trusted"]
-        }
-      ];
+      }));
 
       return {
-        data: placeholderHousemates,
-        title: "Housemates Searching",
-        link: "/products/icon", // This links to the existing housemate profiles page
+        data: transformedProfiles,
+        title: "Available Housemates",
+        link: "/products/icon",
+        isHousemates: true,
       };
     }
     default: {
@@ -212,6 +235,7 @@ export function AirbnbStyleRow({ category }: iAppProps) {
 
 async function LoadRows({ category }: iAppProps) {
   const data = await getData({ category: category });
+  
   return (
     <>
       <div className="mb-6">
@@ -229,9 +253,10 @@ async function LoadRows({ category }: iAppProps) {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {/* Mobile: Horizontal scroll, Desktop: Grid */}
+      <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:overflow-x-visible sm:pb-0">
         {data.data.map((product) => (
-          <div key={product.id} className="h-[450px]">
+          <div key={product.id} className={`flex-shrink-0 w-[280px] sm:w-auto ${data.isHousemates ? "h-[420px]" : "h-[450px]"}`}>
             <AirbnbStyleCard
               images={product.images}
               id={product.id}
@@ -243,6 +268,11 @@ async function LoadRows({ category }: iAppProps) {
                   ? (product.amenities as string[])
                   : []
               }
+              linkPath={data.isHousemates ? `/profile/${product.id}` : undefined}
+              location={data.isHousemates ? "Seeking housing" : undefined}
+              availabilityText={data.isHousemates ? "Looking for housing" : undefined}
+              priceLabel={data.isHousemates ? "budget" : undefined}
+              demographics={data.isHousemates ? (product as any).demographics : undefined}
             />
           </div>
         ))}
@@ -260,9 +290,9 @@ function LoadingState() {
           <Skeleton className="h-5 w-5 rounded" />
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:overflow-x-visible sm:pb-0">
         {[...Array(4)].map((_, index) => (
-          <div key={index} className="h-[450px]">
+          <div key={index} className="flex-shrink-0 w-[280px] sm:w-auto h-[450px]">
             <LoadingAirbnbCard />
           </div>
         ))}

@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/app/lib/db";
-import { requireHomeowner, requireHousemate } from "@/lib/auth";
+import { requireHomeowner, requireHousemate, getCurrentUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 
 // Homeowner profile update action
@@ -133,5 +133,81 @@ export async function updateHousemateProfile(
     console.error("Error updating housemate profile:", error);
     const errorMessage = error instanceof Error ? error.message : "Failed to update profile";
     return { success: false, error: `Profile update failed: ${errorMessage}` };
+  }
+}
+
+// Create housemate profile action for signup wizard
+export async function createHousemateProfile(
+  data: {
+    age?: number;
+    occupation?: string;
+    bio?: string;
+    profilePicture?: string;
+    maxBudget?: number;
+    gender?: string;
+    ageRange?: string;
+    schedule?: string;
+    socialPreference?: string;
+    hobbies?: string[];
+    preferredAgeRanges?: string[];
+    preferredGender?: string;
+    canHelpWith?: string[];
+    socialMedia?: {
+      instagram?: string;
+      facebook?: string;
+      linkedin?: string;
+    };
+    lifestyle?: any;
+  }
+) {
+  try {
+    const user = await getCurrentUser();
+    
+    if (!user) {
+      return { success: false, error: "User not authenticated" };
+    }
+    
+    // Create the profile data object
+    const profileData: any = {
+      userId: user.id,
+    };
+    
+    if (data.age !== undefined) profileData.age = data.age;
+    if (data.occupation !== undefined) profileData.occupation = data.occupation;
+    if (data.bio !== undefined) profileData.bio = data.bio;
+    if (data.profilePicture !== undefined) profileData.profilePicture = data.profilePicture;
+    if (data.maxBudget !== undefined) profileData.maxBudget = data.maxBudget;
+    if (data.gender !== undefined) profileData.gender = data.gender;
+    if (data.ageRange !== undefined) profileData.ageRange = data.ageRange;
+    if (data.schedule !== undefined) profileData.schedule = data.schedule;
+    if (data.socialPreference !== undefined) profileData.socialPreference = data.socialPreference;
+    if (data.hobbies !== undefined) profileData.hobbies = data.hobbies;
+    if (data.preferredAgeRanges !== undefined) profileData.preferredAgeRanges = data.preferredAgeRanges;
+    if (data.preferredGender !== undefined) profileData.preferredGender = data.preferredGender;
+    if (data.canHelpWith !== undefined) profileData.canHelpWith = data.canHelpWith;
+    if (data.socialMedia !== undefined) profileData.socialMedia = data.socialMedia;
+    if (data.lifestyle !== undefined) profileData.lifestyle = data.lifestyle;
+
+    // Create the housemate profile
+    await prisma.housemateProfile.create({
+      data: profileData,
+    });
+
+    // Update user type to HOUSEMATE
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { 
+        userType: "HOUSEMATE",
+        onboardingCompleted: true,
+      },
+    });
+
+    revalidatePath("/housemate/dashboard");
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error creating housemate profile:", error);
+    const errorMessage = error instanceof Error ? error.message : "Failed to create profile";
+    return { success: false, error: `Profile creation failed: ${errorMessage}` };
   }
 } 

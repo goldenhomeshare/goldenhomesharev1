@@ -17,13 +17,14 @@ export function OnboardingForm({ userId }: { userId: string }) {
   const handleRoleSelection = async (role: UserType) => {
     setIsSubmitting(true);
     try {
-      const result = await completeOnboarding(userId, role);
-      if (result.success) {
-        // Redirect to existing profile edit pages
-        if (role === "HOMEOWNER") {
+      if (role === "HOUSEMATE") {
+        // For housemates, redirect to the signup wizard without completing onboarding yet
+        router.push("/housemate/signup-wizard");
+      } else {
+        // For homeowners, complete onboarding and redirect to profile edit
+        const result = await completeOnboarding(userId, role);
+        if (result.success) {
           router.push("/homeowner/profile/edit");
-        } else {
-          router.push("/housemate/profile/edit");
         }
       }
     } catch (error) {
@@ -45,7 +46,7 @@ export function OnboardingForm({ userId }: { userId: string }) {
             <p className="text-sm text-gray-600">
               {selectedRole === "HOMEOWNER" 
                 ? "Preparing your homeowner dashboard" 
-                : "Preparing your housemate profile"
+                : "Starting your profile setup wizard"
               }
             </p>
           </div>
@@ -121,10 +122,10 @@ export function OnboardingForm({ userId }: { userId: string }) {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Setting up...
+                      Starting wizard...
                     </>
                   ) : (
-                    "Continue as Housemate"
+                    "Start Profile Setup"
                   )}
                 </Button>
               )}

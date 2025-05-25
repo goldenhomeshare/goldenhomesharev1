@@ -2,8 +2,10 @@ import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/app/lib/db";
 import Image from "next/image";
-import { User, MapPin, CheckCircle, Heart, Briefcase, Clock, Users, PawPrint, CigaretteOff, Cigarette, Instagram, Facebook, Linkedin, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield } from "lucide-react";
+import { User, MapPin, CheckCircle, Heart, Briefcase, Clock, Users, PawPrint, CigaretteOff, Cigarette, Instagram, Facebook, Linkedin, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, BookOpen, Film, Dumbbell, Music, Gamepad2, Palette, Church, GraduationCap, Armchair } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ProfileNavigation } from "./components/ProfileNavigation";
+import { calculateAgeRange, extractDateOfBirth } from "@/lib/age-utils";
 
 const supportIcons: Record<string, any> = {
   cleaning: { icon: Sparkles, label: "Cleaning" },
@@ -14,6 +16,21 @@ const supportIcons: Record<string, any> = {
   petCare: { icon: Cat, label: "Pet Care" },
   techSupport: { icon: Wrench, label: "Tech Support" },
   homeSecurity: { icon: Shield, label: "Home Security" },
+};
+
+const hobbyIcons: Record<string, any> = {
+  gardening: { icon: Flower, label: "Gardening" },
+  cooking: { icon: Salad, label: "Cooking/Baking" },
+  reading: { icon: BookOpen, label: "Reading" },
+  movies: { icon: Film, label: "Movies/TV" },
+  volunteering: { icon: HeartHandshake, label: "Volunteering" },
+  fitness: { icon: Dumbbell, label: "Fitness" },
+  church: { icon: Church, label: "Church/Religious" },
+  crafting: { icon: Palette, label: "Crafting/Art" },
+  music: { icon: Music, label: "Music" },
+  tech: { icon: Wrench, label: "Tech/Computers" },
+  pets: { icon: PawPrint, label: "Pets/Animals" },
+  games: { icon: Gamepad2, label: "Board Games" }
 };
 
 interface ProfilePageProps {
@@ -113,6 +130,10 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     }
   }
 
+  // Calculate age range based on date of birth
+  const dateOfBirth = extractDateOfBirth(profile?.lifestyle);
+  const displayAgeRange = dateOfBirth ? calculateAgeRange(dateOfBirth) : (profile?.ageRange || 'Age not specified');
+
   const occupationLabels: Record<string, string> = {
     student: "Student",
     professional: "Professional",
@@ -192,66 +213,75 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   </div>
                   <p className="text-gray-600 flex items-center justify-center gap-1">
                     <MapPin size={16} />
-                    Location not specified
+                    {lifestyleData.location?.city && lifestyleData.location?.state ? (
+                      `${lifestyleData.location.city}, ${lifestyleData.location.state}`
+                    ) : (
+                      'Location not specified'
+                    )}
                   </p>
                 </div>
 
-                {/* Stats */}
-                <div className="text-center mb-6">
-                  <div className="text-sm text-gray-600 mb-1">
-                    {profile?.ageRange || 'Age not specified'}
-                  </div>
-                  <div className="text-lg font-semibold text-gray-900">
-                    {profile?.maxBudget ? `$${profile.maxBudget}/month` : 'Budget not specified'}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {profile?.maxBudget ? 'Housing budget' : 'Budget not set'}
-                  </div>
-                </div>
-
-                {/* Contact Button */}
-                {!isOwnProfile && (
-                  <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-full py-3 font-medium mb-6">
-                    Contact {profileUser.firstName}
-                  </Button>
-                )}
-
-                {/* Basic Info */}
-                {(profile?.occupation || profile?.gender) && (
-                  <div className="space-y-3 mb-6">
-                    {profile?.occupation && (
-                      <div className="flex items-center gap-3">
-                        <Briefcase size={16} className="text-gray-400" />
-                        <span className="text-sm text-gray-700">
-                          {occupationLabels[profile.occupation] || profile.occupation}
-                        </span>
-                      </div>
-                    )}
-                    {profile?.gender && (
-                      <div className="flex items-center gap-3">
-                        <User size={16} className="text-gray-400" />
-                        <span className="text-sm text-gray-700">
-                          {genderLabels[profile.gender] || profile.gender}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Social Media Links */}
-                {(socialMediaData.instagram || socialMediaData.facebook || socialMediaData.linkedin) && (
+                {/* Basic Information */}
+                {(profile?.occupation || profile?.gender || profile?.ageRange || profile?.maxBudget || socialMediaData.instagram || socialMediaData.facebook || socialMediaData.linkedin) && (
                   <div className="mb-6">
-                    <h3 className="font-semibold text-gray-900 mb-3">Social Media</h3>
-                    <div className="space-y-2">
+                    <h4 className="font-medium mb-3">Basic Information</h4>
+                    <div className="space-y-3">
+                      {profile?.occupation && (
+                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            {lifestyleData.occupationDetails?.isRetired ? (
+                              <Armchair size={16} className="text-primary" />
+                            ) : lifestyleData.education?.stillAttending ? (
+                              <GraduationCap size={16} className="text-primary" />
+                            ) : (
+                              <Briefcase size={16} className="text-primary" />
+                            )}
+                          </div>
+                          <span className="text-sm font-medium text-gray-700">
+                            {lifestyleData.occupationDetails?.isRetired ? "Retired" : lifestyleData.education?.stillAttending ? "Student" : (occupationLabels[profile.occupation] || profile.occupation)}
+                          </span>
+                        </div>
+                      )}
+
+                      {profile?.gender && (
+                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <User size={16} className="text-primary" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-700">{genderLabels[profile.gender] || profile.gender}</span>
+                        </div>
+                      )}
+                      
+                      {profile?.ageRange && (
+                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Users size={16} className="text-primary" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-700">Age: {displayAgeRange}</span>
+                        </div>
+                      )}
+                      
+                      {profile?.maxBudget && (
+                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <DollarSign size={16} className="text-primary" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-700">Budget: Up to ${profile.maxBudget}/month</span>
+                        </div>
+                      )}
+
+                      {/* Social Media Links */}
                       {socialMediaData.instagram && (
                         <a 
                           href={socialMediaData.instagram} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-pink-600"
+                          className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-primary/5 transition-colors group"
                         >
-                          <Instagram size={16} />
-                          Instagram
+                          <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-pink-200 transition-colors">
+                            <Instagram size={16} className="text-pink-600" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-700 group-hover:text-pink-600 transition-colors">Instagram</span>
                         </a>
                       )}
                       {socialMediaData.facebook && (
@@ -259,10 +289,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                           href={socialMediaData.facebook} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600"
+                          className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-primary/5 transition-colors group"
                         >
-                          <Facebook size={16} />
-                          Facebook
+                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                            <Facebook size={16} className="text-blue-600" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">Facebook</span>
                         </a>
                       )}
                       {socialMediaData.linkedin && (
@@ -270,10 +302,12 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                           href={socialMediaData.linkedin} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-700"
+                          className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-primary/5 transition-colors group"
                         >
-                          <Linkedin size={16} />
-                          LinkedIn
+                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                            <Linkedin size={16} className="text-blue-700" />
+                          </div>
+                          <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 transition-colors">LinkedIn</span>
                         </a>
                       )}
                     </div>
@@ -287,8 +321,8 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100">
               {/* About Section */}
-              <div className="p-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <div id="about-section" className="p-6">
+                <h2 className="text-xl font-semibold text-primary mb-4">
                   About {profileUser.firstName}
                 </h2>
                 
@@ -302,14 +336,58 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                   </p>
                 )}
 
+                {/* Education & Work */}
+                {(lifestyleData.education || lifestyleData.occupationDetails || profile?.occupation) && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold text-primary mb-3">Education & Work</h3>
+                    <div className="space-y-4">
+                      {lifestyleData.education && (
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <h4 className="font-medium text-gray-900 mb-2">Education</h4>
+                          <div className="text-gray-700 space-y-1">
+                            {lifestyleData.education.level && (
+                              <p><span className="font-medium">Level:</span> {lifestyleData.education.level}</p>
+                            )}
+                            {lifestyleData.education.degreeProgram && (
+                              <p><span className="font-medium">Program:</span> {lifestyleData.education.degreeProgram}</p>
+                            )}
+                            {lifestyleData.education.stillAttending && (
+                              <p className="text-sm text-primary font-medium">Currently attending</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {(lifestyleData.occupationDetails || profile?.occupation) && (
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <h4 className="font-medium text-gray-900 mb-2">Work</h4>
+                          <div className="text-gray-700">
+                            {lifestyleData.occupationDetails?.isRetired ? (
+                              <p className="font-medium">Retired</p>
+                            ) : lifestyleData.occupationDetails?.description ? (
+                              <p className="font-medium">{lifestyleData.occupationDetails.description}</p>
+                            ) : profile?.occupation ? (
+                              <p className="font-medium">{occupationLabels[profile.occupation] || profile.occupation}</p>
+                            ) : (
+                              <p className="text-gray-500 italic">No work information provided</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Personal Preferences */}
                 {(profile?.schedule || profile?.socialPreference) && (
-                  <div className="mb-6">
-                    <h3 className="font-semibold text-gray-900 mb-3">Personal Preferences</h3>
+                  <div id="preferences-section" className="mb-6">
+                    <h3 className="font-semibold text-primary mb-3">Personal Preferences</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {profile?.schedule && (
                         <div className="flex items-center gap-3">
-                          <Clock size={20} className="text-gray-400" />
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Clock size={20} className="text-primary" />
+                          </div>
                           <div>
                             <div className="font-medium text-sm">Schedule</div>
                             <div className="text-sm text-gray-600">
@@ -320,7 +398,9 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                       )}
                       {profile?.socialPreference && (
                         <div className="flex items-center gap-3">
-                          <Users size={20} className="text-gray-400" />
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Users size={20} className="text-primary" />
+                          </div>
                           <div>
                             <div className="font-medium text-sm">Social Style</div>
                             <div className="text-sm text-gray-600">
@@ -336,29 +416,35 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 {/* Hobbies & Interests */}
                 {hobbiesArray.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="font-semibold text-gray-900 mb-3">Hobbies & Interests</h3>
+                    <h3 className="font-semibold text-primary mb-3">Hobbies & Interests</h3>
                     <div className="flex flex-wrap gap-2">
-                      {hobbiesArray.map((hobby, index) => (
-                        <span
-                          key={index}
-                          className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
-                        >
-                          {hobbiesLabels[hobby] || hobby}
-                        </span>
-                      ))}
+                      {hobbiesArray.map((hobby, index) => {
+                        const hobbyData = hobbyIcons[hobby];
+                        const Icon = hobbyData?.icon;
+                        
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium border border-primary/20 hover:bg-primary/20 transition-colors"
+                          >
+                            {Icon && <Icon size={16} className="text-primary" />}
+                            <span>{hobbyData?.label || hobbiesLabels[hobby] || hobby}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
 
                 {/* Housing Preferences */}
-                <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">Housing Preferences</h3>
+                <div id="housing-section" className="mb-6">
+                  <h3 className="font-semibold text-primary mb-3">Housing Preferences</h3>
                   <div className="space-y-4">
                     {/* Budget */}
-                    <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="bg-primary/5 rounded-lg p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <DollarSign size={16} className="text-gray-500" />
+                          <DollarSign size={16} className="text-primary" />
                           <span className="text-gray-700">Monthly budget</span>
                         </div>
                         <span className="font-semibold">
@@ -457,7 +543,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 {/* Can Help With */}
                 {canHelpWithArray.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="font-semibold text-gray-900 mb-3">Can Help With</h3>
+                    <h3 className="font-semibold text-primary mb-3">Can Help With</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {canHelpWithArray.map((supportId, index) => {
                         const support = supportIcons[supportId];
@@ -465,11 +551,11 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                         
                         const Icon = support.icon;
                         return (
-                          <div key={index} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                              <Icon size={16} className="text-green-600" />
+                          <div key={index} className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg border border-primary/10">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                              <Icon size={16} className="text-primary" />
                             </div>
-                            <span className="text-sm font-medium text-green-800">
+                            <span className="text-sm font-medium text-primary">
                               {support.label}
                             </span>
                           </div>
@@ -478,22 +564,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     </div>
                   </div>
                 )}
-
-                {/* Reviews Section */}
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-gray-900">Reviews</h3>
-                    {!isOwnProfile && (
-                      <Button variant="outline" size="sm">
-                        Leave a review
-                      </Button>
-                    )}
-                  </div>
-                  <div className="text-center py-8 text-gray-500">
-                    <p className="font-medium">No reviews yet</p>
-                    <p className="text-sm">Be the first to leave {profileUser.firstName} a review!</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

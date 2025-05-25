@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { User, MapPin, Heart, CheckCircle, Briefcase, Users, DollarSign } from "lucide-react";
+import { User, MapPin, Heart, CheckCircle, Briefcase, Users, DollarSign, GraduationCap, Armchair } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HousemateProfileCardNewProps {
@@ -19,6 +19,7 @@ interface HousemateProfileCardNewProps {
   isVerified?: boolean;
   userId?: string;
   email?: string;
+  lifestyle?: any;
   onContact?: (housemateId: string, email: string) => void;
 }
 
@@ -56,9 +57,27 @@ export function HousemateProfileCardNew({
   isVerified = false,
   userId,
   email,
+  lifestyle,
   onContact
 }: HousemateProfileCardNewProps) {
   const [isLiked, setIsLiked] = useState(false);
+
+  // Parse lifestyle data to check if currently attending school
+  let lifestyleData: any = {};
+  if (lifestyle) {
+    try {
+      lifestyleData = typeof lifestyle === 'string' 
+        ? JSON.parse(lifestyle) 
+        : lifestyle;
+    } catch {
+      lifestyleData = {};
+    }
+  }
+
+  const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
+
+  // Check if retired
+  const isRetired = lifestyleData.occupationDetails?.isRetired || false;
 
   const handleContact = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -140,8 +159,16 @@ export function HousemateProfileCardNew({
               {/* Occupation */}
               {occupation && (
                 <div className="flex items-center gap-1 text-gray-600">
-                  <Briefcase size={12} className="flex-shrink-0" />
-                  <span className="text-xs">{occupationLabels[occupation] || occupation}</span>
+                  {isRetired ? (
+                    <Armchair size={12} className="flex-shrink-0" />
+                  ) : isCurrentlyAttending ? (
+                    <GraduationCap size={12} className="flex-shrink-0" />
+                  ) : (
+                    <Briefcase size={12} className="flex-shrink-0" />
+                  )}
+                  <span className="text-xs">
+                    {isRetired ? "Retired" : isCurrentlyAttending ? "Student" : (occupationLabels[occupation] || occupation)}
+                  </span>
                 </div>
               )}
             </div>

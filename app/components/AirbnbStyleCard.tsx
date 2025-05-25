@@ -1,6 +1,6 @@
 'use client';
 
-import { Heart, Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, User } from "lucide-react";
+import { Heart, Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, User, GraduationCap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,8 @@ interface AirbnbStyleCardProps {
     age?: string;
     gender?: string;
     occupation?: string;
+    isCurrentlyAttending?: boolean;
+    isRetired?: boolean;
   };
 }
 
@@ -160,8 +162,14 @@ export function AirbnbStyleCard({
                 )}
                 {demographics.occupation && (
                   <span className="flex items-center gap-1">
-                    <Briefcase size={12} />
-                    {occupationLabels[demographics.occupation] || demographics.occupation}
+                    {demographics.isRetired ? (
+                      <Armchair size={12} />
+                    ) : demographics.isCurrentlyAttending ? (
+                      <GraduationCap size={12} />
+                    ) : (
+                      <Briefcase size={12} />
+                    )}
+                    {demographics.isRetired ? "Retired" : demographics.isCurrentlyAttending ? "Student" : (occupationLabels[demographics.occupation] || demographics.occupation)}
                   </span>
                 )}
                 {/* Add amenities to the same line */}

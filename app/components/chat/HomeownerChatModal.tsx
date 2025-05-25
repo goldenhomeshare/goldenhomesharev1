@@ -287,7 +287,7 @@ export function HomeownerChatModal({
                     }`}
                   >
                     <div className="text-sm font-medium mb-1">
-                      {message.sender.firstName} {message.sender.lastName}
+                      {message.sender.firstName} {message.sender.lastName?.charAt(0) || ''}.
                     </div>
                     <div className="text-sm">{message.content}</div>
                     <div className="text-xs opacity-70 mt-1">

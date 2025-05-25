@@ -81,7 +81,7 @@ export function HomeownerChatCard({ chatRoom, user }: HomeownerChatCardProps) {
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <h3 className="font-medium text-lg">
-                    {chatRoom.housemate.firstName} {chatRoom.housemate.lastName}
+                    {chatRoom.housemate.firstName} {chatRoom.housemate.lastName?.charAt(0) || ''}.
                   </h3>
                   <p className="text-sm text-muted-foreground">
                     About: {chatRoom.product.name}
@@ -140,7 +140,7 @@ export function HomeownerChatCard({ chatRoom, user }: HomeownerChatCardProps) {
         onClose={() => setIsModalOpen(false)}
         productId={chatRoom.productId}
         housemateId={chatRoom.housemateId}
-        housemateName={`${chatRoom.housemate.firstName} ${chatRoom.housemate.lastName}`}
+        housemateName={`${chatRoom.housemate.firstName} ${chatRoom.housemate.lastName?.charAt(0) || ''}.`}
         productName={chatRoom.product.name}
         hostId={chatRoom.homeownerId}
         hostName={`${user.firstName} ${user.lastName}`}

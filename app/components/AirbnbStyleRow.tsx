@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronRight } from "lucide-react";
+import { calculateAgeRange, extractDateOfBirth } from "@/lib/age-utils";
 
 // Special product ID for profile-based chats (should be excluded from listings)
 const PROFILE_CHAT_PRODUCT_ID = "profile-chat-placeholder";
@@ -24,6 +25,8 @@ interface ProductData {
     age?: string;
     gender?: string;
     occupation?: string;
+    isCurrentlyAttending?: boolean;
+    isRetired?: boolean;
   };
 }
 
@@ -191,24 +194,50 @@ async function getData({ category }: iAppProps): Promise<GetDataResult> {
       });
 
       // Transform the data to work with AirbnbStyleCard (similar to other categories)
-      const transformedProfiles = housemateProfiles.map(profile => ({
-        id: profile.user.id, // Use userId as the id for profile links
-        name: `${profile.user.firstName} ${profile.user.lastName}`,
-        price: profile.maxBudget || 0,
-        smallDescription: profile.bio || 'No bio available',
-        images: profile.profilePicture ? [profile.profilePicture] : [],
-        // Create amenities array from preferences and lifestyle attributes (not demographics)
-        amenities: [
-          ...(profile.schedule ? [profile.schedule] : []),
-          ...(profile.socialPreference ? [profile.socialPreference] : []),
-        ].filter(Boolean), // Remove any falsy values, simplified to just 2 key preferences
-        // Demographics information
-        demographics: {
-          age: profile.ageRange || undefined,
-          gender: profile.gender || undefined,
-          occupation: profile.occupation || undefined,
-        },
-      }));
+      const transformedProfiles = housemateProfiles.map(profile => {
+        // Calculate age range based on date of birth
+        const dateOfBirth = extractDateOfBirth(profile.lifestyle);
+        const displayAgeRange = dateOfBirth ? calculateAgeRange(dateOfBirth) : (profile.ageRange || undefined);
+
+        // Parse lifestyle data to get education information
+        let lifestyleData: any = {};
+        if (profile.lifestyle) {
+          try {
+            lifestyleData = typeof profile.lifestyle === 'string' 
+              ? JSON.parse(profile.lifestyle) 
+              : profile.lifestyle;
+          } catch {
+            lifestyleData = {};
+          }
+        }
+
+        // Check if currently attending school
+        const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
+
+        // Check if retired
+        const isRetired = lifestyleData.occupationDetails?.isRetired || false;
+
+        return {
+          id: profile.user.id, // Use userId as the id for profile links
+          name: `${profile.user.firstName} ${profile.user.lastName?.charAt(0) || ''}.`,
+          price: profile.maxBudget || 0,
+          smallDescription: profile.bio || 'No bio available',
+          images: profile.profilePicture ? [profile.profilePicture] : [],
+          // Create amenities array from preferences and lifestyle attributes (not demographics)
+          amenities: [
+            ...(profile.schedule ? [profile.schedule] : []),
+            ...(profile.socialPreference ? [profile.socialPreference] : []),
+          ].filter(Boolean), // Remove any falsy values, simplified to just 2 key preferences
+          // Demographics information
+          demographics: {
+            age: displayAgeRange,
+            gender: profile.gender || undefined,
+            occupation: profile.occupation || undefined,
+            isCurrentlyAttending: isCurrentlyAttending,
+            isRetired: isRetired,
+          },
+        };
+      });
 
       return {
         data: transformedProfiles,

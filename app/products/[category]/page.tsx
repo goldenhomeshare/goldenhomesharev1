@@ -174,6 +174,7 @@ export default function CategoryPage() {
                 isVerified={true}
                 userId={housemate.userId}
                 email={housemate.email}
+                lifestyle={housemate.lifestyle}
                 onContact={handleContactHousemate}
               />
             ))}

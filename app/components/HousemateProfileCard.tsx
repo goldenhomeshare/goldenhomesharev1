@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { User, MapPin, Heart, MessageCircle, CheckCircle } from "lucide-react";
+import { User, MapPin, Heart, MessageCircle, CheckCircle, Armchair } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Briefcase, Clock, Users, Instagram, Facebook, Linkedin, PawPrint, Cigarette, CigaretteOff, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield } from "lucide-react";
+import { Briefcase, Clock, Users, Instagram, Facebook, Linkedin, PawPrint, Cigarette, CigaretteOff, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, GraduationCap } from "lucide-react";
 
 interface HousemateProfile {
   profilePicture?: string | null;
@@ -103,6 +103,20 @@ const supportIcons: Record<string, any> = {
 export function HousemateProfileCard({ housemate }: HousemateProfileCardProps) {
   const profile = housemate.housemateProfile;
 
+  // Parse lifestyle data to check if currently attending school
+  let lifestyleData: any = {};
+  if (profile?.lifestyle) {
+    try {
+      lifestyleData = typeof profile.lifestyle === 'string' 
+        ? JSON.parse(profile.lifestyle) 
+        : profile.lifestyle;
+    } catch {
+      lifestyleData = {};
+    }
+  }
+
+  const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
+
   return (
     <Card className="mt-8">
       <CardHeader>
@@ -123,7 +137,7 @@ export function HousemateProfileCard({ housemate }: HousemateProfileCardProps) {
           </div>
           <div>
             <h3 className="text-xl font-semibold">Housemate Profile</h3>
-            <p className="text-lg text-muted-foreground">{housemate.firstName} {housemate.lastName}</p>
+            <p className="text-lg text-muted-foreground">{housemate.firstName} {housemate.lastName?.charAt(0) || ''}.</p>
           </div>
         </CardTitle>
       </CardHeader>
@@ -145,9 +159,17 @@ export function HousemateProfileCard({ housemate }: HousemateProfileCardProps) {
               {profile.occupation && (
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                    <Briefcase size={16} className="text-slate-600" />
+                    {lifestyleData.occupationDetails?.isRetired ? (
+                      <Armchair size={16} className="text-slate-600" />
+                    ) : isCurrentlyAttending ? (
+                      <GraduationCap size={16} className="text-slate-600" />
+                    ) : (
+                      <Briefcase size={16} className="text-slate-600" />
+                    )}
                   </div>
-                  <span className="text-sm">{occupationLabels[profile.occupation] || profile.occupation}</span>
+                  <span className="text-sm">
+                    {lifestyleData.occupationDetails?.isRetired ? "Retired" : isCurrentlyAttending ? "Student" : (occupationLabels[profile.occupation] || profile.occupation)}
+                  </span>
                 </div>
               )}
               

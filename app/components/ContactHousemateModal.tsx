@@ -277,7 +277,7 @@ export function ContactHousemateModal({
                         style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}
                       >
                         <div className="text-xs font-medium mb-1 opacity-75">
-                          {message.sender.firstName} {message.sender.lastName}
+                          {message.sender.firstName} {message.sender.lastName?.charAt(0) || ''}.
                         </div>
                         <div className="text-sm whitespace-pre-wrap break-words">
                           {message.content}

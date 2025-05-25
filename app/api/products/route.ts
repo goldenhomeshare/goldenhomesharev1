@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/db";
 import { type CategoryTypes } from "@prisma/client";
+import { calculateAgeRange, extractDateOfBirth } from "@/lib/age-utils";
 
 // Special product ID for profile-based chats (should be excluded from listings)
 const PROFILE_CHAT_PRODUCT_ID = "profile-chat-placeholder";
@@ -33,25 +34,31 @@ export async function GET(request: NextRequest) {
       });
 
       // Transform the data to match the expected format
-      const transformedProfiles = housemateProfiles.map(profile => ({
-        id: profile.user.id,
-        name: `${profile.user.firstName} ${profile.user.lastName}`,
-        price: profile.maxBudget || 0,
-        smallDescription: profile.bio || 'No bio available',
-        images: profile.profilePicture ? [profile.profilePicture] : [],
-        // Additional housemate-specific data
-        occupation: profile.occupation,
-        gender: profile.gender,
-        ageRange: profile.ageRange,
-        schedule: profile.schedule,
-        socialPreference: profile.socialPreference,
-        hobbies: profile.hobbies,
-        preferredGender: profile.preferredGender,
-        socialMedia: profile.socialMedia,
-        lifestyle: profile.lifestyle,
-        email: profile.user.email,
-        userId: profile.user.id,
-      }));
+      const transformedProfiles = housemateProfiles.map(profile => {
+        // Calculate age range based on date of birth
+        const dateOfBirth = extractDateOfBirth(profile.lifestyle);
+        const displayAgeRange = dateOfBirth ? calculateAgeRange(dateOfBirth) : (profile.ageRange || 'Age not specified');
+
+        return {
+          id: profile.user.id,
+          name: `${profile.user.firstName} ${profile.user.lastName?.charAt(0) || ''}.`,
+          price: profile.maxBudget || 0,
+          smallDescription: profile.bio || 'No bio available',
+          images: profile.profilePicture ? [profile.profilePicture] : [],
+          // Additional housemate-specific data
+          occupation: profile.occupation,
+          gender: profile.gender,
+          ageRange: displayAgeRange,
+          schedule: profile.schedule,
+          socialPreference: profile.socialPreference,
+          hobbies: profile.hobbies,
+          preferredGender: profile.preferredGender,
+          socialMedia: profile.socialMedia,
+          lifestyle: profile.lifestyle,
+          email: profile.user.email,
+          userId: profile.user.id,
+        };
+      });
 
       return NextResponse.json(transformedProfiles);
     }

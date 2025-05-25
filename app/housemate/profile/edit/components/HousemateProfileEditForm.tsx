@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,11 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { updateHousemateProfile } from "@/app/actions/profile-actions";
 import { useRouter } from "next/navigation";
-import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed, Camera, Armchair, CigaretteOff } from "lucide-react";
+import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed, Camera, Armchair, CigaretteOff, Upload, X, Sparkles, Salad, ShoppingBag, HeartHandshake, Cat, Wrench, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { useUploadThing } from "@/app/lib/uploadthing";
 import Image from "next/image";
-import { useCallback } from "react";
 import React from "react";
 import { UpdateUserSettings } from "@/app/actions";
 
@@ -40,6 +39,7 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
     hobbies: initialData?.hobbies || [],
     preferredAgeRanges: initialData?.preferredAgeRanges || [],
     preferredGender: initialData?.preferredGender || "",
+    canHelpWith: initialData?.canHelpWith || [],
     socialMedia: {
       instagram: initialData?.socialMedia?.instagram || "",
       facebook: initialData?.socialMedia?.facebook || "",
@@ -103,6 +103,17 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
     { id: "games", label: "Board Games", icon: Dice6 },
   ];
 
+  const supportOptions = [
+    { id: "cleaning", label: "Cleaning", icon: Sparkles },
+    { id: "cooking", label: "Cooking", icon: Salad },
+    { id: "gardening", label: "Gardening", icon: Flower },
+    { id: "errands", label: "Errands", icon: ShoppingBag },
+    { id: "companionship", label: "Companionship", icon: HeartHandshake },
+    { id: "petCare", label: "Pet Care", icon: Cat },
+    { id: "techSupport", label: "Tech Support", icon: Wrench },
+    { id: "homeSecurity", label: "Home Security", icon: Shield },
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -135,6 +146,7 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
         preferredGender: formData.preferredGender,
         socialMedia: formData.socialMedia,
         lifestyle: formData.lifestyle,
+        canHelpWith: formData.canHelpWith,
       };
 
       const result = await updateHousemateProfile(submitData);
@@ -181,6 +193,15 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
       preferredAgeRanges: prev.preferredAgeRanges.includes(ageRangeId)
         ? prev.preferredAgeRanges.filter((id: string) => id !== ageRangeId)
         : [...prev.preferredAgeRanges, ageRangeId]
+    }));
+  };
+
+  const handleCanHelpWithToggle = (supportId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      canHelpWith: prev.canHelpWith.includes(supportId)
+        ? prev.canHelpWith.filter((id: string) => id !== supportId)
+        : [...prev.canHelpWith, supportId]
     }));
   };
 
@@ -885,6 +906,44 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                             <div className="w-full h-full rounded-full bg-white scale-50"></div>
                           )}
                         </div>
+                      </div>
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Can Help With</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          {/* Support Selection */}
+          <div>
+            <Label className="text-base font-medium mb-4 block">Services I Can Help With</Label>
+            <p className="text-sm text-muted-foreground mb-4">Select the services you're willing and able to help homeowners with</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {supportOptions.map((option) => {
+                const Icon = option.icon;
+                const isSelected = formData.canHelpWith.includes(option.id);
+                
+                return (
+                  <div key={option.id}>
+                    <label className="cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={isSelected}
+                        onChange={() => handleCanHelpWithToggle(option.id)}
+                      />
+                      <div className="flex flex-col items-center p-4 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 h-full">
+                        <div className="w-12 h-12 rounded-full bg-slate-100 mb-3 flex items-center justify-center">
+                          <Icon size={24} className="text-slate-600" />
+                        </div>
+                        <span className="font-medium text-center text-sm">{option.label}</span>
                       </div>
                     </label>
                   </div>

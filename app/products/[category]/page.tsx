@@ -9,6 +9,7 @@ import { ContactHousemateModal } from "@/app/components/ContactHousemateModal";
 import { notFound, useParams } from "next/navigation";
 import { Map, List } from "lucide-react";
 import { toast } from "sonner";
+import { HousemateProfileCardNew } from "@/app/components/HousemateProfileCardNew";
 
 interface Listing {
   id: string;
@@ -148,7 +149,7 @@ export default function CategoryPage() {
       <>
         <section className="max-w-7xl mx-auto px-4 md:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Housemate Profiles</h1>
+            <h1 className="text-3xl font-bold text-gray-900">View Housemate Profiles</h1>
             <p className="text-gray-600 mt-2">
               Connect with potential housemates looking for a home. Browse profiles and reach out to those who might be a good fit.
             </p>
@@ -157,11 +158,22 @@ export default function CategoryPage() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {housemateData.map((housemate) => (
-              <HousemateCard
+              <HousemateProfileCardNew
                 key={`housemate-${housemate.id}`}
-                {...housemate}
+                id={housemate.id}
+                name={housemate.name}
+                location="Columbia, MO 65201"
+                occupation={housemate.occupation}
+                gender={housemate.gender}
+                ageRange={housemate.ageRange}
+                maxBudget={housemate.price}
+                profileImage={housemate.images?.[0]}
+                bio={housemate.smallDescription}
+                isVerified={true}
+                userId={housemate.userId}
+                email={housemate.email}
                 onContact={handleContactHousemate}
               />
             ))}

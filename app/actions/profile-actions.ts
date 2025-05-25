@@ -81,6 +81,7 @@ export async function updateHousemateProfile(
     hobbies?: string[];
     preferredAgeRanges?: string[];
     preferredGender?: string;
+    canHelpWith?: string[];
     socialMedia?: {
       instagram?: string;
       facebook?: string;
@@ -113,6 +114,7 @@ export async function updateHousemateProfile(
     if (data.hobbies !== undefined) updateData.hobbies = data.hobbies;
     if (data.preferredAgeRanges !== undefined) updateData.preferredAgeRanges = data.preferredAgeRanges;
     if (data.preferredGender !== undefined) updateData.preferredGender = data.preferredGender;
+    if (data.canHelpWith !== undefined) updateData.canHelpWith = data.canHelpWith;
 
     await prisma.housemateProfile.upsert({
       where: { userId: user.id },

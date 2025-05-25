@@ -95,6 +95,7 @@ model HousemateProfile {
   preferredAgeRanges Json?  // Array of preferred age ranges for living companions
   preferredGender   String? // Preferred gender for living companions
   socialMedia       Json?   // Social media links (instagram, facebook, linkedin)
+  canHelpWith       Json?   // Array of services the housemate can help with (cleaning, cooking, etc.)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,6 +1,12 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { User, MapPin, Heart, MessageCircle, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Briefcase, Clock, Users, Heart, Instagram, Facebook, Linkedin, PawPrint, Cigarette, CigaretteOff, DollarSign } from "lucide-react";
+import { Briefcase, Clock, Users, Instagram, Facebook, Linkedin, PawPrint, Cigarette, CigaretteOff, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield } from "lucide-react";
 
 interface HousemateProfile {
   profilePicture?: string | null;
@@ -14,6 +20,7 @@ interface HousemateProfile {
   preferredAgeRanges?: string[] | any | null;
   preferredGender?: string | null;
   maxBudget?: number | null;
+  canHelpWith?: string[] | any | null;
   socialMedia?: {
     instagram?: string | null;
     facebook?: string | null;
@@ -80,6 +87,17 @@ const socialIcons: Record<string, any> = {
   social: { icon: Users, label: "Social" },
   independent: { icon: User, label: "Independent" },
   balanced: { icon: Users, label: "Balanced" }
+};
+
+const supportIcons: Record<string, any> = {
+  cleaning: { icon: Sparkles, label: "Cleaning" },
+  cooking: { icon: Salad, label: "Cooking" },
+  gardening: { icon: Flower, label: "Gardening" },
+  errands: { icon: ShoppingBag, label: "Errands" },
+  companionship: { icon: HeartHandshake, label: "Companionship" },
+  petCare: { icon: Cat, label: "Pet Care" },
+  techSupport: { icon: Wrench, label: "Tech Support" },
+  homeSecurity: { icon: Shield, label: "Home Security" },
 };
 
 export function HousemateProfileCard({ housemate }: HousemateProfileCardProps) {
@@ -303,6 +321,45 @@ export function HousemateProfileCard({ housemate }: HousemateProfileCardProps) {
                       </span>
                     </div>
                   )}
+                </div>
+              </div>
+            );
+          }
+          return null;
+        })()}
+
+        {/* Can Help With */}
+        {profile?.canHelpWith && (() => {
+          let canHelpWithArray: string[] = [];
+          if (typeof profile.canHelpWith === 'string') {
+            try {
+              canHelpWithArray = JSON.parse(profile.canHelpWith);
+            } catch {
+              canHelpWithArray = [];
+            }
+          } else if (Array.isArray(profile.canHelpWith)) {
+            canHelpWithArray = profile.canHelpWith;
+          }
+          
+          if (canHelpWithArray.length > 0) {
+            return (
+              <div>
+                <h4 className="font-medium mb-3">Can Help With</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {canHelpWithArray.map((supportId) => {
+                    const support = supportIcons[supportId];
+                    if (!support) return null;
+                    
+                    const Icon = support.icon;
+                    return (
+                      <div key={supportId} className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+                          <Icon size={12} className="text-slate-600" />
+                        </div>
+                        <span className="text-sm">{support.label}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );

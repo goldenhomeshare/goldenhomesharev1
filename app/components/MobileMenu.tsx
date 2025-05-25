@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger, } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { navbarLinks } from "./NavbarLinks";
 import Link from "next/link";
@@ -18,6 +18,7 @@ export function MobileMenu() {
                 </Button>
             </SheetTrigger>
             <SheetContent>
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                 <div className="mt-5 flex px-2 space-y-1 flex-col">
                     {navbarLinks.map((item) => (
                         <Link 

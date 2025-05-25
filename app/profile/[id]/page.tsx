@@ -6,6 +6,7 @@ import { User, MapPin, CheckCircle, Heart, Briefcase, Clock, Users, PawPrint, Ci
 import { Button } from "@/components/ui/button";
 import { ProfileNavigation } from "./components/ProfileNavigation";
 import { calculateAgeRange, extractDateOfBirth } from "@/lib/age-utils";
+import { MessageHousemateButton } from "@/app/components/chat/MessageHousemateButton";
 
 const supportIcons: Record<string, any> = {
   cleaning: { icon: Sparkles, label: "Cleaning" },
@@ -220,6 +221,16 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     )}
                   </p>
                 </div>
+
+                {/* Message Housemate Button */}
+                {!isOwnProfile && (
+                  <div className="mb-6">
+                    <MessageHousemateButton 
+                      housemateId={profileUser.id} 
+                      housemateName={`${profileUser.firstName} ${profileUser.lastName || ''}`}
+                    />
+                  </div>
+                )}
 
                 {/* Basic Information */}
                 {(profile?.occupation || profile?.gender || profile?.ageRange || profile?.maxBudget || socialMediaData.instagram || socialMediaData.facebook || socialMediaData.linkedin) && (

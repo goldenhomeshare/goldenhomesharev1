@@ -105,19 +105,36 @@ export default function CategoryPage() {
     setVisibleListings(uniqueListings);
   };
 
-  const handleContactHousemate = (housemateId: string, email: string) => {
-    // Find the housemate data to get their name
-    const housemateData = data as HousemateProfile[];
-    const housemate = housemateData.find(h => h.userId === housemateId);
-    
-    if (housemate) {
-      setContactModal({
-        isOpen: true,
-        housemateName: housemate.name,
-        housemateEmail: email,
-        housemateId: housemateId
-      });
-    } else {
+  const handleContactHousemate = async (housemateId: string, email: string) => {
+    try {
+      // Get current user to check if they're trying to contact themselves
+      const userResponse = await fetch("/api/auth/user");
+      if (userResponse.ok) {
+        const currentUser = await userResponse.json();
+        
+        // Check if user is trying to contact themselves
+        if (currentUser.id === housemateId) {
+          toast.error("You cannot contact yourself.");
+          return;
+        }
+      }
+      
+      // Find the housemate data to get their name
+      const housemateData = data as HousemateProfile[];
+      const housemate = housemateData.find(h => h.userId === housemateId);
+      
+      if (housemate) {
+        setContactModal({
+          isOpen: true,
+          housemateName: housemate.name,
+          housemateEmail: email,
+          housemateId: housemateId
+        });
+      } else {
+        toast.error("Unable to contact housemate. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error checking user:", error);
       toast.error("Unable to contact housemate. Please try again.");
     }
   };
@@ -215,8 +232,7 @@ export default function CategoryPage() {
                 {/* Show different text based on device and view */}
                 <span className="md:hidden">
                   {showMobileMap 
-                    ? `${visibleListings.length} of ${listingData.length} listing${listingData.length !== 1 ? 's' : ''} visible on map`
-                    : `${listingData.length} listing${listingData.length !== 1 ? 's' : ''} available`
+                    ? `${visibleListings.length} of ${listingData.length} listing${listingData.length !== 1 ? 's' : ''} visible on map`                    : `${listingData.length} listing${listingData.length !== 1 ? 's' : ''} available`
                   }
                 </span>
                 <span className="hidden md:inline">

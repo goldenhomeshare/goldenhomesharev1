@@ -5,6 +5,9 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Special product ID for profile-based chats (should be excluded from listings)
+const PROFILE_CHAT_PRODUCT_ID = "profile-chat-placeholder";
+
 interface iAppProps {
   category: "newest" | "templates" | "uikits" | "icons";
 }
@@ -15,6 +18,10 @@ async function getData({ category }: iAppProps) {
       const data = await prisma.product.findMany({
         where: {
           category: "icon",
+          // Exclude the profile chat placeholder
+          id: {
+            not: PROFILE_CHAT_PRODUCT_ID,
+          },
         },
         select: {
           price: true,
@@ -34,6 +41,12 @@ async function getData({ category }: iAppProps) {
     }
     case "newest": {
       const data = await prisma.product.findMany({
+        where: {
+          // Exclude the profile chat placeholder
+          id: {
+            not: PROFILE_CHAT_PRODUCT_ID,
+          },
+        },
         select: {
           price: true,
           name: true,
@@ -57,6 +70,10 @@ async function getData({ category }: iAppProps) {
       const data = await prisma.product.findMany({
         where: {
           category: "template",
+          // Exclude the profile chat placeholder
+          id: {
+            not: PROFILE_CHAT_PRODUCT_ID,
+          },
         },
         select: {
           id: true,
@@ -78,6 +95,10 @@ async function getData({ category }: iAppProps) {
       const data = await prisma.product.findMany({
         where: {
           category: "uikit",
+          // Exclude the profile chat placeholder
+          id: {
+            not: PROFILE_CHAT_PRODUCT_ID,
+          },
         },
         select: {
           id: true,

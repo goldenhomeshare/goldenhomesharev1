@@ -129,11 +129,11 @@ model ChatRoom {
   id          String @id @default(uuid())
   homeownerId String
   housemateId String
-  productId   String
+  productId   String?
   
-  homeowner   User    @relation("HomeownerChats", fields: [homeownerId], references: [id])
-  housemate   User    @relation("HousemateChats", fields: [housemateId], references: [id])
-  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  homeowner   User     @relation("HomeownerChats", fields: [homeownerId], references: [id])
+  housemate   User     @relation("HousemateChats", fields: [housemateId], references: [id])
+  product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   
   messages    Message[]
   

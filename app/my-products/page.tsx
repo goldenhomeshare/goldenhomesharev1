@@ -3,10 +3,17 @@ import prisma from "../lib/db";
 import { ProductCard } from "../components/ProductCard";
 import { unstable_noStore as noStore } from "next/cache";
 
+// Special product ID for profile-based chats (should be excluded from listings)
+const PROFILE_CHAT_PRODUCT_ID = "profile-chat-placeholder";
+
 async function getData(userId: string) {
   const data = await prisma.product.findMany({
     where: {
       userId: userId,
+      // Exclude the profile chat placeholder
+      id: {
+        not: PROFILE_CHAT_PRODUCT_ID,
+      },
     },
     select: {
       name: true,

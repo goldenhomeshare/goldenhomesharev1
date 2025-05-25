@@ -1,4 +1,4 @@
-import { ProductRow } from "../app/components/ProductRow";
+import { AirbnbStyleRow } from "../app/components/AirbnbStyleRow";
 import Image from "next/image";
 import { Users, Shield, Layers } from "lucide-react";
 import Link from "next/link";
@@ -348,10 +348,21 @@ export default function Home() {
             </div>
           </div>
           
-          <ProductRow category="newest" />
-          <ProductRow category="templates" />
-          <ProductRow category="icons" />
-          <ProductRow category="uikits" />
+          {/* Listings Section */}
+          <div className="mb-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Explore Available Listings
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Discover comfortable and affordable homesharing opportunities in your area. Each listing is verified and background-checked for your safety.
+              </p>
+            </div>
+            
+            <AirbnbStyleRow category="newest" />
+            <AirbnbStyleRow category="rooms" />
+            <AirbnbStyleRow category="housemates" />
+          </div>
         </div>
       </section>
     </>

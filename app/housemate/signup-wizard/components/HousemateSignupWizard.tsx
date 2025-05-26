@@ -204,16 +204,16 @@ export function HousemateSignupWizard({ userId, firstName, lastName, email }: Ho
         preferredAgeRanges: formData.preferredAgeRanges,
         preferredGender: formData.preferredGender,
         canHelpWith: formData.canHelpWith,
-        location: {
-          city: formData.location.city,
-          state: formData.location.state,
-        },
         lifestyle: {
           ...formData.lifestyle,
           language: formData.language,
           education: formData.education,
           occupationDetails: formData.occupation,
           dateOfBirth: formData.dateOfBirth,
+          location: {
+            city: formData.location.city,
+            state: formData.location.state,
+          },
         },
       };
 

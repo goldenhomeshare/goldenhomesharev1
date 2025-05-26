@@ -186,7 +186,10 @@ export async function createHousemateProfile(
     if (data.preferredGender !== undefined) profileData.preferredGender = data.preferredGender;
     if (data.canHelpWith !== undefined) profileData.canHelpWith = data.canHelpWith;
     if (data.socialMedia !== undefined) profileData.socialMedia = data.socialMedia;
-    if (data.lifestyle !== undefined) profileData.lifestyle = data.lifestyle;
+    if (data.lifestyle !== undefined) {
+      // Merge location data into lifestyle if provided
+      profileData.lifestyle = data.lifestyle;
+    }
 
     // Create the housemate profile
     await prisma.housemateProfile.create({

@@ -154,7 +154,7 @@ export default function Home() {
                 </div>
               </div>
               
-              <div className="flex items-start gap-4">
+              <div className="flex items-center gap-4">
                 <div className="w-16 h-16 flex items-center justify-center flex-shrink-0 mt-1">
                   <Users size={32} className="text-primary" />
                 </div>

@@ -8,6 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MessageCircle, User, ArrowLeft, Inbox, Users, Home, Eye, EyeOff } from "lucide-react";
 import { HousemateChatCard } from "@/app/components/chat/HousemateChatCard";
+import { MobileMessagingView } from "@/app/components/chat/MobileMessagingView";
 
 async function getHousemateChats(userId: string, showHidden: boolean = false) {
   const chatRooms = await prisma.chatRoom.findMany({
@@ -73,6 +74,12 @@ export default async function HousemateMessagesPage({
   const resolvedSearchParams = await searchParams;
   const showHidden = resolvedSearchParams.showHidden === "true";
   const chatRooms = await getHousemateChats(user.id, showHidden);
+  
+  // Filter out chat rooms without required data
+  const validChatRooms = chatRooms.filter(room => 
+    room.homeowner && room.product && room.homeowner.id && room.product.id
+  );
+  
   const unreadCount = 0; // TODO: Implement unread message count
 
   // Get counts for both visible and hidden conversations
@@ -84,145 +91,158 @@ export default async function HousemateMessagesPage({
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
-        {/* Header Section */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
-              <Link href="/housemate/dashboard">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
-              </Link>
-            </Button>
-            <div className="flex items-center gap-2">
-              {!showHidden && visibleCount > 0 && (
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  <Users className="w-3 h-3" />
-                  {visibleCount} conversation{visibleCount !== 1 ? 's' : ''}
-                </Badge>
-              )}
-              {showHidden && hiddenCount > 0 && (
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <EyeOff className="w-3 h-3" />
-                  {hiddenCount} hidden
-                </Badge>
-              )}
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Inbox className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                {showHidden ? "Hidden Messages" : "Messages"}
-              </h1>
-              <p className="text-gray-600 mt-1">
-                {showHidden 
-                  ? "Manage your hidden conversations" 
-                  : "Connect with homeowners and discuss potential living arrangements"
-                }
-              </p>
-            </div>
-          </div>
-        </div>
+    <>
+      {/* Mobile View */}
+      <MobileMessagingView
+        chatRooms={validChatRooms}
+        userType="HOUSEMATE"
+        showHidden={showHidden}
+        visibleCount={visibleCount}
+        hiddenCount={hiddenCount}
+        user={user}
+      />
 
-        {/* Toggle between visible and hidden conversations */}
-        <div className="flex items-center gap-2 mb-6">
-          <Button 
-            variant={!showHidden ? "default" : "outline"} 
-            size="sm" 
-            asChild
-          >
-            <Link href="/housemate/messages">
-              <Eye className="w-4 h-4 mr-2" />
-              Active ({visibleCount})
-            </Link>
-          </Button>
-          <Button 
-            variant={showHidden ? "default" : "outline"} 
-            size="sm" 
-            asChild
-          >
-            <Link href="/housemate/messages?showHidden=true">
-              <EyeOff className="w-4 h-4 mr-2" />
-              Hidden ({hiddenCount})
-            </Link>
-          </Button>
-        </div>
-
-        {/* Messages Content */}
-        {chatRooms.length === 0 ? (
-          <Card className="border-0 shadow-sm">
-            <CardContent className="py-16 text-center">
-              <div className="max-w-md mx-auto">
-                <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-                  {showHidden ? (
-                    <EyeOff className="w-10 h-10 text-gray-400" />
-                  ) : (
-                    <MessageCircle className="w-10 h-10 text-gray-400" />
-                  )}
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  {showHidden ? "No hidden conversations" : "No conversations yet"}
-                </h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">
-                  {showHidden 
-                    ? "You haven't hidden any conversations yet. Hidden conversations will appear here and can be restored at any time."
-                    : "Start exploring properties and reach out to homeowners to begin conversations. Your messages with property owners will appear here for easy access and follow-up."
-                  }
-                </p>
-                {!showHidden && (
-                  <>
-                    <div className="space-y-3 text-sm text-gray-500">
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span>Browse available properties</span>
-                      </div>
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Message homeowners directly</span>
-                      </div>
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        <span>Schedule viewings and ask questions</span>
-                      </div>
-                    </div>
-                    <div className="mt-8">
-                      <Button asChild className="bg-green-600 hover:bg-green-700">
-                        <Link href="/">
-                          <Home className="w-4 h-4 mr-2" />
-                          Browse Properties
-                        </Link>
-                      </Button>
-                    </div>
-                  </>
+      {/* Desktop View */}
+      <div className="min-h-screen bg-gray-50 hidden md:block">
+        <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
+          {/* Header Section */}
+          <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+                <Link href="/housemate/dashboard">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Dashboard
+                </Link>
+              </Button>
+              <div className="flex items-center gap-2">
+                {!showHidden && visibleCount > 0 && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <Users className="w-3 h-3" />
+                    {visibleCount} conversation{visibleCount !== 1 ? 's' : ''}
+                  </Badge>
+                )}
+                {showHidden && hiddenCount > 0 && (
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <EyeOff className="w-3 h-3" />
+                    {hiddenCount} hidden
+                  </Badge>
                 )}
               </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {showHidden ? "Hidden Conversations" : "Your Conversations"}
-              </h2>
-              <p className="text-sm text-gray-500">
-                Sorted by most recent activity
-              </p>
             </div>
-            {chatRooms.map((chatRoom: any) => (
-              <HousemateChatCard 
-                key={chatRoom.id} 
-                chatRoom={chatRoom} 
-                isHidden={showHidden}
-              />
-            ))}
+            
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Inbox className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  {showHidden ? "Hidden Messages" : "Messages"}
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  {showHidden 
+                    ? "Manage your hidden conversations" 
+                    : "Connect with homeowners and discuss potential living arrangements"
+                  }
+                </p>
+              </div>
+            </div>
           </div>
-        )}
+
+          {/* Toggle between visible and hidden conversations */}
+          <div className="flex items-center gap-2 mb-6">
+            <Button 
+              variant={!showHidden ? "default" : "outline"} 
+              size="sm" 
+              asChild
+            >
+              <Link href="/housemate/messages">
+                <Eye className="w-4 h-4 mr-2" />
+                Active ({visibleCount})
+              </Link>
+            </Button>
+            <Button 
+              variant={showHidden ? "default" : "outline"} 
+              size="sm" 
+              asChild
+            >
+              <Link href="/housemate/messages?showHidden=true">
+                <EyeOff className="w-4 h-4 mr-2" />
+                Hidden ({hiddenCount})
+              </Link>
+            </Button>
+          </div>
+
+          {/* Messages Content */}
+          {validChatRooms.length === 0 ? (
+            <Card className="border-0 shadow-sm">
+              <CardContent className="py-16 text-center">
+                <div className="max-w-md mx-auto">
+                  <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                    {showHidden ? (
+                      <EyeOff className="w-10 h-10 text-gray-400" />
+                    ) : (
+                      <MessageCircle className="w-10 h-10 text-gray-400" />
+                    )}
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                    {showHidden ? "No hidden conversations" : "No conversations yet"}
+                  </h3>
+                  <p className="text-gray-600 mb-6 leading-relaxed">
+                    {showHidden 
+                      ? "You haven't hidden any conversations yet. Hidden conversations will appear here and can be restored at any time."
+                      : "Start exploring properties and reach out to homeowners to begin conversations. Your messages with property owners will appear here for easy access and follow-up."
+                    }
+                  </p>
+                  {!showHidden && (
+                    <>
+                      <div className="space-y-3 text-sm text-gray-500">
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <span>Browse available properties</span>
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <span>Message homeowners directly</span>
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                          <span>Schedule viewings and ask questions</span>
+                        </div>
+                      </div>
+                      <div className="mt-8">
+                        <Button asChild className="bg-green-600 hover:bg-green-700">
+                          <Link href="/">
+                            <Home className="w-4 h-4 mr-2" />
+                            Browse Properties
+                          </Link>
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {showHidden ? "Hidden Conversations" : "Your Conversations"}
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Sorted by most recent activity
+                </p>
+              </div>
+              {validChatRooms.map((chatRoom: any) => (
+                <HousemateChatCard 
+                  key={chatRoom.id} 
+                  chatRoom={chatRoom} 
+                  isHidden={showHidden}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 } 

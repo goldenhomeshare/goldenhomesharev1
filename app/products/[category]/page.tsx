@@ -71,7 +71,7 @@ export default function CategoryPage() {
   const [showMobileMap, setShowMobileMap] = useState(false);
   
   // Form state for filters
-  const [location, setLocation] = useState("65201");
+  const [location, setLocation] = useState("");
   const [sortBy, setSortBy] = useState("Recommended");
   const [budgetMax, setBudgetMax] = useState(0);
   const [selectedGender, setSelectedGender] = useState("");
@@ -278,10 +278,9 @@ export default function CategoryPage() {
           if (!isMatch) {
             return false;
           }
-        } else {
-          // If housemate has no location data, exclude them from location-based searches
-          return false;
         }
+        // If housemate has no location data, still include them in results
+        // Users can contact them to discuss location preferences
       }
 
       // Parse canHelpWith data

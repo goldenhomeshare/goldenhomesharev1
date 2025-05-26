@@ -53,6 +53,7 @@ export async function GET(request: NextRequest) {
           socialPreference: profile.socialPreference,
           hobbies: profile.hobbies,
           preferredGender: profile.preferredGender,
+          canHelpWith: profile.canHelpWith,
           socialMedia: profile.socialMedia,
           lifestyle: profile.lifestyle,
           email: profile.user.email,

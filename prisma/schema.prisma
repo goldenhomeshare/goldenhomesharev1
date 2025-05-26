@@ -105,7 +105,7 @@ model HousemateProfile {
 model Application {
   id              String @id @default(uuid())
   housemateId     String
-  housemate       User   @relation(fields: [housemateId], references: [id])
+  housemate       User   @relation(fields: [housemateId], references: [id], onDelete: Cascade)
   productId       String
   product         Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   
@@ -132,8 +132,8 @@ model ChatRoom {
   housemateId String
   productId   String?
   
-  homeowner   User     @relation("HomeownerChats", fields: [homeownerId], references: [id])
-  housemate   User     @relation("HousemateChats", fields: [housemateId], references: [id])
+  homeowner   User     @relation("HomeownerChats", fields: [homeownerId], references: [id], onDelete: Cascade)
+  housemate   User     @relation("HousemateChats", fields: [housemateId], references: [id], onDelete: Cascade)
   product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   
   messages    Message[]
@@ -158,7 +158,7 @@ model Message {
   senderId   String
   chatRoomId String
   
-  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
   chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
   
   isRead     Boolean  @default(false)
@@ -181,7 +181,7 @@ model Product {
   houseRules       Json?         // Array of house rules
 
   createdAt DateTime @default(now())
-  User      User?    @relation(fields: [userId], references: [id])
+  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String?
   
   // New field for applications

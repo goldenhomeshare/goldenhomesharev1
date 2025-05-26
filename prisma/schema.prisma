@@ -139,6 +139,13 @@ model ChatRoom {
   messages    Message[]
   
   lastMessageAt DateTime?
+  
+  // Hide conversation fields
+  hiddenByHomeowner Boolean @default(false)
+  hiddenByHousemate Boolean @default(false)
+  homeownerHiddenAt DateTime?
+  housemateHiddenAt DateTime?
+  
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   

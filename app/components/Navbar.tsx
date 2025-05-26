@@ -5,6 +5,7 @@ import { MobileMenu } from "./MobileMenu";
 import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { UserNav } from "./UserNav";
+import { MessagesIcon } from "./MessagesIcon";
 import { getCurrentUser } from "@/lib/auth";
 
 
@@ -28,14 +29,17 @@ export async function Navbar() {
 
         <div className="flex items-center gap-x-2 ms-auto md:col-span-3">
         {kindeUser ? (
-          <UserNav
-            email={kindeUser.email as string}
-            name={kindeUser.given_name as string}
-            userImage={
-              kindeUser.picture ?? `https://avatar.vercel.sh/${kindeUser.given_name}`
-            }
-            userType={(user as any)?.userType || null}
-                     />
+          <div className="flex items-center gap-x-2">
+            <MessagesIcon userType={(user as any)?.userType || null} />
+            <UserNav
+              email={kindeUser.email as string}
+              name={kindeUser.given_name as string}
+              userImage={
+                kindeUser.picture ?? `https://avatar.vercel.sh/${kindeUser.given_name}`
+              }
+              userType={(user as any)?.userType || null}
+            />
+          </div>
             ) : (
                 <div className="flex items-center gap-x-2">
                 <Button asChild>

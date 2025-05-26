@@ -61,8 +61,16 @@ function loadGoogleMapsScript(): Promise<void> {
 
     isGoogleMapsLoading = true;
 
+    // Check if API key is available
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    if (!apiKey || apiKey === 'DEMO_KEY' || apiKey === '') {
+      isGoogleMapsLoading = false;
+      reject(new Error('Google Maps API key is not configured. Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment variables.'));
+      return;
+    }
+
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=geometry`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=geometry`;
     script.async = true;
     
     script.onload = () => {
@@ -75,7 +83,7 @@ function loadGoogleMapsScript(): Promise<void> {
     
     script.onerror = () => {
       isGoogleMapsLoading = false;
-      reject(new Error('Failed to load Google Maps'));
+      reject(new Error('Failed to load Google Maps API. Please check your API key and ensure the Maps JavaScript API is enabled in Google Cloud Console.'));
     };
     
     document.head.appendChild(script);

@@ -31,6 +31,7 @@ interface HomeownerChatModalProps {
   productName: string;
   hostId: string;
   hostName: string;
+  onMessagesRead?: () => void;
 }
 
 export function HomeownerChatModal({ 
@@ -41,29 +42,35 @@ export function HomeownerChatModal({
   housemateName, 
   productName,
   hostId,
-  hostName
+  hostName,
+  onMessagesRead
 }: HomeownerChatModalProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [chatRoomId, setChatRoomId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // const supabase = createClient();
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 100);
   };
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages]);
 
   useEffect(() => {
     if (isOpen) {
       initializeChat();
     }
-  }, [isOpen]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  }, [isOpen, productId, housemateId]);
 
   const initializeChat = async () => {
     try {
@@ -116,6 +123,9 @@ export function HomeownerChatModal({
         
         console.log("Set messages:", chatMessages || []);
         
+        // Mark messages as read when chat is opened
+        await markMessagesAsRead(chatRoom.id);
+        
         // Subscribe to real-time updates
         // subscribeToMessages(chatRoom.id);
       } else {
@@ -123,6 +133,27 @@ export function HomeownerChatModal({
       }
     } catch (error) {
       console.error("Error getting chat room:", error);
+    }
+  };
+
+  const markMessagesAsRead = async (roomId: string) => {
+    try {
+      await fetch("/api/messages/mark-read", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          chatRoomId: roomId,
+        }),
+      });
+      
+      // Trigger refresh of unread count
+      if (onMessagesRead) {
+        onMessagesRead();
+      }
+    } catch (error) {
+      console.error("Error marking messages as read:", error);
     }
   };
 
@@ -159,7 +190,27 @@ export function HomeownerChatModal({
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !chatRoomId || !currentUser) return;
+    if (!newMessage.trim() || !chatRoomId || !currentUser || isSending) return;
+
+    const messageContent = newMessage.trim();
+    const tempId = `temp-${Date.now()}`;
+    
+    // Optimistic update - add message immediately to UI
+    const optimisticMessage = {
+      id: tempId,
+      content: messageContent,
+      senderId: currentUser.id,
+      createdAt: new Date().toISOString(),
+      sender: {
+        firstName: currentUser.firstName,
+        lastName: currentUser.lastName,
+        profileImage: currentUser.profileImage,
+      }
+    };
+
+    setMessages(prev => [...prev, optimisticMessage]);
+    setNewMessage("");
+    setIsSending(true);
 
     try {
       const response = await fetch("/api/chat/send", {
@@ -169,21 +220,33 @@ export function HomeownerChatModal({
         },
         body: JSON.stringify({
           chatRoomId,
-          content: newMessage.trim(),
+          content: messageContent,
           senderId: currentUser.id,
         }),
       });
 
       if (response.ok) {
-        setNewMessage("");
+        const sentMessage = await response.json();
+        // Replace optimistic message with real message
+        setMessages(prev => prev.map(msg => 
+          msg.id === tempId ? { ...sentMessage, sender: optimisticMessage.sender } : msg
+        ));
         // Refresh messages after sending
         await refreshMessages();
       } else {
+        // Remove optimistic message on error
+        setMessages(prev => prev.filter(msg => msg.id !== tempId));
+        setNewMessage(messageContent); // Restore message text
         toast.error("Failed to send message");
       }
     } catch (error) {
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(msg => msg.id !== tempId));
+      setNewMessage(messageContent); // Restore message text
       console.error("Error sending message:", error);
       toast.error("Failed to send message");
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -226,25 +289,24 @@ export function HomeownerChatModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="max-w-lg h-[80vh] flex flex-col p-0">
+        <DialogHeader className="px-6 py-4 border-b">
           <DialogTitle>Chat with {housemateName}</DialogTitle>
+          <div className="flex items-center justify-between text-sm text-muted-foreground mt-2">
+            <span>Property: {productName}</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleViewProfile}
+              className="text-xs px-2 py-1 h-auto"
+            >
+              View Profile
+            </Button>
+          </div>
         </DialogHeader>
-        
-        <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-          <span>Property: {productName}</span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleViewProfile}
-            className="text-xs px-2 py-1 h-auto"
-          >
-            View Profile
-          </Button>
-        </div>
 
-        <ScrollArea className="flex-1 min-h-[300px] max-h-[400px] pr-4">
-          <div className="space-y-4">
+        <ScrollArea className="flex-1 px-6 py-4 overflow-hidden">
+          <div className="space-y-4 pb-8 min-h-full">
             {isLoading ? (
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -280,7 +342,7 @@ export function HomeownerChatModal({
                   )}
                   
                   <div
-                    className={`max-w-[70%] rounded-lg px-3 py-2 ${
+                    className={`max-w-[70%] rounded-lg px-3 py-2 break-words ${
                       message.senderId === currentUser?.id
                         ? "bg-primary text-primary-foreground"
                         : "bg-muted"
@@ -289,7 +351,7 @@ export function HomeownerChatModal({
                     <div className="text-sm font-medium mb-1">
                       {message.sender.firstName} {message.sender.lastName?.charAt(0) || ''}.
                     </div>
-                    <div className="text-sm">{message.content}</div>
+                    <div className="text-sm whitespace-pre-wrap">{message.content}</div>
                     <div className="text-xs opacity-70 mt-1">
                       {new Date(message.createdAt).toLocaleTimeString()}
                     </div>
@@ -315,25 +377,33 @@ export function HomeownerChatModal({
                 </div>
               ))
             )}
-            <div ref={messagesEndRef} />
+            <div ref={messagesEndRef} className="h-1" />
           </div>
         </ScrollArea>
 
-        <div className="flex gap-2 mt-4">
-          <Input
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
-            onKeyPress={handleKeyPress}
-            disabled={isLoading || !chatRoomId}
-          />
-          <Button 
-            onClick={sendMessage} 
-            disabled={!newMessage.trim() || isLoading || !chatRoomId}
-            size="sm"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
+        <div className="px-6 py-4 border-t bg-background">
+          <div className="flex gap-2">
+            <Input
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type your message..."
+              onKeyPress={handleKeyPress}
+              disabled={isLoading || !chatRoomId || isSending}
+              className="flex-1"
+            />
+            <Button 
+              onClick={sendMessage} 
+              disabled={!newMessage.trim() || isLoading || !chatRoomId || isSending}
+              size="sm"
+              className="px-3"
+            >
+              {isSending ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

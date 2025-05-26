@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       data: { lastMessageAt: new Date() },
     });
 
-    return NextResponse.json({ message });
+    return NextResponse.json(message);
   } catch (error) {
     console.error("Error sending message:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

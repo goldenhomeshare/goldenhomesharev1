@@ -25,8 +25,13 @@ export function HomeownerChatCard({ chatRoom, user, isHidden = false }: Homeowne
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const lastMessage = chatRoom.messages[0];
+  const lastMessage = chatRoom.messages && chatRoom.messages.length > 0 ? chatRoom.messages[0] : null;
   const propertyImage = chatRoom.product.images[0];
+  
+  // Calculate unread messages count (messages from housemate that are unread)
+  const unreadCount = chatRoom.messages?.filter((message: any) => 
+    !message.isRead && message.senderId !== user.id
+  ).length || 0;
 
   const handleViewProfile = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent opening chat modal
@@ -101,6 +106,11 @@ export function HomeownerChatCard({ chatRoom, user, isHidden = false }: Homeowne
                 <Badge variant="secondary" className="text-xs">
                   <Clock className="w-3 h-3 mr-1" />
                   {formatMessageTime(lastMessage.createdAt)}
+                </Badge>
+              )}
+              {unreadCount > 0 && (
+                <Badge variant="destructive" className="text-xs">
+                  {unreadCount} unread
                 </Badge>
               )}
               {isHidden && (
@@ -241,6 +251,7 @@ export function HomeownerChatCard({ chatRoom, user, isHidden = false }: Homeowne
         productName={chatRoom.product.name}
         hostId={chatRoom.homeownerId}
         hostName={`${user.firstName} ${user.lastName}`}
+        onMessagesRead={() => router.refresh()}
       />
     </>
   );

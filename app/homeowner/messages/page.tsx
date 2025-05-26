@@ -35,7 +35,6 @@ async function getHomeownerChats(userId: string, showHidden: boolean = false) {
         orderBy: {
           createdAt: "desc",
         },
-        take: 1,
         include: {
           sender: {
             select: {

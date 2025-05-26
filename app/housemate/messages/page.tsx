@@ -35,7 +35,6 @@ async function getHousemateChats(userId: string, showHidden: boolean = false) {
         orderBy: {
           createdAt: "desc",
         },
-        take: 1,
         include: {
           sender: {
             select: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,8 +24,31 @@ export function HousemateChatCard({ chatRoom, isHidden = false }: HousemateChatC
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const lastMessage = chatRoom.messages[0];
+  const lastMessage = chatRoom.messages && chatRoom.messages.length > 0 ? chatRoom.messages[0] : null;
   const propertyImage = chatRoom.product.images[0];
+  
+  // Calculate unread messages count (messages from homeowner that are unread)
+  // We need to get the current user to filter properly
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const response = await fetch("/api/auth/user");
+        if (response.ok) {
+          const userData = await response.json();
+          setCurrentUser(userData);
+        }
+      } catch (error) {
+        console.error("Error getting current user:", error);
+      }
+    };
+    getCurrentUser();
+  }, []);
+  
+  const unreadCount = currentUser ? chatRoom.messages?.filter((message: any) => 
+    !message.isRead && message.senderId !== currentUser.id
+  ).length || 0 : 0;
 
   const handleToggleHidden = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent opening chat modal
@@ -88,6 +111,11 @@ export function HousemateChatCard({ chatRoom, isHidden = false }: HousemateChatC
                 <Badge variant="secondary" className="text-xs">
                   <Clock className="w-3 h-3 mr-1" />
                   {formatMessageTime(lastMessage.createdAt)}
+                </Badge>
+              )}
+              {unreadCount > 0 && (
+                <Badge variant="destructive" className="text-xs">
+                  {unreadCount} unread
                 </Badge>
               )}
               {isHidden && (
@@ -205,6 +233,7 @@ export function HousemateChatCard({ chatRoom, isHidden = false }: HousemateChatC
         hostId={chatRoom.homeownerId}
         hostName={`${chatRoom.homeowner.firstName} ${chatRoom.homeowner.lastName}`}
         productName={chatRoom.product.name}
+        onMessagesRead={() => router.refresh()}
       />
     </>
   );

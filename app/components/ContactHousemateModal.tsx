@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { X, Send, User, MessageCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface ContactHousemateModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ export function ContactHousemateModal({
   housemateEmail,
   housemateId
 }: ContactHousemateModalProps) {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +72,10 @@ export function ContactHousemateModal({
       // Get current user first
       const userResponse = await fetch("/api/auth/user");
       if (!userResponse.ok) {
-        throw new Error("Please log in to send messages");
+        toast.error("Please log in to send messages.");
+        onClose(); // Close the modal
+        router.push("/api/auth/login");
+        return;
       }
       
       const userData = await userResponse.json();
@@ -81,7 +86,9 @@ export function ContactHousemateModal({
       
     } catch (error) {
       console.error("Error initializing chat:", error);
-      setError(error instanceof Error ? error.message : "Failed to load chat");
+      toast.error("Please log in to send messages.");
+      onClose(); // Close the modal
+      router.push("/api/auth/login");
     } finally {
       setIsLoading(false);
     }

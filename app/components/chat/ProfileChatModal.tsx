@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Send, User } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface Message {
   id: string;
@@ -34,6 +35,7 @@ export function ProfileChatModal({
   housemateId, 
   housemateName
 }: ProfileChatModalProps) {
+  const router = useRouter();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -61,16 +63,23 @@ export function ProfileChatModal({
       
       // Get current user (homeowner)
       const userResponse = await fetch("/api/auth/user");
-      if (userResponse.ok) {
-        const userData = await userResponse.json();
-        setCurrentUser(userData);
-        
-        // Get or create profile chat room
-        await getOrCreateProfileChatRoom(userData.id);
+      if (!userResponse.ok) {
+        toast.error("Please log in to send messages.");
+        onClose(); // Close the modal
+        router.push("/api/auth/login");
+        return;
       }
+      
+      const userData = await userResponse.json();
+      setCurrentUser(userData);
+      
+      // Get or create profile chat room
+      await getOrCreateProfileChatRoom(userData.id);
     } catch (error) {
       console.error("Error initializing chat:", error);
-      toast.error("Failed to load chat");
+      toast.error("Please log in to send messages.");
+      onClose(); // Close the modal
+      router.push("/api/auth/login");
     } finally {
       setIsLoading(false);
     }

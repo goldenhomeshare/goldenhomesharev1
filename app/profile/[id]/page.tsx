@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/app/lib/db";
 import Image from "next/image";
-import { User, MapPin, CheckCircle, Heart, Briefcase, Clock, Users, PawPrint, CigaretteOff, Cigarette, Instagram, Facebook, Linkedin, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, BookOpen, Film, Dumbbell, Music, Gamepad2, Palette, Church, GraduationCap, Armchair } from "lucide-react";
+import { User, MapPin, CheckCircle, Heart, Briefcase, Clock, Users, PawPrint, CigaretteOff, Cigarette, Instagram, Facebook, Linkedin, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, BookOpen, Film, Dumbbell, Music, Gamepad2, Palette, Church, GraduationCap, Armchair, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProfileNavigation } from "./components/ProfileNavigation";
 import { calculateAgeRange, extractDateOfBirth } from "@/lib/age-utils";
@@ -494,10 +494,22 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                 </div>
 
                 {/* Lifestyle Information */}
-                {(lifestyleData.hasPets !== undefined || lifestyleData.numberOfPeople || lifestyleData.smokingStatus) && (
+                {(lifestyleData.hasPets !== undefined || lifestyleData.numberOfPeople || lifestyleData.smokingStatus || lifestyleData.language) && (
                   <div className="mb-6">
                     <h3 className="font-semibold text-gray-900 mb-3">Lifestyle</h3>
                     <div className="space-y-3">
+                      {lifestyleData.language && (
+                        <div className="flex items-center gap-3">
+                          <MessageCircle size={20} className="text-gray-400" />
+                          <div>
+                            <div className="font-medium text-sm">Primary Language</div>
+                            <div className="text-sm text-gray-600">
+                              {lifestyleData.language}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
                       {lifestyleData.hasPets !== undefined && (
                         <div className="flex items-start gap-3">
                           <PawPrint size={20} className="text-gray-400 mt-0.5" />

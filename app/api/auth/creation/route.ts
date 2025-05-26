@@ -53,7 +53,7 @@ export async function GET() {
     // Check if user needs onboarding
     const baseUrl = process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://marshal-ui-yt.vercel.app";
+      : `https://${process.env.VERCEL_URL || process.env.NEXT_PUBLIC_APP_URL || 'your-app.vercel.app'}`;
 
     // For now, always redirect to onboarding for new multi-tenant setup
     // We'll check user type and profiles from the onboarding page itself
@@ -65,7 +65,7 @@ export async function GET() {
     // Fallback redirect on error
     const baseUrl = process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
-      : "https://marshal-ui-yt.vercel.app";
+      : `https://${process.env.VERCEL_URL || process.env.NEXT_PUBLIC_APP_URL || 'your-app.vercel.app'}`;
       
     return NextResponse.redirect(`${baseUrl}/onboarding`);
   }

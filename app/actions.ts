@@ -302,11 +302,11 @@ export async function BuyProduct(formData: FormData) {
     success_url:
       process.env.NODE_ENV === "development"
         ? "http://localhost:3000/payment/success"
-        : "https://marshal-ui-yt.vercel.app/payment/success",
+        : `https://${process.env.VERCEL_URL || process.env.NEXT_PUBLIC_APP_URL || 'your-app.vercel.app'}/payment/success`,
     cancel_url:
       process.env.NODE_ENV === "development"
         ? "http://localhost:3000/payment/cancel"
-        : "https://marshal-ui-yt.vercel.app/payment/cancel",
+        : `https://${process.env.VERCEL_URL || process.env.NEXT_PUBLIC_APP_URL || 'your-app.vercel.app'}/payment/cancel`,
   });
 
   return redirect(session.url as string);
@@ -335,11 +335,11 @@ export async function CreateStripeAccoutnLink() {
     refresh_url:
       process.env.NODE_ENV === "development"
         ? `http://localhost:3000/billing`
-        : `https://marshal-ui-yt.vercel.app/billing`,
+        : `https://${process.env.VERCEL_URL || process.env.NEXT_PUBLIC_APP_URL || 'your-app.vercel.app'}/billing`,
     return_url:
       process.env.NODE_ENV === "development"
         ? `http://localhost:3000/return/${data?.connectedAccountId}`
-        : `https://marshal-ui-yt.vercel.app/return/${data?.connectedAccountId}`,
+        : `https://${process.env.VERCEL_URL || process.env.NEXT_PUBLIC_APP_URL || 'your-app.vercel.app'}/return/${data?.connectedAccountId}`,
     type: "account_onboarding",
   });
 

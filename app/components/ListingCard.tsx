@@ -79,10 +79,6 @@ export function ListingCard({
   const locationDisplay = address ? getCityState(address) : '';
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Get the first 3 amenities for display (reduced to fit better)
-  const displayAmenities = amenities.slice(0, 3);
-  const remainingCount = amenities.length - displayAmenities.length;
-
   const handlePrevImage = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -106,16 +102,16 @@ export function ListingCard({
   };
 
   return (
-    <Link href={`/product/${id}`} className="block h-full">
+    <Link href={`/product/${id}`} className="block">
       <div 
         className={`
-          bg-white rounded-lg shadow-sm border overflow-hidden cursor-pointer transition-all hover:shadow-md h-full flex flex-col
-          ${isSelected ? 'border-blue-500 shadow-md' : 'border-gray-200'}
+          cursor-pointer transition-all hover:scale-[1.02] duration-200 group
+          ${isSelected ? 'transform scale-[1.02]' : ''}
         `}
         onMouseEnter={onClick} // Trigger selection on hover for map highlighting
       >
-        {/* Image Carousel */}
-        <div className="relative aspect-[4/3] w-full bg-gray-100 flex-shrink-0 group">
+        {/* Large Image */}
+        <div className="relative aspect-square w-full bg-gray-100 rounded-xl overflow-hidden mb-3">
           {images.length > 0 ? (
             <>
               <Image
@@ -126,35 +122,35 @@ export function ListingCard({
                 sizes="(max-width: 768px) 100vw, 320px"
               />
               
-              {/* Navigation arrows - only show if more than 1 image */}
+              {/* Navigation arrows - show on hover of entire card */}
               {images.length > 1 && (
                 <>
                   <button
                     onClick={handlePrevImage}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black bg-opacity-70 hover:bg-opacity-90 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/90 hover:bg-white rounded-full flex items-center justify-center text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 shadow-md"
                     aria-label="Previous image"
                   >
-                    <ChevronLeft size={16} />
+                    <ChevronLeft size={14} />
                   </button>
                   
                   <button
                     onClick={handleNextImage}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-black bg-opacity-70 hover:bg-opacity-90 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 bg-white/90 hover:bg-white rounded-full flex items-center justify-center text-gray-800 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 shadow-md"
                     aria-label="Next image"
                   >
-                    <ChevronRight size={16} />
+                    <ChevronRight size={14} />
                   </button>
                   
                   {/* Dots indicator */}
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1 z-10">
                     {images.map((_, index) => (
                       <button
                         key={index}
                         onClick={(e) => handleDotClick(e, index)}
-                        className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                        className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
                           index === currentImageIndex 
-                            ? 'bg-white scale-110' 
-                            : 'bg-white bg-opacity-60 hover:bg-opacity-80'
+                            ? 'bg-white' 
+                            : 'bg-white/60 hover:bg-white/80'
                         }`}
                         aria-label={`Go to image ${index + 1}`}
                       />
@@ -166,7 +162,7 @@ export function ListingCard({
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">
               <svg
-                className="w-8 h-8"
+                className="w-12 h-12"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -182,48 +178,32 @@ export function ListingCard({
           )}
         </div>
         
-        {/* Content - Fixed height section */}
-        <div className="p-3 flex-1 flex flex-col min-h-[120px]">
-          {/* Location */}
-          {locationDisplay && (
-            <h3 className="text-sm font-medium text-gray-900 mb-1 truncate flex-shrink-0">{locationDisplay}</h3>
-          )}
+        {/* Content below image */}
+        <div className="space-y-1">
+          {/* Title (property name) */}
+          <h3 className="font-medium text-gray-900 truncate">
+            {name}
+          </h3>
           
-          {/* Price */}
-          <p className="text-lg font-semibold text-gray-900 mb-2 flex-shrink-0">${price}/mo</p>
+          {/* Summary - truncated to maintain consistent card height */}
+          <p className="text-sm text-gray-600 truncate leading-relaxed">
+            {smallDescription}
+          </p>
           
-          {/* Amenities - Fixed height container */}
-          <div className="flex-1 min-h-[60px] flex items-start">
-            {amenities.length > 0 ? (
-              <div className="w-full">
-                <div className="flex flex-wrap items-center gap-1">
-                  {displayAmenities.map((amenityId, index) => {
-                    const amenity = amenityIcons[amenityId];
-                    if (!amenity) return null;
-                    
-                    const Icon = amenity.icon;
-                    return (
-                      <div 
-                        key={amenityId} 
-                        className="flex items-center gap-1 bg-gray-100 rounded-full px-2 py-1 text-xs"
-                        title={amenity.label}
-                      >
-                        <Icon size={12} className="text-gray-600" />
-                        <span className="text-gray-700 font-medium">{amenity.label}</span>
-                      </div>
-                    );
-                  })}
-                  {remainingCount > 0 && (
-                    <div className="flex items-center bg-gray-100 rounded-full px-2 py-1 text-xs">
-                      <span className="text-gray-700 font-medium">+{remainingCount} more</span>
-                    </div>
-                  )}
-                </div>
+          {/* Price + Location on same line (like home page) */}
+          <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-baseline gap-1">
+              <span className="font-semibold text-gray-900 underline">${price}</span>
+              <span className="text-gray-600 text-sm"> per month</span>
+            </div>
+            {locationDisplay && (
+              <div className="flex items-center gap-1">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <p className="text-gray-600 text-sm truncate">{locationDisplay}</p>
               </div>
-            ) : (
-              <p className="text-xs text-gray-600 leading-relaxed line-clamp-3">
-                {smallDescription}
-              </p>
             )}
           </div>
         </div>

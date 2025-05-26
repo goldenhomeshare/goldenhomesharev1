@@ -272,9 +272,9 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
                 " onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'" onclick="window.open('/product/${listing.id}', '_blank')">
                   ${imageHtml}
                   <div style="padding: 16px;">
-                    <h3 style="font-size: 18px; font-weight: 600; margin: 0 0 8px 0; color: #111827; line-height: 1.3;">${listing.name}</h3>
-                    <p style="font-size: 22px; font-weight: 600; margin: 0 0 8px 0; color: #374151;">$${listing.price}/mo</p>
-                    <p style="font-size: 14px; color: #6b7280; margin: 0; line-height: 1.4;">${listing.smallDescription}</p>
+                    <h3 style="font-size: 16px; font-weight: 600; margin: 0 0 8px 0; color: #111827; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${listing.name}</h3>
+                    <p style="font-size: 14px; color: #6b7280; margin: 0 0 12px 0; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${listing.smallDescription}</p>
+                    <p style="font-size: 14px; font-weight: 600; margin: 0; color: #374151;">$${listing.price} per month</p>
                   </div>
                 </div>
               `,

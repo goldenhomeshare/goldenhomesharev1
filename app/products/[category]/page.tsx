@@ -223,49 +223,31 @@ export default function CategoryPage() {
     
     return (
       <div className="h-screen flex flex-col">
-        {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 z-10">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Available Homeshares</h1>
-              <p className="text-gray-600 mt-1">
-                {/* Show different text based on device and view */}
-                <span className="md:hidden">
-                  {showMobileMap 
-                    ? `${visibleListings.length} of ${listingData.length} listing${listingData.length !== 1 ? 's' : ''} visible on map`                    : `${listingData.length} listing${listingData.length !== 1 ? 's' : ''} available`
-                  }
-                </span>
-                <span className="hidden md:inline">
-                  {visibleListings.length} of {listingData.length} listing{listingData.length !== 1 ? 's' : ''} visible on map
-                </span>
-              </p>
-            </div>
-            
-            {/* Mobile View Toggle Buttons */}
-            <div className="flex md:hidden gap-2">
-              <button
-                onClick={() => setShowMobileMap(false)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  !showMobileMap 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <List size={16} />
-                List
-              </button>
-              <button
-                onClick={() => setShowMobileMap(true)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  showMobileMap 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <Map size={16} />
-                Map
-              </button>
-            </div>
+        {/* Mobile View Toggle Buttons - No header styling */}
+        <div className="md:hidden px-4 py-2 bg-white">
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={() => setShowMobileMap(false)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                !showMobileMap 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              <List size={16} />
+              List
+            </button>
+            <button
+              onClick={() => setShowMobileMap(true)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                showMobileMap 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              <Map size={16} />
+              Map
+            </button>
           </div>
         </div>
         
@@ -307,8 +289,8 @@ export default function CategoryPage() {
         
         {/* Desktop View - Side by Side Layout */}
         <div className="flex-1 hidden md:flex">
-          {/* Map - takes remaining space */}
-          <div className="flex-1">
+          {/* Map - takes 1/3 of the space */}
+          <div className="w-1/3">
             <ListingsMap 
               listings={listingData} 
               className="w-full h-full"
@@ -316,8 +298,8 @@ export default function CategoryPage() {
             />
           </div>
           
-          {/* Listings Sidebar - Right side with grid layout */}
-          <div className="w-[600px] bg-white border-l border-gray-200 flex flex-col">
+          {/* Listings Sidebar - Right side with grid layout - takes 2/3 of the space */}
+          <div className="flex-1 bg-white border-l border-gray-200 flex flex-col">
             <div className="flex-1 overflow-y-auto">
               <div className="p-4">
                 {visibleListings.length === 0 ? (
@@ -330,7 +312,7 @@ export default function CategoryPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     {visibleListings.map((listing, index) => (
                       <ListingCard
                         key={`visible-${index}-${listing.id}`}

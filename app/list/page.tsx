@@ -1,3 +1,5 @@
+"use client";
+
 import {
     Card,
     CardContent,
@@ -13,8 +15,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { TipTapEditor } from "../components/Editor";
 import { UploadDropzone } from "../lib/uploadthing";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { JSONContent } from "@tiptap/react";
 
 export default function ListRoute() {
+    const [json, setJson] = useState<JSONContent | null>(null);
+
     return (
     <section className="max-w-7xl mx-auto px-4 md:px-8">
         <Card>
@@ -46,7 +52,7 @@ export default function ListRoute() {
 
                     <div className="flex flex-col gap-y-2">
                         <Label>Description</Label>
-                        <TipTapEditor setJson={undefined} json={null} />
+                        <TipTapEditor setJson={setJson} json={json} />
                     </div>
                     
                     <div className="flex flex-col gap-y-2">

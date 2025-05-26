@@ -183,18 +183,23 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
     }));
   };
 
-  const ProfilePictureUpload = useCallback(({ currentPicture, onUploadComplete, onRemove }: { currentPicture: string; onUploadComplete: (url: string) => void; onRemove: () => void }) => {
-    const { startUpload, isUploading } = useUploadThing("profilePictureUpload", {
-      onClientUploadComplete: (res) => {
-        if (res && res[0]) {
-          onUploadComplete(res[0].url);
-        }
-      },
-      onUploadError: (error: Error) => {
-        toast.error("Upload failed. Please try again.");
-      },
-    });
+  // Move the upload hook outside the callback
+  const { startUpload, isUploading } = useUploadThing("profilePictureUpload", {
+    onClientUploadComplete: (res) => {
+      if (res && res[0]) {
+        setFormData(prev => ({ ...prev, profilePicture: res[0].url }));
+        toast.success("Profile picture uploaded successfully!");
+      }
+    },
+    onUploadError: (error: Error) => {
+      toast.error("Upload failed. Please try again.");
+    },
+  });
 
+  // Move the ref outside the callback
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const ProfilePictureUpload = useCallback(({ currentPicture, onRemove }: { currentPicture: string; onRemove: () => void }) => {
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
       if (file) {
@@ -203,8 +208,6 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
       // Reset the input so the same file can be selected again
       event.target.value = '';
     };
-
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     return (
       <div className="space-y-4">
@@ -260,7 +263,7 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
         />
       </div>
     );
-  }, []);
+  }, [isUploading, startUpload]);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -274,10 +277,6 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
             <div className="mt-4">
               <ProfilePictureUpload 
                 currentPicture={formData.profilePicture}
-                onUploadComplete={(url) => {
-                  setFormData(prev => ({ ...prev, profilePicture: url }));
-                  toast.success("Profile picture uploaded successfully!");
-                }}
                 onRemove={() => setFormData(prev => ({ ...prev, profilePicture: "" }))}
               />
             </div>

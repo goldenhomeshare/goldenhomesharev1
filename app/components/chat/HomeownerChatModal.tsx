@@ -289,8 +289,8 @@ export function HomeownerChatModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg h-[95vh] md:h-[80vh] flex flex-col p-0 mx-2 md:mx-auto">
-        <DialogHeader className="px-4 md:px-6 py-3 md:py-4 border-b">
+      <DialogContent className="max-w-lg h-[85vh] md:h-[75vh] flex flex-col p-0 mx-2 md:mx-auto">
+        <DialogHeader className="px-4 md:px-6 py-3 md:py-4 border-b flex-shrink-0">
           <DialogTitle className="text-base md:text-lg">Chat with {housemateName}</DialogTitle>
           <div className="flex items-center justify-between text-sm text-muted-foreground mt-2">
             <span className="truncate">Property: {productName}</span>
@@ -305,92 +305,96 @@ export function HomeownerChatModal({
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 px-4 md:px-6 py-2 md:py-4 overflow-hidden">
-          <div className="space-y-3 md:space-y-4 pb-4 md:pb-8 min-h-full">
-            {isLoading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Send className="w-6 h-6 md:w-8 md:h-8 text-gray-400" />
+        {/* Messages Area - Takes remaining space and scrolls independently */}
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="px-4 md:px-6 py-2 md:py-4 space-y-3 md:space-y-4">
+              {isLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
-                <p className="font-medium mb-2">Start the conversation</p>
-                <p className="text-sm px-4">
-                  Send a message to {housemateName.split(' ')[0]} about {productName}.
-                </p>
-              </div>
-            ) : (
-              messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex gap-2 md:gap-3 ${
-                    message.senderId === currentUser?.id ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  {/* Profile picture - show on left for others, right for current user */}
-                  {message.senderId !== currentUser?.id && (
-                    <div className="relative w-7 h-7 md:w-8 md:h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 mt-1">
-                      {message.sender.profileImage ? (
-                        <Image
-                          src={message.sender.profileImage}
-                          alt={`${message.sender.firstName}'s profile`}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                          <User className="w-3 h-3 md:w-4 md:h-4 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  
+              ) : messages.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Send className="w-6 h-6 md:w-8 md:h-8 text-gray-400" />
+                  </div>
+                  <p className="font-medium mb-2">Start the conversation</p>
+                  <p className="text-sm px-4">
+                    Send a message to {housemateName.split(' ')[0]} about {productName}.
+                  </p>
+                </div>
+              ) : (
+                messages.map((message) => (
                   <div
-                    className={`max-w-[75%] md:max-w-[70%] rounded-lg md:rounded-xl px-3 py-2 break-words ${
-                      message.senderId === currentUser?.id
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
+                    key={message.id}
+                    className={`flex gap-2 md:gap-3 ${
+                      message.senderId === currentUser?.id ? "justify-end" : "justify-start"
                     }`}
                   >
-                    <div className="text-xs md:text-sm font-medium mb-1">
-                      {message.sender.firstName} {message.sender.lastName?.charAt(0) || ''}.
+                    {/* Profile picture - show on left for others, right for current user */}
+                    {message.senderId !== currentUser?.id && (
+                      <div className="relative w-7 h-7 md:w-8 md:h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 mt-1">
+                        {message.sender.profileImage ? (
+                          <Image
+                            src={message.sender.profileImage}
+                            alt={`${message.sender.firstName}'s profile`}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <User className="w-3 h-3 md:w-4 md:h-4 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    <div
+                      className={`max-w-[75%] md:max-w-[70%] rounded-lg md:rounded-xl px-3 py-2 break-words ${
+                        message.senderId === currentUser?.id
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      <div className="text-xs md:text-sm font-medium mb-1">
+                        {message.sender.firstName} {message.sender.lastName?.charAt(0) || ''}.
+                      </div>
+                      <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+                      <div className="text-xs opacity-70 mt-1">
+                        {new Date(message.createdAt).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
                     </div>
-                    <div className="text-sm whitespace-pre-wrap">{message.content}</div>
-                    <div className="text-xs opacity-70 mt-1">
-                      {new Date(message.createdAt).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </div>
+
+                    {/* Profile picture for current user on the right */}
+                    {message.senderId === currentUser?.id && (
+                      <div className="relative w-7 h-7 md:w-8 md:h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 mt-1">
+                        {currentUser?.profileImage ? (
+                          <Image
+                            src={currentUser.profileImage}
+                            alt="Your profile"
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <User className="w-3 h-3 md:w-4 md:h-4 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
+                ))
+              )}
+              <div ref={messagesEndRef} className="h-1" />
+            </div>
+          </ScrollArea>
+        </div>
 
-                  {/* Profile picture for current user on the right */}
-                  {message.senderId === currentUser?.id && (
-                    <div className="relative w-7 h-7 md:w-8 md:h-8 rounded-full overflow-hidden border border-gray-200 flex-shrink-0 mt-1">
-                      {currentUser?.profileImage ? (
-                        <Image
-                          src={currentUser.profileImage}
-                          alt="Your profile"
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                          <User className="w-3 h-3 md:w-4 md:h-4 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
-            <div ref={messagesEndRef} className="h-1" />
-          </div>
-        </ScrollArea>
-
-        <div className="px-4 md:px-6 py-3 md:py-4 border-t bg-background">
+        {/* Message Input - Fixed at bottom */}
+        <div className="px-4 md:px-6 py-3 md:py-4 border-t bg-background flex-shrink-0">
           <div className="flex gap-2">
             <Input
               value={newMessage}

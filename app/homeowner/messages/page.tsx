@@ -1,14 +1,21 @@
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/app/lib/db";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import Image from "next/image";
-import { MessageCircle, User, ArrowLeft, Inbox, Users, Eye, EyeOff } from "lucide-react";
-import { HomeownerChatCard } from "@/app/components/chat/HomeownerChatCard";
-import { MobileMessagingView } from "@/app/components/chat/MobileMessagingView";
+import { 
+  MessageCircle, 
+  ArrowLeft, 
+  Search, 
+  Eye, 
+  EyeOff,
+  Mail
+} from "lucide-react";
+import { HomeownerConversationList } from "@/app/components/chat";
+import { ChatWindow } from "@/app/components/chat/ChatWindow";
+import { Suspense } from "react";
 
 async function getHomeownerChats(userId: string, showHidden: boolean = false) {
   const chatRooms = await prisma.chatRoom.findMany({
@@ -39,8 +46,10 @@ async function getHomeownerChats(userId: string, showHidden: boolean = false) {
         include: {
           sender: {
             select: {
+              id: true,
               firstName: true,
               lastName: true,
+              profileImage: true,
             },
           },
         },
@@ -57,7 +66,7 @@ async function getHomeownerChats(userId: string, showHidden: boolean = false) {
 export default async function HomeownerMessagesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ showHidden?: string }>;
+  searchParams: Promise<{ showHidden?: string; chatId?: string }>;
 }) {
   const user = await getCurrentUser();
   
@@ -73,14 +82,13 @@ export default async function HomeownerMessagesPage({
 
   const resolvedSearchParams = await searchParams;
   const showHidden = resolvedSearchParams.showHidden === "true";
+  const selectedChatId = resolvedSearchParams.chatId;
   const chatRooms = await getHomeownerChats(user.id, showHidden);
   
   // Filter out chat rooms without required data
   const validChatRooms = chatRooms.filter(room => 
     room.housemate && room.product && room.housemate.id && room.product.id
   );
-  
-  const unreadCount = 0; // TODO: Implement unread message count
 
   // Get counts for both visible and hidden conversations
   const visibleCount = await prisma.chatRoom.count({
@@ -90,150 +98,152 @@ export default async function HomeownerMessagesPage({
     where: { homeownerId: user.id, hiddenByHomeowner: true } as any
   });
 
+  // Find the selected chat room
+  const selectedChatRoom = selectedChatId 
+    ? validChatRooms.find(room => room.id === selectedChatId)
+    : null;
+
   return (
-    <>
+    <div className="min-h-screen bg-gray-50">
       {/* Mobile View */}
-      <MobileMessagingView
-        chatRooms={validChatRooms}
-        userType="HOMEOWNER"
-        showHidden={showHidden}
-        visibleCount={visibleCount}
-        hiddenCount={hiddenCount}
-        user={user}
-      />
+      <div className="md:hidden flex-1 flex items-center justify-center bg-gray-50 min-h-[calc(100vh-6rem)]">
+        <div className="text-center p-8">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <MessageCircle className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Messages
+          </h3>
+          <p className="text-gray-500 max-w-md mb-4">
+            The messaging interface is optimized for desktop. Please use a larger screen.
+          </p>
+          <Button asChild>
+            <Link href="/homeowner/dashboard">Go to Dashboard</Link>
+          </Button>
+        </div>
+      </div>
 
       {/* Desktop View */}
-      <div className="min-h-screen bg-gray-50 hidden md:block">
-        <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
-          {/* Header Section */}
-          <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+      <div className="hidden md:flex h-[calc(100vh-6rem)] bg-gray-50">
+        {/* Left Panel - Conversations List */}
+        <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+        {/* Header */}
+        <div className="p-4 border-b border-gray-200 bg-white">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" asChild className="lg:hidden">
                 <Link href="/homeowner/dashboard">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Dashboard
+                  <ArrowLeft className="w-5 h-5" />
                 </Link>
               </Button>
-              <div className="flex items-center gap-2">
-                {!showHidden && visibleCount > 0 && (
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <Users className="w-3 h-3" />
-                    {visibleCount} conversation{visibleCount !== 1 ? 's' : ''}
-                  </Badge>
-                )}
-                {showHidden && hiddenCount > 0 && (
-                  <Badge variant="outline" className="flex items-center gap-1">
-                    <EyeOff className="w-3 h-3" />
-                    {hiddenCount} hidden
-                  </Badge>
-                )}
+              <div className="hidden lg:block">
+                <Link href="/homeowner/dashboard" className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors">
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
+                </Link>
               </div>
-            </div>
-            
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Inbox className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  {showHidden ? "Hidden Messages" : "Messages"}
-                </h1>
-                <p className="text-gray-600 mt-1">
-                  {showHidden 
-                    ? "Manage your hidden conversations" 
-                    : "Connect with potential housemates and manage your property inquiries"
-                  }
-                </p>
-              </div>
+              <h1 className="text-xl font-semibold text-gray-900">Messages</h1>
             </div>
           </div>
 
-          {/* Toggle between visible and hidden conversations */}
-          <div className="flex items-center gap-2 mb-6">
-            <Button 
-              variant={!showHidden ? "default" : "outline"} 
-              size="sm" 
-              asChild
+          {/* Toggle Buttons - Improved Layout */}
+          <div className="flex bg-gray-50 rounded-lg p-1 border border-gray-200">
+            <Link 
+              href="/homeowner/messages"
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                !showHidden 
+                  ? "bg-white text-gray-900 shadow-sm border border-gray-200" 
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              }`}
             >
-              <Link href="/homeowner/messages">
-                <Eye className="w-4 h-4 mr-2" />
-                Active ({visibleCount})
-              </Link>
-            </Button>
-            <Button 
-              variant={showHidden ? "default" : "outline"} 
-              size="sm" 
-              asChild
+              <Eye className="w-4 h-4" />
+              <span>Active</span>
+              <Badge variant={!showHidden ? "default" : "secondary"} className="ml-1 text-xs px-2 py-0.5">
+                {visibleCount}
+              </Badge>
+            </Link>
+            <Link 
+              href="/homeowner/messages?showHidden=true"
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+                showHidden 
+                  ? "bg-white text-gray-900 shadow-sm border border-gray-200" 
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              }`}
             >
-              <Link href="/homeowner/messages?showHidden=true">
-                <EyeOff className="w-4 h-4 mr-2" />
-                Hidden ({hiddenCount})
-              </Link>
-            </Button>
+              <EyeOff className="w-4 h-4" />
+              <span>Hidden</span>
+              <Badge variant={showHidden ? "default" : "secondary"} className="ml-1 text-xs px-2 py-0.5">
+                {hiddenCount}
+              </Badge>
+            </Link>
           </div>
+        </div>
 
-          {/* Messages Content */}
+        {/* Search Bar */}
+        <div className="p-4 border-b border-gray-100">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search conversations..."
+              className="pl-10 bg-white border-gray-300 text-sm h-10 focus:border-primary focus:ring-1 focus:ring-primary"
+            />
+          </div>
+        </div>
+
+        {/* Conversations List */}
+        <div className="flex-1 overflow-y-auto">
           {validChatRooms.length === 0 ? (
-            <Card className="border-0 shadow-sm">
-              <CardContent className="py-16 text-center">
-                <div className="max-w-md mx-auto">
-                  <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-6 flex items-center justify-center">
-                    {showHidden ? (
-                      <EyeOff className="w-10 h-10 text-gray-400" />
-                    ) : (
-                      <MessageCircle className="w-10 h-10 text-gray-400" />
-                    )}
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                    {showHidden ? "No hidden conversations" : "No messages yet"}
-                  </h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">
-                    {showHidden 
-                      ? "You haven't hidden any conversations yet. Hidden conversations will appear here and can be restored at any time."
-                      : "When potential housemates reach out about your properties, their messages will appear here. You'll be able to chat, review their profiles, and manage applications all in one place."
-                    }
-                  </p>
-                  {!showHidden && (
-                    <div className="space-y-3 text-sm text-gray-500">
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <span>Receive inquiries about your listings</span>
-                      </div>
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span>Chat directly with interested housemates</span>
-                      </div>
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                        <span>Review profiles and manage applications</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {showHidden ? "Hidden Conversations" : "Recent Conversations"}
-                </h2>
-                <p className="text-sm text-gray-500">
-                  Sorted by most recent activity
-                </p>
+            <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                {showHidden ? (
+                  <EyeOff className="w-6 h-6 text-gray-400" />
+                ) : (
+                  <MessageCircle className="w-6 h-6 text-gray-400" />
+                )}
               </div>
-              {validChatRooms.map((chatRoom: any) => (
-                <HomeownerChatCard 
-                  key={chatRoom.id} 
-                  chatRoom={chatRoom} 
-                  user={user} 
-                  isHidden={showHidden}
-                />
-              ))}
+              <h3 className="text-sm font-medium text-gray-900 mb-2">
+                {showHidden ? "No hidden conversations" : "No conversations yet"}
+              </h3>
+              <p className="text-gray-500 text-xs leading-relaxed">
+                {showHidden 
+                  ? "Hidden conversations will appear here and can be restored at any time."
+                  : "When potential housemates reach out about your properties, their messages will appear here."
+                }
+              </p>
+              {!showHidden && (
+                <Button asChild className="mt-4" size="sm">
+                  <Link href="/homeowner/dashboard">Manage Properties</Link>
+                </Button>
+              )}
             </div>
+          ) : (
+            <HomeownerConversationList 
+              chatRooms={validChatRooms} 
+              currentUserId={user.id}
+              user={user}
+              isHidden={showHidden}
+              selectedChatId={selectedChatId}
+            />
           )}
         </div>
       </div>
-    </>
+
+        {/* Right Panel - Chat Window */}
+        <div className="flex-1 flex flex-col bg-white">
+          <Suspense fallback={
+            <div className="flex-1 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          }>
+            <ChatWindow
+              selectedChatRoom={selectedChatRoom}
+              userType="HOMEOWNER"
+              currentUserId={user.id}
+              user={user}
+            />
+          </Suspense>
+        </div>
+    </div>
+    </div>
   );
 } 

@@ -185,88 +185,91 @@ export function ProfileChatModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="max-w-lg h-[75vh] md:h-[70vh] flex flex-col p-0">
+        <DialogHeader className="px-6 py-4 border-b flex-shrink-0">
           <DialogTitle>Chat with {housemateName}</DialogTitle>
+          <div className="flex items-center justify-between text-sm text-muted-foreground mt-2">
+            <span>Profile Chat</span>
+          </div>
         </DialogHeader>
-        
-        <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-          <span>Profile Chat</span>
-        </div>
 
-        <ScrollArea className="flex-1 min-h-[300px] max-h-[400px] pr-4">
-          <div className="space-y-4">
-            {isLoading ? (
-              <div className="flex justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>No messages yet. Start the conversation!</p>
-              </div>
-            ) : (
-              messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex gap-3 ${
-                    message.senderId === currentUser?.id ? "justify-end" : "justify-start"
-                  }`}
-                >
-                  {message.senderId !== currentUser?.id && (
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                      {message.sender.profileImage ? (
-                        <Image
-                          src={message.sender.profileImage}
-                          alt="Profile picture"
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                          <User className="w-4 h-4 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
-                  )}
+        {/* Messages Area - Takes remaining space and scrolls independently */}
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="p-4 space-y-4">
+              {isLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No messages yet. Start the conversation!</p>
+                </div>
+              ) : (
+                messages.map((message) => (
                   <div
-                    className={`max-w-[70%] rounded-lg px-3 py-2 ${
-                      message.senderId === currentUser?.id
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
+                    key={message.id}
+                    className={`flex gap-3 ${
+                      message.senderId === currentUser?.id ? "justify-end" : "justify-start"
                     }`}
                   >
-                    <p className="text-sm">{message.content}</p>
-                    <p className="text-xs opacity-70 mt-1">
-                      {new Date(message.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                  {message.senderId === currentUser?.id && (
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                      {currentUser?.profileImage ? (
-                        <Image
-                          src={currentUser.profileImage}
-                          alt="Your profile picture"
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                          <User className="w-4 h-4 text-gray-400" />
-                        </div>
-                      )}
+                    {message.senderId !== currentUser?.id && (
+                      <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                        {message.sender.profileImage ? (
+                          <Image
+                            src={message.sender.profileImage}
+                            alt="Profile picture"
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <User className="w-4 h-4 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    <div
+                      className={`max-w-[70%] rounded-lg px-3 py-2 ${
+                        message.senderId === currentUser?.id
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      <p className="text-sm">{message.content}</p>
+                      <p className="text-xs opacity-70 mt-1">
+                        {new Date(message.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
                     </div>
-                  )}
-                </div>
-              ))
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
+                    {message.senderId === currentUser?.id && (
+                      <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                        {currentUser?.profileImage ? (
+                          <Image
+                            src={currentUser.profileImage}
+                            alt="Your profile picture"
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <User className="w-4 h-4 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
+        </div>
 
-        <div className="flex gap-2 pt-4 border-t">
+        {/* Message Input - Fixed at bottom */}
+        <div className="flex gap-2 p-4 border-t flex-shrink-0">
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}

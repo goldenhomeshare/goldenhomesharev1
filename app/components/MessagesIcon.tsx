@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Loader2 } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
 
 interface MessagesIconProps {
   userType?: "HOMEOWNER" | "HOUSEMATE" | "ADMIN" | null;
@@ -13,6 +14,9 @@ interface MessagesIconProps {
 export function MessagesIcon({ userType }: MessagesIconProps) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const getMessagesLink = () => {
     switch (userType) {
@@ -44,6 +48,29 @@ export function MessagesIcon({ userType }: MessagesIconProps) {
     }
   };
 
+  const handleClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isNavigating) return; // Prevent double clicks
+    
+    setIsNavigating(true);
+    
+    try {
+      // Add a minimum loading duration to ensure visibility
+      const [navigationResult] = await Promise.all([
+        router.push(getMessagesLink()),
+        new Promise(resolve => setTimeout(resolve, 500)) // Minimum 500ms loading
+      ]);
+    } catch (error) {
+      console.error('Navigation error:', error);
+      setIsNavigating(false);
+    }
+  };
+
+  // Reset navigation state when pathname changes
+  useEffect(() => {
+    setIsNavigating(false);
+  }, [pathname]);
+
   useEffect(() => {
     fetchUnreadCount();
     
@@ -71,18 +98,30 @@ export function MessagesIcon({ userType }: MessagesIconProps) {
   }
 
   return (
-    <Button variant="ghost" size="sm" asChild className="relative hover:bg-muted flex flex-col items-center gap-1 h-auto py-2">
-      <Link href={getMessagesLink()}>
-        <div className="relative">
-          <MessageCircle className="h-12 w-12" />
-          {!isLoading && unreadCount > 0 && (
-            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-[1.25rem] border-2 border-white">
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </div>
-          )}
-        </div>
-        <span className="text-xs font-medium">Messages</span>
-      </Link>
+    <Button 
+      variant="ghost" 
+      size="sm" 
+      className="relative hover:bg-muted flex flex-col items-center gap-1 h-auto py-2 disabled:opacity-75 transition-all duration-200" 
+      onClick={handleClick}
+      disabled={isNavigating}
+    >
+      <div className="relative">
+        {isNavigating ? (
+          <div className="flex items-center justify-center">
+            <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+          </div>
+        ) : (
+          <MessageCircle className={`h-12 w-12 transition-all duration-200 ${isNavigating ? 'opacity-0' : 'opacity-100'}`} />
+        )}
+        {!isLoading && !isNavigating && unreadCount > 0 && (
+          <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-[1.25rem] border-2 border-white animate-pulse">
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </div>
+        )}
+      </div>
+      <span className={`text-xs font-medium transition-all duration-200 ${isNavigating ? 'text-blue-600' : ''}`}>
+        {isNavigating ? "Loading..." : "Messages"}
+      </span>
     </Button>
   );
 } 

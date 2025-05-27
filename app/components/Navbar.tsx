@@ -7,6 +7,7 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { UserNav } from "./UserNav";
 import { MessagesIcon } from "./MessagesIcon";
 import { getCurrentUser } from "@/lib/auth";
+import { Home } from "lucide-react";
 
 
 export async function Navbar() {
@@ -15,21 +16,29 @@ export async function Navbar() {
     const user = await getCurrentUser();
     
     return (
-        <nav className="relative max-w-7xl w-full flex md:grid md:grid-cols-12 items-center px-4 md:px-8 mx-auto py-7">
-            <div className="md:col-span-3">
+        <nav className="relative max-w-7xl w-full flex items-center px-4 md:px-8 mx-auto py-7">
+            <div className="flex-shrink-0">
             <Link href="/">
-            <h1 className="text-3xl font-semibold">
+            {/* Full logo for larger screens */}
+            <h1 className="hidden sm:block text-xl md:text-2xl lg:text-3xl font-semibold whitespace-nowrap">
             <span className="text-yellow-600" > Golden </span>
             <span className="text-primary"> HomeShare</span> 
             </h1>
+            {/* House icon for mobile */}
+            <div className="sm:hidden flex items-center gap-1">
+            <span className="text-yellow-600 text-lg font-semibold">Golden</span>
+            <Home className="w-6 h-6 text-green-800" />
+            </div>
             </Link>
         </div>         
 
-        <NavbarLinks />
+        <div className="hidden lg:flex justify-center items-center flex-1 mx-8">
+            <NavbarLinks />
+        </div>
 
-        <div className="flex items-center gap-x-2 ms-auto md:col-span-3">
+        <div className="flex items-center gap-x-1 ml-auto flex-shrink-0">
         {kindeUser ? (
-          <div className="flex items-center gap-x-2">
+          <div className="flex items-center gap-x-1">
             <MessagesIcon userType={(user as any)?.userType || null} />
             <UserNav
               email={kindeUser.email as string}
@@ -41,16 +50,16 @@ export async function Navbar() {
             />
           </div>
             ) : (
-                <div className="flex items-center gap-x-2">
-                <Button asChild>
+                <div className="hidden sm:flex items-center gap-x-1">
+                <Button asChild size="sm" className="text-xs px-2">
                     <LoginLink>Login</LoginLink></Button>
-                <Button variant="secondary" asChild>
+                <Button variant="secondary" asChild size="sm" className="text-xs px-2">
                     <RegisterLink>Register</RegisterLink></Button>
 
                 </div>
             )}
 
-            <div className="md:hidden">
+            <div className="lg:hidden ml-1 flex-shrink-0">
                 <MobileMenu/>
             </div>
 

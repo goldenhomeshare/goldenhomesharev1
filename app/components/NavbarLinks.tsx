@@ -23,7 +23,7 @@ export const navbarLinks = [
     {
         id: 3,
         name: "About",
-        href: "/products/uikit" 
+        href: "/about" 
     }, 
 ];
 

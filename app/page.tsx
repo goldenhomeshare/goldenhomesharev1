@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       {/* Hero Section - Full width image with overlay content */}
-      <div className="relative w-full h-[500px] md:h-[600px] mb-6 overflow-hidden rounded-b-[120px] md:rounded-b-[144px]">
+      <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden rounded-b-[120px] md:rounded-b-[144px]">
         {/* Background Image */}
         <Image 
           src="/old-young-hero.jpg" 
@@ -51,46 +51,118 @@ export default function Home() {
         </div>
       </div>
 
-      <section className="mb-24 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="max-w-5xl mx-auto mb-20">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
-              Golden HomeShare Makes Sharing A Home Safe & Simple
-            </h2>
+      {/* Golden HomeShare Benefits Section */}
+      <section className="mt-12 px-4 md:px-8 bg-stone-200 pb-2">
+        <div className="max-w-7xl mx-auto py-16">
+          <div className="grid md:grid-cols-[1.2fr_1fr] gap-8 items-center">
+            {/* Left Side - Image with Badges */}
+            <div className="relative">
+              <div className="relative max-w-4xl mx-auto md:mx-0">
+                                <div className="w-full h-[450px] overflow-hidden rounded-2xl">
+                  <Image 
+                    src="/helping-happy.png" 
+                    alt="Helping hands providing support" 
+                    width={1000}
+                    height={1000}
+                    className="w-full h-full object-cover object-center scale-110"
+                    priority
+                  />
+                </div>
+                
+                {/* Badges positioned to avoid covering faces */}
+                {/* Affordable Housing - Upper right background */}
+                <div className="absolute -top-10 right-4 md:top-4 md:right-6">
+                  <div className="bg-green-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-full shadow-xl transform rotate-12">
+                    <span className="font-bold text-sm md:text-lg">Affordable</span>
+                    <br />
+                    <span className="font-bold text-sm md:text-lg">Housing</span>
+                  </div>
+                </div>
+                
+                {/* Trusted Community - Far left, away from faces */}
+                <div className="absolute top-48 -left-4 md:top-20 md:-left-8">
+                  <div className="bg-green-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-full shadow-xl transform -rotate-12">
+                    <span className="font-bold text-sm md:text-lg">Trusted</span>
+                    <br />
+                    <span className="font-bold text-sm md:text-lg">Community</span>
+                  </div>
+                </div>
+                
+                {/* Extra Income - Bottom right, over laptop area */}
+                <div className="absolute bottom-12 right-16 md:bottom-16 md:right-20">
+                  <div className="bg-green-800 text-white px-6 py-3 md:px-8 md:py-4 rounded-full shadow-xl transform rotate-6">
+                    <span className="font-bold text-sm md:text-lg">Extra</span>
+                    <br />
+                    <span className="font-bold text-sm md:text-lg">Income</span>
+                  </div>
+                </div>
+              </div>
+            </div>
             
-            {/* Action Cards */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16 max-w-2xl mx-auto">
-              <Link 
-                href="/onboarding"
-                className="flex-1 bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-200 group"
-              >
-                <div className="text-center">
-                  <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                      <polyline points="9,22 9,12 15,12 15,22"/>
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">List Your Space</h3>
-                  <p className="text-gray-600 text-sm">Share your home with vetted housemates</p>
-                </div>
-              </Link>
+            {/* Right Side - Text Content */}
+            <div className="space-y-6">
+              <p className="text-lg text-gray-700 leading-relaxed">
+                Housemates provide <strong>up to 10 hours weekly support (depending on arrangement)</strong> plus overnight presence in exchange for affordable accommodation.
+              </p>
               
-              <Link 
-                href="/onboarding"
-                className="flex-1 bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-200 group"
-              >
-                <div className="text-center">
-                  <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                      <circle cx="11" cy="11" r="8"/>
-                      <path d="m21 21-4.35-4.35"/>
-                    </svg>
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-gray-900">Types of Support Available:</h3>
+                <div className="grid grid-cols-2 gap-3 text-gray-700">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
+                    <span className="text-sm">Daily companionship</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Find Housing</h3>
-                  <p className="text-gray-600 text-sm">Discover affordable homesharing options</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
+                    <span className="text-sm">Grocery shopping</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
+                    <span className="text-sm">Light cleaning & tidying</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
+                    <span className="text-sm">Cooking & meal prep</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
+                    <span className="text-sm">Transportation assistance</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
+                    <span className="text-sm">Pet care & walking</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
+                    <span className="text-sm">Garden maintenance</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
+                    <span className="text-sm">Technology support</span>
+                  </div>
                 </div>
-              </Link>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                <p className="text-gray-700 text-sm">
+                  <strong>Important:</strong> This program provides companionship and practical household support only. <strong>No medical care, personal hygiene assistance, or professional services</strong> are included. Housemates are not trained caregivers or medical professionals.
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link 
+                  href="/onboarding"
+                  className="inline-flex items-center bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-colors shadow-lg"
+                >
+                  Start Your Journey
+                </Link>
+                <Link 
+                  href="/about"
+                  className="inline-flex items-center bg-white hover:bg-gray-50 text-primary border-2 border-primary px-8 py-4 rounded-2xl font-semibold text-lg transition-colors"
+                >
+                  Learn More
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -101,6 +173,7 @@ export default function Home() {
         <AirbnbStyleRow category="housemates" />
       </section>
 
+      {/* Partners Section */}
       <section className="mb-24 px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="max-w-5xl mx-auto mb-20">
@@ -267,16 +340,12 @@ export default function Home() {
           
           {/* Right Content */}
           <div className="px-6 md:px-12 py-8 md:py-16 space-y-6">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900">Our Process</h2>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">Our Process</h2>
             
-            <p className="text-lg text-gray-600">
-              Our proven 7-step process ensures compatibility and peace of mind through every step of your homesharing journey.
-            </p>
-            
-            <div className="space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 rounded-lg p-2 mt-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+            <div className="space-y-5">
+              <div className="flex items-start gap-5">
+                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                     <polyline points="14,2 14,8 20,8"/>
                     <line x1="16" y1="13" x2="8" y2="13"/>
@@ -285,53 +354,53 @@ export default function Home() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Application</h3>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Application</h3>
                   <p className="text-gray-600 text-sm">Complete our comprehensive application to get started</p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 rounded-lg p-2 mt-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+              <div className="flex items-start gap-5">
+                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                     <path d="m9 12 2 2 4-4"/>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Background checks and references</h3>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Background checks and references</h3>
                   <p className="text-gray-600 text-sm">Thorough verification for safety and peace of mind</p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 rounded-lg p-2 mt-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+              <div className="flex items-start gap-5">
+                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Interview</h3>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Interview</h3>
                   <p className="text-gray-600 text-sm">Personal interview to understand your needs and preferences</p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 rounded-lg p-2 mt-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+              <div className="flex items-start gap-5">
+                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                     <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                     <path d="M2 17l10 5 10-5"/>
                     <path d="M2 12l10 5 10-5"/>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Match Search</h3>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Match Search</h3>
                   <p className="text-gray-600 text-sm">We search for compatible matches based on your criteria</p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 rounded-lg p-2 mt-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+              <div className="flex items-start gap-5">
+                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                     <path d="M16 3h5v5"/>
                     <path d="M8 3H3v5"/>
                     <path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/>
@@ -341,33 +410,33 @@ export default function Home() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Match Introduction</h3>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Match Introduction</h3>
                   <p className="text-gray-600 text-sm">Facilitated introduction to your potential housemate</p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 rounded-lg p-2 mt-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+              <div className="flex items-start gap-5">
+                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                     <polyline points="14,2 14,8 20,8"/>
                     <line x1="9" y1="15" x2="15" y2="15"/>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Match Agreement</h3>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Match Agreement</h3>
                   <p className="text-gray-600 text-sm">Secure legal agreements to protect both parties</p>
                 </div>
               </div>
               
-              <div className="flex items-start gap-4">
-                <div className="bg-primary/10 rounded-lg p-2 mt-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+              <div className="flex items-start gap-5">
+                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                     <path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"/>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Ongoing support</h3>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Ongoing support</h3>
                   <p className="text-gray-600 text-sm">Continued guidance and support throughout your arrangement</p>
                 </div>
               </div>

@@ -227,7 +227,7 @@ async function getData({ category }: iAppProps): Promise<GetDataResult> {
           amenities: [
             ...(profile.schedule ? [profile.schedule] : []),
             ...(profile.socialPreference ? [profile.socialPreference] : []),
-          ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent"), // Remove early-riser and independent tags
+          ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent" && amenity !== "social"), // Remove early-riser, independent, and social tags
           // Demographics information
           demographics: {
             age: displayAgeRange,

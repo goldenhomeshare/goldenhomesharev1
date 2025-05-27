@@ -56,12 +56,14 @@ export function CostComparisonSupport() {
         {/* Unified Cost Comparison Component */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           {/* Header with Integrated Controls */}
-          <div className="bg-gradient-to-r from-green-800 to-green-900 text-white px-6 py-6">
-            <div className="flex items-center justify-center">
-              {/* Centered Hour Selector */}
-              <div className="flex items-center gap-4">
-                <span className="text-white text-sm font-medium whitespace-nowrap">Hours needed per week:</span>
-                <div className="flex items-center gap-3">
+          <div className="bg-gradient-to-r from-green-800 to-green-900 text-white px-4 md:px-6 py-6 md:py-6">
+            <div className="flex flex-col items-center justify-center space-y-4 md:space-y-0 md:flex-row md:gap-4">
+              {/* Hour Selector */}
+              <div className="flex flex-col items-center space-y-3 md:flex-row md:space-y-0 md:space-x-4">
+                <span className="text-white text-base md:text-base font-medium text-center">
+                  Hours needed per week:
+                </span>
+                <div className="flex items-center gap-4">
                   <button
                     onClick={() => setHoursPerWeek(Math.max(0, hoursPerWeek - 1))}
                     className="w-10 h-10 rounded-full bg-white text-green-800 font-bold text-lg hover:bg-green-50 transition-colors shadow-sm"

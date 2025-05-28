@@ -1,6 +1,6 @@
 import { AirbnbStyleRow } from "../app/components/AirbnbStyleRow";
 import Image from "next/image";
-import { Users, Shield, Layers } from "lucide-react";
+import { Users, Shield, Layers, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -52,119 +52,112 @@ export default function Home() {
       </div>
 
       {/* Golden HomeShare Benefits Section */}
-      <section className="mt-12 px-4 md:px-8 bg-stone-200 pb-2">
-        <div className="max-w-7xl mx-auto py-16">
-          <div className="grid md:grid-cols-[1.2fr_1fr] gap-8 items-center">
-            {/* Left Side - Image with Badges */}
-            <div className="relative">
-              <div className="relative max-w-4xl mx-auto md:mx-0">
-                                <div className="w-full h-[450px] overflow-hidden rounded-2xl">
-                  <Image 
-                    src="/helping-happy.png" 
-                    alt="Helping hands providing support" 
-                    width={1000}
-                    height={1000}
-                    className="w-full h-full object-cover object-center scale-110"
-                    priority
-                  />
+      <section className="mt-16 mb-24">
+        <div className="grid md:grid-cols-2 gap-0 items-center">
+          {/* Left Side - Background Image */}
+          <div className="relative">
+            <div className="relative w-full h-[400px] md:h-[600px] rounded-bl-[60px] overflow-hidden">
+              <Image 
+                src="/helping-happy-bg.jpg" 
+                alt="Helping hands providing support" 
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+          </div>
+          
+          {/* Right Side - Text Content */}
+          <div className="px-6 md:px-12 py-8 md:py-16 space-y-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-8">What is homesharing?</h2>
+            
+            <p className="text-lg text-gray-700 leading-relaxed text-center">
+              Housemates provide <strong>up to 10 hours weekly support (depending on arrangement)</strong> plus overnight presence <strong>(5-6 nights per week)</strong> in exchange for affordable accommodation.
+            </p>
+            
+            <div className="space-y-6">
+              <h3 className="text-xl font-semibold text-gray-900 text-center">Types of Support Available:</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Sparkles size={16} className="text-gray-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Cleaning</span>
                 </div>
                 
-                {/* Badges positioned to avoid covering faces */}
-                {/* Affordable Housing - Upper right background */}
-                <div className="absolute -top-10 right-4 md:top-4 md:right-6">
-                  <div className="bg-green-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-full shadow-xl transform rotate-12">
-                    <span className="font-bold text-sm md:text-lg">Affordable</span>
-                    <br />
-                    <span className="font-bold text-sm md:text-lg">Housing</span>
+                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <HeartHandshake size={16} className="text-gray-600" />
                   </div>
+                  <span className="text-sm font-medium text-gray-700">Companionship</span>
                 </div>
                 
-                {/* Trusted Community - Far left, away from faces */}
-                <div className="absolute top-48 -left-4 md:top-20 md:-left-8">
-                  <div className="bg-green-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-full shadow-xl transform -rotate-12">
-                    <span className="font-bold text-sm md:text-lg">Trusted</span>
-                    <br />
-                    <span className="font-bold text-sm md:text-lg">Community</span>
+                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Cat size={16} className="text-gray-600" />
                   </div>
+                  <span className="text-sm font-medium text-gray-700">Pet Care</span>
                 </div>
                 
-                {/* Extra Income - Bottom right, over laptop area */}
-                <div className="absolute bottom-12 right-16 md:bottom-16 md:right-20">
-                  <div className="bg-green-800 text-white px-6 py-3 md:px-8 md:py-4 rounded-full shadow-xl transform rotate-6">
-                    <span className="font-bold text-sm md:text-lg">Extra</span>
-                    <br />
-                    <span className="font-bold text-sm md:text-lg">Income</span>
+                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Salad size={16} className="text-gray-600" />
                   </div>
+                  <span className="text-sm font-medium text-gray-700">Cooking</span>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Flower size={16} className="text-gray-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Gardening</span>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Wrench size={16} className="text-gray-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Tech Support</span>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <ShoppingBag size={16} className="text-gray-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Errands</span>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Shield size={16} className="text-gray-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Home Security</span>
                 </div>
               </div>
             </div>
             
-            {/* Right Side - Text Content */}
-            <div className="space-y-6">
-              <p className="text-lg text-gray-700 leading-relaxed">
-                Housemates provide <strong>up to 10 hours weekly support (depending on arrangement)</strong> plus overnight presence in exchange for affordable accommodation.
+            <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-700">
+              <p className="text-green-800 text-sm">
+                <strong>Important:</strong> This program provides companionship and practical household support only. <strong>No medical care, personal hygiene assistance, or professional services</strong> are included. Housemates are not trained caregivers or medical professionals.
               </p>
-              
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-gray-900">Types of Support Available:</h3>
-                <div className="grid grid-cols-2 gap-3 text-gray-700">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-                    <span className="text-sm">Daily companionship</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-                    <span className="text-sm">Grocery shopping</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-                    <span className="text-sm">Light cleaning & tidying</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-                    <span className="text-sm">Cooking & meal prep</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-                    <span className="text-sm">Transportation assistance</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-                    <span className="text-sm">Pet care & walking</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-                    <span className="text-sm">Garden maintenance</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0"></div>
-                    <span className="text-sm">Technology support</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
-                <p className="text-gray-700 text-sm">
-                  <strong>Important:</strong> This program provides companionship and practical household support only. <strong>No medical care, personal hygiene assistance, or professional services</strong> are included. Housemates are not trained caregivers or medical professionals.
-                </p>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link 
-                  href="/onboarding"
-                  className="inline-flex items-center bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-colors shadow-lg"
-                >
-                  Start Your Journey
-                </Link>
-                <Link 
-                  href="/about"
-                  className="inline-flex items-center bg-white hover:bg-gray-50 text-primary border-2 border-primary px-8 py-4 rounded-2xl font-semibold text-lg transition-colors"
-                >
-                  Learn More
-                </Link>
-              </div>
             </div>
           </div>
+        </div>
+        
+        {/* Buttons Below Section */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 px-6">
+          <Link 
+            href="/onboarding"
+            className="inline-flex items-center bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-colors shadow-lg"
+          >
+            Start Your Journey
+          </Link>
+          <Link 
+            href="/about"
+            className="inline-flex items-center bg-white hover:bg-gray-50 text-primary border-2 border-primary px-8 py-4 rounded-2xl font-semibold text-lg transition-colors"
+          >
+            Learn More
+          </Link>
         </div>
       </section>
 

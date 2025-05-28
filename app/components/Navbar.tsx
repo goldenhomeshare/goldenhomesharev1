@@ -50,7 +50,7 @@ export async function Navbar() {
             />
           </div>
             ) : (
-                <div className="hidden sm:flex items-center gap-x-1">
+                <div className="flex items-center gap-x-1">
                 <Button asChild size="sm" className="text-xs px-2">
                     <LoginLink>Login</LoginLink></Button>
                 <Button variant="secondary" asChild size="sm" className="text-xs px-2">

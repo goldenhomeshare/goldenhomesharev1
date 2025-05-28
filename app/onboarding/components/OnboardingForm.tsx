@@ -17,13 +17,16 @@ export function OnboardingForm({ userId }: { userId: string }) {
     setIsSubmitting(true);
     try {
       if (role === "HOUSEMATE") {
-        // For housemates, redirect to the signup wizard without completing onboarding yet
+        // For housemates, redirect to the signup wizard
         router.push("/housemate/signup-wizard");
+      } else if (role === "HOMEOWNER") {
+        // For homeowners, redirect to the signup wizard
+        router.push("/homeowner/signup-wizard");
       } else {
-        // For homeowners, complete onboarding and redirect to profile edit
+        // For other roles (like ADMIN), complete onboarding normally
         const result = await completeOnboarding(userId, role);
         if (result.success) {
-          router.push("/homeowner/profile/edit");
+          router.push("/dashboard");
         }
       }
     } catch (error) {

@@ -9,21 +9,18 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 // Import step components
-import { LocationStep } from "./steps/LocationStep";
 import { PersonalInfoStep } from "./steps/PersonalInfoStep";
 import { ProfilePictureStep } from "./steps/ProfilePictureStep";
-import { BudgetStep } from "./steps/BudgetStep";
-import { EducationOccupationStep } from "./steps/EducationOccupationStep";
+import { DemographicsStep } from "./steps/DemographicsStep";
 import { LifestylePreferencesStep } from "./steps/LifestylePreferencesStep";
 import { HousematePreferencesStep } from "./steps/HousematePreferencesStep";
-import { MatchPreferencesStep } from "./steps/MatchPreferencesStep";
 import { BioStep } from "./steps/BioStep";
 
 // Import actions
-import { createHousemateProfile } from "@/app/actions/profile-actions";
+import { createHomeownerProfile } from "@/app/actions/profile-actions";
 import { UpdateUserSettings } from "@/app/actions";
 
-interface HousemateSignupWizardProps {
+interface HomeownerSignupWizardProps {
   userId: string;
   firstName: string;
   lastName: string;
@@ -31,12 +28,6 @@ interface HousemateSignupWizardProps {
 }
 
 export interface WizardFormData {
-  // Location
-  location: {
-    city: string;
-    state: string;
-  };
-  
   // Personal Info
   firstName: string;
   lastName: string;
@@ -45,35 +36,24 @@ export interface WizardFormData {
   gender: string;
   profilePicture: string;
   
-  // Budget
-  maxBudget: string;
-  
-  // Education & Occupation
-  education: {
-    level: string;
-    stillAttending: boolean;
-    degreeProgram: string;
-  };
-  occupation: {
-    isRetired: boolean;
-    description: string;
-  };
-  
-  // Lifestyle Preferences
+  // Demographics & Lifestyle
   schedule: string;
   socialPreference: string;
   hobbies: string[];
+  
+  // Lifestyle Preferences
   lifestyle: {
     hasPets: boolean;
     petDescription: string;
     numberOfPeople: string;
-    smokingStatus: string;
+    smokingPolicy: string;
     guestPolicy: string;
   };
   
-  // Match Preferences
+  // Housemate Preferences
+  preferredCareerStage: string;
   preferredGender: string;
-  canHelpWith: string[];
+  helpExpected: string[];
   
   // Bio
   bio: string;
@@ -87,18 +67,15 @@ export interface WizardFormData {
 }
 
 const STEPS = [
-  { id: 1, title: "Location", description: "Where you're looking to live" },
-  { id: 2, title: "Budget", description: "Your housing budget" },
-  { id: 3, title: "Demographics", description: "Basic information about you" },
-  { id: 4, title: "Profile Picture", description: "Add your photo" },
-  { id: 5, title: "Education & Work", description: "Your background" },
-  { id: 6, title: "Lifestyle", description: "Your lifestyle preferences" },
-  { id: 7, title: "Housemate Preferences", description: "Your living situation" },
-  { id: 8, title: "Match Preferences", description: "Who you'd like to live with" },
-  { id: 9, title: "About You", description: "Tell us about yourself" },
+  { id: 1, title: "Demographics", description: "Basic information about you" },
+  { id: 2, title: "Profile Picture", description: "Add your photo" },
+  { id: 3, title: "Lifestyle", description: "Your schedule and social preferences" },
+  { id: 4, title: "Preferences", description: "Your household preferences" },
+  { id: 5, title: "Match Preferences", description: "Who you'd like to live with" },
+  { id: 6, title: "About You", description: "Tell us about yourself" },
 ];
 
-export function HousemateSignupWizard({ userId, firstName, lastName, email }: HousemateSignupWizardProps) {
+export function HomeownerSignupWizard({ userId, firstName, lastName, email }: HomeownerSignupWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
@@ -111,16 +88,6 @@ export function HousemateSignupWizard({ userId, firstName, lastName, email }: Ho
     language: "",
     gender: "",
     profilePicture: "",
-    maxBudget: "",
-    education: {
-      level: "",
-      stillAttending: false,
-      degreeProgram: "",
-    },
-    occupation: {
-      isRetired: false,
-      description: "",
-    },
     schedule: "",
     socialPreference: "",
     hobbies: [],
@@ -128,16 +95,13 @@ export function HousemateSignupWizard({ userId, firstName, lastName, email }: Ho
       hasPets: false,
       petDescription: "",
       numberOfPeople: "1",
-      smokingStatus: "",
+      smokingPolicy: "",
       guestPolicy: "",
     },
+    preferredCareerStage: "",
     preferredGender: "",
-    canHelpWith: [],
+    helpExpected: [],
     bio: "",
-    location: {
-      city: "",
-      state: "",
-    },
     socialMedia: {
       instagram: "",
       facebook: "",
@@ -193,51 +157,33 @@ export function HousemateSignupWizard({ userId, firstName, lastName, email }: Ho
       else if (age >= 55 && age <= 64) ageRange = "55-64";
       else if (age >= 65) ageRange = "65+";
 
-      // Prepare occupation string
-      let occupationString = "";
-      if (formData.occupation.isRetired) {
-        occupationString = "retired";
-      } else if (formData.occupation.description) {
-        occupationString = "professional";
-      } else if (formData.education.level && formData.education.stillAttending) {
-        occupationString = "student";
-      }
-
-      // Create housemate profile
+      // Create homeowner profile
       const profileData = {
-        age,
-        occupation: occupationString,
         bio: formData.bio,
         profilePicture: formData.profilePicture,
-        maxBudget: formData.maxBudget ? parseInt(formData.maxBudget) : undefined,
         gender: formData.gender,
         ageRange,
         schedule: formData.schedule,
         socialPreference: formData.socialPreference,
         hobbies: formData.hobbies,
+        preferredCareerStage: formData.preferredCareerStage,
         preferredGender: formData.preferredGender,
-        canHelpWith: formData.canHelpWith,
         socialMedia: formData.socialMedia,
         lifestyle: {
           ...formData.lifestyle,
           language: formData.language,
-          education: formData.education,
-          occupationDetails: formData.occupation,
           dateOfBirth: formData.dateOfBirth,
-          location: {
-            city: formData.location.city,
-            state: formData.location.state,
-          },
+          helpExpected: formData.helpExpected,
         },
       };
 
-      const result = await createHousemateProfile(profileData);
+      const result = await createHomeownerProfile(profileData);
       
       if (result.success) {
         toast.success("Welcome! Your profile has been created successfully!");
         setIsRedirecting(true);
         setTimeout(() => {
-          router.push("/housemate/dashboard");
+          router.push("/homeowner/dashboard");
         }, 2000);
       } else {
         toast.error(result.error || "Failed to create profile");
@@ -254,61 +200,40 @@ export function HousemateSignupWizard({ userId, firstName, lastName, email }: Ho
     switch (currentStep) {
       case 1:
         return (
-          <LocationStep
+          <PersonalInfoStep
             formData={formData}
             updateFormData={updateFormData}
           />
         );
       case 2:
         return (
-          <BudgetStep
+          <ProfilePictureStep
             formData={formData}
             updateFormData={updateFormData}
           />
         );
       case 3:
         return (
-          <PersonalInfoStep
+          <DemographicsStep
             formData={formData}
             updateFormData={updateFormData}
           />
         );
       case 4:
         return (
-          <ProfilePictureStep
+          <LifestylePreferencesStep
             formData={formData}
             updateFormData={updateFormData}
           />
         );
       case 5:
         return (
-          <EducationOccupationStep
-            formData={formData}
-            updateFormData={updateFormData}
-          />
-        );
-      case 6:
-        return (
-          <LifestylePreferencesStep
-            formData={formData}
-            updateFormData={updateFormData}
-          />
-        );
-      case 7:
-        return (
           <HousematePreferencesStep
             formData={formData}
             updateFormData={updateFormData}
           />
         );
-      case 8:
-        return (
-          <MatchPreferencesStep
-            formData={formData}
-            updateFormData={updateFormData}
-          />
-        );
-      case 9:
+      case 6:
         return (
           <BioStep
             formData={formData}
@@ -323,25 +248,20 @@ export function HousemateSignupWizard({ userId, firstName, lastName, email }: Ho
   const isStepValid = () => {
     switch (currentStep) {
       case 1:
-        return formData.location.city && formData.location.state;
-      case 2:
-        return formData.maxBudget;
-      case 3:
         return formData.firstName && formData.lastName && formData.dateOfBirth && formData.language && formData.gender;
-      case 4:
+      case 2:
         return formData.profilePicture;
-      case 5:
-        return (formData.education.level || formData.occupation.isRetired || formData.occupation.description);
-      case 6:
+      case 3:
         return formData.schedule && formData.socialPreference;
-      case 7:
+      case 4:
         // Check if pets require description with minimum 25 characters
         const petsValid = !formData.lifestyle.hasPets || 
           (formData.lifestyle.hasPets && formData.lifestyle.petDescription.trim().length >= 25);
-        return formData.lifestyle.smokingStatus && formData.lifestyle.guestPolicy && petsValid;
-      case 8:
-        return formData.preferredGender;
-      case 9:
+        return formData.lifestyle.numberOfPeople && formData.lifestyle.smokingPolicy && 
+               formData.lifestyle.guestPolicy && petsValid;
+      case 5:
+        return formData.preferredGender && formData.preferredCareerStage;
+      case 6:
         return formData.bio.trim().length > 0;
       default:
         return false;
@@ -351,25 +271,20 @@ export function HousemateSignupWizard({ userId, firstName, lastName, email }: Ho
   const isStepValidByNumber = (stepNumber: number) => {
     switch (stepNumber) {
       case 1:
-        return formData.location.city && formData.location.state;
-      case 2:
-        return formData.maxBudget;
-      case 3:
         return formData.firstName && formData.lastName && formData.dateOfBirth && formData.language && formData.gender;
-      case 4:
+      case 2:
         return formData.profilePicture;
-      case 5:
-        return (formData.education.level || formData.occupation.isRetired || formData.occupation.description);
-      case 6:
+      case 3:
         return formData.schedule && formData.socialPreference;
-      case 7:
+      case 4:
         // Check if pets require description with minimum 25 characters
         const petsValid = !formData.lifestyle.hasPets || 
           (formData.lifestyle.hasPets && formData.lifestyle.petDescription.trim().length >= 25);
-        return formData.lifestyle.smokingStatus && formData.lifestyle.guestPolicy && petsValid;
-      case 8:
-        return formData.preferredGender;
-      case 9:
+        return formData.lifestyle.numberOfPeople && formData.lifestyle.smokingPolicy && 
+               formData.lifestyle.guestPolicy && petsValid;
+      case 5:
+        return formData.preferredGender && formData.preferredCareerStage;
+      case 6:
         return formData.bio.trim().length > 0;
       default:
         return false;
@@ -488,7 +403,6 @@ export function HousemateSignupWizard({ userId, firstName, lastName, email }: Ho
           </div>
         </div>
 
-        {/* Step Content */}
         <Card className="mb-10 shadow-lg border-0">
           <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg">
             <div className="text-center">

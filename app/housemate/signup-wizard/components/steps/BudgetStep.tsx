@@ -71,18 +71,18 @@ export function BudgetStep({ formData, updateFormData }: BudgetStepProps) {
 
         {/* Match Message */}
         {showMatchMessage && (
-          <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-xl">
+          <div className="mt-8 p-6 bg-primary/5 border border-primary/20 rounded-xl">
             <div className="flex items-start gap-4">
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="h-5 w-5 text-blue-600" />
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <CheckCircle className="h-5 w-5 text-primary" />
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                <h3 className="text-lg font-semibold text-primary mb-2">
                   Budget confirmed
                 </h3>
-                <p className="text-blue-800 leading-relaxed">
+                <p className="text-gray-700 leading-relaxed">
                   Your budget of ${formatBudget(formData.maxBudget)} per month is within range for available homesharing opportunities in your area.
                 </p>
               </div>

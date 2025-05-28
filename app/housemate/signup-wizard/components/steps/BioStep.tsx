@@ -1,8 +1,17 @@
 "use client";
 
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileText, Lightbulb } from "lucide-react";
+import { 
+  FileText, 
+  Lightbulb, 
+  User,
+  Users,
+  Instagram,
+  Facebook,
+  Linkedin
+} from "lucide-react";
 import { WizardFormData } from "../HousemateSignupWizard";
 
 interface BioStepProps {
@@ -13,6 +22,44 @@ interface BioStepProps {
 export function BioStep({ formData, updateFormData }: BioStepProps) {
   const handleBioChange = (value: string) => {
     updateFormData({ bio: value });
+  };
+
+  const handleSocialMediaChange = (platform: keyof WizardFormData['socialMedia'], value: string) => {
+    updateFormData({
+      socialMedia: {
+        ...formData.socialMedia,
+        [platform]: value
+      }
+    });
+  };
+
+  const validateAndFormatSocialLink = (platform: string, value: string) => {
+    if (!value.trim()) return value;
+    
+    const trimmedValue = value.trim();
+    
+    switch (platform) {
+      case 'instagram':
+        if (!trimmedValue.includes('instagram.com')) {
+          return `https://instagram.com/${trimmedValue.replace('@', '')}`;
+        }
+        return trimmedValue.startsWith('http') ? trimmedValue : `https://${trimmedValue}`;
+      
+      case 'facebook':
+        if (!trimmedValue.includes('facebook.com')) {
+          return `https://facebook.com/${trimmedValue}`;
+        }
+        return trimmedValue.startsWith('http') ? trimmedValue : `https://${trimmedValue}`;
+      
+      case 'linkedin':
+        if (!trimmedValue.includes('linkedin.com')) {
+          return `https://linkedin.com/in/${trimmedValue}`;
+        }
+        return trimmedValue.startsWith('http') ? trimmedValue : `https://${trimmedValue}`;
+      
+      default:
+        return trimmedValue;
+    }
   };
 
   const bioPrompts = [
@@ -29,10 +76,18 @@ export function BioStep({ formData, updateFormData }: BioStepProps) {
 
   return (
     <div className="space-y-8">
+      <div className="text-center mb-8">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">Tell Your Story</h3>
+        <p className="text-gray-600">
+          Help homeowners get to know you and understand what makes you a great housemate
+        </p>
+      </div>
+
       <div className="space-y-6">
         {/* Bio Input */}
         <div>
-          <Label htmlFor="bio" className="text-base font-medium mb-3 block">
+          <Label htmlFor="bio" className="text-lg font-medium text-gray-900 flex items-center gap-2 mb-3">
+            <User className="w-5 h-5" />
             About You *
           </Label>
           <Textarea
@@ -41,7 +96,7 @@ export function BioStep({ formData, updateFormData }: BioStepProps) {
             value={formData.bio}
             onChange={(e) => handleBioChange(e.target.value)}
             rows={8}
-            className="text-lg leading-relaxed border-2 focus:border-primary"
+            className="border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-base leading-relaxed"
           />
           <div className="flex justify-between items-center mt-2">
             <p className="text-sm text-gray-500">
@@ -58,33 +113,13 @@ export function BioStep({ formData, updateFormData }: BioStepProps) {
           </div>
         </div>
 
-        {/* Writing Prompts */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-              <Lightbulb size={20} className="text-blue-600" />
-            </div>
-            <h3 className="text-lg font-semibold text-blue-800">
-              Need inspiration? Consider these questions:
-            </h3>
-          </div>
-          <ul className="space-y-2">
-            {bioPrompts.map((prompt, index) => (
-              <li key={index} className="flex items-start gap-2 text-blue-700">
-                <span className="text-blue-400 mt-1">•</span>
-                <span>{prompt}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
         {/* Tips */}
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+        <div className="bg-primary/5 border border-primary/20 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-              <FileText size={20} className="text-gray-600" />
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <FileText size={20} className="text-primary" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-800">
+            <h3 className="text-lg font-semibold text-primary">
               Tips for a great bio:
             </h3>
           </div>
@@ -108,9 +143,84 @@ export function BioStep({ formData, updateFormData }: BioStepProps) {
           </ul>
         </div>
 
+        {/* Social Media Section */}
+        <div className="space-y-6">
+          <div>
+            <Label className="text-lg font-medium text-gray-900 flex items-center gap-2 mb-2">
+              <Users className="w-5 h-5" />
+              Social Media (Optional)
+            </Label>
+            <p className="text-sm text-gray-600 mb-4">
+              Adding social media links can help homeowners get to know you better and build trust
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Instagram */}
+            <div className="space-y-2">
+              <Label htmlFor="instagram" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Instagram className="w-4 h-4" />
+                Instagram
+              </Label>
+              <Input
+                id="instagram"
+                placeholder="@username or full URL"
+                value={formData.socialMedia.instagram}
+                onChange={(e) => handleSocialMediaChange("instagram", e.target.value)}
+                onBlur={(e) => {
+                  const formatted = validateAndFormatSocialLink('instagram', e.target.value);
+                  handleSocialMediaChange("instagram", formatted);
+                }}
+                className="h-12 border-gray-200 rounded-xl focus:border-primary focus:ring-0"
+              />
+              <p className="text-xs text-gray-500">Enter your Instagram username</p>
+            </div>
+
+            {/* Facebook */}
+            <div className="space-y-2">
+              <Label htmlFor="facebook" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Facebook className="w-4 h-4" />
+                Facebook
+              </Label>
+              <Input
+                id="facebook"
+                placeholder="Profile name or full URL"
+                value={formData.socialMedia.facebook}
+                onChange={(e) => handleSocialMediaChange("facebook", e.target.value)}
+                onBlur={(e) => {
+                  const formatted = validateAndFormatSocialLink('facebook', e.target.value);
+                  handleSocialMediaChange("facebook", formatted);
+                }}
+                className="h-12 border-gray-200 rounded-xl focus:border-primary focus:ring-0"
+              />
+              <p className="text-xs text-gray-500">Enter your Facebook profile name</p>
+            </div>
+
+            {/* LinkedIn */}
+            <div className="space-y-2">
+              <Label htmlFor="linkedin" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <Linkedin className="w-4 h-4" />
+                LinkedIn
+              </Label>
+              <Input
+                id="linkedin"
+                placeholder="Profile name or full URL"
+                value={formData.socialMedia.linkedin}
+                onChange={(e) => handleSocialMediaChange("linkedin", e.target.value)}
+                onBlur={(e) => {
+                  const formatted = validateAndFormatSocialLink('linkedin', e.target.value);
+                  handleSocialMediaChange("linkedin", formatted);
+                }}
+                className="h-12 border-gray-200 rounded-xl focus:border-primary focus:ring-0"
+              />
+              <p className="text-xs text-gray-500">Enter your LinkedIn profile name</p>
+            </div>
+          </div>
+        </div>
+
         {/* Preview */}
         {formData.bio.trim().length > 0 && (
-          <div className="border border-gray-200 rounded-lg p-6">
+          <div className="border border-gray-200 rounded-xl p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-3">
               Preview of your bio:
             </h3>

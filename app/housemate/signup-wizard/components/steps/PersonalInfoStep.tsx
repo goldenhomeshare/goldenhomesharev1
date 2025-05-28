@@ -2,8 +2,9 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, UserCircle, CircleDashed } from "lucide-react";
+import { User, Mars, Venus, ChevronDown } from "lucide-react";
 import { WizardFormData } from "../HousemateSignupWizard";
+import { useState, useRef, useEffect } from "react";
 
 interface PersonalInfoStepProps {
   formData: WizardFormData;
@@ -11,10 +12,13 @@ interface PersonalInfoStepProps {
 }
 
 export function PersonalInfoStep({ formData, updateFormData }: PersonalInfoStepProps) {
+  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   const genderOptions = [
-    { id: "male", label: "Male", icon: UserCircle },
-    { id: "female", label: "Female", icon: User },
-    { id: "other", label: "Other", icon: CircleDashed },
+    { id: "male", label: "Male", icon: Mars },
+    { id: "female", label: "Female", icon: Venus },
+    { id: "other", label: "Other", icon: User },
   ];
 
   const languageOptions = [
@@ -29,8 +33,23 @@ export function PersonalInfoStep({ formData, updateFormData }: PersonalInfoStepP
     "Korean",
     "Arabic",
     "Hindi",
+    "Russian",
     "Other"
   ];
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsLanguageDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleInputChange = (field: keyof WizardFormData, value: string) => {
     updateFormData({ [field]: value });
@@ -39,6 +58,13 @@ export function PersonalInfoStep({ formData, updateFormData }: PersonalInfoStepP
   const handleGenderSelect = (gender: string) => {
     updateFormData({ gender });
   };
+
+  const handleLanguageSelect = (language: string) => {
+    updateFormData({ language });
+    setIsLanguageDropdownOpen(false);
+  };
+
+  const selectedLanguage = languageOptions.find(lang => lang === formData.language);
 
   return (
     <div className="space-y-8">
@@ -90,24 +116,42 @@ export function PersonalInfoStep({ formData, updateFormData }: PersonalInfoStepP
           </p>
         </div>
 
-        {/* Language */}
+        {/* Language - Custom Dropdown */}
         <div>
-          <Label htmlFor="language" className="text-base font-medium">
+          <Label className="text-base font-medium">
             Primary Language *
           </Label>
-          <select
-            id="language"
-            value={formData.language}
-            onChange={(e) => handleInputChange("language", e.target.value)}
-            className="mt-2 h-12 w-full px-3 py-2 border border-gray-200 rounded-xl text-lg focus:outline-none focus:border-primary bg-white"
+          <div className="relative mt-2" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
+              className="w-full h-12 px-4 text-lg border-2 border-gray-200 rounded-xl bg-white focus:outline-none focus:border-primary flex items-center justify-between hover:border-gray-300 transition-colors"
           >
-            <option value="">Select your primary language</option>
-            {languageOptions.map((lang) => (
-              <option key={lang} value={lang}>
-                {lang}
-              </option>
+              <span className={selectedLanguage ? "text-gray-900" : "text-gray-500"}>
+                {selectedLanguage || "Select your primary language"}
+              </span>
+              <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${isLanguageDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {isLanguageDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-gray-200 rounded-xl shadow-lg z-20 max-h-60 overflow-y-auto">
+                {languageOptions.map((language) => (
+                  <button
+                    key={language}
+                    type="button"
+                    onClick={() => handleLanguageSelect(language)}
+                    className={`w-full px-4 py-3 text-left text-lg hover:bg-gray-50 transition-colors first:rounded-t-xl last:rounded-b-xl ${
+                      formData.language === language 
+                        ? 'bg-primary/5 text-primary font-medium' 
+                        : 'text-gray-900'
+                    }`}
+                  >
+                    {language}
+                  </button>
             ))}
-          </select>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Gender Selection */}

@@ -29,7 +29,7 @@ export const ourFileRouter = {
       return { uploadedBy: metadata.userId };
     }),
 
-  profilePictureUpload: f({ image: { maxFileSize: "2MB", maxFileCount: 1 } })
+  profilePictureUpload: f({ image: { maxFileSize: "8MB", maxFileCount: 1 } })
     // Set permissions and file types for profile pictures
     .middleware(async ({ req }) => {
       const { getUser } = getKindeServerSession();

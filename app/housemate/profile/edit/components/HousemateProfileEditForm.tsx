@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { updateHousemateProfile } from "@/app/actions/profile-actions";
 import { useRouter } from "next/navigation";
-import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed, Camera, Armchair, CigaretteOff, Upload, X, Sparkles, Salad, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, MapPin } from "lucide-react";
+import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed, Camera, Armchair, CigaretteOff, Upload, X, Sparkles, Salad, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, MapPin, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useUploadThing } from "@/app/lib/uploadthing";
 import Image from "next/image";
@@ -56,6 +56,7 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
       petDescription: initialData?.lifestyle?.petDescription || "",
       numberOfPeople: initialData?.lifestyle?.numberOfPeople || "1",
       smokingStatus: initialData?.lifestyle?.smokingStatus || "",
+      guestPolicy: initialData?.lifestyle?.guestPolicy || "",
     },
     education: {
       level: initialData?.lifestyle?.education?.level || "",
@@ -158,6 +159,13 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate all required fields from signup wizard
+    if (!isFormValid()) {
+      toast.error("Please complete all required fields before saving your profile");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -211,6 +219,83 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Comprehensive validation function that matches signup wizard requirements
+  const isFormValid = () => {
+    // Step 1: Location validation - city, state
+    if (!formData.location.city.trim()) return false;
+    if (!formData.location.state.trim()) return false;
+
+    // Step 2: Budget validation - maxBudget
+    if (!formData.maxBudget) return false;
+
+    // Step 3: Demographics validation - firstName, lastName, dateOfBirth, language, gender
+    if (!formData.firstName.trim()) return false;
+    if (!formData.lastName.trim()) return false;
+    if (!formData.dateOfBirth) return false;
+    if (!formData.language) return false;
+    if (!formData.gender) return false;
+
+    // Step 4: Profile Picture validation
+    if (!formData.profilePicture) return false;
+
+    // Step 5: Education & Occupation validation - at least one must be provided
+    const hasEducation = formData.education.level;
+    const hasOccupation = formData.occupationDetails.isRetired || formData.occupationDetails.description;
+    if (!hasEducation && !hasOccupation) return false;
+
+    // Step 6: Lifestyle validation - schedule, socialPreference
+    if (!formData.schedule) return false;
+    if (!formData.socialPreference) return false;
+
+    // Step 7: Housemate Preferences validation - smokingStatus, guestPolicy, pets
+    if (!formData.lifestyle.smokingStatus) return false;
+    if (!formData.lifestyle.guestPolicy) return false;
+    
+    // Pet validation - if has pets, must have description with at least 25 characters
+    if (formData.lifestyle.hasPets && formData.lifestyle.petDescription.trim().length < 25) {
+      return false;
+    }
+
+    // Step 8: Match Preferences validation - preferredGender
+    if (!formData.preferredGender) return false;
+
+    // Step 9: Bio validation - must have content
+    if (!formData.bio.trim()) return false;
+
+    return true;
+  };
+
+  // Get missing fields for user feedback
+  const getMissingFields = () => {
+    const missing: string[] = [];
+
+    if (!formData.location.city.trim()) missing.push("City");
+    if (!formData.location.state.trim()) missing.push("State");
+    if (!formData.maxBudget) missing.push("Maximum Budget");
+    if (!formData.firstName.trim()) missing.push("First Name");
+    if (!formData.lastName.trim()) missing.push("Last Name");
+    if (!formData.dateOfBirth) missing.push("Date of Birth");
+    if (!formData.language) missing.push("Primary Language");
+    if (!formData.gender) missing.push("Gender");
+    if (!formData.profilePicture) missing.push("Profile Picture");
+    
+    const hasEducation = formData.education.level;
+    const hasOccupation = formData.occupationDetails.isRetired || formData.occupationDetails.description;
+    if (!hasEducation && !hasOccupation) missing.push("Education Level or Occupation");
+    
+    if (!formData.schedule) missing.push("Schedule Preference");
+    if (!formData.socialPreference) missing.push("Social Preference");
+    if (!formData.lifestyle.smokingStatus) missing.push("Smoking Status");
+    if (!formData.lifestyle.guestPolicy) missing.push("Guest Policy");
+    if (formData.lifestyle.hasPets && formData.lifestyle.petDescription.trim().length < 25) {
+      missing.push("Pet Description (minimum 25 characters)");
+    }
+    if (!formData.preferredGender) missing.push("Gender Preference");
+    if (!formData.bio.trim()) missing.push("About You");
+
+    return missing;
   };
 
   const handleInputChange = (field: string, value: string | number) => {
@@ -520,6 +605,7 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                 </div>
               </div>
 
+              {/* Email */}
               <div>
                 <Label htmlFor="email" className="text-sm font-medium text-gray-700 mb-2 block">
                   Email
@@ -1134,8 +1220,32 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                         value={formData.lifestyle.petDescription}
                         onChange={(e) => handleLifestyleChange("petDescription", e.target.value)}
                         rows={3}
-                        className="border-gray-200 rounded-xl focus:border-primary focus:ring-0 text-gray-900"
+                        className={`border-gray-200 rounded-xl focus:border-primary focus:ring-0 text-gray-900 ${
+                          formData.lifestyle.hasPets && formData.lifestyle.petDescription.trim().length < 25
+                            ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+                            : ''
+                        }`}
                       />
+                      <div className="flex justify-between items-center mt-2">
+                        <div className="text-sm">
+                          {formData.lifestyle.hasPets && formData.lifestyle.petDescription.trim().length < 25 ? (
+                            <span className="text-red-600">
+                              Please provide at least 25 characters to help homeowners understand your pets
+                            </span>
+                          ) : (
+                            <span className="text-gray-500">
+                              Help potential homeowners understand your pets better
+                            </span>
+                          )}
+                        </div>
+                        <span className={`text-sm ${
+                          formData.lifestyle.hasPets && formData.lifestyle.petDescription.trim().length < 25
+                            ? 'text-red-600'
+                            : 'text-gray-500'
+                        }`}>
+                          {formData.lifestyle.petDescription.trim().length}/25 min
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1240,6 +1350,61 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                       </div>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Guest Policy */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <UserPlus size={24} className="text-primary" />
+                  </div>
+                  <Label className="text-sm font-medium text-gray-700">Guest Policy</Label>
+                </div>
+                
+                <div className="space-y-2">
+                  <p className="text-xs text-gray-500">
+                    How often do you plan to have guests visit?
+                  </p>
+                  
+                  <div className="space-y-2">
+                    {[
+                      { value: "rarely", label: "Rarely Have Guests" },
+                      { value: "occasional", label: "Occasional Guests" },
+                      { value: "moderate", label: "Moderate Guest Activity" },
+                      { value: "frequent", label: "Frequent Guests" }
+                    ].map((option) => {
+                      const isSelected = formData.lifestyle.guestPolicy === option.value;
+                      
+                      return (
+                        <div key={option.value}>
+                          <label className="cursor-pointer">
+                            <input
+                              type="radio"
+                              name="guestPolicy"
+                              className="sr-only peer"
+                              checked={isSelected}
+                              onChange={() => handleLifestyleChange("guestPolicy", option.value)}
+                            />
+                            <div className="flex items-center p-3 rounded-xl border border-gray-200 peer-checked:border-gray-400 peer-checked:bg-gray-50 hover:border-gray-300 transition-colors">
+                              <div className="flex-1">
+                                <span className="font-medium text-sm text-gray-900">{option.label}</span>
+                              </div>
+                              <div className={`w-4 h-4 rounded-full border-2 transition-colors ${
+                                isSelected 
+                                  ? 'border-gray-400 bg-gray-400' 
+                                  : 'border-gray-300'
+                              }`}>
+                                {isSelected && (
+                                  <div className="w-full h-full rounded-full bg-white scale-50"></div>
+                                )}
+                              </div>
+                            </div>
+                          </label>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1379,6 +1544,25 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
           </div>
 
           <div className="flex gap-4 pt-4">
+            {!isFormValid() && (
+              <div className="w-full mb-4 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                <h4 className="font-medium text-amber-800 mb-2">Complete Required Fields</h4>
+                <p className="text-sm text-amber-700 mb-3">
+                  The following fields are required to save your profile:
+                </p>
+                <ul className="text-sm text-amber-700 space-y-1 max-h-32 overflow-y-auto">
+                  {getMissingFields().map((field, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-amber-600 rounded-full flex-shrink-0"></span>
+                      {field}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          <div className="flex gap-4 pt-4">
             <Button
               type="button"
               variant="outline"
@@ -1390,8 +1574,12 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
             </Button>
             <Button 
               type="submit" 
-              disabled={isSubmitting}
-              className="flex-1 h-12 rounded-xl bg-primary hover:bg-primary/90 text-white transition-colors"
+              disabled={isSubmitting || !isFormValid()}
+              className={`flex-1 h-12 rounded-xl transition-colors ${
+                isFormValid() 
+                  ? "bg-primary hover:bg-primary/90 text-white" 
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              }`}
             >
               {isSubmitting ? (
                 <>

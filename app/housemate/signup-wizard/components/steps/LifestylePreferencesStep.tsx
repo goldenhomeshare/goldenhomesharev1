@@ -1,7 +1,6 @@
 "use client";
 
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { 
   Sunrise, 
   Moon, 
@@ -9,8 +8,6 @@ import {
   Users, 
   User, 
   CircleDot, 
-  PawPrint, 
-  CigaretteOff,
   Flower,
   ChefHat,
   Book,
@@ -21,8 +18,7 @@ import {
   Palette,
   Music,
   Laptop,
-  Dice6,
-  Check
+  Dice6
 } from "lucide-react";
 import { WizardFormData } from "../HousemateSignupWizard";
 
@@ -69,15 +65,6 @@ export function LifestylePreferencesStep({ formData, updateFormData }: Lifestyle
       : [...currentHobbies, hobbyId];
     
     updateFormData({ hobbies: updatedHobbies });
-  };
-
-  const handleLifestyleChange = (field: string, value: string | boolean) => {
-    updateFormData({
-      lifestyle: {
-        ...formData.lifestyle,
-        [field]: value
-      }
-    });
   };
 
   return (
@@ -176,158 +163,6 @@ export function LifestylePreferencesStep({ formData, updateFormData }: Lifestyle
                         <Icon size={24} className="text-slate-600" />
                       </div>
                       <span className="font-medium text-center text-sm">{option.label}</span>
-                    </div>
-                  </label>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Pets */}
-        <div className="border border-gray-200 rounded-lg p-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-              <PawPrint size={24} className="text-gray-600" />
-            </div>
-            <Label className="text-base font-medium">Pets</Label>
-          </div>
-          
-          <div className="space-y-3">
-            <label className="cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={formData.lifestyle.hasPets}
-                onChange={(e) => handleLifestyleChange("hasPets", e.target.checked)}
-              />
-              <div className="flex items-center p-3 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 transition-colors">
-                <div className="flex-1">
-                  <span className="font-medium text-sm">I have pets that I plan to bring</span>
-                </div>
-                <div className={`w-4 h-4 rounded border transition-colors ${
-                  formData.lifestyle.hasPets 
-                    ? 'border-primary bg-primary' 
-                    : 'border-gray-300'
-                }`}>
-                  {formData.lifestyle.hasPets && (
-                    <Check className="w-3 h-3 text-white" />
-                  )}
-                </div>
-              </div>
-            </label>
-            
-            {formData.lifestyle.hasPets && (
-              <div className="ml-3">
-                <Label className="text-sm text-muted-foreground mb-2 block">
-                  Please describe your pets (type, size, behavior, etc.):
-                </Label>
-                <Textarea
-                  placeholder="e.g., Small, friendly dog that is house-trained and quiet"
-                  value={formData.lifestyle.petDescription}
-                  onChange={(e) => handleLifestyleChange("petDescription", e.target.value)}
-                  rows={3}
-                  className="border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
-                />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Number of People */}
-        <div className="border border-gray-200 rounded-lg p-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-              <Users size={24} className="text-gray-600" />
-            </div>
-            <Label className="text-base font-medium">Number of People</Label>
-          </div>
-          
-          <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Homesharing is typically for one individual, but some opportunities for multiple people may be available.
-            </p>
-            
-            <div className="space-y-2">
-              {[
-                { value: "1", label: "Just myself (1 person)" },
-                { value: "2", label: "2 people" },
-                { value: "3+", label: "3 or more people" }
-              ].map((option) => {
-                const isSelected = formData.lifestyle.numberOfPeople === option.value;
-                
-                return (
-                  <div key={option.value}>
-                    <label className="cursor-pointer">
-                      <input
-                        type="radio"
-                        name="numberOfPeople"
-                        className="sr-only peer"
-                        checked={isSelected}
-                        onChange={() => handleLifestyleChange("numberOfPeople", option.value)}
-                      />
-                      <div className="flex items-center p-3 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 transition-colors">
-                        <div className="flex-1">
-                          <span className="font-medium text-sm">{option.label}</span>
-                        </div>
-                        <div className={`w-4 h-4 rounded-full border-2 transition-colors ${
-                          isSelected 
-                            ? 'border-primary bg-primary' 
-                            : 'border-gray-300'
-                        }`}>
-                          {isSelected && (
-                            <div className="w-full h-full rounded-full bg-white scale-50"></div>
-                          )}
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Smoking Status */}
-        <div className="border border-gray-200 rounded-lg p-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
-              <CigaretteOff size={24} className="text-gray-600" />
-            </div>
-            <Label className="text-base font-medium">Smoking Status *</Label>
-          </div>
-          
-          <div className="space-y-2">
-            {[
-              { value: "no", label: "Non-smoker" },
-              { value: "outside", label: "Smoker (outside only)" },
-              { value: "yes", label: "Smoker (anywhere)" }
-            ].map((option) => {
-              const isSelected = formData.lifestyle.smokingStatus === option.value;
-              
-              return (
-                <div key={option.value}>
-                  <label className="cursor-pointer">
-                    <input
-                      type="radio"
-                      name="smokingStatus"
-                      className="sr-only peer"
-                      checked={isSelected}
-                      onChange={() => handleLifestyleChange("smokingStatus", option.value)}
-                    />
-                    <div className="flex items-center p-3 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 transition-colors">
-                      <div className="flex-1">
-                        <span className="font-medium text-sm">{option.label}</span>
-                      </div>
-                      <div className={`w-4 h-4 rounded-full border-2 transition-colors ${
-                        isSelected 
-                          ? 'border-primary bg-primary' 
-                          : 'border-gray-300'
-                      }`}>
-                        {isSelected && (
-                          <div className="w-full h-full rounded-full bg-white scale-50"></div>
-                        )}
-                      </div>
                     </div>
                   </label>
                 </div>

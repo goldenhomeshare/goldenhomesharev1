@@ -52,14 +52,14 @@ export interface WizardFormData {
 }
 
 const STEPS = [
-  { id: 1, title: "Location", description: "Where your property is located" },
-  { id: 2, title: "Basic Info", description: "Title and summary for your listing" },
-  { id: 3, title: "Pricing", description: "Set your monthly price" },
-  { id: 4, title: "Amenities", description: "What you offer" },
-  { id: 5, title: "Support", description: "Support options" },
+  { id: 1, title: "Basic Info", description: "Title and summary for your listing" },
+  { id: 2, title: "Location", description: "Where your property is located" },
+  { id: 3, title: "Description", description: "Detailed description" },
+  { id: 4, title: "Support", description: "Support options" },
+  { id: 5, title: "Amenities", description: "What you offer" },
   { id: 6, title: "House Rules", description: "Rules for your home" },
   { id: 7, title: "Photos", description: "Upload property photos" },
-  { id: 8, title: "Description", description: "Detailed description" },
+  { id: 8, title: "Pricing", description: "Set your monthly price" },
   { id: 9, title: "Review", description: "Final review before publishing" },
 ];
 
@@ -90,6 +90,12 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
   };
 
   const nextStep = () => {
+    // Explicit validation for pricing step
+    if (currentStep === 8 && formData.price < 200) {
+      toast.error("Minimum price of $200 required to cover platform fee");
+      return;
+    }
+    
     if (currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
     }
@@ -105,11 +111,11 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
   const isStepValidByNumber = (stepNumber: number) => {
     switch (stepNumber) {
       case 1:
-        return formData.streetAddress && formData.city && formData.state && formData.zipCode;
-      case 2:
         return formData.title && formData.smallDescription;
+      case 2:
+        return formData.streetAddress && formData.city && formData.state && formData.zipCode;
       case 3:
-        return formData.price > 0;
+        return formData.description.trim().length > 0;
       case 4:
         return true;
       case 5:
@@ -119,7 +125,7 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
       case 7:
         return formData.images.length > 0;
       case 8:
-        return formData.description.trim().length > 0;
+        return formData.price >= 200;
       case 9:
         return true;
       default:
@@ -146,21 +152,21 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
   const renderStep = () => {
     switch (currentStep) {
       case 1:
-        return <ConfirmAddressStep formData={formData} updateFormData={updateFormData} />;
-      case 2:
         return <BasicInfoStep formData={formData} updateFormData={updateFormData} />;
+      case 2:
+        return <ConfirmAddressStep formData={formData} updateFormData={updateFormData} />;
       case 3:
-        return <PricingStep formData={formData} updateFormData={updateFormData} />;
+        return <DescriptionStep formData={formData} updateFormData={updateFormData} />;
       case 4:
-        return <AmenitiesStep formData={formData} updateFormData={updateFormData} />;
-      case 5:
         return <SupportStep formData={formData} updateFormData={updateFormData} />;
+      case 5:
+        return <AmenitiesStep formData={formData} updateFormData={updateFormData} />;
       case 6:
         return <HouseRulesStep formData={formData} updateFormData={updateFormData} />;
       case 7:
         return <PhotosStep formData={formData} updateFormData={updateFormData} />;
       case 8:
-        return <DescriptionStep formData={formData} updateFormData={updateFormData} />;
+        return <PricingStep formData={formData} updateFormData={updateFormData} />;
       case 9:
         return <ReviewStep formData={formData} firstName={firstName} lastName={lastName} email={email} />;
       default:

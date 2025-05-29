@@ -2,7 +2,8 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Users, CigaretteOff, Cat, Clock } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Cat, Clock, FileText } from "lucide-react";
 import { WizardFormData } from "../ListingWizard";
 
 interface HouseRulesStepProps {
@@ -12,33 +13,13 @@ interface HouseRulesStepProps {
 
 const houseRulesOptions = [
   { 
-    id: "guestPolicy", 
-    label: "Guest Policy", 
-    icon: Users, 
-    options: [
-      { value: "dayNightApproval", label: "Day and night with approval" },
-      { value: "dayOnly", label: "Day only" },
-      { value: "no", label: "No guests allowed" }
-    ]
-  },
-  { 
-    id: "smokingPolicy", 
-    label: "Smoking Policy", 
-    icon: CigaretteOff, 
-    options: [
-      { value: "no", label: "No smoking" },
-      { value: "designatedAreas", label: "Designated areas only" },
-      { value: "yes", label: "Smoking allowed" }
-    ]
-  },
-  { 
     id: "petPolicy", 
     label: "Pet Policy", 
     icon: Cat, 
     options: [
-      { value: "no", label: "No pets" },
-      { value: "discussionRequired", label: "Discussion required" },
-      { value: "yes", label: "Pets welcome" }
+      { value: "no", label: "No pets allowed" },
+      { value: "discussionRequired", label: "Pet approval required" },
+      { value: "yes", label: "Pets are welcome" }
     ]
   },
   { 
@@ -91,10 +72,10 @@ export function HouseRulesStep({ formData, updateFormData }: HouseRulesStepProps
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-          What are your house rules?
+          Set specific house rules for this listing
         </h2>
         <p className="text-gray-600">
-          Set clear expectations to ensure a harmonious living arrangement
+          Additional rules from your homeowner profile will also apply to this listing
         </p>
       </div>
 
@@ -186,21 +167,61 @@ export function HouseRulesStep({ formData, updateFormData }: HouseRulesStepProps
         })}
       </div>
 
+      {/* Additional House Rules */}
+      <div className="border border-gray-200 rounded-xl p-6 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+            <FileText size={24} className="text-gray-600" />
+          </div>
+          <Label className="text-base font-medium">Additional House Rules</Label>
+        </div>
+        
+        <div className="space-y-2">
+          <Label className="text-sm font-medium text-gray-700">
+            Other rules or expectations (optional)
+          </Label>
+          <Textarea
+            placeholder="Enter any additional house rules, expectations, or guidelines for your home..."
+            value={formData.houseRules.find(rule => rule.id === 'additionalRules')?.value || ""}
+            onChange={(e) => {
+              if (e.target.value.trim()) {
+                toggleHouseRule('additionalRules', e.target.value);
+              } else {
+                // Remove the rule if text is empty
+                const updatedRules = formData.houseRules.filter(rule => rule.id !== 'additionalRules');
+                updateFormData({ houseRules: updatedRules });
+              }
+            }}
+            rows={4}
+            className="resize-none border-gray-200 rounded-lg focus:border-primary focus:ring-0"
+            maxLength={500}
+          />
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-gray-500">
+              Mention things like noise preferences, shared space usage, or other important guidelines
+            </p>
+            <span className="text-xs text-gray-400">
+              {(formData.houseRules.find(rule => rule.id === 'additionalRules')?.value || "").length}/500
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Tips Section */}
       <div className="bg-primary/5 border border-primary/20 rounded-xl p-6">
         <h3 className="font-medium text-primary mb-3">📋 House Rules Tips</h3>
         <ul className="space-y-2 text-sm text-gray-700">
           <li className="flex items-start gap-2">
             <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-            <span>Clear rules help prevent misunderstandings and conflicts</span>
+            <span>These rules are specific to this listing and complement your general homeowner preferences</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-            <span>Be reasonable and consider the needs of both parties</span>
+            <span>Other house rules (like smoking and guest policies) will be pulled from your homeowner profile</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-            <span>Discuss and agree on rules before move-in</span>
+            <span>Clear pet and quiet hour policies help potential housemates understand your expectations</span>
           </li>
         </ul>
       </div>

@@ -21,6 +21,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    serverComponentsExternalPackages: ['@uploadthing/react', 'uploadthing'],
+  },
 };
 
 export default nextConfig;

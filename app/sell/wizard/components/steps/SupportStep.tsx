@@ -2,7 +2,7 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Monitor, Car } from "lucide-react";
+import { Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Monitor, Car, Wrench } from "lucide-react";
 import { WizardFormData } from "../ListingWizard";
 
 interface SupportStepProps {
@@ -18,6 +18,7 @@ const supportOptions = [
   { id: "companionship", label: "Companionship", icon: HeartHandshake },
   { id: "petCare", label: "Pet Care", icon: Cat },
   { id: "techSupport", label: "Tech Support", icon: Monitor },
+  { id: "homeMaintenance", label: "Home Maintenance", icon: Wrench },
   { id: "transportation", label: "Transportation", icon: Car },
 ];
 
@@ -29,16 +30,36 @@ export function SupportStep({ formData, updateFormData }: SupportStepProps) {
       const updatedSupport = formData.supportRequested.filter(item => item.id !== supportId);
       updateFormData({ supportRequested: updatedSupport });
     } else {
-      const updatedSupport = [...formData.supportRequested, { id: supportId, hoursPerWeek: 2 }];
+      const updatedSupport = [...formData.supportRequested, { id: supportId, hoursPerWeek: 1 }];
       updateFormData({ supportRequested: updatedSupport });
     }
   };
 
+  const getTotalHours = () => {
+    return formData.supportRequested.reduce((total, item) => total + item.hoursPerWeek, 0);
+  };
+
   const updateSupportHours = (supportId: string, hours: number) => {
+    const currentItem = formData.supportRequested.find(item => item.id === supportId);
+    const otherItemsTotal = formData.supportRequested
+      .filter(item => item.id !== supportId)
+      .reduce((total, item) => total + item.hoursPerWeek, 0);
+    
+    // Ensure the new total doesn't exceed 10
+    const maxAllowedHours = Math.min(hours, 10 - otherItemsTotal);
+    const finalHours = Math.max(1, maxAllowedHours);
+    
     const updatedSupport = formData.supportRequested.map(item =>
-      item.id === supportId ? { ...item, hoursPerWeek: hours } : item
+      item.id === supportId ? { ...item, hoursPerWeek: finalHours } : item
     );
     updateFormData({ supportRequested: updatedSupport });
+  };
+
+  const getMaxHoursForService = (supportId: string) => {
+    const otherItemsTotal = formData.supportRequested
+      .filter(item => item.id !== supportId)
+      .reduce((total, item) => total + item.hoursPerWeek, 0);
+    return Math.max(1, 10 - otherItemsTotal);
   };
 
   return (
@@ -83,14 +104,15 @@ export function SupportStep({ formData, updateFormData }: SupportStepProps) {
                 
                 {isSelected && (
                   <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block text-center">
                       How many hours per week?
                     </Label>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-center gap-3">
                       <button
                         type="button"
-                        onClick={() => updateSupportHours(support.id, Math.max(1, (selectedItem?.hoursPerWeek || 2) - 1))}
+                        onClick={() => updateSupportHours(support.id, Math.max(1, (selectedItem?.hoursPerWeek || 1) - 1))}
                         className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 text-gray-600"
+                        disabled={(selectedItem?.hoursPerWeek || 1) <= 1}
                       >
                         −
                       </button>
@@ -98,26 +120,21 @@ export function SupportStep({ formData, updateFormData }: SupportStepProps) {
                         <Input
                           type="number"
                           min={1}
-                          max={20}
-                          value={selectedItem?.hoursPerWeek || 2}
+                          max={getMaxHoursForService(support.id)}
+                          value={selectedItem?.hoursPerWeek || 1}
                           onChange={(e) => updateSupportHours(support.id, parseInt(e.target.value) || 1)}
                           className="w-16 h-10 text-center text-base font-medium border-gray-300 rounded-lg focus:border-primary focus:ring-0"
                         />
-                        <span className="text-sm text-gray-600 font-medium">hours/week</span>
                       </div>
                       <button
                         type="button"
-                        onClick={() => updateSupportHours(support.id, Math.min(20, (selectedItem?.hoursPerWeek || 2) + 1))}
+                        onClick={() => updateSupportHours(support.id, Math.min(getMaxHoursForService(support.id), (selectedItem?.hoursPerWeek || 1) + 1))}
                         className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 text-gray-600"
+                        disabled={(selectedItem?.hoursPerWeek || 1) >= getMaxHoursForService(support.id)}
                       >
                         +
                       </button>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                      {(selectedItem?.hoursPerWeek || 2) <= 3 && "Light help - occasional assistance"}
-                      {(selectedItem?.hoursPerWeek || 2) > 3 && (selectedItem?.hoursPerWeek || 2) <= 7 && "Moderate help - regular weekly assistance"}
-                      {(selectedItem?.hoursPerWeek || 2) > 7 && "Significant help - substantial weekly commitment"}
-                    </p>
                   </div>
                 )}
               </div>
@@ -127,35 +144,49 @@ export function SupportStep({ formData, updateFormData }: SupportStepProps) {
       </div>
 
       {/* Info Section */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-        <h3 className="font-medium text-blue-900 mb-3">ℹ️ About Support Services</h3>
-        <ul className="space-y-2 text-sm text-blue-800">
+      <div className="bg-primary/5 border border-primary/20 rounded-xl p-6">
+        <h3 className="font-medium text-primary mb-3">💡 About Support Services</h3>
+        <ul className="space-y-2 text-sm text-gray-700">
           <li className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
-            <span>These are optional services that can create mutual benefit in your living arrangement</span>
+            <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+            <span>These preferences help potential housemates understand what kind of arrangement you're considering</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
-            <span>Consider offering reduced rent in exchange for regular help</span>
+            <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+            <span>Nothing is set in stone - you can discuss and adjust expectations with matched housemates</span>
           </li>
           <li className="flex items-start gap-2">
-            <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
-            <span>Discuss expectations clearly with potential housemates</span>
+            <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+            <span>Consider how support services might complement reduced rent or other mutual benefits</span>
           </li>
         </ul>
       </div>
 
+      {/* Summary Section */}
       {formData.supportRequested.length > 0 && (
-        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-              </svg>
+        <div className="mt-8 p-6 bg-primary/5 border border-primary/20 rounded-xl">
+          <h3 className="font-medium text-primary mb-4 text-center">Support Services Summary</h3>
+          <div className="space-y-3">
+            {formData.supportRequested.map((item) => {
+              const supportOption = supportOptions.find(option => option.id === item.id);
+              return (
+                <div key={item.id} className="flex justify-between items-center bg-white px-4 py-2 rounded-lg">
+                  <span className="text-sm font-medium text-gray-900">{supportOption?.label}</span>
+                  <span className="text-sm text-gray-600">{item.hoursPerWeek} {item.hoursPerWeek === 1 ? 'hour' : 'hours'}/week</span>
+                </div>
+              );
+            })}
+            <div className="border-t pt-3 mt-3">
+              <div className="flex justify-between items-center font-medium">
+                <span className="text-gray-900">Total Hours per Week:</span>
+                <span className={`${getTotalHours() === 10 ? 'text-primary' : 'text-gray-900'}`}>
+                  {getTotalHours()}/10 hours
+                </span>
+              </div>
+              {getTotalHours() === 10 && (
+                <p className="text-xs text-primary mt-1 text-center">Maximum hours reached</p>
+              )}
             </div>
-            <span className="text-sm font-medium text-green-800">
-              You've selected {formData.supportRequested.length} support services.
-            </span>
           </div>
         </div>
       )}

@@ -49,85 +49,24 @@ export function DescriptionStep({ formData, updateFormData }: DescriptionStepPro
           </div>
         </div>
 
-        {/* Writing Prompts */}
+        {/* Description Tips */}
         <div className="bg-primary/5 border border-primary/20 rounded-xl p-6">
-          <h3 className="font-medium text-primary mb-4">✍️ Writing Prompts to Get You Started</h3>
-          <div className="space-y-4">
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">About the Space</h4>
-              <ul className="space-y-1 text-sm text-gray-700 ml-4">
-                <li>• Describe the room size, lighting, and any special features</li>
-                <li>• What shared spaces are available (kitchen, living room, etc.)?</li>
-                <li>• Is there storage space, parking, or outdoor areas?</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">About the Neighborhood</h4>
-              <ul className="space-y-1 text-sm text-gray-700 ml-4">
-                <li>• How close is public transportation, grocery stores, or restaurants?</li>
-                <li>• What's the neighborhood character like?</li>
-                <li>• Are there parks, gyms, or other amenities nearby?</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">About You & Your Lifestyle</h4>
-              <ul className="space-y-1 text-sm text-gray-700 ml-4">
-                <li>• What's your daily routine like?</li>
-                <li>• Do you work from home or travel frequently?</li>
-                <li>• What are your hobbies and interests?</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">What You're Looking For</h4>
-              <ul className="space-y-1 text-sm text-gray-700 ml-4">
-                <li>• What kind of person would be a good fit?</li>
-                <li>• Are you looking for someone social or more independent?</li>
-                <li>• Any specific preferences or requirements?</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* Additional Tips */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="font-medium text-blue-900 mb-3">💡 Description Tips</h3>
-          <ul className="space-y-2 text-sm text-blue-800">
+          <h3 className="font-medium text-primary mb-3">💡 Description Tips</h3>
+          <ul className="space-y-2 text-sm text-gray-700">
             <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
-              <span>Be honest and authentic - this helps attract the right matches</span>
+              <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+              <span>Describe the room, shared spaces, and neighborhood amenities</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
-              <span>Use a warm, welcoming tone to make potential housemates feel comfortable</span>
+              <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+              <span>Share your lifestyle and what kind of housemate you're seeking</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
-              <span>Include practical details like move-in date, lease terms, and utilities</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></span>
-              <span>Mention any mutual benefits or support arrangements</span>
+              <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
+              <span>Be honest and authentic to attract the right matches</span>
             </li>
           </ul>
         </div>
-
-        {formData.description.trim() && (
-          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-xl">
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-                </svg>
-              </div>
-              <span className="text-sm font-medium text-green-800">
-                Great! Your listing has a detailed description.
-              </span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

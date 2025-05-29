@@ -13,8 +13,8 @@ export function CostComparisonSupport() {
     
     const privateHomecareWeekly = (hoursPerWeek * privateHomecareHourlyRate) + overnightRatePrivate;
     
-    // Golden HomeShare base cost includes nightlight support (basic presence and safety monitoring)
-    const baseCostWithNightlightSupport = 99; // Base weekly rate includes nightlight support
+    // Golden HomeShare base cost includes nighttime presence (basic presence and safety monitoring)
+    const baseCostWithNightlightSupport = 50; // Base weekly rate includes nighttime presence
     const additionalSupportCost = hoursPerWeek > 0 ? 0 : 0; // Up to 10 hours included in base price
     const goldenHomeShareWeekly = baseCostWithNightlightSupport + additionalSupportCost;
     
@@ -44,7 +44,7 @@ export function CostComparisonSupport() {
     {
       service: "Golden HomeShare",
       hoursPerWeek: "Up to 10 hrs/week included",
-      overnightRate: "Nightlight support & presence included",
+      overnightRate: "Nighttime presence included",
       costPerWeek: `$${costs.goldenHomeShare.weekly}`,
       costPerYear: `$${costs.goldenHomeShare.yearly.toLocaleString()}`
     }

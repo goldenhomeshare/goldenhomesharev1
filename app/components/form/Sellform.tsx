@@ -230,7 +230,7 @@ export function SellForm() {
           )}
         </div>
         <div className="flex flex-col gap-y-2">
-          <Label>I am a...</Label>
+          <Label>Category (Optional)</Label>
           <SelectCategory />
           {state?.errors?.["category"]?.[0] && (
             <p className="text-destructive">

@@ -82,18 +82,42 @@ export function SupportStep({ formData, updateFormData }: SupportStepProps) {
                 </label>
                 
                 {isSelected && (
-                  <div className="mt-3 ml-4">
-                    <Label className="text-xs font-medium text-gray-600 mb-1 block">
-                      Estimated hours per week
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      How many hours per week?
                     </Label>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={20}
-                      value={selectedItem?.hoursPerWeek || 2}
-                      onChange={(e) => updateSupportHours(support.id, parseInt(e.target.value) || 1)}
-                      className="w-24 h-8 text-center text-sm border-gray-200 rounded-lg focus:border-primary focus:ring-0"
-                    />
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => updateSupportHours(support.id, Math.max(1, (selectedItem?.hoursPerWeek || 2) - 1))}
+                        className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 text-gray-600"
+                      >
+                        −
+                      </button>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min={1}
+                          max={20}
+                          value={selectedItem?.hoursPerWeek || 2}
+                          onChange={(e) => updateSupportHours(support.id, parseInt(e.target.value) || 1)}
+                          className="w-16 h-10 text-center text-base font-medium border-gray-300 rounded-lg focus:border-primary focus:ring-0"
+                        />
+                        <span className="text-sm text-gray-600 font-medium">hours/week</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => updateSupportHours(support.id, Math.min(20, (selectedItem?.hoursPerWeek || 2) + 1))}
+                        className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-50 text-gray-600"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">
+                      {(selectedItem?.hoursPerWeek || 2) <= 3 && "Light help - occasional assistance"}
+                      {(selectedItem?.hoursPerWeek || 2) > 3 && (selectedItem?.hoursPerWeek || 2) <= 7 && "Moderate help - regular weekly assistance"}
+                      {(selectedItem?.hoursPerWeek || 2) > 7 && "Significant help - substantial weekly commitment"}
+                    </p>
                   </div>
                 )}
               </div>

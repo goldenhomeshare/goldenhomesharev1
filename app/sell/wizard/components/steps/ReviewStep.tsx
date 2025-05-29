@@ -50,10 +50,12 @@ export function ReviewStep({ formData, firstName, lastName, email }: ReviewStepP
                     <MapPin className="w-4 h-4" />
                     <span>{formData.address}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Home className="w-4 h-4" />
-                    <span>{categoryLabels[formData.category] || formData.category}</span>
-                  </div>
+                  {formData.category && (
+                    <div className="flex items-center gap-1">
+                      <Home className="w-4 h-4" />
+                      <span>{categoryLabels[formData.category] || formData.category}</span>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="text-right">

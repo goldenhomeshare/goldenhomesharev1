@@ -18,7 +18,7 @@ const productSchema = z.object({
   name: z
     .string()
     .min(3, { message: "The name has to be a min charackter length of 5" }),
-  category: z.string().min(1, { message: "Category is required" }),
+  category: z.string().optional(),
   price: z.number().min(1, { message: "The Price has to be bigger then 1" }),
   smallDescription: z
     .string()
@@ -95,7 +95,7 @@ export async function SellProduct(prevState: any, formData: FormData) {
 
   const productData: any = {
     name: validateFields.data.name,
-    category: validateFields.data.category as CategoryTypes,
+    category: (validateFields.data.category as CategoryTypes) || "template",
     smallDescription: validateFields.data.smallDescription,
     price: validateFields.data.price,
     images: validateFields.data.images,
@@ -178,7 +178,7 @@ export async function EditProduct(prevState: any, formData: FormData) {
 
   const productData: any = {
     name: validateFields.data.name,
-    category: validateFields.data.category as CategoryTypes,
+    category: (validateFields.data.category as CategoryTypes) || "template",
     smallDescription: validateFields.data.smallDescription,
     price: validateFields.data.price,
     images: validateFields.data.images,

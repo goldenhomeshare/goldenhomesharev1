@@ -43,16 +43,7 @@ import {
   Venus,
   Instagram,
   Facebook,
-  Linkedin,
-  Sparkles,
-  Salad,
-  ShoppingBag,
-  HeartHandshake,
-  Cat,
-  Wrench,
-  Car,
-  Monitor,
-  Home
+  Linkedin
 } from "lucide-react";
 import { toast } from "sonner";
 import { useUploadThing } from "@/app/lib/uploadthing";
@@ -84,7 +75,6 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
     hobbies: initialData?.hobbies || [],
     preferredCareerStage: initialData?.preferredCareerStage || "",
     preferredGender: initialData?.preferredGender || "",
-    helpExpected: initialData?.lifestyle?.helpExpected || [],
     socialMedia: {
       instagram: initialData?.socialMedia?.instagram || "",
       facebook: initialData?.socialMedia?.facebook || "",
@@ -156,19 +146,6 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
     { id: "no-preference", label: "No Preference", icon: Users, description: "Open to any career stage" }
   ];
 
-  const helpExpectedOptions = [
-    { id: "cleaning", label: "Cleaning", icon: Sparkles },
-    { id: "cooking", label: "Cooking", icon: Salad },
-    { id: "gardening", label: "Yard Work", icon: Flower },
-    { id: "errands", label: "Shopping & Errands", icon: ShoppingBag },
-    { id: "companionship", label: "Companionship", icon: HeartHandshake },
-    { id: "petCare", label: "Pet Care", icon: Cat },
-    { id: "techSupport", label: "Tech Support", icon: Monitor },
-    { id: "homeMaintenance", label: "Home Maintenance", icon: Wrench },
-    { id: "transportation", label: "Transportation", icon: Car },
-    { id: "none", label: "No Assistance Expected", icon: Home }
-  ];
-
   const numberOfPeopleOptions = [
     { value: "1", label: "1 person (just me)", description: "I live alone" },
     { value: "2", label: "2 people", description: "I live with one other person" },
@@ -229,7 +206,6 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
           ...formData.lifestyle,
           language: formData.language,
           dateOfBirth: formData.dateOfBirth,
-          helpExpected: formData.helpExpected,
         },
       };
       
@@ -268,30 +244,6 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
       hobbies: prev.hobbies.includes(hobbyId)
         ? prev.hobbies.filter((id: string) => id !== hobbyId)
         : [...prev.hobbies, hobbyId]
-    }));
-  };
-
-  const handleHelpExpectedToggle = (helpId: string) => {
-    const currentHelp = formData.helpExpected || [];
-    
-    // If "none" is selected, clear all others
-    if (helpId === "none") {
-      setFormData(prev => ({
-        ...prev,
-        helpExpected: currentHelp.includes("none") ? [] : ["none"]
-      }));
-      return;
-    }
-    
-    // If selecting something other than "none", remove "none" if it's selected
-    const filteredHelp = currentHelp.filter((id: string) => id !== "none");
-    const updatedHelp = filteredHelp.includes(helpId)
-      ? filteredHelp.filter((id: string) => id !== helpId)
-      : [...filteredHelp, helpId];
-    
-    setFormData(prev => ({
-      ...prev,
-      helpExpected: updatedHelp
     }));
   };
 
@@ -1148,41 +1100,6 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
                         </div>
                         <span className="font-medium">{option.label}</span>
                       </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Help Expected */}
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-4 block">
-                  Assistance You Might Appreciate
-                </Label>
-                <p className="text-sm text-gray-600 mb-4">
-                  What kind of help would you appreciate from a housemate? (optional, select all that apply)
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {helpExpectedOptions.map((option) => {
-                    const Icon = option.icon;
-                    const isSelected = formData.helpExpected?.includes(option.id) || false;
-                    
-                    return (
-                      <div key={option.id}>
-                        <label className="cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="sr-only peer"
-                            checked={isSelected}
-                            onChange={() => handleHelpExpectedToggle(option.id)}
-                          />
-                          <div className="flex flex-col items-center p-4 rounded-lg border peer-checked:border-primary peer-checked:bg-primary/5 hover:bg-slate-50 h-full">
-                            <div className="w-12 h-12 rounded-full bg-slate-100 mb-3 flex items-center justify-center">
-                              <Icon size={24} className="text-slate-600" />
-                            </div>
-                            <span className="font-medium text-center text-sm">{option.label}</span>
-                          </div>
-                        </label>
-                      </div>
                     );
                   })}
                 </div>

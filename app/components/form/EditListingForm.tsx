@@ -259,7 +259,7 @@ export function EditListingForm({ listing }: EditListingFormProps) {
         </div>
 
         <div className="flex flex-col gap-y-2">
-          <Label>Category</Label>
+          <Label>Category (Optional)</Label>
           <SelectCategory defaultValue={listing.category} />
           {state?.errors?.["category"]?.[0] && (
             <p className="text-destructive">{state.errors["category"][0]}</p>

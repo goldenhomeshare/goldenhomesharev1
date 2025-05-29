@@ -228,11 +228,14 @@ export default async function ProductPage({
                 }).format(data.createdAt)}
               </h3>
 
-              <h3 className="text-sm font-medium text-muted-foreground col-span-1">
-                Category:
-              </h3>
-
-              <h3 className="text-sm font-medium col-span-1">{data.category}</h3>
+              {data.category && (
+                <>
+                  <h3 className="text-sm font-medium text-muted-foreground col-span-1">
+                    Category:
+                  </h3>
+                  <h3 className="text-sm font-medium col-span-1">{data.category}</h3>
+                </>
+              )}
             </div>
           </div>
 

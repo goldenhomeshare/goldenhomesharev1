@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, CheckCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Step Components
-import { ListingTypeStep } from "./steps/ListingTypeStep";
 import { BasicInfoStep } from "./steps/BasicInfoStep";
-import { AddressStep } from "./steps/AddressStep";
+import { ConfirmAddressStep } from "./steps/ConfirmAddressStep";
 import { PricingStep } from "./steps/PricingStep";
 import { AmenitiesStep } from "./steps/AmenitiesStep";
 import { SupportStep } from "./steps/SupportStep";
@@ -31,50 +31,50 @@ export interface WizardFormData {
   title: string;
   category: string;
   smallDescription: string;
-  
-  // Address
-  address: string;
-  
+  // Address - Structured
+  streetAddress: string;
+  aptSuite: string;
+  city: string;
+  state: string;
+  zipCode: string;
   // Pricing
   price: number;
-  
   // Amenities
   selectedAmenities: string[];
-  
   // Support
   supportRequested: Array<{id: string, hoursPerWeek: number}>;
-  
   // House Rules
   houseRules: Array<{id: string, value?: string}>;
-  
   // Photos
   images: string[];
-  
   // Description
   description: string;
 }
 
 const STEPS = [
-  { title: "Listing Type", component: "listingType" },
-  { title: "Basic Info", component: "basicInfo" },
-  { title: "Location", component: "address" },
-  { title: "Pricing", component: "pricing" },
-  { title: "Amenities", component: "amenities" },
-  { title: "Support", component: "support" },
-  { title: "House Rules", component: "houseRules" },
-  { title: "Photos", component: "photos" },
-  { title: "Description", component: "description" },
-  { title: "Review", component: "review" },
+  { id: 1, title: "Location", description: "Where your property is located" },
+  { id: 2, title: "Basic Info", description: "Title and summary for your listing" },
+  { id: 3, title: "Pricing", description: "Set your monthly price" },
+  { id: 4, title: "Amenities", description: "What you offer" },
+  { id: 5, title: "Support", description: "Support options" },
+  { id: 6, title: "House Rules", description: "Rules for your home" },
+  { id: 7, title: "Photos", description: "Upload property photos" },
+  { id: 8, title: "Description", description: "Detailed description" },
+  { id: 9, title: "Review", description: "Final review before publishing" },
 ];
 
 export function ListingWizard({ userId, firstName, lastName, email }: ListingWizardProps) {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<WizardFormData>({
     title: "",
     category: "",
     smallDescription: "",
-    address: "",
+    streetAddress: "",
+    aptSuite: "",
+    city: "",
+    state: "",
+    zipCode: "",
     price: 0,
     selectedAmenities: [],
     supportRequested: [],
@@ -89,76 +89,117 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
     setFormData(prev => ({ ...prev, ...data }));
   };
 
-  const canProceed = (step: number): boolean => {
-    switch (step) {
-      case 0: // Listing Type
-        return !!formData.category;
-      case 1: // Basic Info
-        return !!formData.title.trim() && !!formData.smallDescription.trim();
-      case 2: // Address
-        return !!formData.address.trim();
-      case 3: // Pricing
+  const nextStep = () => {
+    if (currentStep < STEPS.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  // Step validation logic
+  const isStepValidByNumber = (stepNumber: number) => {
+    switch (stepNumber) {
+      case 1:
+        return formData.streetAddress && formData.city && formData.state && formData.zipCode;
+      case 2:
+        return formData.title && formData.smallDescription;
+      case 3:
         return formData.price > 0;
-      case 4: // Amenities
-        return true; // Optional
-      case 5: // Support
-        return true; // Optional
-      case 6: // House Rules
-        return true; // Optional
-      case 7: // Photos
+      case 4:
+        return true;
+      case 5:
+        return true;
+      case 6:
+        return true;
+      case 7:
         return formData.images.length > 0;
-      case 8: // Description
-        return !!formData.description.trim();
-      case 9: // Review
+      case 8:
+        return formData.description.trim().length > 0;
+      case 9:
         return true;
       default:
         return false;
     }
   };
 
-  const handleNext = () => {
-    if (currentStep < STEPS.length - 1 && canProceed(currentStep)) {
-      setCurrentStep(prev => prev + 1);
+  const getHighestCompletedStep = () => {
+    for (let i = 1; i <= STEPS.length; i++) {
+      if (!isStepValidByNumber(i)) {
+        return i - 1;
+      }
     }
+    return STEPS.length;
   };
 
-  const handlePrevious = () => {
-    if (currentStep > 0) {
-      setCurrentStep(prev => prev - 1);
+  const canNavigateToStep = (stepNumber: number) => {
+    const highestCompleted = getHighestCompletedStep();
+    return stepNumber <= Math.max(highestCompleted + 1, currentStep);
+  };
+
+  const progress = (currentStep / STEPS.length) * 100;
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 1:
+        return <ConfirmAddressStep formData={formData} updateFormData={updateFormData} />;
+      case 2:
+        return <BasicInfoStep formData={formData} updateFormData={updateFormData} />;
+      case 3:
+        return <PricingStep formData={formData} updateFormData={updateFormData} />;
+      case 4:
+        return <AmenitiesStep formData={formData} updateFormData={updateFormData} />;
+      case 5:
+        return <SupportStep formData={formData} updateFormData={updateFormData} />;
+      case 6:
+        return <HouseRulesStep formData={formData} updateFormData={updateFormData} />;
+      case 7:
+        return <PhotosStep formData={formData} updateFormData={updateFormData} />;
+      case 8:
+        return <DescriptionStep formData={formData} updateFormData={updateFormData} />;
+      case 9:
+        return <ReviewStep formData={formData} firstName={firstName} lastName={lastName} email={email} />;
+      default:
+        return null;
     }
   };
 
   const handleSubmit = async () => {
-    if (!canProceed(currentStep)) {
+    if (!isStepValidByNumber(currentStep)) {
       toast.error("Please complete all required fields");
       return;
     }
-
     setIsSubmitting(true);
-
     try {
       const submitFormData = new FormData();
       submitFormData.append("name", formData.title);
-      submitFormData.append("category", formData.category);
+      submitFormData.append("category", formData.category || "");
       submitFormData.append("price", formData.price.toString());
       submitFormData.append("smallDescription", formData.smallDescription);
-      submitFormData.append("address", formData.address);
+      const fullAddress = formData.streetAddress && formData.city && formData.state && formData.zipCode
+        ? `${formData.streetAddress}${formData.aptSuite ? `, ${formData.aptSuite}` : ''}, ${formData.city}, ${formData.state} ${formData.zipCode}, United States`
+        : "";
+      if (!fullAddress) {
+        toast.error("Please complete all address fields");
+        return;
+      }
+      submitFormData.append("address", fullAddress);
       submitFormData.append("description", formData.description);
       submitFormData.append("images", JSON.stringify(formData.images));
       submitFormData.append("amenities", JSON.stringify(formData.selectedAmenities));
       submitFormData.append("supportRequested", JSON.stringify(formData.supportRequested));
       submitFormData.append("houseRules", JSON.stringify(formData.houseRules));
-      submitFormData.append("productFile", ""); // Not used in this wizard
-
-      // Import and call the action
+      submitFormData.append("productFile", "");
       const { SellProduct } = await import("@/app/actions");
       const result = await SellProduct(null, submitFormData);
-
       if (result && result.status === "error") {
         toast.error(result.message || "Failed to create listing");
       } else {
         toast.success("Listing created successfully!");
-        // Redirect will be handled by the action
       }
     } catch (error) {
       console.error("Error creating listing:", error);
@@ -168,110 +209,88 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
     }
   };
 
-  const renderStep = () => {
-    const stepComponent = STEPS[currentStep].component;
-    
-    switch (stepComponent) {
-      case "listingType":
-        return <ListingTypeStep formData={formData} updateFormData={updateFormData} />;
-      case "basicInfo":
-        return <BasicInfoStep formData={formData} updateFormData={updateFormData} />;
-      case "address":
-        return <AddressStep formData={formData} updateFormData={updateFormData} />;
-      case "pricing":
-        return <PricingStep formData={formData} updateFormData={updateFormData} />;
-      case "amenities":
-        return <AmenitiesStep formData={formData} updateFormData={updateFormData} />;
-      case "support":
-        return <SupportStep formData={formData} updateFormData={updateFormData} />;
-      case "houseRules":
-        return <HouseRulesStep formData={formData} updateFormData={updateFormData} />;
-      case "photos":
-        return <PhotosStep formData={formData} updateFormData={updateFormData} />;
-      case "description":
-        return <DescriptionStep formData={formData} updateFormData={updateFormData} />;
-      case "review":
-        return <ReviewStep formData={formData} firstName={firstName} lastName={lastName} email={email} />;
-      default:
-        return null;
-    }
-  };
-
-  const progressPercentage = ((currentStep + 1) / STEPS.length) * 100;
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-semibold text-gray-900">Create Your Listing</h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Step {currentStep + 1} of {STEPS.length}: {STEPS[currentStep].title}
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => router.push("/sell")}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              Exit
-            </Button>
-          </div>
-          
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Your Listing</h1>
+          <p className="text-lg text-gray-600 mb-8">
+            Step-by-step guidance to help you publish your home
+          </p>
           {/* Progress Bar */}
-          <div className="mt-4">
-            <Progress value={progressPercentage} className="h-2" />
+          <div className="max-w-md mx-auto">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-gray-700">Progress</span>
+              <span className="text-sm text-gray-500">
+                Step {currentStep} of {STEPS.length}
+              </span>
+            </div>
+            <Progress value={progress} className="h-3" />
           </div>
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="p-8">
+        {/* Section Navigation */}
+        <div className="mb-10">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+            <div className="flex flex-wrap gap-3 justify-center">
+              {STEPS.map((step) => {
+                const canNavigate = canNavigateToStep(step.id);
+                const isCompleted = isStepValidByNumber(step.id);
+                const isCurrent = currentStep === step.id;
+                return (
+                  <button
+                    key={step.id}
+                    type="button"
+                    onClick={() => canNavigate && setCurrentStep(step.id)}
+                    disabled={!canNavigate}
+                    className={`px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                      isCurrent
+                        ? 'bg-primary text-white shadow-md'
+                        : isCompleted
+                        ? 'text-primary bg-primary/10 hover:bg-primary/20 border border-primary/20'
+                        : canNavigate
+                        ? 'text-gray-600 hover:text-primary hover:bg-gray-50 border border-gray-200'
+                        : 'text-gray-400 bg-gray-50 border border-gray-100 cursor-not-allowed opacity-60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {isCompleted && !isCurrent && (
+                        <CheckCircle className="w-4 h-4" />
+                      )}
+                      <span>{step.title}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+        {/* Step Content */}
+        <Card className="mb-10 shadow-lg border-0">
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg">
+            <div className="text-center">
+              <CardTitle className="text-2xl text-gray-900 mb-2">
+                {STEPS[currentStep - 1].title}
+              </CardTitle>
+              <p className="text-gray-600">{STEPS[currentStep - 1].description}</p>
+            </div>
+          </CardHeader>
+          <CardContent className="p-8 bg-white rounded-b-lg">
             {renderStep()}
-          </div>
-        </div>
-
+          </CardContent>
+        </Card>
         {/* Navigation */}
-        <div className="flex justify-between items-center mt-8">
-          <Button
-            variant="outline"
-            onClick={handlePrevious}
-            disabled={currentStep === 0}
-            className="flex items-center gap-2"
-          >
-            <ChevronLeft size={16} />
-            Previous
-          </Button>
-
-          <div className="flex items-center gap-2">
-            {STEPS.map((_, index) => (
-              <div
-                key={index}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  index === currentStep
-                    ? "bg-primary"
-                    : index < currentStep
-                    ? "bg-primary/60"
-                    : "bg-gray-200"
-                }`}
-              />
-            ))}
-          </div>
-
-          {currentStep === STEPS.length - 1 ? (
+        <div className="w-full flex justify-center gap-4">
+          {currentStep === STEPS.length ? (
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || !canProceed(currentStep)}
-              className="flex items-center gap-2"
+              disabled={!isStepValidByNumber(currentStep) || isSubmitting}
+              className="max-w-md w-full py-8 px-12 text-xl bg-primary hover:bg-primary/90 text-white rounded-3xl shadow-lg font-semibold transition-colors duration-200"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 size={16} className="animate-spin" />
-                  Creating...
+                  <Loader2 size={24} className="animate-spin mr-3" />
+                  Creating Listing...
                 </>
               ) : (
                 "Create Listing"
@@ -279,12 +298,11 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
             </Button>
           ) : (
             <Button
-              onClick={handleNext}
-              disabled={!canProceed(currentStep)}
-              className="flex items-center gap-2"
+              onClick={nextStep}
+              disabled={!isStepValidByNumber(currentStep)}
+              className="max-w-md w-full py-8 px-12 text-xl bg-primary hover:bg-primary/90 text-white rounded-3xl shadow-lg font-semibold transition-colors duration-200"
             >
               Next
-              <ChevronRight size={16} />
             </Button>
           )}
         </div>

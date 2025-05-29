@@ -174,7 +174,7 @@ model Product {
   description      Json
   images           String[]
   productFile      String
-  category         CategoryTypes
+  category         CategoryTypes?
   address          String?       // Address of the property
   amenities        Json?         // Array of selected amenities
   supportRequested Json?         // Array of objects with id and hoursPerWeek fields for support options

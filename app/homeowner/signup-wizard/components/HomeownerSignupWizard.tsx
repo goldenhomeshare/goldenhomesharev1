@@ -53,7 +53,6 @@ export interface WizardFormData {
   // Housemate Preferences
   preferredCareerStage: string;
   preferredGender: string;
-  helpExpected: string[];
   
   // Bio
   bio: string;
@@ -100,7 +99,6 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
     },
     preferredCareerStage: "",
     preferredGender: "",
-    helpExpected: [],
     bio: "",
     socialMedia: {
       instagram: "",
@@ -173,7 +171,6 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
           ...formData.lifestyle,
           language: formData.language,
           dateOfBirth: formData.dateOfBirth,
-          helpExpected: formData.helpExpected,
         },
       };
 

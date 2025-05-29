@@ -1,6 +1,6 @@
 import { AirbnbStyleRow } from "../app/components/AirbnbStyleRow";
 import Image from "next/image";
-import { Users, Shield, Layers, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench } from "lucide-react";
+import { Users, Shield, Layers, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Monitor, Car } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -72,17 +72,38 @@ export default function Home() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-8">What is homesharing?</h2>
             
             <p className="text-lg text-gray-700 leading-relaxed text-center">
-              Housemates provide <strong>up to 10 hours weekly support (depending on arrangement)</strong> plus overnight presence <strong>(5-6 nights per week)</strong> in exchange for affordable accommodation.
+              Housemates help homeowners by providing <strong>up to 10 hours weekly support (depending on arrangement)</strong> plus overnight presence <strong>(5-6 nights per week)</strong> in exchange for affordable accommodation.
             </p>
             
             <div className="space-y-6">
               <h3 className="text-xl font-semibold text-gray-900 text-center">Types of Support Available:</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
                   <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
                     <Sparkles size={16} className="text-gray-600" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">Cleaning</span>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Salad size={16} className="text-gray-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Cooking</span>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Flower size={16} className="text-gray-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Yard Work</span>
+                </div>
+                
+                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
+                    <ShoppingBag size={16} className="text-gray-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">Shopping & Errands</span>
                 </div>
                 
                 <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
@@ -101,37 +122,23 @@ export default function Home() {
                 
                 <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
                   <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Salad size={16} className="text-gray-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Cooking</span>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Flower size={16} className="text-gray-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Gardening</span>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Wrench size={16} className="text-gray-600" />
+                    <Monitor size={16} className="text-gray-600" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">Tech Support</span>
                 </div>
                 
                 <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
                   <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <ShoppingBag size={16} className="text-gray-600" />
+                    <Wrench size={16} className="text-gray-600" />
                   </div>
-                  <span className="text-sm font-medium text-gray-700">Errands</span>
+                  <span className="text-sm font-medium text-gray-700">Home Maintenance</span>
                 </div>
                 
                 <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
                   <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Shield size={16} className="text-gray-600" />
+                    <Car size={16} className="text-gray-600" />
                   </div>
-                  <span className="text-sm font-medium text-gray-700">Home Security</span>
+                  <span className="text-sm font-medium text-gray-700">Transportation</span>
                 </div>
               </div>
             </div>

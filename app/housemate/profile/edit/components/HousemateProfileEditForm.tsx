@@ -459,19 +459,19 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Section Navigation */}
         <div className="sticky top-4 z-10 mb-8">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-            <div className="flex flex-wrap gap-2 justify-center">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+            <div className="flex flex-wrap gap-3 justify-center">
               <button
                 type="button"
                 onClick={() => {
                   const element = document.getElementById('about-section');
                   if (element) {
-                    const yOffset = -100; // Offset to show above the title
+                    const yOffset = -150; // Larger offset to ensure title visibility
                     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                   }
                 }}
-                className="px-3 py-2 text-xs font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-300 hover:bg-primary hover:text-white hover:border-primary rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 About You
               </button>
@@ -480,12 +480,12 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                 onClick={() => {
                   const element = document.getElementById('location-section');
                   if (element) {
-                    const yOffset = -100; // Offset to show above the title
+                    const yOffset = -150; // Larger offset to ensure title visibility
                     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                   }
                 }}
-                className="px-3 py-2 text-xs font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-300 hover:bg-primary hover:text-white hover:border-primary rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 Location
               </button>
@@ -494,12 +494,12 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                 onClick={() => {
                   const element = document.getElementById('budget-section');
                   if (element) {
-                    const yOffset = -100; // Offset to show above the title
+                    const yOffset = -150; // Larger offset to ensure title visibility
                     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                   }
                 }}
-                className="px-3 py-2 text-xs font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-300 hover:bg-primary hover:text-white hover:border-primary rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 Budget
               </button>
@@ -508,12 +508,12 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                 onClick={() => {
                   const element = document.getElementById('education-section');
                   if (element) {
-                    const yOffset = -100; // Offset to show above the title
+                    const yOffset = -150; // Larger offset to ensure title visibility
                     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                   }
                 }}
-                className="px-3 py-2 text-xs font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-300 hover:bg-primary hover:text-white hover:border-primary rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 Education & Work
               </button>
@@ -522,12 +522,12 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                 onClick={() => {
                   const element = document.getElementById('lifestyle-section');
                   if (element) {
-                    const yOffset = -100; // Offset to show above the title
+                    const yOffset = -150; // Larger offset to ensure title visibility
                     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                   }
                 }}
-                className="px-3 py-2 text-xs font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-300 hover:bg-primary hover:text-white hover:border-primary rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 Lifestyle
               </button>
@@ -536,12 +536,12 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                 onClick={() => {
                   const element = document.getElementById('preferences-section');
                   if (element) {
-                    const yOffset = -100; // Offset to show above the title
+                    const yOffset = -150; // Larger offset to ensure title visibility
                     const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
                     window.scrollTo({ top: y, behavior: 'smooth' });
                   }
                 }}
-                className="px-3 py-2 text-xs font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                className="px-4 py-2.5 text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-300 hover:bg-primary hover:text-white hover:border-primary rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 Match Preferences
               </button>

@@ -37,9 +37,13 @@ export function BasicInfoStep({ formData, updateFormData }: BasicInfoStepProps) 
           />
           <div className="flex justify-between items-center mt-2">
             <p className="text-xs text-gray-500">
-              Write a catchy title that highlights the best features of your space
+              {formData.title.length < 3 ? (
+                <span className="text-orange-600 font-medium">Minimum 3 characters required</span>
+              ) : (
+                "Write a catchy title that highlights the best features of your space"
+              )}
             </p>
-            <span className="text-xs text-gray-400">
+            <span className={`text-xs ${formData.title.length < 3 ? 'text-orange-600' : 'text-gray-400'}`}>
               {formData.title.length}/100
             </span>
           </div>
@@ -60,9 +64,13 @@ export function BasicInfoStep({ formData, updateFormData }: BasicInfoStepProps) 
           />
           <div className="flex justify-between items-center mt-2">
             <p className="text-xs text-gray-500">
-              Keep it concise - this will appear in search results
+              {formData.smallDescription.length < 10 ? (
+                <span className="text-orange-600 font-medium">Minimum 10 characters required</span>
+              ) : (
+                "Keep it concise - this will appear in search results"
+              )}
             </p>
-            <span className="text-xs text-gray-400">
+            <span className={`text-xs ${formData.smallDescription.length < 10 ? 'text-orange-600' : 'text-gray-400'}`}>
               {formData.smallDescription.length}/300
             </span>
           </div>

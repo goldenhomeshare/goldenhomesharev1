@@ -15,7 +15,7 @@ interface AddressAutocompleteProps {
 export function AddressAutocomplete({
   value,
   onChange,
-  placeholder = "Enter the full address (e.g., 123 Main St, City, State 12345)",
+  placeholder = "Enter the full address (e.g., 123 Main St, Anytown, ST 12345)",
   className = "",
   name = "address"
 }: AddressAutocompleteProps) {

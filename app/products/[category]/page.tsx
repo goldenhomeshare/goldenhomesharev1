@@ -410,7 +410,7 @@ export default function CategoryPage() {
                   type="text" 
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Zip code or city (e.g., 65201, Columbia)"
+                  placeholder="Zip code or city (e.g., 12345, Anytown)"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-green-800 focus:ring-0"
                 />
                 {location && (
@@ -574,7 +574,7 @@ export default function CategoryPage() {
                   type="text" 
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Zip code or city (e.g., 65201, Columbia)"
+                  placeholder="Zip code or city (e.g., 12345, Anytown)"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-green-800 focus:ring-0"
                 />
                 {location && (

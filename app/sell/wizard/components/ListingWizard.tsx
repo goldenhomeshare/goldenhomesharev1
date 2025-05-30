@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, Loader2, CheckCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Step Components
@@ -66,6 +66,7 @@ const STEPS = [
 export function ListingWizard({ userId, firstName, lastName, email }: ListingWizardProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [visitedSteps, setVisitedSteps] = useState<Set<number>>(new Set([1])); // Start with step 1 visited
   const [formData, setFormData] = useState<WizardFormData>({
     title: "",
     category: "",
@@ -97,7 +98,10 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
     }
     
     if (currentStep < STEPS.length) {
-      setCurrentStep(currentStep + 1);
+      const newStep = currentStep + 1;
+      setCurrentStep(newStep);
+      // Mark the new step as visited
+      setVisitedSteps(prev => new Set([...prev, newStep]));
     }
   };
 
@@ -107,8 +111,13 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
     }
   };
 
-  // Step validation logic
+  // Step validation logic - only considers a step complete if it has been visited AND has valid data
   const isStepValidByNumber = (stepNumber: number) => {
+    // If step hasn't been visited, it can't be complete
+    if (!visitedSteps.has(stepNumber)) {
+      return false;
+    }
+    
     switch (stepNumber) {
       case 1:
         return formData.title && formData.smallDescription;
@@ -117,16 +126,20 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
       case 3:
         return formData.description.trim().length > 0;
       case 4:
+        // For optional steps, consider them complete once visited (user can choose no support)
         return true;
       case 5:
+        // For amenities, consider complete once visited (user can choose no amenities)
         return true;
       case 6:
+        // For house rules, consider complete once visited (user can choose no rules)
         return true;
       case 7:
         return formData.images.length > 0;
       case 8:
         return formData.price >= 200;
       case 9:
+        // Review step is complete once visited
         return true;
       default:
         return false;
@@ -145,6 +158,20 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
   const canNavigateToStep = (stepNumber: number) => {
     const highestCompleted = getHighestCompletedStep();
     return stepNumber <= Math.max(highestCompleted + 1, currentStep);
+  };
+
+  // Function to handle direct navigation to a step
+  const navigateToStep = (stepNumber: number) => {
+    if (canNavigateToStep(stepNumber)) {
+      setCurrentStep(stepNumber);
+      // Mark the step as visited when navigating to it
+      setVisitedSteps(prev => new Set([...prev, stepNumber]));
+    }
+  };
+
+  // Helper function to check if step is visited but not completed
+  const isStepVisitedButIncomplete = (stepNumber: number) => {
+    return visitedSteps.has(stepNumber) && !isStepValidByNumber(stepNumber);
   };
 
   const progress = (currentStep / STEPS.length) * 100;
@@ -174,7 +201,50 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
     }
   };
 
+  // Enhanced validation function to check all required fields
+  const validateAllRequiredFields = () => {
+    const errors: string[] = [];
+
+    // Check basic info (Step 1)
+    if (!formData.title?.trim()) errors.push("Listing title is required");
+    if (!formData.smallDescription?.trim()) errors.push("Short description is required");
+    if (formData.smallDescription && formData.smallDescription.trim().length < 10) {
+      errors.push("Short description must be at least 10 characters");
+    }
+
+    // Check address (Step 2)
+    if (!formData.streetAddress?.trim()) errors.push("Street address is required");
+    if (!formData.city?.trim()) errors.push("City is required");
+    if (!formData.state?.trim()) errors.push("State is required");
+    if (!formData.zipCode?.trim()) errors.push("ZIP code is required");
+
+    // Check description (Step 3)
+    if (!formData.description?.trim()) errors.push("Property description is required");
+    if (formData.description && formData.description.trim().length < 10) {
+      errors.push("Property description must be at least 10 characters");
+    }
+
+    // Check photos (Step 7)
+    if (!formData.images || formData.images.length === 0) {
+      errors.push("At least one photo is required");
+    }
+
+    // Check pricing (Step 8)
+    if (!formData.price || formData.price < 200) {
+      errors.push("Monthly rate must be at least $200");
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async () => {
+    // Comprehensive validation before submission
+    const validationErrors = validateAllRequiredFields();
+    if (validationErrors.length > 0) {
+      toast.error(`Please fix the following issues: ${validationErrors.join(", ")}`);
+      return;
+    }
+
     if (!isStepValidByNumber(currentStep)) {
       toast.error("Please complete all required fields");
       return;
@@ -182,10 +252,13 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
     setIsSubmitting(true);
     try {
       const submitFormData = new FormData();
+      
+      // Add form data with validation
       submitFormData.append("name", formData.title);
       submitFormData.append("category", formData.category || "");
       submitFormData.append("price", formData.price.toString());
       submitFormData.append("smallDescription", formData.smallDescription);
+      
       const fullAddress = formData.streetAddress && formData.city && formData.state && formData.zipCode
         ? `${formData.streetAddress}${formData.aptSuite ? `, ${formData.aptSuite}` : ''}, ${formData.city}, ${formData.state} ${formData.zipCode}, United States`
         : "";
@@ -194,22 +267,97 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
         return;
       }
       submitFormData.append("address", fullAddress);
-      submitFormData.append("description", formData.description);
-      submitFormData.append("images", JSON.stringify(formData.images));
-      submitFormData.append("amenities", JSON.stringify(formData.selectedAmenities));
-      submitFormData.append("supportRequested", JSON.stringify(formData.supportRequested));
-      submitFormData.append("houseRules", JSON.stringify(formData.houseRules));
-      submitFormData.append("productFile", "");
+      
+      // Convert plain text description to TipTap JSON format
+      const descriptionJson = {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            content: [
+              {
+                type: "text",
+                text: formData.description
+              }
+            ]
+          }
+        ]
+      };
+      
+      // Validate and append form data with proper error handling
+      try {
+        submitFormData.append("description", JSON.stringify(descriptionJson));
+        submitFormData.append("images", JSON.stringify(formData.images));
+        submitFormData.append("amenities", JSON.stringify(formData.selectedAmenities));
+        submitFormData.append("supportRequested", JSON.stringify(formData.supportRequested));
+        submitFormData.append("houseRules", JSON.stringify(formData.houseRules));
+        submitFormData.append("productFile", "");
+      } catch (jsonError) {
+        console.error("JSON serialization error:", jsonError);
+        toast.error("Error preparing listing data. Please check your inputs and try again.");
+        return;
+      }
+      
+      console.log("Submitting listing with data:", {
+        title: formData.title,
+        category: formData.category,
+        price: formData.price,
+        smallDescription: formData.smallDescription,
+        address: fullAddress,
+        description: formData.description,
+        images: formData.images,
+        amenities: formData.selectedAmenities,
+        supportRequested: formData.supportRequested,
+        houseRules: formData.houseRules
+      });
+      
+      // Log the exact FormData being sent for debugging
+      const formDataEntries: any = {};
+      for (const [key, value] of submitFormData.entries()) {
+        formDataEntries[key] = value;
+      }
+      console.log("FormData being sent to server:", formDataEntries);
+      
       const { SellProduct } = await import("@/app/actions");
       const result = await SellProduct(null, submitFormData);
+      
       if (result && result.status === "error") {
-        toast.error(result.message || "Failed to create listing");
-      } else {
+        console.error("Validation errors:", result.errors);
+        // Show specific field errors if available
+        if (result.errors) {
+          const errorMessages = Object.entries(result.errors)
+            .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
+            .join(" | ");
+          toast.error(`Validation errors: ${errorMessages}`);
+        } else {
+          toast.error(result.message || "Failed to create listing");
+        }
+      } else if (result) {
         toast.success("Listing created successfully!");
+        // The SellProduct action should handle the redirect
+      } else {
+        console.error("Unexpected result from SellProduct:", result);
+        toast.error("Unexpected response from server. Please try again.");
       }
     } catch (error) {
       console.error("Error creating listing:", error);
-      toast.error("Something went wrong. Please try again.");
+      
+      // Provide more specific error messages based on the error type
+      if (error instanceof Error) {
+        if (error.message.includes("Authentication") || error.message.includes("session")) {
+          toast.error("Your session has expired. Please log in again.");
+          window.location.href = "/api/auth/login?post_login_redirect_url=/sell";
+          return;
+        } else if (error.message.includes("Network") || error.message.includes("fetch")) {
+          toast.error("Network error. Please check your connection and try again.");
+        } else if (error.message.includes("JSON")) {
+          toast.error("Data formatting error. Please check your inputs and try again.");
+        } else {
+          toast.error(`Error: ${error.message}`);
+        }
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -242,18 +390,21 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
               {STEPS.map((step) => {
                 const canNavigate = canNavigateToStep(step.id);
                 const isCompleted = isStepValidByNumber(step.id);
+                const isVisitedIncomplete = isStepVisitedButIncomplete(step.id);
                 const isCurrent = currentStep === step.id;
                 return (
                   <button
                     key={step.id}
                     type="button"
-                    onClick={() => canNavigate && setCurrentStep(step.id)}
+                    onClick={() => navigateToStep(step.id)}
                     disabled={!canNavigate}
                     className={`px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                       isCurrent
                         ? 'bg-primary text-white shadow-md'
                         : isCompleted
                         ? 'text-primary bg-primary/10 hover:bg-primary/20 border border-primary/20'
+                        : isVisitedIncomplete
+                        ? 'text-yellow-700 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200'
                         : canNavigate
                         ? 'text-gray-600 hover:text-primary hover:bg-gray-50 border border-gray-200'
                         : 'text-gray-400 bg-gray-50 border border-gray-100 cursor-not-allowed opacity-60'
@@ -262,6 +413,9 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
                     <div className="flex items-center gap-2">
                       {isCompleted && !isCurrent && (
                         <CheckCircle className="w-4 h-4" />
+                      )}
+                      {isVisitedIncomplete && !isCurrent && (
+                        <AlertCircle className="w-4 h-4 text-yellow-600" />
                       )}
                       <span>{step.title}</span>
                     </div>

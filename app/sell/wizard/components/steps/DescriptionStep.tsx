@@ -41,9 +41,13 @@ export function DescriptionStep({ formData, updateFormData }: DescriptionStepPro
           />
           <div className="flex justify-between items-center mt-2">
             <p className="text-xs text-gray-500">
-              This detailed description will help potential housemates understand if your space is right for them
+              {formData.description.length < 10 ? (
+                <span className="text-orange-600 font-medium">Minimum 10 characters required</span>
+              ) : (
+                "This detailed description will help potential housemates understand if your space is right for them"
+              )}
             </p>
-            <span className="text-xs text-gray-400">
+            <span className={`text-xs ${formData.description.length < 10 ? 'text-orange-600' : 'text-gray-400'}`}>
               {formData.description.length}/2000
             </span>
           </div>

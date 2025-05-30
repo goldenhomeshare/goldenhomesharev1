@@ -17,18 +17,18 @@ export type State = {
 const productSchema = z.object({
   name: z
     .string()
-    .min(3, { message: "The name has to be a min charackter length of 5" }),
+    .min(3, { message: "The name has to be a minimum of 3 characters" }),
   category: z.string().optional(),
   price: z.number().min(1, { message: "The Price has to be bigger then 1" }),
   smallDescription: z
     .string()
-    .min(10, { message: "Please summerize your product more" }),
+    .min(10, { message: "Please summarize your listing in at least 10 characters" }),
   description: z.string().min(10, { message: "Description is required" }),
   images: z.array(z.string(), { message: "Images are required" }),
   productFile: z
     .string()
-    .min(1, { message: "Please upload a zip of your product" }),
-  address: z.string().min(5, { message: "Please provide a valid address" }).optional(),
+    .optional(),
+  address: z.string().min(5, { message: "Please provide a valid address" }),
   amenities: z.array(z.string()).optional(),
   supportRequested: z.array(
     z.union([
@@ -66,66 +66,168 @@ export async function SellProduct(prevState: any, formData: FormData) {
   const user = await getUser();
 
   if (!user) {
-    throw new Error("Something went wrong");
+    throw new Error("User authentication failed");
   }
 
-  const validateFields = productSchema.safeParse({
+  // Log the incoming form data for debugging
+  console.log("SellProduct received form data:", {
     name: formData.get("name"),
     category: formData.get("category"),
-    price: Number(formData.get("price")),
+    price: formData.get("price"),
     smallDescription: formData.get("smallDescription"),
-    description: formData.get("description"),
-    images: JSON.parse(formData.get("images") as string),
-    productFile: formData.get("productFile"),
     address: formData.get("address"),
-    amenities: formData.get("amenities") ? JSON.parse(formData.get("amenities") as string) : [],
-    supportRequested: formData.get("supportRequested") ? JSON.parse(formData.get("supportRequested") as string) : [],
-    houseRules: formData.get("houseRules") ? JSON.parse(formData.get("houseRules") as string) : [],
+    images: formData.get("images"),
+    amenities: formData.get("amenities"),
+    supportRequested: formData.get("supportRequested"),
+    houseRules: formData.get("houseRules"),
   });
 
-  if (!validateFields.success) {
-    const state: State = {
-      status: "error",
-      errors: validateFields.error.flatten().fieldErrors,
-      message: "Oops, I think there is a mistake with your inputs.",
+  try {
+    // Parse JSON fields with better error handling
+    let images, amenities, supportRequested, houseRules;
+    
+    try {
+      images = JSON.parse(formData.get("images") as string);
+    } catch (e) {
+      console.error("Error parsing images JSON:", e);
+      const state: State = {
+        status: "error",
+        message: "Invalid images data format. Please try uploading your images again.",
+      };
+      return state;
+    }
+
+    try {
+      amenities = formData.get("amenities") ? JSON.parse(formData.get("amenities") as string) : [];
+    } catch (e) {
+      console.error("Error parsing amenities JSON:", e);
+      const state: State = {
+        status: "error",
+        message: "Invalid amenities data format. Please try selecting your amenities again.",
+      };
+      return state;
+    }
+
+    try {
+      supportRequested = formData.get("supportRequested") ? JSON.parse(formData.get("supportRequested") as string) : [];
+    } catch (e) {
+      console.error("Error parsing supportRequested JSON:", e);
+      const state: State = {
+        status: "error",
+        message: "Invalid support services data format. Please try selecting support services again.",
+      };
+      return state;
+    }
+
+    try {
+      houseRules = formData.get("houseRules") ? JSON.parse(formData.get("houseRules") as string) : [];
+    } catch (e) {
+      console.error("Error parsing houseRules JSON:", e);
+      const state: State = {
+        status: "error",
+        message: "Invalid house rules data format. Please try setting house rules again.",
+      };
+      return state;
+    }
+
+    const validateFields = productSchema.safeParse({
+      name: formData.get("name"),
+      category: formData.get("category"),
+      price: Number(formData.get("price")),
+      smallDescription: formData.get("smallDescription"),
+      description: formData.get("description"),
+      images: images,
+      productFile: formData.get("productFile"),
+      address: formData.get("address"),
+      amenities: amenities,
+      supportRequested: supportRequested,
+      houseRules: houseRules,
+    });
+
+    if (!validateFields.success) {
+      console.error("Validation failed:", validateFields.error.flatten());
+      const state: State = {
+        status: "error",
+        errors: validateFields.error.flatten().fieldErrors,
+        message: "Oops, I think there is a mistake with your inputs.",
+      };
+
+      return state;
+    }
+
+    console.log("Validation successful, creating product with data:", validateFields.data);
+
+    let descriptionParsed;
+    try {
+      descriptionParsed = JSON.parse(validateFields.data.description);
+    } catch (e) {
+      console.error("Error parsing description JSON:", e);
+      const state: State = {
+        status: "error",
+        message: "Invalid description format. Please try editing your description again.",
+      };
+      return state;
+    }
+
+    const productData: any = {
+      name: validateFields.data.name,
+      category: (validateFields.data.category as CategoryTypes) || "template",
+      smallDescription: validateFields.data.smallDescription,
+      price: validateFields.data.price,
+      images: validateFields.data.images,
+      productFile: validateFields.data.productFile || "",
+      address: validateFields.data.address,
+      description: descriptionParsed,
+      User: {
+        connect: {
+          id: user.id
+        }
+      }
     };
 
-    return state;
-  }
+    if (validateFields.data.amenities && validateFields.data.amenities.length > 0) {
+      productData.amenities = validateFields.data.amenities;
+    }
 
-  const productData: any = {
-    name: validateFields.data.name,
-    category: (validateFields.data.category as CategoryTypes) || "template",
-    smallDescription: validateFields.data.smallDescription,
-    price: validateFields.data.price,
-    images: validateFields.data.images,
-    productFile: validateFields.data.productFile,
-    address: validateFields.data.address,
-    description: JSON.parse(validateFields.data.description),
-    User: {
-      connect: {
-        id: user.id
+    if (validateFields.data.supportRequested && validateFields.data.supportRequested.length > 0) {
+      productData.supportRequested = validateFields.data.supportRequested;
+    }
+
+    if (validateFields.data.houseRules && validateFields.data.houseRules.length > 0) {
+      productData.houseRules = validateFields.data.houseRules;
+    }
+
+    console.log("Creating product in database with:", productData);
+
+    const data = await prisma.product.create({
+      data: productData,
+    });
+
+    console.log("Product created successfully with ID:", data.id);
+
+    return redirect(`/product/${data.id}`);
+  } catch (error) {
+    console.error("Error in SellProduct:", error);
+    
+    if (error instanceof Error) {
+      if (error.message.includes("Invalid JSON")) {
+        const state: State = {
+          status: "error",
+          message: "Invalid data format. Please check your inputs and try again.",
+        };
+        return state;
+      } else if (error.message.includes("Prisma") || error.message.includes("database")) {
+        const state: State = {
+          status: "error",
+          message: "Database error. Please try again later.",
+        };
+        return state;
       }
     }
-  };
-
-  if (validateFields.data.amenities && validateFields.data.amenities.length > 0) {
-    productData.amenities = validateFields.data.amenities;
+    
+    // Re-throw the error to be caught by the client-side error handler
+    throw error;
   }
-
-  if (validateFields.data.supportRequested && validateFields.data.supportRequested.length > 0) {
-    productData.supportRequested = validateFields.data.supportRequested;
-  }
-
-  if (validateFields.data.houseRules && validateFields.data.houseRules.length > 0) {
-    productData.houseRules = validateFields.data.houseRules;
-  }
-
-  const data = await prisma.product.create({
-    data: productData,
-  });
-
-  return redirect(`/product/${data.id}`);
 }
 
 export async function EditProduct(prevState: any, formData: FormData) {
@@ -182,7 +284,7 @@ export async function EditProduct(prevState: any, formData: FormData) {
     smallDescription: validateFields.data.smallDescription,
     price: validateFields.data.price,
     images: validateFields.data.images,
-    productFile: validateFields.data.productFile,
+    productFile: validateFields.data.productFile || "",
     address: validateFields.data.address,
     description: JSON.parse(validateFields.data.description),
   };

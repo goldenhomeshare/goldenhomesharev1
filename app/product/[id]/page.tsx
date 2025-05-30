@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/carousel";
 import { JSONContent } from "@tiptap/react";
 import Image from "next/image";
-import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, Clock, VolumeX, Cigarette, CigaretteOff, Wine, GlassWater, Users, UserMinus } from "lucide-react";
+import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, Clock, VolumeX, Cigarette, CigaretteOff, Wine, GlassWater, Users, UserMinus, FileText } from "lucide-react";
 
 const amenityIcons: Record<string, any> = {
   parking: { icon: Car, label: "Parking" },
@@ -51,23 +51,31 @@ const houseRulesIcons: Record<string, any> = {
   smokingPolicy: { icon: CigaretteOff, label: "Smoking Policy" },
   petPolicy: { icon: Cat, label: "Pet Policy" },
   quietHours: { icon: Clock, label: "Quiet Hours" },
+  additionalRules: { icon: FileText, label: "Additional Rules" },
 };
 
 const houseRulesValueLabels: Record<string, Record<string, string>> = {
   guestPolicy: {
     dayNightApproval: "Day and night with approval",
     dayOnly: "Day only",
-    no: "No"
+    no: "No guests allowed",
+    "always-welcome": "Guests always welcome with notice",
+    "occasional": "Occasional guests with advance notice", 
+    "rare": "Rare guests only",
+    "no-guests": "No overnight guests"
   },
   smokingPolicy: {
-    yes: "Yes",
-    no: "No",
-    designatedAreas: "Designated areas"
+    yes: "Smoking allowed",
+    no: "No smoking",
+    designatedAreas: "Designated areas only",
+    "no-smoking": "No smoking anywhere",
+    "outdoor-only": "Outdoor smoking only",
+    "smoking-allowed": "Smoking allowed indoors and outdoors"
   },
   petPolicy: {
-    yes: "Yes",
-    no: "No",
-    discussionRequired: "Discussion required"
+    yes: "Pets welcome",
+    no: "No pets allowed",
+    discussionRequired: "Pet approval required"
   }
 };
 
@@ -163,6 +171,48 @@ export default async function ProductPage({
   const amenities = data.amenities || [];
   const supportRequested = data.supportRequested || [];
   const houseRules = data.houseRules || [];
+  
+  // Extract profile-level house rules from homeowner profile
+  const profileHouseRules: any[] = [];
+  const homeownerProfile = data.User?.homeownerProfile;
+  
+  if (homeownerProfile?.lifestyle) {
+    const lifestyle = homeownerProfile.lifestyle;
+    
+    // Add smoking policy from profile if available
+    if (lifestyle.smokingPolicy) {
+      profileHouseRules.push({
+        id: "smokingPolicy",
+        value: lifestyle.smokingPolicy,
+        source: "profile" // Mark as coming from profile
+      });
+    }
+    
+    // Add guest policy from profile if available
+    if (lifestyle.guestPolicy) {
+      profileHouseRules.push({
+        id: "guestPolicy", 
+        value: lifestyle.guestPolicy,
+        source: "profile" // Mark as coming from profile
+      });
+    }
+  }
+  
+  // Combine listing-specific rules with profile rules, avoiding duplicates
+  // Listing-specific rules take precedence over profile rules
+  const listingRuleIds = houseRules.map((rule: any) => 
+    typeof rule === 'string' ? rule : rule.id
+  );
+  
+  const combinedHouseRules = [
+    ...houseRules.map((rule: any) => ({
+      ...(typeof rule === 'string' ? { id: rule } : rule),
+      source: "listing"
+    })),
+    ...profileHouseRules.filter(profileRule => 
+      !listingRuleIds.includes(profileRule.id)
+    )
+  ];
   
   // Check if current user is a housemate and not the owner of this listing
   const canMessageHost = currentUser && 
@@ -294,16 +344,37 @@ export default async function ProductPage({
             </>
           )}
 
-          {houseRules.length > 0 && (
+          {combinedHouseRules.length > 0 && (
             <>
               <div className="border-t border-gray-200 mt-6 pt-6">
                 <h3 className="text-base font-medium mb-4">House Rules</h3>
                 <div className="grid grid-cols-1 gap-4">
-                  {houseRules.map((ruleItem: any) => {
+                  {combinedHouseRules.map((ruleItem: any) => {
                     const ruleId = typeof ruleItem === 'string' ? ruleItem : ruleItem.id;
                     const ruleValue = typeof ruleItem === 'string' ? null : ruleItem.value;
                     const rule = houseRulesIcons[ruleId];
-                    if (!rule) return null;
+                    
+                    // Skip additional rules here - they'll be displayed separately below
+                    if (ruleId === 'additionalRules') {
+                      return null;
+                    }
+                    
+                    // Handle unknown rule types gracefully
+                    if (!rule) {
+                      return (
+                        <div key={ruleId} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+                            <FileText size={16} className="text-slate-600" />
+                          </div>
+                          <div className="flex-1">
+                            <span className="text-sm font-medium capitalize">{ruleId.replace(/([A-Z])/g, ' $1')}</span>
+                            {ruleValue && (
+                              <span className="block text-sm text-muted-foreground">{ruleValue}</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
                     
                     const Icon = rule.icon;
                     let displayValue = ruleValue;
@@ -328,6 +399,40 @@ export default async function ProductPage({
                     );
                   })}
                 </div>
+
+                {/* Display additional rules separately below other rules */}
+                {combinedHouseRules.some((rule: any) => {
+                  const ruleId = typeof rule === 'string' ? rule : rule.id;
+                  return ruleId === 'additionalRules';
+                }) && (
+                  <div className="mt-6">
+                    {combinedHouseRules.map((ruleItem: any) => {
+                      const ruleId = typeof ruleItem === 'string' ? ruleItem : ruleItem.id;
+                      const ruleValue = typeof ruleItem === 'string' ? null : ruleItem.value;
+                      
+                      if (ruleId !== 'additionalRules' || !ruleValue) return null;
+                      
+                      const rule = houseRulesIcons[ruleId];
+                      const Icon = rule.icon;
+                      
+                      return (
+                        <div key={ruleId} className="border border-gray-200 rounded-lg p-4 bg-white">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                              <Icon size={16} className="text-slate-600" />
+                            </div>
+                            <span className="text-sm font-medium">{rule.label}</span>
+                          </div>
+                          <div className="pl-11">
+                            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                              {ruleValue}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </>
           )}

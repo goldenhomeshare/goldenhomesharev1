@@ -1,141 +1,172 @@
-# Sell Wizard Location Step Updates
+# Sell Wizard Updates
 
-## Summary
-Successfully updated the sell wizard with enhanced location functionality including proper address validation, automatic parsing, and seamless integration between the location entry and confirmation steps.
+Successfully updated the Golden HomeShare marketplace to use the listing wizard as the primary way to create listings. The old form-based approach has been replaced with a streamlined, step-by-step wizard experience.
 
 ## Changes Made
 
-### 1. Enhanced Address Entry (Step 1)
-- **Google Places Autocomplete**: Integrated existing `AddressAutocomplete` component for accurate address suggestions
-- **Real-time Validation**: Address must contain at least street and city (comma-separated format)
-- **Conditional Display**: Map and privacy info only appear when valid address is entered
+### 1. Primary Route Update
+- **`app/sell/page.tsx`**: Updated to use the ListingWizard component directly instead of offering both wizard and old form options
+- **`app/sell/wizard/page.tsx`**: Removed (wizard functionality moved to main sell route)
+- **`app/components/form/Sellform.tsx`**: Removed (replaced by wizard)
+
+### 2. Wizard Components (Now Used by `/sell`)
+1. **`app/sell/wizard/components/ListingWizard.tsx`**
+   - Main wizard orchestrator with 9 steps
+   - Progress tracking and step validation
+   - Form submission with proper data formatting
+
+2. **`app/sell/wizard/components/steps/ConfirmAddressStep.tsx`**
+   - Address validation and confirmation
+   - Interactive map display
+   - Apartment/suite number handling
+   - Uses generic placeholders (e.g., "123 Main Street", "Anytown", "State")
+
+3. **Additional Step Components**:
+   - `BasicInfoStep.tsx`: Title and short description with validation notices
+   - `DescriptionStep.tsx`: Detailed description with character requirements
+   - `PhotosStep.tsx`: Image upload with drag-and-drop
+   - `PricingStep.tsx`: Monthly pricing with minimum validation
+   - `AmenitiesStep.tsx`: Amenity selection with icons
+   - `SupportStep.tsx`: Support services with hour tracking
+   - `HouseRulesStep.tsx`: House rules configuration
+   - `ReviewStep.tsx`: Final review before submission
+
+### 3. Key Features
+- **Step-by-step guidance**: 9 well-defined steps with clear navigation
+- **Progress tracking**: Visual progress bar and step completion indicators
+- **Form validation**: Real-time validation with helpful error messages
+- **Data persistence**: Form data maintained across steps
+- **Professional UI**: Modern design with smooth transitions
+- **Error handling**: Comprehensive error handling and user feedback
+
+### 4. User Experience Improvements
+- **Validation notices**: Proactive validation messages showing character requirements
+- **Visual feedback**: Color-coded validation states (orange for incomplete fields)
+- **Step navigation**: Users can jump between completed steps
+- **Progress visualization**: Clear indication of completion status per step
+
+## Usage
+
+1. Navigate to `/sell` (now uses wizard directly)
+2. Complete all 9 steps in order
+3. Each step validates before allowing progression
+4. Submit creates listing with proper JSON formatting for descriptions
+
+## Technical Details
+
+- Converts plain text descriptions to TipTap JSON format for database compatibility
+- Handles optional productFile field (no longer required for homeshare listings)  
+- Integrates with existing Stripe Connect and UploadThing infrastructure
+- Maintains compatibility with existing product schema and validation
+- Uses generic address placeholders for better privacy and broader applicability
+
+## Summary
+Successfully updated the sell wizard with enhanced location functionality including proper address validation, automatic parsing, and seamless integration between location entry and confirmation steps. All placeholders now use generic examples instead of specific locations.
+
+## Changes Made
+
+### 1. Enhanced Address Entry (Step 2 - ConfirmAddressStep)
+- **Structured Address Input**: Individual fields for street, city, state, and ZIP code
+- **Real-time Validation**: Address fields must all be completed for progression
+- **Generic Placeholders**: Uses non-location-specific examples (e.g., "123 Main Street", "Anytown", "State", "12345")
 - **Visual Feedback**: Clear success indicators and helpful guidance text
 
-### 2. Smart Address Confirmation (Step 2)
-- **Automatic Parsing**: Advanced address parsing automatically splits the entered address into structured fields
-- **Intelligent Validation**: Comprehensive validation ensures all required fields are completed
-- **Visual Feedback**: Real-time validation with success/warning indicators
-- **Flexible Format Support**: Handles multiple address formats (with/without ZIP, state abbreviations, etc.)
-
-### 3. Improved Flow Integration
-- **Seamless Transition**: Address from Step 1 automatically populates structured fields in Step 2
-- **Smart Validation**: Step 1 requires proper address format before proceeding
-- **Data Consistency**: Full address reconstruction ensures map displays correctly
+### 2. Improved Flow Integration
+- **Data Consistency**: Structured address data ensures consistent formatting
+- **Smart Validation**: Step 2 requires all address fields before proceeding
+- **Privacy-Focused**: Generic placeholders don't suggest specific locations
 
 ## Technical Implementation
 
-### Enhanced Address Parsing Function
+### Enhanced Address Validation
 ```typescript
-function parseAddressComponents(address: string) {
-  // Handles multiple formats:
-  // "123 Main St, Springfield, MO 65802"
-  // "456 Oak Ave, Portland, OR"
-  // "789 Pine Rd, Austin TX 78701"
-  
-  // Advanced regex matching for state/ZIP extraction
-  // Fallback logic for incomplete addresses
-  // Default country assignment
-}
+// Example address format handling:
+// Street: "123 Main Street"  
+// City: "Anytown"
+// State: "State" or "ST"
+// ZIP: "12345" or "12345-6789"
 ```
 
 ### Improved Validation Logic
-- **Step 1**: Requires comma-separated address format (minimum: "Street, City")
-- **Step 2**: Validates all required structured fields
+- **Step 2**: Validates all required structured fields (street, city, state, ZIP)
 - **Real-time Feedback**: Visual indicators for validation status
+- **Generic Examples**: All placeholders use non-specific location examples
 
 ### Files Modified
 
 1. **`app/sell/wizard/components/ListingWizard.tsx`**
-   - Enhanced address validation with format checking
+   - Enhanced address validation with structured field checking
    - Updated step progression logic
 
-2. **`app/sell/wizard/components/steps/AddressStep.tsx`**
-   - Integrated AddressAutocomplete component
-   - Added conditional display logic
-   - Improved user guidance and feedback
-
-3. **`app/sell/wizard/components/steps/ConfirmAddressStep.tsx`**
-   - Advanced address parsing algorithm
+2. **`app/sell/wizard/components/steps/ConfirmAddressStep.tsx`**
+   - Updated placeholders to use generic examples
    - Comprehensive validation system
    - Real-time feedback mechanisms
    - Proper form field management
 
+3. **`app/components/AddressAutocomplete.tsx`**
+   - Updated default placeholder to use generic address format
+
+4. **`app/products/[category]/page.tsx`**
+   - Updated location search placeholders to use generic examples
+
 ## User Experience Improvements
 
-### Step 1: Location Entry
-1. **Guided Input**: Start typing to see Google Places suggestions
-2. **Format Enforcement**: Must enter address in proper format (Street, City, State)
-3. **Immediate Feedback**: Map appears when valid address is entered
-4. **Privacy Information**: Clear explanation of data protection
-
-### Step 2: Address Confirmation
-1. **Auto-Population**: Fields automatically filled from Step 1 address
-2. **Easy Editing**: Users can refine any individual field
+### Step 2: Address Confirmation  
+1. **Clear Input Fields**: Individual fields for each address component
+2. **Generic Guidance**: Placeholders show format without suggesting specific locations
 3. **Validation Feedback**: Real-time indicators show completion status
-4. **Map Toggle**: Users control whether to display location on map
+4. **Map Integration**: Address validation works with mapping functionality
 
 ## Address Format Support
 
 ### Supported Formats
-- ✅ `123 Main St, Springfield, MO 65802`
-- ✅ `456 Oak Ave, Portland, Oregon 97201`
-- ✅ `789 Pine Rd, Austin TX 78701`
-- ✅ `321 Elm St, Boston, MA`
+- ✅ `123 Main Street, Anytown, ST 12345`
+- ✅ `456 Oak Avenue, Somewhere, State 98765`  
+- ✅ `789 Pine Road, Anywhere TX 78701`
+- ✅ `321 Elm Street, Hometown, State`
 - ✅ Google Places formatted addresses
 
 ### Validation Requirements
-- **Step 1**: Minimum format `Street, City` (2 comma-separated parts)
-- **Step 2**: All fields required (Country, Street, City, State, ZIP)
+- **Step 2**: All fields required (Street, City, State, ZIP)
+- **Generic Placeholders**: Non-location-specific examples for privacy
 
 ## Testing Instructions
 
-### Test Step 1 (Location Entry)
-1. Navigate to `/sell/wizard`
-2. Try entering incomplete addresses:
-   - ❌ `123 Main St` (missing city - cannot proceed)
-   - ❌ `Springfield` (missing street - cannot proceed)
-3. Try valid addresses:
-   - ✅ `123 Main St, Springfield` (can proceed)
-   - ✅ `456 Oak Ave, Portland, OR 97201` (can proceed)
-4. Verify map appears when valid address is entered
-
 ### Test Step 2 (Address Confirmation)
-1. Enter valid address in Step 1, click "Next"
-2. Verify fields are auto-populated from parsed address
-3. Test editing individual fields
-4. Test validation feedback (try clearing required fields)
-5. Test location toggle (map should appear/disappear)
-6. Verify "Next" button is disabled until all fields are complete
+1. Navigate to `/sell` 
+2. Complete Step 1 (Basic Info) and proceed to Step 2
+3. Test address field validation:
+   - ❌ Leave any field empty (cannot proceed)
+   - ✅ Fill all fields completely (can proceed)
+4. Test placeholder guidance shows generic examples
+5. Verify map integration works with entered address
 
-### Test Address Parsing
-- **Input**: `1208 East Ash Street, Columbia, MO 65201`
-- **Expected Output**:
-  - Street: `1208 East Ash Street`
-  - City: `Columbia`
-  - State: `MO`
-  - ZIP: `65201`
+### Test Address Format
+- **Input**: Any valid US address format
+- **Expected**: All individual fields properly formatted
+- **Placeholders**: Generic examples like "123 Main Street", "Anytown", "State", "12345"
 
 ## Benefits
 
-1. **Accurate Location Data**: Google Places integration ensures valid addresses
-2. **Better User Experience**: Guided input with clear validation feedback
+1. **Privacy-Focused**: Generic placeholders don't suggest specific locations
+2. **Better User Experience**: Clear field-by-field guidance  
 3. **Data Quality**: Structured fields ensure consistent address formatting
-4. **Privacy Control**: Users choose whether to display location on map
-5. **Smart Validation**: Prevents progression with incomplete/invalid data
-6. **Flexible Parsing**: Handles various address formats automatically
+4. **Broad Applicability**: Examples work for any location
+5. **Smart Validation**: Prevents progression with incomplete address data
+6. **Professional Appearance**: Non-specific examples look more polished
 
 ## Dependencies
 
 - Google Maps API with Places library (existing)
-- `AddressAutocomplete` component (existing)
+- `AddressAutocomplete` component (existing, updated placeholders)
 - `AddressMap` component (existing)
-- Enhanced validation logic (new)
-- Advanced parsing algorithms (new)
+- Enhanced validation logic (updated)
 
 ## Environment Requirements
 
 - `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` configured
 - Google Places API enabled in Google Cloud Console
-- Application running at `http://localhost:3002`
+- Application running at configured port
 
-The enhanced location flow now provides a professional, user-friendly experience that ensures accurate address data while maintaining privacy controls. 
+The enhanced location flow now provides a professional, user-friendly experience with generic placeholders that ensure privacy while maintaining clear guidance for address entry. 

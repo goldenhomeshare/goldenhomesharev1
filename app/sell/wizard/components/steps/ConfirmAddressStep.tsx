@@ -65,7 +65,7 @@ export function ConfirmAddressStep({ formData, updateFormData }: ConfirmAddressS
             className={`h-12 text-gray-900 ${
               formData.streetAddress ? 'border-gray-400 bg-gray-50' : 'border-gray-300'
             }`}
-            placeholder="1208 East Ash Street"
+            placeholder="123 Main Street"
             required
           />
         </div>
@@ -96,7 +96,7 @@ export function ConfirmAddressStep({ formData, updateFormData }: ConfirmAddressS
             className={`h-12 text-gray-900 ${
               formData.city ? 'border-gray-400 bg-gray-50' : 'border-gray-300'
             }`}
-            placeholder="Columbia"
+            placeholder="Anytown"
             required
           />
         </div>
@@ -113,7 +113,7 @@ export function ConfirmAddressStep({ formData, updateFormData }: ConfirmAddressS
             className={`h-12 text-gray-900 ${
               formData.state ? 'border-gray-400 bg-gray-50' : 'border-gray-300'
             }`}
-            placeholder="Missouri"
+            placeholder="State"
             required
           />
         </div>
@@ -130,7 +130,7 @@ export function ConfirmAddressStep({ formData, updateFormData }: ConfirmAddressS
             className={`h-12 text-gray-900 ${
               formData.zipCode ? 'border-gray-400 bg-gray-50' : 'border-gray-300'
             }`}
-            placeholder="65201"
+            placeholder="12345"
             pattern="[0-9]{5}(-[0-9]{4})?"
             required
           />

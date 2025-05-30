@@ -17,7 +17,6 @@ interface HousemateProfile {
   schedule?: string | null;
   socialPreference?: string | null;
   hobbies?: string[] | any | null;
-  preferredAgeRanges?: string[] | any | null;
   preferredGender?: string | null;
   maxBudget?: number | null;
   canHelpWith?: string[] | any | null;
@@ -244,7 +243,7 @@ export function HousemateProfileCard({ housemate }: HousemateProfileCardProps) {
         )}
 
         {/* Living Preferences */}
-        {(profile?.preferredGender || profile?.preferredAgeRanges) && (
+        {(profile?.preferredGender) && (
           <div>
             <h4 className="font-medium mb-3">Living Preferences</h4>
             <div className="space-y-3">
@@ -256,31 +255,6 @@ export function HousemateProfileCard({ housemate }: HousemateProfileCardProps) {
                   <span className="text-sm">Prefers {genderLabels[profile.preferredGender] || profile.preferredGender} housemates</span>
                 </div>
               )}
-              
-              {profile.preferredAgeRanges && (() => {
-                let ageRangesArray: string[] = [];
-                if (typeof profile.preferredAgeRanges === 'string') {
-                  try {
-                    ageRangesArray = JSON.parse(profile.preferredAgeRanges);
-                  } catch {
-                    ageRangesArray = [];
-                  }
-                } else if (Array.isArray(profile.preferredAgeRanges)) {
-                  ageRangesArray = profile.preferredAgeRanges;
-                }
-                
-                if (ageRangesArray.length > 0) {
-                  return (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                        <Users size={16} className="text-slate-600" />
-                      </div>
-                      <span className="text-sm">Age preference: {ageRangesArray.join(', ')}</span>
-                    </div>
-                  );
-                }
-                return null;
-              })()}
             </div>
           </div>
         )}

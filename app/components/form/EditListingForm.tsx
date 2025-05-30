@@ -38,7 +38,7 @@ interface EditListingFormProps {
     description: any;
     images: string[];
     productFile: string;
-    category: string;
+    category: string | null;
     address: string | null;
     amenities: any;
     supportRequested: any;
@@ -260,7 +260,7 @@ export function EditListingForm({ listing }: EditListingFormProps) {
 
         <div className="flex flex-col gap-y-2">
           <Label>Category (Optional)</Label>
-          <SelectCategory defaultValue={listing.category} />
+          <SelectCategory defaultValue={listing.category || undefined} />
           {state?.errors?.["category"]?.[0] && (
             <p className="text-destructive">{state.errors["category"][0]}</p>
           )}

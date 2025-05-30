@@ -2,12 +2,12 @@ import { BuyProduct } from "@/app/actions";
 import { ProductDescription } from "@/app/components/ProductDescription";
 import { BuyButton } from "@/app/components/SubmitButtons";
 import { HomeownerProfileCard } from "@/app/components/HomeownerProfileCard";
-import { MessageHostButton } from "@/app/components/chat/MessageHostButton";
 import { ApproximateLocationMap } from "@/app/components/ApproximateLocationMap";
 import prisma from "@/app/lib/db";
 import { Button } from "@/components/ui/button";
 import { unstable_noStore as noStore } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
+import ImageGallery from "./ImageGallery";
 
 import {
   Carousel,
@@ -117,12 +117,12 @@ async function getData(id: string) {
       socialPreference: string | null;
       hobbies: any | null;
       socialMedia: any | null;
-      preferredAgeRanges: any | null;
       preferredGender: string | null;
+      preferredCareerStage: string | null;
       lifestyle: any | null;
     }]>`
       SELECT "profilePicture", bio, gender, "ageRange", schedule, "socialPreference", hobbies, "socialMedia",
-             "preferredAgeRanges", "preferredGender", lifestyle
+             "preferredGender", "preferredCareerStage", lifestyle
       FROM "HomeownerProfile" 
       WHERE "userId" = ${productData.User.id}
     `;
@@ -221,77 +221,63 @@ export default async function ProductPage({
 
   return (
     <>
-      <section className="mx-auto px-4  lg:mt-10 max-w-7xl lg:px-8 lg:grid lg:grid-rows-1 lg:grid-cols-7 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
-        <Carousel className=" lg:row-end-1 lg:col-span-4">
-          <CarouselContent>
-            {data.images?.map((item, index) => (
-              <CarouselItem key={index}>
-                <div className="aspect-w-4 aspect-h-3 rounded-lg bg-gray-100 overflow-hidden">
-                  <Image
-                    src={item as string}
-                    alt="yoo"
-                    fill
-                    className="object-cover w-full h-full rounded-lg"
-                  />
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="ml-16" />
-          <CarouselNext className="mr-16" />
-        </Carousel>
+      {/* Desktop: Listing Title above images */}
+      <div className="hidden lg:block mx-auto px-4 max-w-7xl lg:px-8 mt-8">
+        <h1 className="text-2xl font-semibold tracking-tight text-gray-900 sm:text-3xl mb-6">
+          {data.name}
+        </h1>
+      </div>
 
-        <div className="max-w-2xl mx-auto mt-5 lg:max-w-none lg:mt-0 lg:row-end-2 lg:row-span-2 lg:col-span-3">
-          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
+      <section className="mx-auto lg:px-4 max-w-7xl lg:px-8">
+        <ImageGallery images={data.images as string[]} />
+
+        {/* Mobile: Title and description below images */}
+        <div className="lg:hidden -mt-6 pt-10 pb-6 px-4 bg-white relative z-10 rounded-t-3xl text-center">
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900 mb-3">
             {data.name}
           </h1>
+          <p className="text-lg text-gray-600 leading-relaxed">{data.smallDescription}</p>
+        </div>
 
-          <p className="mt-2 text-muted-foreground">{data.smallDescription}</p>
+        {/* Desktop: Short description below images */}
+        <div className="hidden lg:block mt-4">
+          <p className="text-xl text-gray-900 font-medium">{data.smallDescription}</p>
+        </div>
+      </section>
+
+      {/* Host profile and payment section side by side */}
+      <section className="mx-auto px-4 max-w-7xl lg:px-8 lg:grid lg:grid-cols-7 lg:gap-x-8 xl:gap-x-16 mt-4">
+        <div className="w-full max-w-2xl mx-auto lg:max-w-none lg:col-span-4">
+          {data.User && (
+            <HomeownerProfileCard 
+              homeowner={{
+                firstName: data.User.firstName,
+                lastName: data.User.lastName,
+                profileImage: data.User.profileImage,
+                homeownerProfile: data.User.homeownerProfile,
+              }}
+              canMessageHost={!!canMessageHost}
+              messageProps={canMessageHost && data.User && data.id && data.name ? {
+                productId: data.id,
+                hostId: data.User.id,
+                productName: data.name,
+              } : undefined}
+              supportRequested={supportRequested}
+            />
+          )}
+          
+          <ProductDescription content={data.description as JSONContent} />
+        </div>
+
+        <div className="max-w-2xl mx-auto mt-4 lg:max-w-none lg:mt-0 lg:col-span-3">
           <form action={BuyProduct}>
             <input type="hidden" name="id" value={data.id} />
             <BuyButton price={data.price as number} />
           </form>
 
-          {canMessageHost && 
-           data.User && 
-           data.User.firstName && 
-           data.User.lastName && 
-           data.User.id && 
-           data.id &&
-           data.name && (
-            <MessageHostButton
-              productId={data.id}
-              hostId={data.User.id}
-              hostName={`${data.User.firstName} ${data.User.lastName}`}
-              productName={data.name}
-            />
-          )}
-
-          <div className="border-t border-gray-200 mt-10 pt-10">
-            <div className="grid grid-cols-2 w-full gap-y-3">
-              <h3 className="text-sm font-medium text-muted-foreground col-span-1">
-                Released:
-              </h3>
-              <h3 className="text-sm font-medium col-span-1">
-                {new Intl.DateTimeFormat("en-US", {
-                  dateStyle: "long",
-                }).format(data.createdAt)}
-              </h3>
-
-              {data.category && (
-                <>
-                  <h3 className="text-sm font-medium text-muted-foreground col-span-1">
-                    Category:
-                  </h3>
-                  <h3 className="text-sm font-medium col-span-1">{data.category}</h3>
-                </>
-              )}
-            </div>
-          </div>
-
           {amenities.length > 0 && (
             <>
-              <div className="border-t border-gray-200 mt-6 pt-6">
+              <div className="border-t border-gray-200 mt-4 pt-4">
                 <h3 className="text-base font-medium mb-4">Amenities</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {amenities.map((amenityId: string) => {
@@ -313,40 +299,9 @@ export default async function ProductPage({
             </>
           )}
 
-          {supportRequested.length > 0 && (
-            <>
-              <div className="border-t border-gray-200 mt-6 pt-6">
-                <h3 className="text-base font-medium mb-4">Support Requested</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  {supportRequested.map((supportItem: any) => {
-                    const supportId = typeof supportItem === 'string' ? supportItem : supportItem.id;
-                    const hoursPerWeek = typeof supportItem === 'string' ? null : supportItem.hoursPerWeek;
-                    const support = supportIcons[supportId];
-                    if (!support) return null;
-                    
-                    const Icon = support.icon;
-                    return (
-                      <div key={supportId} className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                          <Icon size={16} className="text-slate-600" />
-                        </div>
-                        <div>
-                          <span className="text-sm">{support.label}</span>
-                          {hoursPerWeek && (
-                            <span className="block text-xs text-muted-foreground">{hoursPerWeek} hours/week</span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
-          )}
-
           {combinedHouseRules.length > 0 && (
             <>
-              <div className="border-t border-gray-200 mt-6 pt-6">
+              <div className="border-t border-gray-200 mt-4 pt-4">
                 <h3 className="text-base font-medium mb-4">House Rules</h3>
                 <div className="grid grid-cols-1 gap-4">
                   {combinedHouseRules.map((ruleItem: any) => {
@@ -437,22 +392,7 @@ export default async function ProductPage({
             </>
           )}
 
-          <div className="border-t border-gray-200 mt-10"></div>
-        </div>
-
-        <div className="w-full max-w-2xl mx-auto mt-16 lg:max-w-none lg:mt-0 lg:col-span-4">
-          <ProductDescription content={data.description as JSONContent} />
-          
-          {data.User && (
-            <HomeownerProfileCard 
-              homeowner={{
-                firstName: data.User.firstName,
-                lastName: data.User.lastName,
-                profileImage: data.User.profileImage,
-                homeownerProfile: data.User.homeownerProfile,
-              }}
-            />
-          )}
+          <div className="border-t border-gray-200 mt-6"></div>
         </div>
       </section>
 
@@ -472,4 +412,4 @@ export default async function ProductPage({
       )}
     </>
   );
-}
+} 

@@ -61,8 +61,8 @@ model HomeownerProfile {
   schedule          String? // Early Riser, Night Owl, Flexible
   socialPreference  String? // Social, Independent, Balanced
   hobbies           Json?   // Array of selected hobbies
-  preferredAgeRanges Json?  // Array of preferred age ranges for housemates
   preferredGender   String? // Preferred gender for housemates
+  preferredCareerStage String? // Preferred career stage for housemates (student, professional, retired, no-preference)
   socialMedia       Json?   // Social media links (instagram, facebook, linkedin)
   lifestyle         Json?   // Lifestyle preferences (pets, smoking policy, etc.)
   
@@ -92,7 +92,6 @@ model HousemateProfile {
   schedule          String? // Early Riser, Night Owl, Flexible
   socialPreference  String? // Social, Independent, Balanced
   hobbies           Json?   // Array of selected hobbies
-  preferredAgeRanges Json?  // Array of preferred age ranges for living companions
   preferredGender   String? // Preferred gender for living companions
   socialMedia       Json?   // Social media links (instagram, facebook, linkedin)
   canHelpWith       Json?   // Array of services the housemate can help with (cleaning, cooking, etc.)

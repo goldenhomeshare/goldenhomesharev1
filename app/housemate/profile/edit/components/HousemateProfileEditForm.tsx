@@ -39,7 +39,6 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
     schedule: initialData?.schedule || "",
     socialPreference: initialData?.socialPreference || "",
     hobbies: initialData?.hobbies || [],
-    preferredAgeRanges: initialData?.preferredAgeRanges || [],
     preferredGender: initialData?.preferredGender || "",
     canHelpWith: initialData?.canHelpWith || [],
     location: {
@@ -192,7 +191,6 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
         schedule: formData.schedule,
         socialPreference: formData.socialPreference,
         hobbies: formData.hobbies,
-        preferredAgeRanges: formData.preferredAgeRanges,
         preferredGender: formData.preferredGender,
         socialMedia: formData.socialMedia,
         lifestyle: {
@@ -321,14 +319,6 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
     }));
   };
 
-  const handlePreferredAgeRangeToggle = (ageRangeId: string) => {
-    setFormData(prev => ({
-      ...prev,
-      preferredAgeRanges: prev.preferredAgeRanges.includes(ageRangeId)
-        ? prev.preferredAgeRanges.filter((id: string) => id !== ageRangeId)
-        : [...prev.preferredAgeRanges, ageRangeId]
-    }));
-  };
 
   const handleCanHelpWithToggle = (supportId: string) => {
     setFormData(prev => ({
@@ -1416,48 +1406,6 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
               <h2 className="text-xl font-medium text-primary">Match Preferences</h2>
             </div>
             <div className="px-6 py-6 space-y-8">
-              {/* Preferred Age Ranges */}
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Preferred Age Ranges
-                </Label>
-                <p className="text-xs text-gray-500 mb-4">Select the age ranges you'd prefer to live with (select all that apply)</p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {[
-                    ...ageRangeOptions,
-                    { id: "no-preference", label: "No Preference", icon: Users }
-                  ].map((option) => {
-                    const Icon = option.icon;
-                    const isSelected = formData.preferredAgeRanges.includes(option.id);
-                    
-                    return (
-                      <div key={option.id}>
-                        <label className="cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="sr-only peer"
-                            checked={isSelected}
-                            onChange={() => handlePreferredAgeRangeToggle(option.id)}
-                          />
-                          <div className={`flex flex-col items-center p-3 rounded-xl border transition-all duration-200 ${
-                            isSelected 
-                              ? 'border-primary bg-primary/5' 
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}>
-                            <div className={`w-12 h-12 rounded-lg mb-2 flex items-center justify-center ${
-                              isSelected ? 'bg-primary/10' : 'bg-gray-100'
-                            }`}>
-                              <Icon size={20} className={isSelected ? 'text-primary' : 'text-gray-600'} />
-                            </div>
-                            <span className="font-medium text-center text-xs text-gray-900 leading-tight px-1">{option.label}</span>
-                          </div>
-                        </label>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Preferred Gender */}
               <div>
                 <Label className="text-sm font-medium text-gray-700 mb-2 block">

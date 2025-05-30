@@ -107,18 +107,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     }
   }
 
-  // Parse preferred age ranges
-  let preferredAgeRanges: string[] = [];
-  if (profile?.preferredAgeRanges) {
-    try {
-      preferredAgeRanges = Array.isArray(profile.preferredAgeRanges) 
-        ? profile.preferredAgeRanges 
-        : JSON.parse(profile.preferredAgeRanges as string);
-    } catch {
-      preferredAgeRanges = [];
-    }
-  }
-
   // Parse canHelpWith
   let canHelpWithArray: string[] = [];
   if ((profile as any)?.canHelpWith) {
@@ -465,21 +453,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     </div>
 
                     {/* Preferred Age Ranges */}
-                    {preferredAgeRanges.length > 0 && (
-                      <div>
-                        <div className="text-sm font-medium text-gray-700 mb-2">Preferred age ranges for housemates:</div>
-                        <div className="flex flex-wrap gap-2">
-                          {preferredAgeRanges.map((ageRange, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm"
-                            >
-                              {ageRange === "no-preference" ? "No Preference" : ageRange}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
 
                     {/* Preferred Gender */}
                     {profile?.preferredGender && (

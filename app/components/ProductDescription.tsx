@@ -8,6 +8,7 @@ export function ProductDescription({ content }: { content: JSONContent }) {
     editable: false,
     extensions: [StarterKit],
     content: content,
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class: "prose prose-sm sm:prose-base",

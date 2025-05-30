@@ -14,8 +14,8 @@ export async function updateHomeownerProfile(
     schedule?: string;
     socialPreference?: string;
     hobbies?: string[];
-    preferredAgeRanges?: string[];
     preferredGender?: string;
+    preferredCareerStage?: string;
     socialMedia?: {
       instagram?: string;
       facebook?: string;
@@ -42,8 +42,8 @@ export async function updateHomeownerProfile(
     if (data.schedule !== undefined) updateData.schedule = data.schedule;
     if (data.socialPreference !== undefined) updateData.socialPreference = data.socialPreference;
     if (data.hobbies !== undefined) updateData.hobbies = data.hobbies;
-    if (data.preferredAgeRanges !== undefined) updateData.preferredAgeRanges = data.preferredAgeRanges;
     if (data.preferredGender !== undefined) updateData.preferredGender = data.preferredGender;
+    if (data.preferredCareerStage !== undefined) updateData.preferredCareerStage = data.preferredCareerStage;
     if (data.socialMedia !== undefined) updateData.socialMedia = data.socialMedia;
     if (data.lifestyle !== undefined) updateData.lifestyle = data.lifestyle;
 
@@ -79,7 +79,6 @@ export async function updateHousemateProfile(
     schedule?: string;
     socialPreference?: string;
     hobbies?: string[];
-    preferredAgeRanges?: string[];
     preferredGender?: string;
     canHelpWith?: string[];
     socialMedia?: {
@@ -104,17 +103,16 @@ export async function updateHousemateProfile(
     if (data.occupation !== undefined) updateData.occupation = data.occupation;
     if (data.bio !== undefined) updateData.bio = data.bio;
     if (data.profilePicture !== undefined) updateData.profilePicture = data.profilePicture;
-    if (data.socialMedia !== undefined) updateData.socialMedia = data.socialMedia;
-    if (data.lifestyle !== undefined) updateData.lifestyle = data.lifestyle;
     if (data.maxBudget !== undefined) updateData.maxBudget = data.maxBudget;
     if (data.gender !== undefined) updateData.gender = data.gender;
     if (data.ageRange !== undefined) updateData.ageRange = data.ageRange;
     if (data.schedule !== undefined) updateData.schedule = data.schedule;
     if (data.socialPreference !== undefined) updateData.socialPreference = data.socialPreference;
     if (data.hobbies !== undefined) updateData.hobbies = data.hobbies;
-    if (data.preferredAgeRanges !== undefined) updateData.preferredAgeRanges = data.preferredAgeRanges;
     if (data.preferredGender !== undefined) updateData.preferredGender = data.preferredGender;
     if (data.canHelpWith !== undefined) updateData.canHelpWith = data.canHelpWith;
+    if (data.socialMedia !== undefined) updateData.socialMedia = data.socialMedia;
+    if (data.lifestyle !== undefined) updateData.lifestyle = data.lifestyle;
 
     await prisma.housemateProfile.upsert({
       where: { userId: user.id },
@@ -149,7 +147,6 @@ export async function createHousemateProfile(
     schedule?: string;
     socialPreference?: string;
     hobbies?: string[];
-    preferredAgeRanges?: string[];
     preferredGender?: string;
     canHelpWith?: string[];
     socialMedia?: {
@@ -182,7 +179,6 @@ export async function createHousemateProfile(
     if (data.schedule !== undefined) profileData.schedule = data.schedule;
     if (data.socialPreference !== undefined) profileData.socialPreference = data.socialPreference;
     if (data.hobbies !== undefined) profileData.hobbies = data.hobbies;
-    if (data.preferredAgeRanges !== undefined) profileData.preferredAgeRanges = data.preferredAgeRanges;
     if (data.preferredGender !== undefined) profileData.preferredGender = data.preferredGender;
     if (data.canHelpWith !== undefined) profileData.canHelpWith = data.canHelpWith;
     if (data.socialMedia !== undefined) profileData.socialMedia = data.socialMedia;
@@ -225,8 +221,8 @@ export async function createHomeownerProfile(
     schedule?: string;
     socialPreference?: string;
     hobbies?: string[];
-    preferredAgeRanges?: string[];
     preferredGender?: string;
+    preferredCareerStage?: string;
     socialMedia?: {
       instagram?: string;
       facebook?: string;
@@ -254,8 +250,8 @@ export async function createHomeownerProfile(
     if (data.schedule !== undefined) profileData.schedule = data.schedule;
     if (data.socialPreference !== undefined) profileData.socialPreference = data.socialPreference;
     if (data.hobbies !== undefined) profileData.hobbies = data.hobbies;
-    if (data.preferredAgeRanges !== undefined) profileData.preferredAgeRanges = data.preferredAgeRanges;
     if (data.preferredGender !== undefined) profileData.preferredGender = data.preferredGender;
+    if (data.preferredCareerStage !== undefined) profileData.preferredCareerStage = data.preferredCareerStage;
     if (data.socialMedia !== undefined) profileData.socialMedia = data.socialMedia;
     if (data.lifestyle !== undefined) profileData.lifestyle = data.lifestyle;
 

@@ -2,6 +2,8 @@ import { AirbnbStyleRow } from "../app/components/AirbnbStyleRow";
 import Image from "next/image";
 import { Users, Shield, Layers, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Monitor, Car } from "lucide-react";
 import Link from "next/link";
+import { VideoSection } from "../components/VideoSection";
+import { videoConfig } from "../lib/video-config";
 
 export default function Home() {
   return (
@@ -23,7 +25,7 @@ export default function Home() {
             <div className="flex justify-between items-end">
               <div className="max-w-xl mx-auto md:mx-0 mb-8 md:mb-0">
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white mb-6 text-center md:text-left">
-                  Turn a Spare Room Into Connection, Support, and Extra Income.
+                  Turn a Spare Room Into Support, Extra Income, and Community
                 </h1>
                 
                 {/* Get Started Button - Mobile only, below text */}
@@ -50,6 +52,17 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Video Section */}
+      <VideoSection 
+        playbackId={videoConfig.homePageVideo.playbackId}
+        title={videoConfig.homePageVideo.title}
+        description={videoConfig.homePageVideo.description}
+        thumbnailUrl={videoConfig.homePageVideo.thumbnailUrl}
+        autoplay={videoConfig.homePageVideo.autoplay}
+        muted={videoConfig.homePageVideo.muted}
+        loop={videoConfig.homePageVideo.loop}
+      />
 
       {/* Golden HomeShare Benefits Section */}
       <section className="mt-16 mb-24">

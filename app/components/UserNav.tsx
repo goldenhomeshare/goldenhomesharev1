@@ -33,16 +33,14 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
     }
   };
 
-  const getDashboardLabel = () => {
+  const getMessagesLink = () => {
     switch (userType) {
       case "HOMEOWNER":
-        return "Homeowner Dashboard";
+        return "/homeowner/messages";
       case "HOUSEMATE":
-        return "Housemate Dashboard";
-      case "ADMIN":
-        return "Admin Dashboard";
+        return "/housemate/messages";
       default:
-        return "Complete Setup";
+        return "/messages";
     }
   };
 
@@ -77,24 +75,46 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        
+        {/* Manage Section */}
+        <DropdownMenuLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+          Manage
+        </DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href={getDashboardLink()}>{getDashboardLabel()}</Link>
+            <Link href={getMessagesLink()}>Messages</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/sell">Make a Listing</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={getProfileEditLink()}>Edit Profile</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="my-products">My Products</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/billing">Billing</Link>
+            <Link href="/applications">Applications</Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
+        
+        {/* Account Section */}
+        <DropdownMenuLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+          Account
+        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link href={getProfileEditLink()}>Profile</Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        
+        {/* Resources Section */}
+        <DropdownMenuLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+          Resources
+        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link href="/safety">Safety</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/help">Help</Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        
         <DropdownMenuItem asChild>
           <LogoutLink>Log out</LogoutLink>
         </DropdownMenuItem>

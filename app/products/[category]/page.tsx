@@ -399,7 +399,39 @@ export default function CategoryPage() {
           </div>
 
           {/* Mobile Layout */}
-          <div className="lg:hidden">
+          <div className="lg:hidden h-screen flex flex-col">
+            {/* Mobile Header with Filters Button */}
+            <div className="bg-white p-4">
+              <div className="flex items-center justify-between">
+                <h1 className="text-lg font-semibold text-gray-900">Find Housemates</h1>
+                <button
+                  onClick={() => setShowMobileFilters(true)}
+                  className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  <Filter size={16} />
+                  Filters
+                  {activeFiltersCount > 0 && (
+                    <span className="bg-green-800 text-white text-xs px-2 py-1 rounded-full min-w-[20px] h-5 flex items-center justify-center">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+              
+              {/* Mobile listing count display */}
+              <div className="mt-2">
+                <p className="text-sm text-gray-600">
+                  {filteredHousemates.length > 1000 
+                    ? `Over ${Math.floor(filteredHousemates.length / 1000) * 1000} housemates` 
+                    : `${filteredHousemates.length} housemate${filteredHousemates.length !== 1 ? 's' : ''}`
+                  }
+                  {filteredHousemates.length !== housemateData.length && 
+                    ` (filtered from ${housemateData.length} total)`
+                  }
+                </p>
+              </div>
+            </div>
+
             {/* Mobile Location Filter - Always visible */}
             <div className="bg-white p-6 border-b border-gray-200">
               <div className="mb-4">
@@ -543,17 +575,6 @@ export default function CategoryPage() {
                 </div>
               )}
             </div>
-
-            {/* Mobile Filter Button - Fixed at bottom */}
-            <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
-              <button
-                onClick={() => setShowMobileFilters(true)}
-                className="bg-green-800 hover:bg-green-900 text-white px-4 py-2 rounded-full font-medium transition-colors flex items-center justify-center gap-2 shadow-lg text-sm"
-              >
-                <Filter size={16} />
-                Filters {activeFiltersCount > 0 && `(${activeFiltersCount})`}
-              </button>
-            </div>
           </div>
 
           {/* Desktop Layout */}
@@ -597,6 +618,19 @@ export default function CategoryPage() {
                   >
                     Clear all
                   </button>
+                </div>
+
+                {/* Listing count display */}
+                <div className="mb-6">
+                  <p className="text-sm text-gray-600">
+                    {filteredHousemates.length > 1000 
+                      ? `Over ${Math.floor(filteredHousemates.length / 1000) * 1000} housemates` 
+                      : `${filteredHousemates.length} housemate${filteredHousemates.length !== 1 ? 's' : ''}`
+                    }
+                    {filteredHousemates.length !== housemateData.length && 
+                      ` (filtered from ${housemateData.length} total)`
+                    }
+                  </p>
                 </div>
 
                 {/* Budget Filter */}
@@ -1347,68 +1381,87 @@ export default function CategoryPage() {
     
     return (
       <div className="h-screen flex flex-col">
-        {/* Mobile View Toggle Buttons - No header styling */}
+        {/* Mobile View Toggle Buttons */}
         <div className="md:hidden px-4 py-2 bg-white">
-          <div className="flex gap-2 justify-end">
-            <button
-              onClick={() => setShowMobileMap(false)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                !showMobileMap 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              <List size={16} />
-              List
-            </button>
-            <button
-              onClick={() => setShowMobileMap(true)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                showMobileMap 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              <Map size={16} />
-              Map
-            </button>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">
+                {visibleListings.length > 0
+                  ? (visibleListings.length > 1000 
+                      ? `Over ${Math.floor(visibleListings.length / 1000) * 1000} listings in view` 
+                      : `${visibleListings.length} listing${visibleListings.length !== 1 ? 's' : ''} in view`
+                    )
+                  : (listingData.length > 1000 
+                      ? `Over ${Math.floor(listingData.length / 1000) * 1000} total listings` 
+                      : `${listingData.length} total listing${listingData.length !== 1 ? 's' : ''}`
+                    )
+                }
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowMobileMap(false)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  !showMobileMap 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <List size={16} />
+                List
+              </button>
+              <button
+                onClick={() => setShowMobileMap(true)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  showMobileMap 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <Map size={16} />
+                Map
+              </button>
+            </div>
           </div>
         </div>
         
-        {/* Mobile View - Conditional Rendering */}
-        <div className="flex-1 md:hidden">
-          {showMobileMap ? (
-            /* Mobile Map View */
-            <div className="h-full">
-              <ListingsMap 
-                listings={listingData} 
-                className="w-full h-full"
-                onVisibleListingsChange={handleVisibleListingsChange}
-              />
+        {/* Mobile View - Both map and list, but toggle visibility */}
+        <div className="flex-1 md:hidden relative">
+          {/* Mobile Map View - Always mounted but hidden/shown */}
+          <div className={`absolute inset-0 ${showMobileMap ? 'block' : 'hidden'}`}>
+            <ListingsMap 
+              listings={listingData} 
+              className="w-full h-full"
+              onVisibleListingsChange={handleVisibleListingsChange}
+            />
+          </div>
+          
+          {/* Mobile List View - Always mounted but hidden/shown */}
+          <div className={`absolute inset-0 ${!showMobileMap ? 'block' : 'hidden'} overflow-y-auto`}>
+            <div className="p-4">
+              {visibleListings.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">
+                    {listingData.length === 0 
+                      ? "No listings available" 
+                      : "Switch to map view and pan around to see listings in different areas"
+                    }
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {visibleListings.map((listing, index) => (
+                    <ListingCard
+                      key={`mobile-visible-${index}-${listing.id}`}
+                      {...listing}
+                      isSelected={selectedListing === listing.id}
+                      onClick={() => setSelectedListing(listing.id)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-          ) : (
-            /* Mobile List View - Show ALL listings */
-            <div className="h-full overflow-y-auto">
-              <div className="p-4">
-                {listingData.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">No listings available</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {listingData.map((listing, index) => (
-                      <ListingCard
-                        key={`mobile-all-${index}-${listing.id}`}
-                        {...listing}
-                        isSelected={selectedListing === listing.id}
-                        onClick={() => setSelectedListing(listing.id)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          </div>
         </div>
         
         {/* Desktop View - Side by Side Layout */}
@@ -1424,6 +1477,22 @@ export default function CategoryPage() {
           
           {/* Listings Sidebar - Right side with grid layout - takes 2/3 of the space */}
           <div className="flex-1 bg-white border-l border-gray-200 flex flex-col">
+            {/* Desktop listing count header */}
+            <div className="p-4 bg-white">
+              <p className="text-sm text-gray-600">
+                {visibleListings.length > 0 
+                  ? (visibleListings.length > 1000 
+                      ? `Over ${Math.floor(visibleListings.length / 1000) * 1000} listings in this area` 
+                      : `${visibleListings.length} listing${visibleListings.length !== 1 ? 's' : ''} in this area`
+                    )
+                  : (listingData.length > 1000 
+                      ? `Over ${Math.floor(listingData.length / 1000) * 1000} total listings` 
+                      : `${listingData.length} total listing${listingData.length !== 1 ? 's' : ''}`
+                    )
+                }
+              </p>
+            </div>
+            
             <div className="flex-1 overflow-y-auto">
               <div className="p-4">
                 {visibleListings.length === 0 ? (
@@ -1458,6 +1527,16 @@ export default function CategoryPage() {
   // For other categories, show the original grid view
   return (
     <section className="max-w-7xl mx-auto px-4 md:px-8">
+      {/* Listing count header */}
+      <div className="mb-6 pt-4">
+        <p className="text-sm text-gray-600">
+          {(data as Listing[]).length > 1000 
+            ? `Over ${Math.floor((data as Listing[]).length / 1000) * 1000} listings` 
+            : `${(data as Listing[]).length} listing${(data as Listing[]).length !== 1 ? 's' : ''}`
+          }
+        </p>
+      </div>
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 sm:grid-cols-2 gap-10 mt-4">
         {(data as Listing[]).map((product) => (
           <ProductCard

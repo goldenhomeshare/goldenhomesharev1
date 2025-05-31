@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { User, MapPin, Heart, MessageCircle, CheckCircle, Armchair } from "lucide-react";
+import { User, MapPin, MessageCircle, CheckCircle, Armchair } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Briefcase, Clock, Users, Instagram, Facebook, Linkedin, PawPrint, Cigarette, CigaretteOff, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, GraduationCap } from "lucide-react";
@@ -250,7 +250,7 @@ export function HousemateProfileCard({ housemate }: HousemateProfileCardProps) {
               {profile.preferredGender && (
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                    <Heart size={16} className="text-slate-600" />
+                    <User size={16} className="text-slate-600" />
                   </div>
                   <span className="text-sm">Prefers {genderLabels[profile.preferredGender] || profile.preferredGender} housemates</span>
                 </div>

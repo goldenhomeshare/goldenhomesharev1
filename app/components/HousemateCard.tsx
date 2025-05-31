@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { User, MapPin, Briefcase, Clock, Users, Heart, MessageCircle, Mail } from "lucide-react";
+import { User, MapPin, Briefcase, Clock, Users, MessageCircle, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HousemateCardProps {

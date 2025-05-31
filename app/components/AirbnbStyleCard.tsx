@@ -47,19 +47,19 @@ const amenityIcons: Record<string, any> = {
   "flexible": { icon: Car, label: "Flexible Schedule" },
   "social": { icon: User, label: "Social" },
   "independent": { icon: Home, label: "Independent" },
-  "balanced": { icon: Heart, label: "Balanced" },
+  "balanced": { icon: User, label: "Balanced" },
   // Common hobbies
   "gardening": { icon: Home, label: "Gardening" },
   "cooking": { icon: Utensils, label: "Cooking" },
   "reading": { icon: Briefcase, label: "Reading" },
   "movies": { icon: Tv, label: "Movies/TV" },
-  "volunteering": { icon: Heart, label: "Volunteering" },
+  "volunteering": { icon: User, label: "Volunteering" },
   "fitness": { icon: User, label: "Fitness" },
   "church": { icon: Home, label: "Church" },
   "crafting": { icon: Armchair, label: "Arts & Crafts" },
-  "music": { icon: Heart, label: "Music" },
+  "music": { icon: User, label: "Music" },
   "tech": { icon: Briefcase, label: "Technology" },
-  "pets": { icon: Heart, label: "Pet Lover" },
+  "pets": { icon: User, label: "Pet Lover" },
   "games": { icon: Armchair, label: "Board Games" },
 };
 
@@ -112,18 +112,6 @@ export function AirbnbStyleCard({
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-          
-          {/* Heart Icon - Favorite Button */}
-          <button 
-            className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              // Add favorite functionality here
-            }}
-          >
-            <Heart size={16} className="text-gray-600 hover:text-red-500 transition-colors" />
-          </button>
         </div>
         
         {/* Card Content - Improved layout for housemates */}

@@ -2,9 +2,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { User, Home, FileText, MessageCircle, Settings } from "lucide-react";
+import { User, Users, Home, Settings, Shield, FileText, MessageCircle, BarChart3 } from "lucide-react";
 
-export default async function HousemateDashboardPage() {
+export default async function AdminDashboardPage() {
   const user = await getCurrentUser();
   
   if (!user) {
@@ -13,40 +13,59 @@ export default async function HousemateDashboardPage() {
   
   const userType = (user as any).userType;
   
-  if (userType !== "HOUSEMATE") {
+  if (userType !== "ADMIN") {
     redirect("/onboarding");
   }
 
-  const housemateProfile = (user as any).housemateProfile;
-
   const dashboardItems = [
     {
-      icon: Home,
-      title: "Browse Homes",
-      description: "Discover available homeshare listings",
-      href: "/",
+      icon: Users,
+      title: "User Management",
+      description: "Manage homeowners and housemates",
+      href: "/admin/users",
       color: "text-blue-600"
     },
     {
-      icon: FileText,
-      title: "My Applications",
-      description: "Track your applications to homeowners",
-      href: "/housemate/applications",
+      icon: Home,
+      title: "Listing Management",
+      description: "Review and moderate property listings",
+      href: "/admin/listings",
       color: "text-green-600"
+    },
+    {
+      icon: FileText,
+      title: "Applications",
+      description: "Monitor application activity",
+      href: "/admin/applications",
+      color: "text-purple-600"
     },
     {
       icon: MessageCircle,
       title: "Messages",
-      description: "Connect with homeowners",
-      href: "/housemate/messages",
+      description: "View and moderate conversations",
+      href: "/admin/messages",
       color: "text-orange-600"
     },
     {
-      icon: User,
-      title: "Edit Profile",
-      description: "Update your information and preferences",
-      href: "/housemate/profile/edit",
-      color: "text-purple-600"
+      icon: BarChart3,
+      title: "Analytics",
+      description: "Platform usage and statistics",
+      href: "/admin/analytics",
+      color: "text-indigo-600"
+    },
+    {
+      icon: Shield,
+      title: "Safety & Reports",
+      description: "Handle safety reports and issues",
+      href: "/admin/safety",
+      color: "text-red-600"
+    },
+    {
+      icon: Settings,
+      title: "Platform Settings",
+      description: "Configure platform settings",
+      href: "/admin/settings",
+      color: "text-gray-600"
     }
   ];
 
@@ -54,23 +73,14 @@ export default async function HousemateDashboardPage() {
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
       <div className="mb-12 flex items-center gap-4">
         <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200">
-          {housemateProfile?.profilePicture ? (
-            <Image
-              src={housemateProfile.profilePicture}
-              alt="Profile picture"
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-              <User className="w-8 h-8 text-gray-400" />
-            </div>
-          )}
+          <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center">
+            <Shield className="w-8 h-8 text-white" />
+          </div>
         </div>
         <div>
-          <h1 className="text-3xl font-bold">Welcome, {user.firstName}!</h1>
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <p className="text-muted-foreground mt-2">
-            Find your perfect home and connect with homeowners
+            Welcome, {user.firstName}! Manage the Golden HomeShare platform
           </p>
         </div>
       </div>

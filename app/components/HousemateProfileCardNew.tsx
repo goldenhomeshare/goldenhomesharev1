@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { User, MapPin, Heart, CheckCircle, Briefcase, Users, DollarSign, GraduationCap, Armchair } from "lucide-react";
+import { User, MapPin, CheckCircle, Briefcase, Users, DollarSign, GraduationCap, Armchair } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HousemateProfileCardNewProps {
@@ -60,7 +60,14 @@ export function HousemateProfileCardNew({
   lifestyle,
   onContact
 }: HousemateProfileCardNewProps) {
-  const [isLiked, setIsLiked] = useState(false);
+
+  const handleContact = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onContact && userId && email) {
+      onContact(userId, email);
+    }
+  };
 
   // Parse lifestyle data to check if currently attending school
   let lifestyleData: any = {};
@@ -78,20 +85,6 @@ export function HousemateProfileCardNew({
 
   // Check if retired
   const isRetired = lifestyleData.occupationDetails?.isRetired || false;
-
-  const handleContact = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onContact && userId && email) {
-      onContact(userId, email);
-    }
-  };
-
-  const handleLike = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsLiked(!isLiked);
-  };
 
   return (
     <Link href={`/profile/${userId}`} className="block">
@@ -111,17 +104,6 @@ export function HousemateProfileCardNew({
               <User size={48} className="text-gray-300" />
             </div>
           )}
-          
-          {/* Like Button */}
-          <button
-            onClick={handleLike}
-            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors shadow-sm"
-          >
-            <Heart 
-              size={14} 
-              className={`${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'} transition-colors`}
-            />
-          </button>
         </div>
 
         {/* Content */}

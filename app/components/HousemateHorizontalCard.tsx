@@ -3,22 +3,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { User, MapPin, Heart, CheckCircle, Briefcase, Star } from "lucide-react";
+import { User, MapPin, CheckCircle, Briefcase, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HousemateHorizontalCardProps {
   id: string;
   name: string;
   location: string;
-  occupation?: string;
-  gender?: string;
-  ageRange?: string;
-  maxBudget?: number;
+  occupation: string;
+  gender: string;
+  ageRange: string;
+  maxBudget: number;
   profileImage?: string;
   bio?: string;
   isVerified?: boolean;
-  userId?: string;
-  email?: string;
+  userId: string;
+  email: string;
   lifestyle?: any;
   experience?: string;
   onContact?: (housemateId: string, email: string) => void;
@@ -55,7 +55,14 @@ export function HousemateHorizontalCard({
   experience,
   onContact
 }: HousemateHorizontalCardProps) {
-  const [isLiked, setIsLiked] = useState(false);
+
+  const handleContact = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onContact) {
+      onContact(userId, email);
+    }
+  };
 
   // Parse lifestyle data to check if currently attending school
   let lifestyleData: any = {};
@@ -71,20 +78,6 @@ export function HousemateHorizontalCard({
 
   const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
   const isRetired = lifestyleData.occupationDetails?.isRetired || false;
-
-  const handleContact = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onContact && userId && email) {
-      onContact(userId, email);
-    }
-  };
-
-  const handleLike = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsLiked(!isLiked);
-  };
 
   // Gender labels
   const genderLabels: Record<string, string> = {
@@ -220,26 +213,13 @@ export function HousemateHorizontalCard({
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2">
-                    {/* Heart Icon */}
-                    <button
-                      onClick={handleLike}
-                      className="w-8 h-8 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-colors"
-                    >
-                      <Heart 
-                        size={16} 
-                        className={`${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400'} transition-colors`}
-                      />
-                    </button>
-
-                    <Button
-                      onClick={handleContact}
-                      className="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-2xl font-medium transition-colors text-sm"
-                      size="sm"
-                    >
-                      Contact
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={handleContact}
+                    className="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-2xl font-medium transition-colors text-sm"
+                    size="sm"
+                  >
+                    Contact
+                  </Button>
                 </div>
               </div>
 
@@ -254,27 +234,14 @@ export function HousemateHorizontalCard({
                   <div className="text-xs text-gray-500">per month</div>
                 </div>
 
-                {/* Contact Button and Heart */}
-                <div className="flex items-center gap-3 mb-3">
-                  {/* Heart Icon */}
-                  <button
-                    onClick={handleLike}
-                    className="w-8 h-8 rounded-full bg-gray-50 hover:bg-gray-100 flex items-center justify-center transition-colors"
-                  >
-                    <Heart 
-                      size={16} 
-                      className={`${isLiked ? 'fill-red-500 text-red-500' : 'text-gray-400'} transition-colors`}
-                    />
-                  </button>
-
-                  <Button
-                    onClick={handleContact}
-                    className="bg-green-800 hover:bg-green-900 text-white px-8 py-3 rounded-2xl font-medium transition-colors"
-                    size="default"
-                  >
-                    Contact
-                  </Button>
-                </div>
+                {/* Contact Button */}
+                <Button
+                  onClick={handleContact}
+                  className="bg-green-800 hover:bg-green-900 text-white px-8 py-3 rounded-2xl font-medium transition-colors"
+                  size="default"
+                >
+                  Contact
+                </Button>
               </div>
             </div>
           </div>

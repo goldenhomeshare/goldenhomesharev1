@@ -82,6 +82,9 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
         </DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
+            <Link href={getDashboardLink()}>Dashboard</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
             <Link href={getMessagesLink()}>Messages</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>

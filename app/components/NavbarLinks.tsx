@@ -24,6 +24,11 @@ export const navbarLinks = [
         id: 3,
         name: "About",
         href: "/about" 
+    },
+    {
+        id: 4,
+        name: "Help",
+        href: "/help" 
     }, 
 ];
 

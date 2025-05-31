@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverExternalPackages: ['@uploadthing/react', 'uploadthing'],
+  transpilePackages: ['@uploadthing/react', 'uploadthing'],
 };
 
 export default nextConfig;

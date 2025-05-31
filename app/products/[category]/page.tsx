@@ -537,15 +537,15 @@ export default function CategoryPage() {
                       id={housemate.id}
                       name={housemate.name}
                       location={displayLocation}
-                      occupation={housemate.occupation}
-                      gender={housemate.gender}
-                      ageRange={housemate.ageRange}
+                      occupation={housemate.occupation || "Not specified"}
+                      gender={housemate.gender || "Not specified"}
+                      ageRange={housemate.ageRange || "Not specified"}
                       maxBudget={housemate.price}
                       profileImage={housemate.images?.[0]}
                       bio={housemate.smallDescription}
                       isVerified={true}
-                      userId={housemate.userId}
-                      email={housemate.email}
+                      userId={housemate.userId || ""}
+                      email={housemate.email || ""}
                       lifestyle={housemate.lifestyle}
                       onContact={handleContactHousemate}
                     />
@@ -997,15 +997,15 @@ export default function CategoryPage() {
                       id={housemate.id}
                       name={housemate.name}
                       location={displayLocation}
-                      occupation={housemate.occupation}
-                      gender={housemate.gender}
-                      ageRange={housemate.ageRange}
+                      occupation={housemate.occupation || "Not specified"}
+                      gender={housemate.gender || "Not specified"}
+                      ageRange={housemate.ageRange || "Not specified"}
                       maxBudget={housemate.price}
                       profileImage={housemate.images?.[0]}
                       bio={housemate.smallDescription}
                       isVerified={true}
-                      userId={housemate.userId}
-                      email={housemate.email}
+                      userId={housemate.userId || ""}
+                      email={housemate.email || ""}
                       lifestyle={housemate.lifestyle}
                       onContact={handleContactHousemate}
                     />

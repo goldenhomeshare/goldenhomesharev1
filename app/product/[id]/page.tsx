@@ -298,6 +298,7 @@ export default async function ProductPage({
             <ApplicationForm
               productId={data.id}
               productName={data.name || 'Property'}
+              price={data.price}
               hasExistingApplication={!!existingApplication}
               existingApplicationStatus={existingApplication?.status || undefined}
               applicationId={existingApplication?.id}

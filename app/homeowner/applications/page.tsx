@@ -6,9 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, CheckCircle, XCircle, User, MessageSquare } from "lucide-react";
+import { Clock, CheckCircle, XCircle, User, MessageSquare, Calendar, CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { ApplicationActionButtons } from "../../components/ApplicationActionButtons";
+import { format } from "date-fns";
 
 async function getApplicationsForHomeowner(userId: string) {
   const applications = await prisma.application.findMany({
@@ -108,6 +109,50 @@ export default async function HomeownerApplicationsPage() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
+          {/* Stay Duration Section */}
+          {application.moveInDate && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-medium mb-3 flex items-center gap-2">
+                <CalendarDays className="h-4 w-4 text-blue-600" />
+                Intended Stay Period
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-blue-600" />
+                  <div>
+                    <span className="font-medium">Move-in Date:</span>
+                    <br />
+                    <span className="text-blue-700">
+                      {format(new Date(application.moveInDate), "MMMM dd, yyyy")}
+                    </span>
+                  </div>
+                </div>
+                {application.moveOutDate && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-blue-600" />
+                    <div>
+                      <span className="font-medium">Move-out Date:</span>
+                      <br />
+                      <span className="text-blue-700">
+                        {format(new Date(application.moveOutDate), "MMMM dd, yyyy")}
+                      </span>
+                    </div>
+                  </div>
+                )}
+                {!application.moveOutDate && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-gray-400" />
+                    <div>
+                      <span className="font-medium">Move-out Date:</span>
+                      <br />
+                      <span className="text-gray-500">Not specified (long-term)</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {application.housemate.housemateProfile?.bio && (
             <div>
               <h4 className="font-medium mb-2">About:</h4>

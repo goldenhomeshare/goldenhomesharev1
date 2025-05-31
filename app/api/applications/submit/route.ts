@@ -6,6 +6,8 @@ import { z } from "zod";
 const submitApplicationSchema = z.object({
   productId: z.string(),
   message: z.string().optional(),
+  moveInDate: z.string().optional().transform((str) => str ? new Date(str) : undefined),
+  moveOutDate: z.string().optional().transform((str) => str ? new Date(str) : undefined),
 });
 
 export async function POST(request: NextRequest) {
@@ -18,7 +20,22 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { productId, message } = submitApplicationSchema.parse(body);
+    const { productId, message, moveInDate, moveOutDate } = submitApplicationSchema.parse(body);
+
+    // Validate that move-in date is provided
+    if (!moveInDate) {
+      return NextResponse.json({ error: "Move-in date is required" }, { status: 400 });
+    }
+
+    // Validate that move-in date is not in the past
+    if (moveInDate < new Date()) {
+      return NextResponse.json({ error: "Move-in date cannot be in the past" }, { status: 400 });
+    }
+
+    // Validate that move-out date is after move-in date if provided
+    if (moveOutDate && moveOutDate <= moveInDate) {
+      return NextResponse.json({ error: "Move-out date must be after move-in date" }, { status: 400 });
+    }
 
     // Check if the product exists
     const product = await prisma.product.findUnique({
@@ -59,6 +76,8 @@ export async function POST(request: NextRequest) {
         housemateId: user.id,
         productId: productId,
         message: message || null,
+        moveInDate,
+        moveOutDate,
         status: "PENDING",
       },
       include: {

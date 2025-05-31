@@ -110,6 +110,8 @@ model Application {
   
   status          ApplicationStatus @default(PENDING)
   message         String?
+  moveInDate      DateTime?         // When the applicant wants to move in
+  moveOutDate     DateTime?         // When the applicant plans to move out (optional)
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -39,22 +39,22 @@ async function getData(listingId: string, userId: string) {
   return listing;
 }
 
-async function checkUserStripeStatus(userId: string) {
-  const data = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-    select: {
-      stripeConnectedLinked: true,
-    },
-  });
+// async function checkUserStripeStatus(userId: string) {
+//   const data = await prisma.user.findUnique({
+//     where: {
+//       id: userId,
+//     },
+//     select: {
+//       stripeConnectedLinked: true,
+//     },
+//   });
 
-  if (data?.stripeConnectedLinked === false) {
-    return redirect("/billing");
-  }
+//   if (data?.stripeConnectedLinked === false) {
+//     return redirect("/billing");
+//   }
 
-  return null;
-}
+//   return null;
+// }
 
 export default async function EditListingRoute({
   params,
@@ -71,7 +71,8 @@ export default async function EditListingRoute({
 
   const resolvedParams = await params;
   
-  await checkUserStripeStatus(user.id);
+  // Removed Stripe connection requirement for editing listings
+  // await checkUserStripeStatus(user.id);
   const listing = await getData(resolvedParams.id, user.id);
 
   return (

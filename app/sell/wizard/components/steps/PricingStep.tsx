@@ -23,7 +23,7 @@ export function PricingStep({ formData, updateFormData }: PricingStepProps) {
 
   // Calculate suggested price based on support hours
   const calculateSuggestedPrice = () => {
-    const baseRent = 500; // Base monthly rent
+    const baseRent = 500; // Base monthly contribution
     const utilitiesIncrease = 60; // Additional utilities cost
     const goldenHomeShareFee = 200; // Platform fee
     const minimumRate = goldenHomeShareFee + utilitiesIncrease; // Ensure no loss
@@ -69,7 +69,7 @@ export function PricingStep({ formData, updateFormData }: PricingStepProps) {
           
           <div className="space-y-3 text-sm">
             <div className="flex justify-between items-center">
-              <span className="text-gray-700">Base monthly rent (based on location):</span>
+              <span className="text-gray-700">Base monthly contribution (based on location):</span>
               <span className="font-medium">$500</span>
             </div>
             <div className="flex justify-between items-center">
@@ -186,7 +186,7 @@ export function PricingStep({ formData, updateFormData }: PricingStepProps) {
                 <h4 className="text-sm font-medium text-gray-900 mb-2">Your Income Breakdown</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Monthly rent you set:</span>
+                    <span className="text-gray-700">Monthly contribution you set:</span>
                     <span className="font-medium">${formData.price}</span>
                   </div>
                   <div className="flex justify-between items-center">

@@ -498,3 +498,80 @@ export async function DeleteProduct(productId: string) {
 
   return { success: true };
 }
+
+export async function ProcessApplicationPayment(formData: FormData) {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  const applicationId = formData.get("applicationId") as string;
+  
+  // Get the approved application and related product data
+  const application = await prisma.application.findUnique({
+    where: {
+      id: applicationId,
+      housemateId: user.id,
+      status: "APPROVED",
+    },
+    include: {
+      product: {
+        include: {
+          User: {
+            select: {
+              connectedAccountId: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!application) {
+    throw new Error("Application not found or not approved");
+  }
+
+  const product = application.product;
+
+  // Create checkout session configuration
+  const sessionConfig: any = {
+    mode: "payment",
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          unit_amount: Math.round((product.price as number) * 100),
+          product_data: {
+            name: `Monthly Contribution - ${product.name}`,
+            description: `First month's contribution for ${product.name}`,
+            images: product.images,
+          },
+        },
+        quantity: 1,
+      },
+    ],
+    metadata: {
+      applicationId: applicationId,
+      productId: product.id,
+      housemateId: user.id,
+    },
+    success_url:
+      process.env.NODE_ENV === "development"
+        ? `http://localhost:3001/payment/success?application=${applicationId}`
+        : `https://${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'goldenhomeshare.com'}/payment/success?application=${applicationId}`,
+    cancel_url:
+      process.env.NODE_ENV === "development"
+        ? `http://localhost:3001/billing?application=${applicationId}`
+        : `https://${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'goldenhomeshare.com'}/billing?application=${applicationId}`,
+  };
+
+  // Only add payment_intent_data if connected account exists and is properly configured
+  // For now, we'll skip the transfer to avoid capability errors
+  // TODO: Add proper account capability checking before enabling transfers
+  
+  const session = await stripe.checkout.sessions.create(sessionConfig);
+
+  return redirect(session.url as string);
+}

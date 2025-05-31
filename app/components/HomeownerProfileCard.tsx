@@ -196,19 +196,19 @@ export function HomeownerProfileCard({ homeowner, canMessageHost, messageProps, 
                   )}
                 </div>
               )}
-              
-              {/* Message Button */}
-              {canMessageHost && messageProps && (
-                <div className="mt-3">
-                  <MessageHostButton 
-                    productId={messageProps.productId}
-                    hostId={messageProps.hostId}
-                    hostName={homeowner.firstName}
-                    productName={messageProps.productName}
-                  />
-                </div>
-              )}
             </div>
+
+            {/* Message Button - Positioned to the right */}
+            {canMessageHost && messageProps && (
+              <div className="flex-shrink-0">
+                <MessageHostButton 
+                  productId={messageProps.productId}
+                  hostId={messageProps.hostId}
+                  hostName={homeowner.firstName}
+                  productName={messageProps.productName}
+                />
+              </div>
+            )}
           </div>
 
           {/* Bio Section */}

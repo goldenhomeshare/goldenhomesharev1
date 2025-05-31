@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/app/lib/db";
 import Image from "next/image";
-import { User, MapPin, CheckCircle, Heart, Briefcase, Clock, Users, PawPrint, CigaretteOff, Cigarette, Instagram, Facebook, Linkedin, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, BookOpen, Film, Dumbbell, Music, Gamepad2, Palette, Church, GraduationCap, Armchair, MessageCircle } from "lucide-react";
+import { User, MapPin, CheckCircle, Briefcase, Clock, Users, PawPrint, CigaretteOff, Cigarette, Instagram, Facebook, Linkedin, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, BookOpen, Film, Dumbbell, Music, Gamepad2, Palette, Church, GraduationCap, Armchair, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProfileNavigation } from "./components/ProfileNavigation";
 import { calculateAgeRange, extractDateOfBirth } from "@/lib/age-utils";
@@ -184,11 +184,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
                     <User size={64} className="text-gray-300" />
                   </div>
                 )}
-                
-                {/* Heart Button */}
-                <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors shadow-sm">
-                  <Heart size={20} className="text-gray-600" />
-                </button>
               </div>
 
               {/* Profile Info */}

@@ -2,12 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-import { Menu, MessageCircle, FileText, User, Settings, Shield, HelpCircle } from "lucide-react";
+import { Menu, MessageCircle, FileText, User, Settings, Shield, HelpCircle, Home, Building, Users, Info, LayoutDashboard } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { navbarLinks } from "./NavbarLinks";
 
 interface MobileMenuProps {
   user?: {
@@ -56,8 +57,17 @@ export function MobileMenu({ user }: MobileMenuProps) {
     }
   };
 
+  // Website navigation items with icons
+  const websiteNavItems = [
+    { name: "Home", href: "/", icon: Home },
+    { name: "View Listings", href: "/products/template", icon: Building },
+    { name: "View Housemates", href: "/products/icon", icon: Users },
+    { name: "About", href: "/about", icon: Info },
+  ];
+
   // Menu items organized by sections
   const manageItems = [
+    { name: "Dashboard", href: getDashboardLink(), icon: LayoutDashboard },
     { name: "Messages", href: getMessagesLink(), icon: MessageCircle },
     { name: "Applications", href: "/applications", icon: FileText },
   ];
@@ -114,6 +124,31 @@ export function MobileMenu({ user }: MobileMenuProps) {
                   <h3 className="font-semibold text-gray-900">{user.name}</h3>
                   <p className="text-sm text-gray-600">{user.email}</p>
                 </div>
+              </div>
+            </div>
+
+            {/* Website Navigation Section */}
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h4 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">Navigation</h4>
+              <div className="space-y-1">
+                {websiteNavItems.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link 
+                      href={item.href} 
+                      key={item.name}
+                      className={cn(
+                        location === item.href 
+                        ? 'bg-gray-100 text-gray-900' 
+                        : 'text-gray-700 hover:bg-gray-50',
+                        "flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors"
+                      )}
+                    >
+                      <Icon className="w-5 h-5 mr-3 text-gray-500" />
+                      {item.name}
+                    </Link>
+                  );
+                })}
               </div>
             </div>
 
@@ -209,31 +244,26 @@ export function MobileMenu({ user }: MobileMenuProps) {
         {/* Show basic navigation for non-authenticated users */}
         {!user && (
           <div className="px-6 py-6">
-            <div className="space-y-2">
-              <Link 
-                href="/" 
-                className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
-              >
-                Home
-              </Link>
-              <Link 
-                href="/products/template" 
-                className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
-              >
-                View Listings
-              </Link>
-              <Link 
-                href="/products/icon" 
-                className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
-              >
-                View Housemates
-              </Link>
-              <Link 
-                href="/about" 
-                className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg"
-              >
-                About
-              </Link>
+            <h4 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">Navigation</h4>
+            <div className="space-y-1">
+              {websiteNavItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link 
+                    href={item.href} 
+                    key={item.name}
+                    className={cn(
+                      location === item.href 
+                      ? 'bg-gray-100 text-gray-900' 
+                      : 'text-gray-700 hover:bg-gray-50',
+                      "flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors"
+                    )}
+                  >
+                    <Icon className="w-5 h-5 mr-3 text-gray-500" />
+                    {item.name}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}

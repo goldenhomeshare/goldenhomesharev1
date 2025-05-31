@@ -19,9 +19,10 @@ async function getData(userId: string) {
       },
     });
 
-    if (data?.stripeConnectedLinked === false) {
-      return redirect("/billing");
-    }
+    // Removed Stripe connection requirement for creating listings
+    // if (data?.stripeConnectedLinked === false) {
+    //   return redirect("/billing");
+    // }
 
     return data;
   } catch (error) {
@@ -63,7 +64,6 @@ export default async function SellRoute() {
           <ul className="list-disc list-inside text-sm text-gray-600 space-y-1 mb-4">
             <li>Authentication issues - please try logging in again</li>
             <li>Database connection problems</li>
-            <li>Missing Stripe account setup</li>
           </ul>
           <div className="space-y-2">
             <Link 

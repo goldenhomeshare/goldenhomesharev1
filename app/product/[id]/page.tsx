@@ -1,8 +1,7 @@
-import { BuyProduct } from "@/app/actions";
 import { ProductDescription } from "@/app/components/ProductDescription";
-import { BuyButton } from "@/app/components/SubmitButtons";
 import { HomeownerProfileCard } from "@/app/components/HomeownerProfileCard";
 import { ApproximateLocationMap } from "@/app/components/ApproximateLocationMap";
+import { ApplicationForm } from "@/app/components/ApplicationForm";
 import prisma from "@/app/lib/db";
 import { Button } from "@/components/ui/button";
 import { unstable_noStore as noStore } from "next/cache";
@@ -19,6 +18,7 @@ import {
 import { JSONContent } from "@tiptap/react";
 import Image from "next/image";
 import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, Clock, VolumeX, Cigarette, CigaretteOff, Wine, GlassWater, Users, UserMinus, FileText } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 const amenityIcons: Record<string, any> = {
   parking: { icon: Car, label: "Parking" },
@@ -153,6 +153,19 @@ async function getData(id: string) {
   };
 }
 
+async function getApplicationStatus(productId: string, userId: string) {
+  const application = await prisma.application.findUnique({
+    where: {
+      housemateId_productId: {
+        housemateId: userId,
+        productId: productId,
+      },
+    },
+  });
+  
+  return application;
+}
+
 export default async function ProductPage({
   params,
 }: {
@@ -171,6 +184,12 @@ export default async function ProductPage({
   const amenities = data.amenities || [];
   const supportRequested = data.supportRequested || [];
   const houseRules = data.houseRules || [];
+  
+  // Check for existing application if user is logged in and not the owner
+  let existingApplication = null;
+  if (currentUser && currentUser.id !== data.User?.id && data.id) {
+    existingApplication = await getApplicationStatus(data.id, currentUser.id);
+  }
   
   // Extract profile-level house rules from homeowner profile
   const profileHouseRules: any[] = [];
@@ -218,6 +237,10 @@ export default async function ProductPage({
   const canMessageHost = currentUser && 
     (currentUser as any).userType === "HOUSEMATE" && 
     currentUser.id !== data.User?.id;
+
+  // Check user type and ownership for the action component
+  const isOwner = currentUser?.id === data.User?.id;
+  const isHousemate = currentUser && (currentUser as any).userType === "HOUSEMATE";
 
   return (
     <>
@@ -270,10 +293,29 @@ export default async function ProductPage({
         </div>
 
         <div className="max-w-2xl mx-auto mt-4 lg:max-w-none lg:mt-0 lg:col-span-3">
-          <form action={BuyProduct}>
-            <input type="hidden" name="id" value={data.id} />
-            <BuyButton price={data.price as number} />
-          </form>
+          {/* Application Form for all users except owners */}
+          {!isOwner && data.id ? (
+            <ApplicationForm
+              productId={data.id}
+              productName={data.name || 'Property'}
+              price={data.price}
+              hasExistingApplication={!!existingApplication}
+              existingApplicationStatus={existingApplication?.status || undefined}
+              applicationId={existingApplication?.id}
+            />
+          ) : isOwner ? (
+            <Card>
+              <CardContent className="py-6 text-center">
+                <h3 className="text-lg font-medium mb-2">This is your listing</h3>
+                <p className="text-muted-foreground mb-4">
+                  You can view and manage applications from interested housemates in your dashboard.
+                </p>
+                <Button asChild variant="outline">
+                  <a href="/applications">View Applications</a>
+                </Button>
+              </CardContent>
+            </Card>
+          ) : null}
 
           {amenities.length > 0 && (
             <>

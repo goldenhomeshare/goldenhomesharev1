@@ -19,11 +19,12 @@ export function MessageHostButton({ productId, hostId, hostName, productName }: 
     <>
       <Button 
         onClick={() => setIsModalOpen(true)}
-        className="w-full mt-4"
+        className="px-4 py-2 text-sm"
         variant="outline"
+        size="sm"
       >
         <MessageCircle className="w-4 h-4 mr-2" />
-        Message Host
+        Message Homeowner
       </Button>
 
       <ChatModal

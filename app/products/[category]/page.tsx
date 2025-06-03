@@ -45,17 +45,33 @@ interface HousemateProfile {
 
 async function getData(category: string) {
   try {
-    const response = await fetch(`/api/products?category=${category}`, {
-      cache: 'no-store'
+    // Use window.location.origin for client-side fetches to ensure proper URL resolution
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const url = `${baseUrl}/api/products?category=${category}`;
+    
+    console.log('Fetching data from:', url);
+    
+    const response = await fetch(url, {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
     
+    console.log('Response status:', response.status, response.statusText);
+    
     if (!response.ok) {
-      throw new Error('Failed to fetch data');
+      const errorText = await response.text();
+      console.error('API Error:', errorText);
+      throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
     }
     
-    return await response.json();
+    const data = await response.json();
+    console.log('Fetched data:', data);
+    return data;
   } catch (error) {
     console.error('Error fetching data:', error);
+    // Return empty array instead of throwing to prevent the component from breaking
     return [];
   }
 }

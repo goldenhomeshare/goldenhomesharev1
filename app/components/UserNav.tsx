@@ -115,6 +115,9 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
           <DropdownMenuItem asChild>
             <Link href="/help">Help</Link>
           </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/fill-agreement">Agreement Form</Link>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         

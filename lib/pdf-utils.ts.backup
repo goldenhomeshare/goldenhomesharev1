@@ -1,0 +1,263 @@
+import jsPDF from "jspdf";
+
+export interface HomesharingAgreementData {
+  // Agreement details
+  agreementTitle: string;
+  agreementNumber: string;
+  createdDate: Date;
+  effectiveDate: Date;
+  endDate?: Date;
+  
+  // Host information
+  hostName: string;
+  hostEmail: string;
+  hostAddress: string;
+  hostPhone?: string;
+  
+  // Seeker information
+  seekerName: string;
+  seekerEmail: string;
+  seekerPhone?: string;
+  
+  // Property details
+  propertyAddress: string;
+  roomDescription: string;
+  
+  // Financial terms
+  monthlyRent: number;
+  securityDeposit?: number;
+  currency: "USD" | "EUR" | "GBP";
+  
+  // Agreement terms
+  terms: string[];
+  specialConditions?: string;
+  
+  // Additional notes
+  notes?: string;
+}
+
+export interface CurrencyFormatOptions {
+  amount: number;
+  currency: "USD" | "EUR" | "GBP";
+}
+
+export function formatCurrency({ amount, currency }: CurrencyFormatOptions): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency,
+  }).format(amount);
+}
+
+export function generateHomesharingAgreementPDF(data: HomesharingAgreementData): Buffer {
+  const pdf = new jsPDF({
+    orientation: "portrait",
+    unit: "mm",
+    format: "a4",
+  });
+
+  // Set default font
+  pdf.setFont("helvetica");
+  
+  let currentY = 20;
+  const leftMargin = 20;
+  const rightMargin = 190;
+  const lineHeight = 6;
+
+  // Header
+  pdf.setFontSize(20);
+  pdf.setFont("helvetica", "bold");
+  pdf.text(data.agreementTitle, leftMargin, currentY);
+  currentY += 10;
+
+  // Agreement number and dates
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "normal");
+  pdf.text(`Agreement #: ${data.agreementNumber}`, leftMargin, currentY);
+  currentY += lineHeight;
+  
+  pdf.text(
+    `Created: ${new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(data.createdDate)}`,
+    leftMargin,
+    currentY
+  );
+  currentY += lineHeight;
+  
+  pdf.text(
+    `Effective: ${new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(data.effectiveDate)}`,
+    leftMargin,
+    currentY
+  );
+  currentY += lineHeight;
+
+  if (data.endDate) {
+    pdf.text(
+      `End Date: ${new Intl.DateTimeFormat("en-US", { dateStyle: "long" }).format(data.endDate)}`,
+      leftMargin,
+      currentY
+    );
+    currentY += lineHeight;
+  }
+
+  currentY += 5;
+
+  // Host Information Section
+  pdf.setFontSize(14);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Host Information", leftMargin, currentY);
+  currentY += lineHeight;
+
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "normal");
+  pdf.text(`Name: ${data.hostName}`, leftMargin, currentY);
+  currentY += lineHeight;
+  pdf.text(`Email: ${data.hostEmail}`, leftMargin, currentY);
+  currentY += lineHeight;
+  pdf.text(`Address: ${data.hostAddress}`, leftMargin, currentY);
+  currentY += lineHeight;
+  
+  if (data.hostPhone) {
+    pdf.text(`Phone: ${data.hostPhone}`, leftMargin, currentY);
+    currentY += lineHeight;
+  }
+
+  currentY += 5;
+
+  // Seeker Information Section
+  pdf.setFontSize(14);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Seeker Information", leftMargin, currentY);
+  currentY += lineHeight;
+
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "normal");
+  pdf.text(`Name: ${data.seekerName}`, leftMargin, currentY);
+  currentY += lineHeight;
+  pdf.text(`Email: ${data.seekerEmail}`, leftMargin, currentY);
+  currentY += lineHeight;
+  
+  if (data.seekerPhone) {
+    pdf.text(`Phone: ${data.seekerPhone}`, leftMargin, currentY);
+    currentY += lineHeight;
+  }
+
+  currentY += 5;
+
+  // Property Details Section
+  pdf.setFontSize(14);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Property Details", leftMargin, currentY);
+  currentY += lineHeight;
+
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "normal");
+  pdf.text(`Address: ${data.propertyAddress}`, leftMargin, currentY);
+  currentY += lineHeight;
+  pdf.text(`Room: ${data.roomDescription}`, leftMargin, currentY);
+  currentY += lineHeight;
+
+  currentY += 5;
+
+  // Financial Terms Section
+  pdf.setFontSize(14);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Financial Terms", leftMargin, currentY);
+  currentY += lineHeight;
+
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "normal");
+  pdf.text(
+    `Monthly Rent: ${formatCurrency({ amount: data.monthlyRent, currency: data.currency })}`,
+    leftMargin,
+    currentY
+  );
+  currentY += lineHeight;
+
+  if (data.securityDeposit) {
+    pdf.text(
+      `Security Deposit: ${formatCurrency({ amount: data.securityDeposit, currency: data.currency })}`,
+      leftMargin,
+      currentY
+    );
+    currentY += lineHeight;
+  }
+
+  currentY += 5;
+
+  // Agreement Terms Section
+  pdf.setFontSize(14);
+  pdf.setFont("helvetica", "bold");
+  pdf.text("Agreement Terms", leftMargin, currentY);
+  currentY += lineHeight;
+
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "normal");
+  
+  data.terms.forEach((term, index) => {
+    const termText = `${index + 1}. ${term}`;
+    const splitText = pdf.splitTextToSize(termText, rightMargin - leftMargin);
+    pdf.text(splitText, leftMargin, currentY);
+    currentY += lineHeight * splitText.length;
+  });
+
+  // Special Conditions
+  if (data.specialConditions) {
+    currentY += 5;
+    pdf.setFontSize(12);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Special Conditions", leftMargin, currentY);
+    currentY += lineHeight;
+
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "normal");
+    const splitConditions = pdf.splitTextToSize(data.specialConditions, rightMargin - leftMargin);
+    pdf.text(splitConditions, leftMargin, currentY);
+    currentY += lineHeight * splitConditions.length;
+  }
+
+  // Additional Notes
+  if (data.notes) {
+    currentY += 5;
+    pdf.setFontSize(12);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Additional Notes", leftMargin, currentY);
+    currentY += lineHeight;
+
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "normal");
+    const splitNotes = pdf.splitTextToSize(data.notes, rightMargin - leftMargin);
+    pdf.text(splitNotes, leftMargin, currentY);
+    currentY += lineHeight * splitNotes.length;
+  }
+
+  // Signature section
+  currentY += 15;
+  pdf.setFontSize(10);
+  pdf.setFont("helvetica", "normal");
+  
+  // Host signature
+  pdf.text("Host Signature: ___________________________", leftMargin, currentY);
+  currentY += lineHeight * 2;
+  pdf.text(`${data.hostName}`, leftMargin, currentY);
+  currentY += lineHeight;
+  pdf.text("Date: ___________", leftMargin, currentY);
+
+  // Seeker signature
+  currentY += 10;
+  pdf.text("Seeker Signature: ___________________________", leftMargin, currentY);
+  currentY += lineHeight * 2;
+  pdf.text(`${data.seekerName}`, leftMargin, currentY);
+  currentY += lineHeight;
+  pdf.text("Date: ___________", leftMargin, currentY);
+
+  // Generate PDF as buffer
+  return Buffer.from(pdf.output("arraybuffer"));
+}
+
+export function generatePDFResponse(pdfBuffer: Buffer, filename: string) {
+  return new Response(pdfBuffer, {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `inline; filename="${filename}.pdf"`,
+    },
+  });
+} 

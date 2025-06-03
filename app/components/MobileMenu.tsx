@@ -79,6 +79,7 @@ export function MobileMenu({ user }: MobileMenuProps) {
   const resourceItems = [
     { name: "Safety", href: "/safety", icon: Shield },
     { name: "Help", href: "/help", icon: HelpCircle },
+    { name: "Agreement Form", href: "/fill-agreement", icon: FileText },
   ];
 
   return (

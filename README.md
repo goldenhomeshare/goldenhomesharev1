@@ -36,3 +36,41 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 # goldenhomesharev1
 # goldenhomesharecolab
+
+## ✅ **Background Check Integration Fixed!**
+
+### **What Was Fixed:**
+1. ✅ **Database Operations:** Re-enabled saving background check records  
+2. ✅ **Webhook Endpoint:** Created `/api/checkr/webhook` to handle completion updates
+3. ✅ **User Verification:** Automatically updates `isVerified` when background check completes
+
+### **Required Setup:**
+
+#### **1. Configure Checkr Webhook (IMPORTANT)**
+In your [Checkr Dashboard](https://dashboard.checkr.com), set up a webhook:
+
+**Webhook URL:** `https://your-domain.com/api/checkr/webhook`
+**Events to Subscribe:**
+- `invitation.completed`
+- `report.completed` 
+- `invitation.canceled`
+- `invitation.expired`
+
+#### **2. Add Webhook Secret (Optional but Recommended)**
+Add to your `.env` file:
+```bash
+CHECKR_WEBHOOK_SECRET=your_webhook_secret_from_checkr
+```
+
+### **How it Works Now:**
+1. **User initiates background check** → Creates invitation & saves to database
+2. **User completes Checkr form** → Checkr sends webhook to your app  
+3. **Webhook processes completion** → Updates user's `isVerified` status
+4. **User is verified** → No more prompts to redo background check
+
+### **Testing:**
+1. **Complete a background check** through your app
+2. **Check the logs** for webhook events 
+3. **Verify user status** - should be `isVerified: true`
+
+The "keeps asking to redo" issue should now be resolved! 🎉

@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { User, Home, FileText, MessageCircle, Settings } from "lucide-react";
+import BackgroundCheckCard from "@/app/components/BackgroundCheckCard";
+import prisma from "@/app/lib/db";
 
 export default async function HousemateDashboardPage() {
   const user = await getCurrentUser();
@@ -16,6 +18,14 @@ export default async function HousemateDashboardPage() {
   if (userType !== "HOUSEMATE") {
     redirect("/onboarding");
   }
+
+  // Get user with background check status
+  const userWithStatus = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: {
+      isVerified: true,
+    }
+  });
 
   const housemateProfile = (user as any).housemateProfile;
 
@@ -76,6 +86,12 @@ export default async function HousemateDashboardPage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        {/* Background Check Card */}
+        <BackgroundCheckCard 
+          isVerified={userWithStatus?.isVerified || false}
+          checkrReportStatus={null}
+        />
+        
         {dashboardItems.map((item) => {
           const IconComponent = item.icon;
           return (

@@ -4,14 +4,14 @@ import Link from "next/link";
 
 export default function FillAgreementPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <Link href="/" className="flex items-center">
-                <div className="bg-primary rounded-full p-2 mr-3">
+                <div className="bg-stone-600 rounded-full p-2 mr-3">
                   <FileText className="h-6 w-6 text-white" />
                 </div>
                 <span className="text-xl font-bold text-gray-900">Golden HomeShare</span>
@@ -35,30 +35,29 @@ export default function FillAgreementPage() {
           {/* Page Header */}
           <div className="text-center mb-12">
             <div className="flex justify-center mb-4">
-              <div className="bg-primary/10 rounded-full p-3">
-                <FileText className="h-8 w-8 text-primary" />
+              <div className="bg-stone-100 rounded-full p-3">
+                <FileText className="h-8 w-8 text-stone-600" />
               </div>
             </div>
             <h1 className="text-4xl font-bold text-gray-900 mb-4">
-              Fill Your Golden HomeShare Agreement
+              📄 Agreement Generator
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Complete the form below to generate a personalized agreement for your homesharing arrangement. 
-              All information will be filled into the official Golden HomeShare licensing agreement.
+              Complete the form below to generate your personalized Golden HomeShare agreement
             </p>
           </div>
 
           {/* Important Notice */}
-          <div className="mb-8 p-6 bg-yellow-50 border border-yellow-200 rounded-xl">
+          <div className="mb-8 p-6 bg-amber-50 border border-amber-200 rounded-xl">
             <div className="flex items-start gap-3">
-              <Shield className="h-6 w-6 text-yellow-600 mt-1 flex-shrink-0" />
+              <Shield className="h-6 w-6 text-amber-600 mt-1 flex-shrink-0" />
               <div>
-                <h3 className="font-semibold text-yellow-900 mb-2">Important Legal Information</h3>
-                <p className="text-yellow-800 text-sm mb-2">
+                <h3 className="font-semibold text-amber-900 mb-2">Important Legal Information</h3>
+                <p className="text-amber-800 text-sm mb-2">
                   This form generates a <strong>licensing agreement, not a lease</strong>. This distinction is 
                   important for legal protection under Missouri law.
                 </p>
-                <ul className="text-yellow-800 text-sm space-y-1">
+                <ul className="text-amber-800 text-sm space-y-1">
                   <li>• Both parties should review the agreement carefully before signing</li>
                   <li>• Ensure compliance with local housing codes and municipal requirements</li>
                   <li>• Keep copies of the signed agreement for your records</li>

@@ -14,6 +14,7 @@ import {
   import { Badge } from "@/components/ui/badge";
   import { CheckCircle, Home, CreditCard } from "lucide-react";
   import Link from "next/link";
+  import { redirect } from "next/navigation";
   
   async function getData(userId: string) {
     const data = await prisma.user.findUnique({
@@ -45,6 +46,7 @@ import {
             },
           },
         },
+        agreement: true,
       },
     });
   
@@ -71,6 +73,16 @@ import {
     let approvedApplication = null;
     if (applicationId) {
       approvedApplication = await getApprovedApplication(applicationId, user.id);
+      
+      // Check if housemate needs to review and sign the agreement first
+      if (approvedApplication && approvedApplication.agreement) {
+        const agreement = approvedApplication.agreement;
+        
+        // If agreement exists but housemate hasn't signed, redirect to agreement review
+        if (!agreement.housemateSigned) {
+          redirect(`/housemate/agreement/${applicationId}`);
+        }
+      }
     }
   
     return (

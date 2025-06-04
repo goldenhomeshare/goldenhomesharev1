@@ -526,11 +526,26 @@ export async function ProcessApplicationPayment(formData: FormData) {
           },
         },
       },
+      agreement: true, // Include agreement to check signing status
     },
   });
 
   if (!application) {
     throw new Error("Application not found or not approved");
+  }
+
+  // Check if agreement exists and is fully signed
+  if (!application.agreement) {
+    throw new Error("No agreement found. Please wait for the homeowner to create the agreement.");
+  }
+
+  if (!application.agreement.homeownerSigned) {
+    throw new Error("Agreement not yet signed by homeowner. Please wait for homeowner to complete their signature.");
+  }
+
+  if (!application.agreement.housemateSigned) {
+    // Redirect to agreement review page instead of throwing error
+    return redirect(`/housemate/agreement/${applicationId}`);
   }
 
   const product = application.product;

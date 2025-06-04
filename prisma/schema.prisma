@@ -113,6 +113,9 @@ model Application {
   moveInDate      DateTime?         // When the applicant wants to move in
   moveOutDate     DateTime?         // When the applicant plans to move out (optional)
   
+  // Agreement relation
+  agreement       Agreement?
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -124,6 +127,38 @@ enum ApplicationStatus {
   APPROVED
   REJECTED
   WITHDRAWN
+}
+
+// Agreement model for tracking the signing flow
+model Agreement {
+  id                    String @id @default(uuid())
+  applicationId         String @unique
+  application           Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  
+  // Agreement content (form data from the agreement wizard)
+  agreementData         Json
+  
+  // Signing status
+  homeownerSigned       Boolean @default(false)
+  homeownerSignedAt     DateTime?
+  homeownerSignature    String?  // Name typed for e-signature
+  
+  housemateSigned       Boolean @default(false)
+  housemateSignedAt     DateTime?
+  housemateSignature    String?  // Name typed for e-signature
+  
+  // Status tracking
+  status                AgreementStatus @default(PENDING_HOMEOWNER)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum AgreementStatus {
+  PENDING_HOMEOWNER     // Waiting for homeowner to sign
+  PENDING_HOUSEMATE     // Waiting for housemate to sign
+  COMPLETED             // Both parties signed
+  CANCELLED             // Agreement cancelled
 }
 
 // Chat-related models for realtime messaging

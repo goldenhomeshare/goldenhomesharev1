@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, CheckCircle, XCircle, User, MessageSquare, Calendar, CalendarDays } from "lucide-react";
+import { Clock, CheckCircle, XCircle, User, MessageSquare, Calendar, CalendarDays, FileText } from "lucide-react";
 import Link from "next/link";
 import { ApplicationActionButtons } from "../../components/ApplicationActionButtons";
 import { format } from "date-fns";
@@ -103,7 +103,9 @@ export default async function HomeownerApplicationsPage() {
             className={`${getStatusColor(application.status)} flex items-center gap-1`}
           >
             {getStatusIcon(application.status)}
-            {application.status}
+            {application.status === "APPROVED" 
+              ? "APPROVED - CREATE AGREEMENT"
+              : application.status}
           </Badge>
         </div>
       </CardHeader>
@@ -190,6 +192,14 @@ export default async function HomeownerApplicationsPage() {
               </Link>
               {showActions && application.status === "PENDING" && (
                 <ApplicationActionButtons applicationId={application.id} />
+              )}
+              {application.status === "APPROVED" && (
+                <Link href={`/homeowner/agreement/${application.id}`}>
+                  <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Create Agreement
+                  </Button>
+                </Link>
               )}
             </div>
           </div>

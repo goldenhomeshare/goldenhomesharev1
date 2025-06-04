@@ -28,7 +28,7 @@ export function calculateAgeRange(dateOfBirth: string): string {
     
     // Calculate range (5 years on each side)
     let minAge = actualAge - 5;
-    let maxAge = actualAge + 5;
+    const maxAge = actualAge + 5;
     
     // Apply constraints
     minAge = Math.max(minAge, 18); // Minimum of 18

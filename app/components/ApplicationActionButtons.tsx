@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface ApplicationActionButtonsProps {
   applicationId: string;
@@ -30,23 +31,41 @@ async function updateApplicationStatus(applicationId: string, status: "APPROVED"
 
 export function ApplicationActionButtons({ applicationId }: ApplicationActionButtonsProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleStatusUpdate = async (status: "APPROVED" | "REJECTED") => {
+  const handleApprove = async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      await updateApplicationStatus(applicationId, status);
+      // Update the application status to APPROVED
+      await updateApplicationStatus(applicationId, "APPROVED");
       
-      toast.success(
-        status === "APPROVED" 
-          ? "Application approved! The housemate will be notified." 
-          : "Application rejected."
-      );
+      toast.success("Application approved! Now create the agreement to complete the process.", {
+        duration: 5000,
+      });
+      
+      // Redirect to the agreement page where the agreement must be created and signed
+      router.push(`/homeowner/agreement/${applicationId}`);
+      
+    } catch (error) {
+      console.error("Error approving application:", error);
+      toast.error("Failed to approve application. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleReject = async () => {
+    setIsLoading(true);
+    try {
+      await updateApplicationStatus(applicationId, "REJECTED");
+      toast.success("Application rejected successfully");
       
       // Refresh the page to update the UI
       window.location.reload();
+      
     } catch (error) {
-      toast.error("Failed to update application status. Please try again.");
-      console.error("Error updating application status:", error);
+      console.error("Error rejecting application:", error);
+      toast.error("Failed to reject application. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -55,29 +74,41 @@ export function ApplicationActionButtons({ applicationId }: ApplicationActionBut
   return (
     <div className="flex gap-2">
       <Button
-        size="sm"
-        variant="destructive"
-        onClick={() => handleStatusUpdate("REJECTED")}
+        onClick={handleApprove}
         disabled={isLoading}
+        className="bg-green-600 hover:bg-green-700 text-white"
+        size="sm"
       >
         {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          <>
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            Approving...
+          </>
         ) : (
-          <XCircle className="h-4 w-4 mr-2" />
+          <>
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Approve & Create Agreement
+          </>
         )}
-        Reject
       </Button>
+      
       <Button
-        size="sm"
-        onClick={() => handleStatusUpdate("APPROVED")}
+        onClick={handleReject}
         disabled={isLoading}
+        variant="destructive"
+        size="sm"
       >
         {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+          <>
+            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            Rejecting...
+          </>
         ) : (
-          <CheckCircle className="h-4 w-4 mr-2" />
+          <>
+            <XCircle className="h-4 w-4 mr-2" />
+            Reject
+          </>
         )}
-        Approve
       </Button>
     </div>
   );

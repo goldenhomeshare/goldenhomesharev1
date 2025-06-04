@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
     const addText = (page: any, text: string, x: number, y: number, fontSize = 10, fontType = font, maxWidth = 500, color = rgb(0, 0, 0)) => {
       if (!text || !text.trim() || text === 'undefined' || text === 'null') return y;
       const words = text.trim().split(' ');
-      let lines = [];
+      const lines = [];
       let currentLine = '';
       
       for (const word of words) {
@@ -711,7 +711,7 @@ export async function POST(request: NextRequest) {
       'offlimits': '[✓] TV off-limits'
     };
     
-    y = addText(page10, tvUsageText[formData.tvUsage] || tvUsageText['anytime'], 70, y, 10, font);
+    y = addText(page10, tvUsageText[formData.tvUsage as keyof typeof tvUsageText] || tvUsageText['anytime'], 70, y, 10, font);
     y -= 8;
 
     if (formData.tvUsage === 'limited' && formData.tvLimitedHours) {
@@ -731,7 +731,7 @@ export async function POST(request: NextRequest) {
       'offlimits': '[✓] Playing music off-limits'
     };
 
-    y = addText(page10, musicUsageText[formData.musicUsage] || musicUsageText['anytime'], 70, y, 10, font);
+    y = addText(page10, musicUsageText[formData.musicUsage as keyof typeof musicUsageText] || musicUsageText['anytime'], 70, y, 10, font);
     y -= 8;
 
     if (formData.musicUsage === 'limited' && formData.musicLimitedHours) {
@@ -933,7 +933,7 @@ export async function POST(request: NextRequest) {
       'nopreference': '[✓] Longer than overnight is fine/no preference'
     };
 
-    y = addText(page11, dishPolicyText[formData.dishesPolicy] || dishPolicyText['rightaway'], 70, y, 10, font);
+    y = addText(page11, dishPolicyText[formData.dishesPolicy as keyof typeof dishPolicyText] || dishPolicyText['rightaway'], 70, y, 10, font);
     y -= 8;
 
     // =========================== PAGE 12 - HOUSE RULES FINAL SECTION ===========================
@@ -952,7 +952,7 @@ export async function POST(request: NextRequest) {
       'nopreference': '[✓] Longer than a few days is fine/no preference'
     };
 
-    y = addText(page12, foodPolicyText[formData.expiredFoodPolicy] || foodPolicyText['rightaway'], 70, y, 10, font);
+    y = addText(page12, foodPolicyText[formData.expiredFoodPolicy as keyof typeof foodPolicyText] || foodPolicyText['rightaway'], 70, y, 10, font);
     y -= 8;
     y -= 15;
 

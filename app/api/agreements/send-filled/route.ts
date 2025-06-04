@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
         if (!text || !text.trim()) return y;
         
         const words = text.trim().split(' ');
-        let lines = [];
+        const lines = [];
         let currentLine = '';
         
         for (const word of words) {

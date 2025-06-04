@@ -32,6 +32,10 @@ model User {
   housemateChats        ChatRoom[] @relation("HousemateChats")
   sentMessages          Message[]  @relation("SentMessages")
 
+  // Background check relations
+  background_checks_background_checks_candidateUserIdToUser background_checks[] @relation("background_checks_candidateUserIdToUser")
+  background_checks_background_checks_requestedByIdToUser   background_checks[] @relation("background_checks_requestedByIdToUser")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -159,6 +163,41 @@ enum AgreementStatus {
   PENDING_HOUSEMATE     // Waiting for housemate to sign
   COMPLETED             // Both parties signed
   CANCELLED             // Agreement cancelled
+}
+
+// Background checks model
+model background_checks {
+  id                                           String                @id
+  candidateId                                  String                @unique
+  invitationId                                 String?
+  reportId                                     String?
+  requestedById                                String?
+  candidateUserId                              String?
+  candidateEmail                               String
+  candidateName                                String
+  candidatePhone                               String?
+  status                                       BackgroundCheckStatus @default(PENDING)
+  checkrStatus                                 String?
+  invitationUrl                                String?
+  invitationStatus                             String?
+  completedAt                                  DateTime?
+  invitationSentAt                             DateTime?
+  createdAt                                    DateTime              @default(now())
+  updatedAt                                    DateTime
+  User_background_checks_candidateUserIdToUser User?                 @relation("background_checks_candidateUserIdToUser", fields: [candidateUserId], references: [id])
+  User_background_checks_requestedByIdToUser   User?                 @relation("background_checks_requestedByIdToUser", fields: [requestedById], references: [id])
+}
+
+enum BackgroundCheckStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CLEAR
+  CONSIDER
+  DISPUTE
+  EXPIRED
+  DECLINED
+  FAILED
 }
 
 // Chat-related models for realtime messaging

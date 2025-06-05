@@ -10,7 +10,7 @@ export default function BackgroundCheckForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | React.ReactNode | null>(null);
 
   const handleInitiateCheck = async () => {
     setIsLoading(true);
@@ -37,13 +37,31 @@ export default function BackgroundCheckForm() {
       // For hosted flow, redirect to Checkr's hosted page
       if (data.redirectUrl || data.invitationUrl) {
         const redirectUrl = data.redirectUrl || data.invitationUrl;
-        console.log("Redirecting to Checkr hosted page:", redirectUrl);
+        console.log("Opening Checkr hosted page in new window:", redirectUrl);
         
-        // Open in current window (recommended for hosted flow)
-        window.location.href = redirectUrl;
+        // Open in new window so user can return to this page
+        const newWindow = window.open(redirectUrl, '_blank', 'width=1024,height=768,scrollbars=yes,resizable=yes');
         
-        // Set success message in case redirect fails
-        setSuccess("Redirecting to secure background check form...");
+        if (!newWindow) {
+          // If popup was blocked, show message with link
+          setSuccess(
+            <>
+              <div>Background check created! Please complete it in Checkr's secure platform.</div>
+              <div className="mt-2">
+                <a 
+                  href={redirectUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 underline"
+                >
+                  Open Background Check <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            </>
+          );
+        } else {
+          setSuccess("Background check opened in new window. Complete it there and return here to see your status.");
+        }
       } else {
         setSuccess("Background check invitation created successfully! You will receive an email with further instructions.");
       }
@@ -63,8 +81,8 @@ export default function BackgroundCheckForm() {
             <CheckCircle className="w-6 h-6" />
             <div>
               <h3 className="font-semibold">Background Check Initiated</h3>
-              <p className="text-sm mt-1">{success}</p>
-              {success.includes("Redirecting") && (
+              <div className="text-sm mt-1">{success}</div>
+              {typeof success === 'string' && success.includes("Redirecting") && (
                 <p className="text-xs mt-2">If you're not redirected automatically, check your email for the invitation link.</p>
               )}
             </div>

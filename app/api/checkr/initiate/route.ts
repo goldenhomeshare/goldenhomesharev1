@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/app/lib/db";
 import { checkr } from "@/app/lib/checkr";
 import { z } from "zod";
+import crypto from "crypto";
 
 const initiateBackgroundCheckSchema = z.object({
   package: z.string().optional().default("basic_plus_criminal"),
@@ -55,35 +56,40 @@ export async function POST(request: NextRequest) {
     // Check if user already has a background check in progress
     try {
       console.log("[Background Check] Checking for existing background checks...");
-      console.log("[Background Check] Using candidateEmail:", user.email);
+      console.log("[Background Check] Using candidateEmail:", user.email, "and candidateUserId:", user.id);
       
-      // Debug: Check what properties are available on prisma
-      console.log("[Background Check] Available Prisma properties:", Object.keys(prisma));
-      console.log("[Background Check] backgroundCheck available?", !!prisma.backgroundCheck);
-      console.log("[Background Check] background_checks available?", !!(prisma as any).background_checks);
-      
-      // Use the actual property name that exists
-      const backgroundCheckModel = prisma.backgroundCheck || (prisma as any).background_checks;
-      
-      if (!backgroundCheckModel) {
-        throw new Error("Background check model not found in Prisma client");
-      }
-      
-      // TEMPORARILY COMMENT OUT DATABASE OPERATIONS FOR TESTING
-      console.log("[Background Check] CHECKING DATABASE FOR EXISTING CHECKS...");
-      
-      const existingCheck = await backgroundCheckModel.findFirst({
+      // First check by candidateUserId
+      let existingCheck = await prisma.background_checks.findFirst({
         where: { 
-          candidateEmail: user.email,
-          status: { in: ["PENDING", "IN_PROGRESS", "COMPLETED"] }
+          candidateUserId: user.id,
+          status: { in: ["PENDING", "IN_PROGRESS"] }
         },
       });
 
+      // If not found by user ID, check by email
+      if (!existingCheck) {
+        existingCheck = await prisma.background_checks.findFirst({
+          where: { 
+            candidateEmail: user.email,
+            status: { in: ["PENDING", "IN_PROGRESS"] }
+          },
+        });
+
+        // If found by email but candidateUserId is null, fix it
+        if (existingCheck && !existingCheck.candidateUserId) {
+          console.log("[Background Check] Fixing candidateUserId for existing check:", existingCheck.id);
+          await prisma.background_checks.update({
+            where: { id: existingCheck.id },
+            data: { candidateUserId: user.id }
+          });
+        }
+      }
+
       console.log("[Background Check] Existing check result:", existingCheck ? "Found" : "None");
 
-      if (existingCheck && existingCheck.status !== "FAILED") {
+      if (existingCheck && (existingCheck.status === "PENDING" || existingCheck.status === "IN_PROGRESS")) {
         return NextResponse.json({
-          message: "Background check already exists",
+          message: "Background check already in progress",
           invitationId: existingCheck.invitationId,
           invitationUrl: existingCheck.invitationUrl,
           status: existingCheck.status,
@@ -92,8 +98,13 @@ export async function POST(request: NextRequest) {
       }
     } catch (dbError) {
       console.error("[Background Check] Database check failed:", dbError);
-      // Continue without database check for now
-      console.log("[Background Check] Continuing without database check...");
+      
+      // If the table doesn't exist, continue without database check
+      if (dbError instanceof Error && dbError.message.includes("does not exist")) {
+        console.log("[Background Check] Background checks table does not exist yet - continuing without check");
+      } else {
+        console.log("[Background Check] Continuing without database check...");
+      }
     }
 
     // Check if user already has a completed verification
@@ -104,11 +115,9 @@ export async function POST(request: NextRequest) {
         select: { isVerified: true }
       });
 
-      if (userRecord?.isVerified) {
-        return NextResponse.json({ 
-          error: "Background check already completed successfully" 
-        }, { status: 400 });
-      }
+      // Removed the check that prevents verified users from initiating new background checks
+      // Users should be able to initiate new background checks even when already verified
+      
     } catch (userCheckError) {
       console.error("[Background Check] Error checking user verification status:", userCheckError);
       return NextResponse.json({ 
@@ -218,17 +227,10 @@ export async function POST(request: NextRequest) {
           invitationId: backgroundCheckData.invitationId.substring(0, 8) + "..."
         });
 
-        // Use the same dynamic model resolution
-        const backgroundCheckModel = prisma.backgroundCheck || (prisma as any).background_checks;
-        
-        if (!backgroundCheckModel) {
-          throw new Error("Background check model not found in Prisma client");
-        }
-
         // TEMPORARILY COMMENT OUT DATABASE SAVE FOR TESTING
         console.log("[Background Check] SAVING TO DATABASE...");
         
-        const savedCheck = await backgroundCheckModel.create({
+        const savedCheck = await prisma.background_checks.create({
           data: backgroundCheckData,
         });
 

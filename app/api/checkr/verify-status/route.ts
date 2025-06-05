@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/app/lib/db";
+import { checkr } from "@/app/lib/checkr";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,19 +14,8 @@ export async function POST(request: NextRequest) {
 
     console.log("[Verify Status] Checking for user:", user.email);
 
-    // Check if user has any completed background checks
-    const backgroundCheckModel = (prisma as any).background_checks;
-    
-    if (!backgroundCheckModel) {
-      console.error("[Verify Status] Background check model not found");
-      return NextResponse.json({
-        success: false,
-        message: "Background check model not available",
-        isVerified: false
-      });
-    }
-    
-    const completedBackgroundCheck = await backgroundCheckModel.findFirst({
+    // First check if user has any completed background checks
+    let completedBackgroundCheck = await prisma.background_checks.findFirst({
       where: {
         candidateEmail: user.email,
         status: { in: ["COMPLETED", "CLEAR"] }
@@ -35,10 +25,10 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    console.log("[Verify Status] Background check found:", !!completedBackgroundCheck);
+    console.log("[Verify Status] Local completed check found:", !!completedBackgroundCheck);
 
     if (completedBackgroundCheck) {
-      // Update user verification status if not already verified
+      // User already has a completed check
       if (!user.isVerified) {
         await prisma.user.update({
           where: { id: user.id },
@@ -61,13 +51,77 @@ export async function POST(request: NextRequest) {
           backgroundCheckId: completedBackgroundCheck.id
         });
       }
+    }
+
+    // If no completed check found locally, check for pending ones and sync with Checkr
+    const pendingCheck = await prisma.background_checks.findFirst({
+      where: {
+        candidateEmail: user.email,
+        status: "PENDING"
+      },
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
+
+    if (pendingCheck && pendingCheck.invitationId) {
+      console.log("[Verify Status] Found pending check, syncing with Checkr...");
+      
+      try {
+        // Check status with Checkr API
+        const invitation = await checkr.getInvitation(pendingCheck.invitationId);
+        console.log(`[Verify Status] Checkr invitation status: ${invitation.status}`);
+
+        if (invitation.status === 'completed') {
+          console.log("[Verify Status] Invitation completed, updating database...");
+          
+          // Update the background check as completed
+          const updatedCheck = await prisma.background_checks.update({
+            where: { id: pendingCheck.id },
+            data: {
+              status: "COMPLETED",
+              checkrStatus: invitation.report?.result || "clear",
+              reportId: invitation.report?.id || null,
+              completedAt: new Date(),
+              updatedAt: new Date()
+            }
+          });
+
+          // Update user verification status
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { isVerified: true }
+          });
+
+          console.log("[Verify Status] Background check synced and user verified!");
+
+          return NextResponse.json({
+            success: true,
+            message: "Background check completed and verified",
+            isVerified: true,
+            backgroundCheckId: updatedCheck.id,
+            synced: true
+          });
     } else {
+          console.log(`[Verify Status] Invitation still ${invitation.status}`);
+          return NextResponse.json({
+            success: true,
+            message: `Background check is ${invitation.status}`,
+            isVerified: false,
+            status: invitation.status
+          });
+        }
+      } catch (checkrError) {
+        console.error("[Verify Status] Error checking with Checkr:", checkrError);
+        // Continue with local database result
+      }
+    }
+
       return NextResponse.json({
         success: true,
         message: "No completed background check found",
         isVerified: false
       });
-    }
 
   } catch (error) {
     console.error("[Verify Status] Error:", error);

@@ -1,0 +1,17 @@
+🔍 BACKGROUND CHECK SYNC DIAGNOSTIC TOOL
+=========================================
+
+📊 Running comprehensive system analysis...
+
+📊 SYSTEM-WIDE ANALYSIS
+==============================
+
+📈 OVERALL STATISTICS:
+  Total Users: 5
+  Verified Users: 1 (20.0%)
+  Total Background Checks: 1
+
+📊 BACKGROUND CHECK STATUS BREAKDOWN:
+  COMPLETED: 1
+
+🚨 POTENTIAL ISSUES:

@@ -39,12 +39,14 @@ export function ApplicationActionButtons({ applicationId }: ApplicationActionBut
       // Update the application status to APPROVED
       await updateApplicationStatus(applicationId, "APPROVED");
       
-      toast.success("Application approved! Now create the agreement to complete the process.", {
-        duration: 5000,
+      toast.success("Application approved! Redirecting to create agreement...", {
+        duration: 4000,
       });
       
-      // Redirect to the agreement page where the agreement must be created and signed
-      router.push(`/homeowner/agreement/${applicationId}`);
+      // Small delay to ensure UI updates and user sees the success message
+      setTimeout(() => {
+        router.push(`/homeowner/agreement/${applicationId}`);
+      }, 1000);
       
     } catch (error) {
       console.error("Error approving application:", error);

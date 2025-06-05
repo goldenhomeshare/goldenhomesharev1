@@ -41,7 +41,41 @@ export interface AgreementFormData {
   endDate: string;
   agreementLength?: string;
   
-  // Area Access Properties
+  // Enhanced Room and Space Descriptions
+  // Required Bedroom Section
+  bedroomDescription?: string;
+  
+  // Required Bathroom Section 
+  bathroomType?: 'private' | 'shared';
+  bathroomDescription?: string;
+  
+  // Optional Additional Room Access
+  additionalRooms?: Array<{
+    name: string;
+    description: string;
+  }>;
+  
+  // Predefined Shared Spaces (toggleable)
+  kitchenAccess?: boolean;
+  kitchenNotes?: string;
+  laundryAccess?: boolean;
+  laundryNotes?: string;
+  livingRoomAccess?: boolean;
+  livingRoomNotes?: string;
+  diningRoomAccess?: boolean;
+  diningRoomNotes?: string;
+  parkingAccess?: boolean;
+  parkingNotes?: string;
+  indoorStorageAccess?: boolean;
+  indoorStorageNotes?: string;
+  outdoorAccess?: boolean;
+  outdoorNotes?: string;
+  additionalSharedAreas?: string;
+  
+  // Governing Conditions for Shared Space Use
+  sharedSpaceConditions?: string;
+  
+  // Legacy Area Access Properties (keep for backward compatibility)
   bedroomAAccess?: boolean;
   bedroomANotes?: string;
   bedroomBAccess?: boolean;
@@ -50,16 +84,10 @@ export interface AgreementFormData {
   otherAreasNotes?: string;
   livingAreaAccess?: boolean;
   livingAreaNotes?: string;
-  kitchenAccess?: boolean;
-  kitchenNotes?: string;
   diningAreaAccess?: boolean;
   diningAreaNotes?: string;
   laundryAreaAccess?: boolean;
   laundryAreaNotes?: string;
-  indoorStorageAccess?: boolean;
-  indoorStorageNotes?: string;
-  parkingAreaAccess?: boolean;
-  parkingAreaNotes?: string;
   outdoorAreaAccess?: boolean;
   outdoorAreaNotes?: string;
   outdoorStorageAccess?: boolean;
@@ -224,7 +252,7 @@ export function FillableAgreementForm({
   // Helper function to extract support tasks from listings
   const extractSupportTasksFromListings = (listings: any[]) => {
     const allSupportTasks: any[] = [];
-    listings.forEach(listing => {
+    listings.forEach((listing, index) => {
       if (listing.supportRequested && Array.isArray(listing.supportRequested)) {
         allSupportTasks.push(...listing.supportRequested);
       }
@@ -389,6 +417,12 @@ export function FillableAgreementForm({
 
   // Initialize form data with defaults and populate from homeowner data if available
   const getInitialFormData = (): AgreementFormData => {
+    console.log('FillableAgreementForm getInitialFormData called with:', {
+      hasHomeownerData: !!homeownerData,
+      homeownerListings: homeownerData?.listings?.length || 0,
+      hasPrePopulatedData: !!prePopulatedData
+    });
+    
     const defaultData: AgreementFormData = {
       // Basic Agreement Information
       effectiveDate: "",
@@ -410,7 +444,7 @@ export function FillableAgreementForm({
       
       // Financial Terms
       monthlyAmount: "",
-      securityDeposit: "",
+      securityDeposit: "0",
       
       // Agreement Terms
       moveInDate: "",
@@ -477,14 +511,35 @@ export function FillableAgreementForm({
       specialConditions: "",
       additionalNotes: "",
       
-      // Area Access Properties
-      bedroomAAccess: true,
+      // Enhanced Room and Space Descriptions
+      bedroomDescription: "",
+      bathroomType: 'shared' as const,
+      bathroomDescription: "",
+      additionalRooms: [],
       kitchenAccess: true,
+      kitchenNotes: "",
+      laundryAccess: true,
+      laundryNotes: "",
+      livingRoomAccess: true,
+      livingRoomNotes: "",
+      diningRoomAccess: true,
+      diningRoomNotes: "",
+      parkingAccess: false,
+      parkingNotes: "",
+      indoorStorageAccess: false,
+      indoorStorageNotes: "",
+      outdoorAccess: true,
+      outdoorNotes: "",
+      additionalSharedAreas: "",
+      sharedSpaceConditions: "",
+      
+      // Legacy Area Access Properties (for backward compatibility)
+      bedroomAAccess: true,
+      bedroomBAccess: false,
+      otherAreasAccess: false,
       livingAreaAccess: true,
       diningAreaAccess: true,
       laundryAreaAccess: true,
-      indoorStorageAccess: false,
-      parkingAreaAccess: false,
       outdoorAreaAccess: true,
       outdoorStorageAccess: false,
       otherSharedAccess: false,
@@ -492,19 +547,16 @@ export function FillableAgreementForm({
       bedroomBNotes: "",
       otherAreasNotes: "",
       livingAreaNotes: "",
-      kitchenNotes: "",
       diningAreaNotes: "",
       laundryAreaNotes: "",
-      indoorStorageNotes: "",
-      parkingAreaNotes: "",
       outdoorAreaNotes: "",
       outdoorStorageNotes: "",
       otherSharedNotes: "",
       specificItemsOwnership: ""
     };
 
-    // Auto-populate from homeowner data if no prePopulatedData is provided
-    if (homeownerData && !prePopulatedData) {
+    // Auto-populate from homeowner data (always extract support services and house rules)
+    if (homeownerData) {
       const { user, homeownerProfile, listings } = homeownerData;
       
       // Auto-populate host info
@@ -542,6 +594,11 @@ export function FillableAgreementForm({
       
       // Extract support tasks from listings
       const supportTasks = extractSupportTasksFromListings(listings);
+      console.log('Support tasks extraction:', {
+        listingCount: listings.length,
+        extractedTasks: supportTasks,
+        firstListingSupport: listings[0]?.supportRequested
+      });
       defaultData.supportRequested = supportTasks;
       
       // Apply house rule updates
@@ -601,7 +658,7 @@ export function FillableAgreementForm({
   const validateForm = (): boolean => {
     const requiredFields: (keyof AgreementFormData)[] = [
       'effectiveDate', 'hostName', 'hostEmail', 'seekerName', 'seekerEmail',
-      'propertyAddress', 'monthlyAmount', 'securityDeposit', 'moveInDate', 'endDate'
+      'propertyAddress', 'monthlyAmount', 'moveInDate', 'endDate'
     ];
     
     const missingFields = requiredFields.filter(field => !formData[field]);
@@ -646,6 +703,17 @@ export function FillableAgreementForm({
 
     if (!formData.expiredFoodPolicy) {
       toast.error("Please select an expired food policy");
+      return false;
+    }
+
+    // Validate required room and space descriptions
+    if (!formData.bedroomDescription?.trim()) {
+      toast.error("Please provide a bedroom description");
+      return false;
+    }
+
+    if (!formData.bathroomType) {
+      toast.error("Please select a bathroom type");
       return false;
     }
 
@@ -986,6 +1054,417 @@ export function FillableAgreementForm({
 
             <Separator className="bg-stone-200" />
 
+            {/* Enhanced Room and Space Descriptions */}
+            <div className="space-y-6 my-8">
+              <div className="flex items-center gap-2 mb-6">
+                <Home className="h-5 w-5 text-gray-600" />
+                <h3 className="text-xl font-semibold text-gray-900">Room & Space Access</h3>
+              </div>
+              
+              {/* Required Bedroom Section */}
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                    <Home className="w-4 h-4 text-gray-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900">
+                    Bedroom Details <span className="text-red-500">*</span>
+                  </h4>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="bedroomDescription" className="text-base font-medium">
+                      Bedroom Description
+                    </Label>
+                    <Textarea
+                      id="bedroomDescription"
+                      value={formData.bedroomDescription || ''}
+                      onChange={(e) => handleInputChange('bedroomDescription', e.target.value)}
+                      placeholder="Describe the bedroom (size, furnishing, windows, notable features, etc.)"
+                      rows={3}
+                      className="mt-2 rounded-lg"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Required Bathroom Section */}
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                    <Home className="w-4 h-4 text-gray-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900">
+                    Bathroom Access <span className="text-red-500">*</span>
+                  </h4>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-base font-medium">Bathroom Type</Label>
+                    <Select value={formData.bathroomType || 'shared'} onValueChange={(value) => handleInputChange('bathroomType', value)}>
+                      <SelectTrigger className="mt-2 rounded-lg">
+                        <SelectValue placeholder="Select bathroom type..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="private">Private Bathroom</SelectItem>
+                        <SelectItem value="shared">Shared Bathroom</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="bathroomDescription" className="text-base font-medium">
+                      Bathroom Details
+                    </Label>
+                    <Textarea
+                      id="bathroomDescription"
+                      value={formData.bathroomDescription || ''}
+                      onChange={(e) => handleInputChange('bathroomDescription', e.target.value)}
+                      placeholder="Describe bathroom location, features, and any relevant details"
+                      rows={2}
+                      className="mt-2 rounded-lg"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Optional Additional Room Access */}
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                      <Plus className="w-4 h-4 text-gray-600" />
+                    </div>
+                    <h4 className="text-lg font-semibold text-gray-900">Additional Room Access</h4>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const newRooms = [...(formData.additionalRooms || []), { name: '', description: '' }];
+                      setFormData(prev => ({ ...prev, additionalRooms: newRooms }));
+                    }}
+                    className="rounded-lg"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Add Room
+                  </Button>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">
+                  Add any additional rooms the housemate may access (e.g., office, basement, storage room)
+                </p>
+                
+                {formData.additionalRooms && formData.additionalRooms.length > 0 ? (
+                  <div className="space-y-3">
+                    {formData.additionalRooms.map((room, index) => (
+                      <div key={index} className="flex gap-3 items-start p-3 bg-gray-50 rounded-lg">
+                        <div className="flex-1 space-y-2">
+                          <Input
+                            value={room.name}
+                            onChange={(e) => {
+                              const newRooms = [...(formData.additionalRooms || [])];
+                              newRooms[index] = { ...newRooms[index], name: e.target.value };
+                              setFormData(prev => ({ ...prev, additionalRooms: newRooms }));
+                            }}
+                            placeholder="Room name (e.g., Home Office)"
+                            className="rounded-lg"
+                          />
+                          <Input
+                            value={room.description}
+                            onChange={(e) => {
+                              const newRooms = [...(formData.additionalRooms || [])];
+                              newRooms[index] = { ...newRooms[index], description: e.target.value };
+                              setFormData(prev => ({ ...prev, additionalRooms: newRooms }));
+                            }}
+                            placeholder="Brief description and access details"
+                            className="rounded-lg"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const newRooms = formData.additionalRooms?.filter((_, i) => i !== index) || [];
+                            setFormData(prev => ({ ...prev, additionalRooms: newRooms }));
+                          }}
+                          className="text-red-600 hover:text-red-700 rounded-lg"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 italic">No additional rooms added yet</p>
+                )}
+              </div>
+
+              {/* Predefined Shared Spaces */}
+              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                    <Settings className="w-4 h-4 text-gray-600" />
+                  </div>
+                  <h4 className="text-lg font-semibold text-gray-900">Shared Space Access</h4>
+                </div>
+                <p className="text-sm text-gray-600 mb-6">
+                  Select which shared spaces the housemate may access and add any specific details or conditions
+                </p>
+                
+                <div className="space-y-4">
+                  {/* Kitchen */}
+                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <input
+                        type="checkbox"
+                        id="kitchenAccess"
+                        checked={formData.kitchenAccess || false}
+                        onChange={(e) => handleCheckboxChange('kitchenAccess', e.target.checked)}
+                        className="mt-1 w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor="kitchenAccess" className="text-base font-medium cursor-pointer">
+                          Kitchen Access
+                        </Label>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Access to kitchen facilities and appliances
+                        </p>
+                      </div>
+                    </div>
+                    {formData.kitchenAccess && (
+                      <div className="ml-7">
+                        <Input
+                          value={formData.kitchenNotes || ''}
+                          onChange={(e) => handleInputChange('kitchenNotes', e.target.value)}
+                          placeholder="Any kitchen-specific details or restrictions"
+                          className="rounded-lg bg-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Laundry */}
+                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <input
+                        type="checkbox"
+                        id="laundryAccess"
+                        checked={formData.laundryAccess || false}
+                        onChange={(e) => handleCheckboxChange('laundryAccess', e.target.checked)}
+                        className="mt-1 w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor="laundryAccess" className="text-base font-medium cursor-pointer">
+                          Laundry Access
+                        </Label>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Access to washing machine and dryer
+                        </p>
+                      </div>
+                    </div>
+                    {formData.laundryAccess && (
+                      <div className="ml-7">
+                        <Input
+                          value={formData.laundryNotes || ''}
+                          onChange={(e) => handleInputChange('laundryNotes', e.target.value)}
+                          placeholder="Laundry schedule or guidelines"
+                          className="rounded-lg bg-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Living Room */}
+                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <input
+                        type="checkbox"
+                        id="livingRoomAccess"
+                        checked={formData.livingRoomAccess || false}
+                        onChange={(e) => handleCheckboxChange('livingRoomAccess', e.target.checked)}
+                        className="mt-1 w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor="livingRoomAccess" className="text-base font-medium cursor-pointer">
+                          Living Room
+                        </Label>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Access to main living and entertainment area
+                        </p>
+                      </div>
+                    </div>
+                    {formData.livingRoomAccess && (
+                      <div className="ml-7">
+                        <Input
+                          value={formData.livingRoomNotes || ''}
+                          onChange={(e) => handleInputChange('livingRoomNotes', e.target.value)}
+                          placeholder="Living room guidelines or restrictions"
+                          className="rounded-lg bg-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Dining Room */}
+                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <input
+                        type="checkbox"
+                        id="diningRoomAccess"
+                        checked={formData.diningRoomAccess || false}
+                        onChange={(e) => handleCheckboxChange('diningRoomAccess', e.target.checked)}
+                        className="mt-1 w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor="diningRoomAccess" className="text-base font-medium cursor-pointer">
+                          Dining Room
+                        </Label>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Access to formal dining area
+                        </p>
+                      </div>
+                    </div>
+                    {formData.diningRoomAccess && (
+                      <div className="ml-7">
+                        <Input
+                          value={formData.diningRoomNotes || ''}
+                          onChange={(e) => handleInputChange('diningRoomNotes', e.target.value)}
+                          placeholder="Dining area details"
+                          className="rounded-lg bg-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Parking */}
+                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <input
+                        type="checkbox"
+                        id="parkingAccess"
+                        checked={formData.parkingAccess || false}
+                        onChange={(e) => handleCheckboxChange('parkingAccess', e.target.checked)}
+                        className="mt-1 w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor="parkingAccess" className="text-base font-medium cursor-pointer">
+                          Parking
+                        </Label>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Dedicated parking space or garage access
+                        </p>
+                      </div>
+                    </div>
+                    {formData.parkingAccess && (
+                      <div className="ml-7">
+                        <Input
+                          value={formData.parkingNotes || ''}
+                          onChange={(e) => handleInputChange('parkingNotes', e.target.value)}
+                          placeholder="Parking spot details or restrictions"
+                          className="rounded-lg bg-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Indoor Storage */}
+                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <input
+                        type="checkbox"
+                        id="indoorStorageAccess"
+                        checked={formData.indoorStorageAccess || false}
+                        onChange={(e) => handleCheckboxChange('indoorStorageAccess', e.target.checked)}
+                        className="mt-1 w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor="indoorStorageAccess" className="text-base font-medium cursor-pointer">
+                          Indoor Storage
+                        </Label>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Access to closets, cabinets, or storage rooms
+                        </p>
+                      </div>
+                    </div>
+                    {formData.indoorStorageAccess && (
+                      <div className="ml-7">
+                        <Input
+                          value={formData.indoorStorageNotes || ''}
+                          onChange={(e) => handleInputChange('indoorStorageNotes', e.target.value)}
+                          placeholder="Storage area details"
+                          className="rounded-lg bg-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Outdoor Access */}
+                  <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                    <div className="flex items-start gap-3 mb-3">
+                      <input
+                        type="checkbox"
+                        id="outdoorAccess"
+                        checked={formData.outdoorAccess || false}
+                        onChange={(e) => handleCheckboxChange('outdoorAccess', e.target.checked)}
+                        className="mt-1 w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor="outdoorAccess" className="text-base font-medium cursor-pointer">
+                          Outdoor Access
+                        </Label>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Access to yard, patio, deck, or garden areas
+                        </p>
+                      </div>
+                    </div>
+                    {formData.outdoorAccess && (
+                      <div className="ml-7">
+                        <Input
+                          value={formData.outdoorNotes || ''}
+                          onChange={(e) => handleInputChange('outdoorNotes', e.target.value)}
+                          placeholder="Yard, patio, or outdoor space details"
+                          className="rounded-lg bg-white"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Additional Shared Areas */}
+                <div className="mt-6 space-y-3">
+                  <Label htmlFor="additionalSharedAreas" className="text-base font-medium">
+                    Additional Shared Areas
+                  </Label>
+                  <Textarea
+                    id="additionalSharedAreas"
+                    value={formData.additionalSharedAreas || ''}
+                    onChange={(e) => handleInputChange('additionalSharedAreas', e.target.value)}
+                    placeholder="Describe any other shared spaces not listed above"
+                    rows={2}
+                    className="rounded-lg"
+                  />
+                </div>
+
+                {/* Governing Conditions */}
+                <div className="mt-6 space-y-3">
+                  <Label htmlFor="sharedSpaceConditions" className="text-base font-medium">
+                    Shared Space Guidelines
+                  </Label>
+                  <Textarea
+                    id="sharedSpaceConditions"
+                    value={formData.sharedSpaceConditions || ''}
+                    onChange={(e) => handleInputChange('sharedSpaceConditions', e.target.value)}
+                    placeholder="General expectations for shared space use (e.g., time restrictions, cleanliness requirements, etc.)"
+                    rows={3}
+                    className="rounded-lg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator className="bg-stone-200" />
+
             {/* Monthly Fee */}
             <div className="space-y-4 my-6">
               <div className="flex items-center gap-2 mb-3">
@@ -1026,7 +1505,7 @@ export function FillableAgreementForm({
                 </p>
               </div>
               
-              {formData.supportRequested.length > 0 && (
+              {formData.supportRequested.length > 0 ? (
                 <div className="space-y-2">
                   <Label className="text-sm font-medium">Services from Profile:</Label>
                   <div className="grid gap-2">
@@ -1055,6 +1534,17 @@ export function FillableAgreementForm({
                       );
                     })}
                   </div>
+                </div>
+              ) : (
+                <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-sm text-gray-600">
+                    No support services specified in the listing. Support requirements can be added to the listing details for automatic import.
+                  </p>
+                  {homeownerData?.listings && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      Checking {homeownerData.listings.length} listing(s) for support data...
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -1379,12 +1869,12 @@ export function FillableAgreementForm({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="securityDeposit">Security Deposit *</Label>
+                  <Label htmlFor="securityDeposit">Security Deposit (optional)</Label>
                   <Input
                     id="securityDeposit"
                     value={formData.securityDeposit}
                     onChange={(e) => handleInputChange('securityDeposit', e.target.value)}
-                    placeholder="400"
+                    placeholder="0 (enter amount if required)"
                     type="number"
                   />
                 </div>
@@ -1473,7 +1963,7 @@ export function FillableAgreementForm({
                 </div>
 
                 {/* Dishes Policy Card */}
-                <div className="p-4 border-2 border-gray-300 bg-gray-50 rounded-lg">
+                <div className="p-6 border-2 border-stone-300 bg-stone-50 rounded-xl">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                       <Home className="w-5 h-5 text-gray-600" />
@@ -1486,7 +1976,7 @@ export function FillableAgreementForm({
                     </div>
                   </div>
                   <Select value={formData.dishesPolicy} onValueChange={(value) => handleInputChange('dishesPolicy', value as string)}>
-                    <SelectTrigger className="bg-white">
+                    <SelectTrigger className="bg-white rounded-lg">
                       <SelectValue placeholder="Choose dishes policy..." />
                     </SelectTrigger>
                     <SelectContent>

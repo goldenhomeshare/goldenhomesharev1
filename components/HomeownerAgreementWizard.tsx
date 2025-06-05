@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, FileText, Loader2, PenTool, Download } from "lucide-react";
+import { CheckCircle, FileText, Loader2, PenTool, Download, FileSignature } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { FillableAgreementForm, type AgreementFormData } from "@/components/FillableAgreementForm";
@@ -35,59 +35,82 @@ function SigningStep({ agreementData, onSign, isLoading }: SigningStepProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <PenTool className="h-5 w-5 text-blue-600" />
-          Sign Agreement
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-blue-800 font-medium mb-2">Ready to Sign</p>
-          <p className="text-blue-700 text-sm">
-            By signing this agreement, you confirm that all information is accurate and you agree to the terms.
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <FileSignature className="w-12 h-12 text-green-600" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">Sign Agreement</h1>
+          <p className="text-gray-600 max-w-xl mx-auto">
+            Review and sign your agreement to proceed with the housemate arrangement
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="signature">Electronic Signature *</Label>
-            <Input
-              id="signature"
-              value={signature}
-              onChange={(e) => setSignature(e.target.value)}
-              placeholder="Type your full name"
-              className="text-lg"
-            />
-            <p className="text-sm text-gray-500 mt-1">
-              By typing your name, you agree to electronically sign this document
-            </p>
-          </div>
+        <Card className="shadow-lg border-0">
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg">
+            <div className="text-center">
+              <CardTitle className="text-xl text-gray-900 mb-2">
+                Electronic Signature Required
+              </CardTitle>
+              <p className="text-gray-600 text-sm">
+                Complete your electronic signature to finalize the agreement
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent className="p-8 bg-white rounded-b-lg">
+            <div className="space-y-6">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <p className="text-blue-800 font-medium mb-2">Ready to Sign</p>
+                <p className="text-blue-700 text-sm">
+                  By signing this agreement, you confirm that all information is accurate and you agree to the terms. 
+                  The housemate will be notified to review the agreement and complete their payment.
+                </p>
+              </div>
 
-          <div className="pt-4 border-t">
-            <Button
-              onClick={handleSign}
-              disabled={isLoading || !signature.trim()}
-              className="w-full bg-green-600 hover:bg-green-700"
-              size="lg"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Signing Agreement...
-                </>
-              ) : (
-                <>
-                  <PenTool className="h-4 w-4 mr-2" />
-                  Sign Agreement
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="signature" className="text-base font-medium">
+                    Electronic Signature *
+                  </Label>
+                  <Input
+                    id="signature"
+                    value={signature}
+                    onChange={(e) => setSignature(e.target.value)}
+                    placeholder="Type your full name"
+                    className="text-lg mt-2 h-12 rounded-xl"
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    By typing your name, you agree to electronically sign this document
+                  </p>
+                </div>
+
+                <div className="pt-4">
+                  <Button
+                    onClick={handleSign}
+                    disabled={isLoading || !signature.trim()}
+                    className="w-full py-6 text-lg bg-primary hover:bg-primary/90 rounded-xl font-semibold"
+                    size="lg"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin mr-3" />
+                        Signing Agreement...
+                      </>
+                    ) : (
+                      <>
+                        <FileSignature className="h-5 w-5 mr-3" />
+                        Sign & Complete Agreement
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }
 
@@ -150,6 +173,9 @@ export function HomeownerAgreementWizard({ application, homeownerData, existingA
       dishesPolicy: "rightaway" as const,
       expiredFoodPolicy: "rightaway" as const,
       additionalNotes: "",
+      
+      // IMPORTANT: Don't override supportRequested - let FillableAgreementForm extract it from homeownerData
+      // supportRequested: undefined, // This allows the form to extract from listings
     };
   };
 
@@ -324,32 +350,27 @@ export function HomeownerAgreementWizard({ application, homeownerData, existingA
 
   if (currentStep === 'complete') {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            Agreement Completed
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="text-center py-8">
-            <div className="flex justify-center mb-4">
-              <div className="p-3 bg-green-100 rounded-full">
-                <CheckCircle className="h-8 w-8 text-green-600" />
-              </div>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-md mx-auto px-4 text-center py-12">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+            {/* Success Icon */}
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <CheckCircle className="w-12 h-12 text-green-600" />
             </div>
-            <h3 className="text-xl font-semibold text-green-800 mb-2">
+            
+            {/* Success Message */}
+            <h1 className="text-2xl font-bold text-gray-900 mb-3">
               Agreement Signed Successfully!
-            </h3>
-            <p className="text-green-700 mb-6">
+            </h1>
+            <p className="text-gray-600 mb-6">
               The housemate has been notified and will receive a link to review and sign the agreement.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="flex flex-col gap-3">
               <Button
                 onClick={handleDownloadAgreement}
                 variant="outline"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 rounded-xl"
               >
                 <Download className="h-4 w-4" />
                 Download Agreement
@@ -357,14 +378,14 @@ export function HomeownerAgreementWizard({ application, homeownerData, existingA
               
               <Button
                 onClick={() => router.push('/homeowner/applications')}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 bg-primary hover:bg-primary/90 rounded-xl"
               >
                 Back to Applications
               </Button>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
@@ -380,42 +401,71 @@ export function HomeownerAgreementWizard({ application, homeownerData, existingA
 
   // Default: Show the form
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Create Housemate Agreement</h1>
-        <p className="text-muted-foreground">
-          Complete the agreement form for {application.housemate?.firstName} {application.housemate?.lastName}
-        </p>
-        
-        {/* Progress indicator */}
-        <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
-            <FileText className="h-4 w-4" />
-            Complete Agreement Form
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Modern Header */}
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <FileText className="w-12 h-12 text-green-600" />
           </div>
-          <div className="text-gray-400">→</div>
-          <div className="text-gray-400">Sign & Send to Housemate</div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">Create Housemate Agreement</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Complete the agreement form for {application.housemate?.firstName} {application.housemate?.lastName}
+          </p>
         </div>
-      </div>
 
-      <FillableAgreementForm
-        title="Housemate Agreement Form"
-        description="Complete all required fields to create the agreement. Pre-filled information cannot be modified for security."
-        onFormSubmit={handleFormSubmit}
-        homeownerData={homeownerData}
-        currentUser={homeownerData?.user}
-        prePopulatedData={getPrePopulatedFormData()}
-        readOnlyFields={[
-          'seekerName',
-          'seekerEmail', 
-          'propertyAddress',
-          'hostName',
-          'hostEmail',
-          'moveInDate',
-          'endDate',
-          'monthlyAmount'
-        ]}
-      />
+        {/* Progress Steps */}
+        <div className="mb-10">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+            <div className="flex flex-wrap gap-3 justify-center">
+              <div className="px-4 py-3 text-sm font-medium rounded-xl bg-primary text-white shadow-md">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  <span>Complete Agreement Form</span>
+                </div>
+              </div>
+              <div className="text-gray-400">→</div>
+              <div className="px-4 py-3 text-sm font-medium rounded-xl text-gray-400 bg-gray-50 border border-gray-100">
+                Sign & Send to Housemate
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Card */}
+        <Card className="shadow-lg border-0">
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg">
+            <div className="text-center">
+              <CardTitle className="text-2xl text-gray-900 mb-2">
+                Housemate Agreement Form
+              </CardTitle>
+              <p className="text-gray-600">
+                Complete all required fields to create the agreement. Pre-filled information cannot be modified for security.
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent className="p-8 bg-white rounded-b-lg">
+            <FillableAgreementForm
+              title=""
+              description=""
+              onFormSubmit={handleFormSubmit}
+              homeownerData={homeownerData}
+              currentUser={homeownerData?.user}
+              prePopulatedData={getPrePopulatedFormData()}
+              readOnlyFields={[
+                'seekerName',
+                'seekerEmail', 
+                'propertyAddress',
+                'hostName',
+                'hostEmail',
+                'moveInDate',
+                'endDate',
+                'monthlyAmount'
+              ]}
+            />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 } 

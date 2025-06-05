@@ -40,18 +40,27 @@ async function getHomeownerData(userId: string) {
       where: { id: userId },
       include: {
         homeownerProfile: true,
-        Product: true, // Get all listings
+        Product: true, // Get all listings including supportRequested field
       },
     });
 
     // Transform the data to match what the FillableAgreementForm expects
     if (!homeownerData) return null;
 
-    return {
+    const result = {
       user: homeownerData,
       homeownerProfile: homeownerData.homeownerProfile,
       listings: homeownerData.Product || [],
     };
+
+    // Debug logging
+    console.log('Homeowner data fetched successfully:', {
+      listingCount: result.listings.length,
+      firstListingSupport: result.listings[0]?.supportRequested,
+      allListingIds: result.listings.map(l => l.id)
+    });
+
+    return result;
   } catch (error) {
     console.error("Error fetching homeowner data:", error);
     return null;
@@ -193,16 +202,16 @@ export default async function HomeownerAgreementPage({
             </CardContent>
           </Card>
         ) : (
-          <Card className="mb-8">
+          <Card className="mb-8 border-green-200 bg-green-50">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-yellow-600" />
-                Ready to Create Agreement
+              <CardTitle className="flex items-center gap-2 text-green-800">
+                <Clock className="h-5 w-5 text-green-600" />
+                Action Required: Create Agreement
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">
-                No agreement has been created yet. Proceed below to create and sign the agreement.
+              <p className="text-green-700 mb-4 font-medium">
+                Please complete the agreement form below to finalize the arrangement with your housemate.
               </p>
               <div className="space-y-2 text-sm text-green-600">
                 <p>• Application ID: {application.id}</p>

@@ -527,21 +527,21 @@ export async function POST(request: NextRequest) {
 
       // Use actual form data for Licensee Areas
       if (formData.bedroomAAccess) {
-        y = addText(page9, '☑ Bedroom A: ' + (formData.bedroomANotes || 'Private bedroom'), 70, y, 10, font, 450);
+        y = addText(page9, '[X] Bedroom A: ' + (formData.bedroomANotes || 'Private bedroom'), 70, y, 10, font, 450);
         y -= 8;
       }
       if (formData.bedroomBAccess) {
-        y = addText(page9, '☑ Bedroom B: ' + (formData.bedroomBNotes || 'Private bedroom'), 70, y, 10, font, 450);
+        y = addText(page9, '[X] Bedroom B: ' + (formData.bedroomBNotes || 'Private bedroom'), 70, y, 10, font, 450);
         y -= 8;
       }
       if (formData.otherAreasAccess) {
-        y = addText(page9, '☑ Other Areas: ' + (formData.otherAreasNotes || 'Additional private areas'), 70, y, 10, font, 450);
+        y = addText(page9, '[X] Other Areas: ' + (formData.otherAreasNotes || 'Additional private areas'), 70, y, 10, font, 450);
         y -= 8;
       }
       
       // Room description if provided
       if (formData.roomDescription) {
-        y = addText(page9, '☑ Room Description: ' + formData.roomDescription, 70, y, 10, font, 450);
+        y = addText(page9, '[X] Room Description: ' + formData.roomDescription, 70, y, 10, font, 450);
         y -= 8;
       }
 
@@ -556,39 +556,39 @@ export async function POST(request: NextRequest) {
 
       // Use actual form data for Shared Areas
       if (formData.livingAreaAccess) {
-        y = addText(page9, '☑ Living room/family room' + (formData.livingAreaNotes ? ': ' + formData.livingAreaNotes : ''), 70, y, 10, font, 450);
+        y = addText(page9, '[X] Living room/family room' + (formData.livingAreaNotes ? ': ' + formData.livingAreaNotes : ''), 70, y, 10, font, 450);
         y -= 8;
       }
       if (formData.kitchenAccess) {
-        y = addText(page9, '☑ Kitchen and dining area' + (formData.kitchenNotes ? ': ' + formData.kitchenNotes : ''), 70, y, 10, font, 450);
+        y = addText(page9, '[X] Kitchen and dining area' + (formData.kitchenNotes ? ': ' + formData.kitchenNotes : ''), 70, y, 10, font, 450);
         y -= 8;
       }
       if (formData.diningAreaAccess) {
-        y = addText(page9, '☑ Dining area' + (formData.diningAreaNotes ? ': ' + formData.diningAreaNotes : ''), 70, y, 10, font, 450);
+        y = addText(page9, '[X] Dining area' + (formData.diningAreaNotes ? ': ' + formData.diningAreaNotes : ''), 70, y, 10, font, 450);
         y -= 8;
       }
       if (formData.laundryAreaAccess) {
-        y = addText(page9, '☑ Laundry room/facilities' + (formData.laundryAreaNotes ? ': ' + formData.laundryAreaNotes : ''), 70, y, 10, font, 450);
+        y = addText(page9, '[X] Laundry room/facilities' + (formData.laundryAreaNotes ? ': ' + formData.laundryAreaNotes : ''), 70, y, 10, font, 450);
         y -= 8;
       }
       if (formData.indoorStorageAccess) {
-        y = addText(page9, '☑ Indoor storage areas' + (formData.indoorStorageNotes ? ': ' + formData.indoorStorageNotes : ''), 70, y, 10, font, 450);
+        y = addText(page9, '[X] Indoor storage areas' + (formData.indoorStorageNotes ? ': ' + formData.indoorStorageNotes : ''), 70, y, 10, font, 450);
         y -= 8;
       }
-      if (formData.parkingAreaAccess) {
-        y = addText(page9, '☑ Parking area' + (formData.parkingAreaNotes ? ': ' + formData.parkingAreaNotes : ''), 70, y, 10, font, 450);
+      if (formData.parkingAccess) {
+        y = addText(page9, '[X] Parking area' + (formData.parkingNotes ? ': ' + formData.parkingNotes : ''), 70, y, 10, font, 450);
         y -= 8;
       }
       if (formData.outdoorAreaAccess) {
-        y = addText(page9, '☑ Outdoor spaces (yard, patio, deck)' + (formData.outdoorAreaNotes ? ': ' + formData.outdoorAreaNotes : ''), 70, y, 10, font, 450);
+        y = addText(page9, '[X] Outdoor spaces (yard, patio, deck)' + (formData.outdoorAreaNotes ? ': ' + formData.outdoorAreaNotes : ''), 70, y, 10, font, 450);
         y -= 8;
       }
       if (formData.outdoorStorageAccess) {
-        y = addText(page9, '☑ Outdoor storage' + (formData.outdoorStorageNotes ? ': ' + formData.outdoorStorageNotes : ''), 70, y, 10, font, 450);
+        y = addText(page9, '[X] Outdoor storage' + (formData.outdoorStorageNotes ? ': ' + formData.outdoorStorageNotes : ''), 70, y, 10, font, 450);
         y -= 8;
       }
       if (formData.otherSharedAccess) {
-        y = addText(page9, '☑ Other shared areas' + (formData.otherSharedNotes ? ': ' + formData.otherSharedNotes : ''), 70, y, 10, font, 450);
+        y = addText(page9, '[X] Other shared areas' + (formData.otherSharedNotes ? ': ' + formData.otherSharedNotes : ''), 70, y, 10, font, 450);
         y -= 8;
       }
 
@@ -620,10 +620,10 @@ export async function POST(request: NextRequest) {
 
       // Use actual TV usage data
       const tvUsageText = {
-        'anytime': '☑ Turn on anytime at a reasonable volume',
-        'ask': '☑ If the other person is in the same room, ask to turn on TV',
-        'limited': '☑ TV limited to these days or hours: ' + (formData.tvLimitedHours || 'See specified times'),
-        'offlimits': '☑ TV off-limits'
+        'anytime': '[X] Turn on anytime at a reasonable volume',
+        'ask': '[X] If the other person is in the same room, ask to turn on TV',
+        'limited': '[X] TV limited to these days or hours: ' + (formData.tvLimitedHours || 'See specified times'),
+        'offlimits': '[X] TV off-limits'
       };
       
       y = addText(page10, tvUsageText[formData.tvUsage as keyof typeof tvUsageText] || tvUsageText['anytime'], 70, y, 10, font);
@@ -640,10 +640,10 @@ export async function POST(request: NextRequest) {
 
       // Use actual music usage data
       const musicUsageText = {
-        'anytime': '☑ Play at any time at a reasonable volume',
-        'ask': '☑ If the other person is in the same room, ask to play music',
-        'limited': '☑ Playing music limited to these days or hours: ' + (formData.musicLimitedHours || 'See specified times'),
-        'offlimits': '☑ Playing music off-limits'
+        'anytime': '[X] Play at any time at a reasonable volume',
+        'ask': '[X] If the other person is in the same room, ask to play music',
+        'limited': '[X] Playing music limited to these days or hours: ' + (formData.musicLimitedHours || 'See specified times'),
+        'offlimits': '[X] Playing music off-limits'
       };
 
       y = addText(page10, musicUsageText[formData.musicUsage as keyof typeof musicUsageText] || musicUsageText['anytime'], 70, y, 10, font);
@@ -664,7 +664,7 @@ export async function POST(request: NextRequest) {
 
       // Use actual social activities data
       if (formData.alcoholAllowed) {
-        y = addText(page10, '☑ Drinking alcohol', 70, y, 10, font);
+        y = addText(page10, '[X] Drinking alcohol', 70, y, 10, font);
         y -= 8;
         if (formData.alcoholParameters) {
           y = addText(page10, '    Within these parameters: ' + formData.alcoholParameters, 70, y, 10, font);
@@ -676,7 +676,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (formData.smokingAllowed) {
-        y = addText(page10, '☑ Smoking', 70, y, 10, font);
+        y = addText(page10, '[X] Smoking', 70, y, 10, font);
         y -= 8;
         if (formData.smokingParameters) {
           y = addText(page10, '    Within these parameters: ' + formData.smokingParameters, 70, y, 10, font);
@@ -688,7 +688,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (formData.otherActivitiesAllowed && formData.otherActivitiesParameters) {
-        y = addText(page10, '☑ Other: ' + formData.otherActivitiesParameters, 70, y, 10, font);
+        y = addText(page10, '[X] Other: ' + formData.otherActivitiesParameters, 70, y, 10, font);
         y -= 8;
       }
       y -= 15;
@@ -708,7 +708,7 @@ export async function POST(request: NextRequest) {
 
       // Use actual pet policy data
       if (formData.petsAllowed) {
-        y = addText(page10, '☑ Pets ARE permitted at the Residence', 70, y, 10, font);
+        y = addText(page10, '[X] Pets ARE permitted at the Residence', 70, y, 10, font);
         y -= 8;
         if (formData.petSpeciesRestrictions) {
           y = addText(page10, 'Species and/or breed restrictions: ' + formData.petSpeciesRestrictions, 70, y, 10, font);
@@ -719,7 +719,7 @@ export async function POST(request: NextRequest) {
           y -= 8;
         }
       } else {
-        y = addText(page10, '☑ Pets ARE NOT permitted at the Residence', 70, y, 10, font);
+        y = addText(page10, '[X] Pets ARE NOT permitted at the Residence', 70, y, 10, font);
         y -= 8;
       }
 
@@ -736,7 +736,7 @@ export async function POST(request: NextRequest) {
 
       // Use actual guest policy data
       if (formData.guestsAllowed) {
-        y = addText(page11, '☑ Guests ARE permitted at the Residence', 70, y, 10, font);
+        y = addText(page11, '[X] Guests ARE permitted at the Residence', 70, y, 10, font);
         y -= 8;
         if (formData.guestDaysOccasions) {
           y = addText(page11, 'On the following days and/or occasions: ' + formData.guestDaysOccasions, 70, y, 10, font);
@@ -747,7 +747,7 @@ export async function POST(request: NextRequest) {
           y -= 8;
         }
       } else {
-        y = addText(page11, '☑ Guests ARE NOT permitted at the Residence', 70, y, 10, font);
+        y = addText(page11, '[X] Guests ARE NOT permitted at the Residence', 70, y, 10, font);
         y -= 8;
       }
       y -= 15;
@@ -765,23 +765,23 @@ export async function POST(request: NextRequest) {
       y -= 10;
 
       if (formData.noticesInPerson) {
-        y = addText(page11, '☑ In-person Conversation', 70, y, 10, font);
+        y = addText(page11, '[X] In-person Conversation', 70, y, 10, font);
         y -= 8;
       }
       if (formData.noticesPhone) {
-        y = addText(page11, '☑ Phone Call', 70, y, 10, font);
+        y = addText(page11, '[X] Phone Call', 70, y, 10, font);
         y -= 8;
       }
       if (formData.noticesText) {
-        y = addText(page11, '☑ Text message', 70, y, 10, font);
+        y = addText(page11, '[X] Text message', 70, y, 10, font);
         y -= 8;
       }
       if (formData.noticesEmail) {
-        y = addText(page11, '☑ Email', 70, y, 10, font);
+        y = addText(page11, '[X] Email', 70, y, 10, font);
         y -= 8;
       }
       if (formData.noticesOther && formData.noticesOtherMethod) {
-        y = addText(page11, '☑ Other: ' + formData.noticesOtherMethod, 70, y, 10, font);
+        y = addText(page11, '[X] Other: ' + formData.noticesOtherMethod, 70, y, 10, font);
         y -= 8;
       }
       y -= 10;
@@ -790,23 +790,23 @@ export async function POST(request: NextRequest) {
       y -= 10;
 
       if (formData.disagreementsInPerson) {
-        y = addText(page11, '☑ In-person Conversation', 70, y, 10, font);
+        y = addText(page11, '[X] In-person Conversation', 70, y, 10, font);
         y -= 8;
       }
       if (formData.disagreementsPhone) {
-        y = addText(page11, '☑ Phone Call', 70, y, 10, font);
+        y = addText(page11, '[X] Phone Call', 70, y, 10, font);
         y -= 8;
       }
       if (formData.disagreementsText) {
-        y = addText(page11, '☑ Text message', 70, y, 10, font);
+        y = addText(page11, '[X] Text message', 70, y, 10, font);
         y -= 8;
       }
       if (formData.disagreementsEmail) {
-        y = addText(page11, '☑ Email', 70, y, 10, font);
+        y = addText(page11, '[X] Email', 70, y, 10, font);
         y -= 8;
       }
       if (formData.disagreementsOther && formData.disagreementsOtherMethod) {
-        y = addText(page11, '☑ Other: ' + formData.disagreementsOtherMethod, 70, y, 10, font);
+        y = addText(page11, '[X] Other: ' + formData.disagreementsOtherMethod, 70, y, 10, font);
         y -= 8;
       }
       y -= 15;
@@ -844,9 +844,9 @@ export async function POST(request: NextRequest) {
       y -= 10;
 
       const dishPolicyText = {
-        'rightaway': '☑ Right away—no sitting in the sink',
-        'overnight': '☑ Overnight is fine',
-        'nopreference': '☑ Longer than overnight is fine/no preference'
+        'rightaway': '[X] Right away—no sitting in the sink',
+        'overnight': '[X] Overnight is fine',
+        'nopreference': '[X] Longer than overnight is fine/no preference'
       };
 
       y = addText(page11, dishPolicyText[formData.dishesPolicy as keyof typeof dishPolicyText] || dishPolicyText['rightaway'], 70, y, 10, font);
@@ -864,9 +864,9 @@ export async function POST(request: NextRequest) {
       y -= 10;
 
       const foodPolicyText = {
-        'rightaway': '☑ Right away—no sitting in the fridge/pantry',
-        'fewdays': '☑ Within a few days is fine',
-        'nopreference': '☑ Longer than a few days is fine/no preference'
+        'rightaway': '[X] Right away—no sitting in the fridge/pantry',
+        'fewdays': '[X] Within a few days is fine',
+        'nopreference': '[X] Longer than a few days is fine/no preference'
       };
 
       y = addText(page12, foodPolicyText[formData.expiredFoodPolicy as keyof typeof foodPolicyText] || foodPolicyText['rightaway'], 70, y, 10, font);

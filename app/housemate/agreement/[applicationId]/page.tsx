@@ -93,7 +93,7 @@ export default async function HousemateAgreementPage({
                 </p>
                 <p className="text-sm text-gray-600">
                   Property: <strong>{application.product.name}</strong><br />
-                  Homeowner: <strong>{application.product.User.firstName} {application.product.User.lastName}</strong>
+                  Homeowner: <strong>{application.product.User?.firstName} {application.product.User?.lastName}</strong>
                 </p>
               </div>
             </CardContent>
@@ -141,7 +141,7 @@ export default async function HousemateAgreementPage({
               <div>
                 <label className="text-sm font-medium text-gray-500">Homeowner</label>
                 <p className="text-lg font-semibold">
-                  {application.product.User.firstName} {application.product.User.lastName}
+                  {application.product.User?.firstName} {application.product.User?.lastName}
                 </p>
               </div>
               <div>

@@ -83,7 +83,7 @@ async function handleBackgroundCheckCompleted(data: any) {
     console.log("[Checkr Webhook] Processing background check completion");
 
     // Find the background check record
-    const backgroundCheck = await prisma.backgroundCheck.findFirst({
+    const backgroundCheck = await (prisma as any).backgroundCheck.findFirst({
       where: {
         OR: [
           { invitationId: data.id },
@@ -98,7 +98,7 @@ async function handleBackgroundCheckCompleted(data: any) {
     }
 
     // Update background check status
-    await prisma.backgroundCheck.update({
+    await (prisma as any).backgroundCheck.update({
       where: { id: backgroundCheck.id },
       data: {
         status: "COMPLETED",
@@ -128,7 +128,7 @@ async function handleBackgroundCheckCanceled(data: any) {
   try {
     console.log("[Checkr Webhook] Processing background check cancellation");
 
-    const backgroundCheck = await prisma.backgroundCheck.findFirst({
+    const backgroundCheck = await (prisma as any).backgroundCheck.findFirst({
       where: {
         OR: [
           { invitationId: data.id },
@@ -138,7 +138,7 @@ async function handleBackgroundCheckCanceled(data: any) {
     });
 
     if (backgroundCheck) {
-      await prisma.backgroundCheck.update({
+      await (prisma as any).backgroundCheck.update({
         where: { id: backgroundCheck.id },
         data: {
           status: "DECLINED",
@@ -157,7 +157,7 @@ async function handleBackgroundCheckExpired(data: any) {
   try {
     console.log("[Checkr Webhook] Processing background check expiration");
 
-    const backgroundCheck = await prisma.backgroundCheck.findFirst({
+    const backgroundCheck = await (prisma as any).backgroundCheck.findFirst({
       where: {
         OR: [
           { invitationId: data.id },
@@ -167,7 +167,7 @@ async function handleBackgroundCheckExpired(data: any) {
     });
 
     if (backgroundCheck) {
-      await prisma.backgroundCheck.update({
+      await (prisma as any).backgroundCheck.update({
         where: { id: backgroundCheck.id },
         data: {
           status: "EXPIRED",

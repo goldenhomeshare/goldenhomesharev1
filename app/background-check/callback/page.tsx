@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 export default async function BackgroundCheckCallbackPage({
   searchParams,
 }: {
-  searchParams: { invitation_id?: string; status?: string };
+  searchParams: Promise<{ invitation_id?: string; status?: string }>;
 }) {
   const user = await getCurrentUser();
   
@@ -17,7 +17,8 @@ export default async function BackgroundCheckCallbackPage({
     redirect("/api/auth/login");
   }
 
-  const { invitation_id, status } = searchParams;
+  const resolvedSearchParams = await searchParams;
+  const { invitation_id, status } = resolvedSearchParams;
 
   const getStatusInfo = (status?: string) => {
     switch (status) {

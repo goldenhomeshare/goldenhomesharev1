@@ -12,26 +12,54 @@ import { ApplicationActionButtons } from "../../components/ApplicationActionButt
 import { format } from "date-fns";
 
 async function getApplicationsForHomeowner(userId: string) {
-  const applications = await prisma.application.findMany({
-    where: {
-      product: {
-        userId: userId,
-      },
-    },
-    include: {
-      housemate: {
-        include: {
-          housemateProfile: true,
+  try {
+    const applications = await prisma.application.findMany({
+      where: {
+        product: {
+          userId: userId,
         },
       },
-      product: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+      include: {
+        housemate: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            housemateProfile: {
+              select: {
+                profilePicture: true,
+                occupation: true,
+                maxBudget: true,
+                bio: true,
+              },
+            },
+          },
+        },
+        product: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        agreement: {
+          select: {
+            id: true,
+            homeownerSigned: true,
+            housemateSigned: true,
+            status: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
-  return applications;
+    return applications;
+  } catch (error) {
+    console.error("Error fetching applications:", error);
+    return [];
+  }
 }
 
 export default async function HomeownerApplicationsPage() {
@@ -104,7 +132,11 @@ export default async function HomeownerApplicationsPage() {
           >
             {getStatusIcon(application.status)}
             {application.status === "APPROVED" 
-              ? "APPROVED - CREATE AGREEMENT"
+              ? (application.agreement 
+                  ? (application.agreement?.homeownerSigned 
+                      ? (application.agreement?.housemateSigned ? "AGREEMENT COMPLETE" : "AWAITING HOUSEMATE SIGNATURE")
+                      : "AGREEMENT NEEDS SIGNATURE") 
+                  : "NEEDS AGREEMENT")
               : application.status}
           </Badge>
         </div>
@@ -194,12 +226,25 @@ export default async function HomeownerApplicationsPage() {
                 <ApplicationActionButtons applicationId={application.id} />
               )}
               {application.status === "APPROVED" && (
-                <Link href={`/homeowner/agreement/${application.id}`}>
-                  <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700">
-                    <FileText className="h-4 w-4 mr-2" />
-                    Create Agreement
-                  </Button>
-                </Link>
+                application.agreement ? (
+                  // Agreement exists - show different button based on signing status
+                  <Link href={`/homeowner/agreement/${application.id}`}>
+                    <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700">
+                      <FileText className="h-4 w-4 mr-2" />
+                      {application.agreement?.homeownerSigned 
+                        ? (application.agreement?.housemateSigned ? "View Agreement" : "View Agreement (Pending Housemate)")
+                        : "Complete Agreement"}
+                    </Button>
+                  </Link>
+                ) : (
+                  // No agreement exists - show create button
+                  <Link href={`/homeowner/agreement/${application.id}`}>
+                    <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Create Agreement
+                    </Button>
+                  </Link>
+                )
               )}
             </div>
           </div>

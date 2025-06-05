@@ -59,11 +59,11 @@ export async function POST(request: NextRequest) {
       
       // Debug: Check what properties are available on prisma
       console.log("[Background Check] Available Prisma properties:", Object.keys(prisma));
-      console.log("[Background Check] backgroundCheck available?", !!prisma.backgroundCheck);
+      console.log("[Background Check] backgroundCheck available?", !!(prisma as any).backgroundCheck);
       console.log("[Background Check] background_checks available?", !!(prisma as any).background_checks);
       
       // Use the actual property name that exists
-      const backgroundCheckModel = prisma.backgroundCheck || (prisma as any).background_checks;
+      const backgroundCheckModel = (prisma as any).backgroundCheck || (prisma as any).background_checks;
       
       if (!backgroundCheckModel) {
         throw new Error("Background check model not found in Prisma client");
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Use the same dynamic model resolution
-        const backgroundCheckModel = prisma.backgroundCheck || (prisma as any).background_checks;
+        const backgroundCheckModel = (prisma as any).backgroundCheck || (prisma as any).background_checks;
         
         if (!backgroundCheckModel) {
           throw new Error("Background check model not found in Prisma client");

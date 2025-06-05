@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     });
 
     // TODO: Send notification to homeowner (email, etc.)
-    console.log(`Agreement ${agreement.id} signed by housemate. Both parties have signed. Notify homeowner: ${agreement.application.product.User.email}`);
+    console.log(`Agreement ${agreement.id} signed by housemate. Both parties have signed. Notify homeowner: ${agreement.application.product.User?.email}`);
 
     return NextResponse.json({
       success: true,

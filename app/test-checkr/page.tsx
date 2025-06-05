@@ -31,10 +31,10 @@ export default async function BackgroundCheckPage() {
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-blue-800 text-sm">
               💡 <strong>Tip:</strong> Log in first to automatically populate your name and email address.
-            </p>
-          </div>
-        )}
-      </div>
+                  </p>
+                </div>
+              )}
+            </div>
 
       <BackgroundCheckForm initialData={initialFormData} />
     </div>

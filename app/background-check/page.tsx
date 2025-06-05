@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import BackgroundCheckForm from "@/app/components/BackgroundCheckForm";
+import { BackgroundCheckForm } from "@/app/test-checkr/components/BackgroundCheckForm";
 import RefreshStatusButton from "@/app/components/RefreshStatusButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, CheckCircle, Clock, AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
@@ -181,7 +181,22 @@ export default async function BackgroundCheckPage() {
             </p>
           </CardHeader>
           <CardContent>
-            <BackgroundCheckForm />
+            <BackgroundCheckForm 
+              initialData={{
+                firstName: user.firstName || '',
+                middleName: '',
+                lastName: user.lastName || '',
+                email: user.email || '',
+                phone: '',
+                zipcode: '',
+                workLocation: {
+                  country: 'US',
+                  state: '',
+                  city: '',
+                },
+                package: 'basic_for_golden_homeshare',
+              }}
+            />
           </CardContent>
         </Card>
       )}

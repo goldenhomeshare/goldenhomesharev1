@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Clock, CheckCircle, AlertCircle, RefreshCw, StopCircle, Loader2 } from 'lucide-react';
+import { Clock, CheckCircle, AlertCircle, RefreshCw, StopCircle, Loader2, Shield, ExternalLink, User } from 'lucide-react';
 
 interface HostedCheckForm {
   firstName: string;
@@ -38,6 +38,29 @@ interface PollingStatus {
   lastCheck: string | null;
 }
 
+interface ExistingBackgroundCheck {
+  status: {
+    overall: string;
+    report: string;
+    invitation: string;
+  };
+  result: string;
+  adjudication: string | null;
+  reportId?: string;
+  candidateId?: string;
+  invitationId?: string;
+  report?: {
+    status: string;
+    result: string;
+    completedAt?: string;
+    package: string;
+  };
+  candidate?: {
+    name: string;
+    email: string;
+  };
+}
+
 interface BackgroundCheckFormProps {
   initialData: HostedCheckForm;
 }
@@ -45,6 +68,8 @@ interface BackgroundCheckFormProps {
 export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
   const [loading, setLoading] = useState(false);
   const [hostedCheckForm, setHostedCheckForm] = useState<HostedCheckForm>(initialData);
+  const [checkingExisting, setCheckingExisting] = useState(true);
+  const [existingCheck, setExistingCheck] = useState<ExistingBackgroundCheck | null>(null);
   const [pollingStatus, setPollingStatus] = useState<PollingStatus>({
     isPolling: false,
     data: null,
@@ -53,6 +78,102 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
   });
   
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-check for existing background checks on component mount
+  useEffect(() => {
+    checkForExistingBackgroundCheck();
+  }, []);
+
+  const checkForExistingBackgroundCheck = async () => {
+    try {
+      setCheckingExisting(true);
+      console.log('[AutoCheck] Checking for existing background checks...');
+      
+      const response = await fetch('/api/checkr/my-status');
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        console.log('[AutoCheck] Existing background check found:', result.data);
+        
+        // Check if there's a completed background check
+        if (result.data.status?.overall === 'complete' && result.data.result) {
+          setExistingCheck(result.data);
+          console.log('[AutoCheck] Found completed background check with result:', result.data.result);
+        } else if (result.data.status?.overall === 'processing' || result.data.status?.overall === 'pending') {
+          // There's an in-progress check - start polling for it
+          console.log('[AutoCheck] Found in-progress background check, starting polling');
+          setExistingCheck(result.data);
+          
+          if (result.data.candidateId || result.data.invitationId) {
+            startPolling(
+              result.data.candidateId,
+              result.data.invitationId,
+              result.data.user?.email || hostedCheckForm.email
+            );
+          }
+        }
+      } else {
+        console.log('[AutoCheck] No existing background check found');
+      }
+    } catch (error) {
+      console.error('[AutoCheck] Error checking for existing background check:', error);
+    } finally {
+      setCheckingExisting(false);
+    }
+  };
+
+  // Function to get human-readable status
+  const getStatusDisplay = (check: ExistingBackgroundCheck) => {
+    if (check.status.overall === 'complete') {
+      switch (check.result) {
+        case 'clear':
+          return {
+            label: 'Background Check Passed',
+            color: 'text-green-700',
+            bgColor: 'bg-green-100',
+            borderColor: 'border-green-300',
+            icon: CheckCircle,
+            description: 'Your background check has been completed successfully with no issues found.'
+          };
+        case 'consider':
+          return {
+            label: 'Background Check Requires Review',
+            color: 'text-yellow-700',
+            bgColor: 'bg-yellow-100',
+            borderColor: 'border-yellow-300',
+            icon: AlertCircle,
+            description: 'Your background check has been completed but requires manual review by the employer.'
+          };
+        default:
+          return {
+            label: 'Background Check Complete',
+            color: 'text-blue-700',
+            bgColor: 'bg-blue-100',
+            borderColor: 'border-blue-300',
+            icon: CheckCircle,
+            description: 'Your background check has been completed.'
+          };
+      }
+    } else if (check.status.overall === 'processing' || check.status.overall === 'pending') {
+      return {
+        label: 'Background Check In Progress',
+        color: 'text-blue-700',
+        bgColor: 'bg-blue-100',
+        borderColor: 'border-blue-300',
+        icon: Clock,
+        description: 'Your background check is currently being processed. We\'ll update you when it\'s complete.'
+      };
+    } else {
+      return {
+        label: 'Background Check Status Unknown',
+        color: 'text-gray-700',
+        bgColor: 'bg-gray-100',
+        borderColor: 'border-gray-300',
+        icon: AlertCircle,
+        description: 'Unable to determine the current status of your background check.'
+      };
+    }
+  };
 
   const startPolling = (candidateId?: string, invitationId?: string, email?: string) => {
     console.log('[Polling] Starting background check status polling');
@@ -199,8 +320,160 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
     };
   }, []);
 
+  // If we're still checking for existing background checks
+  if (checkingExisting) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="flex items-center gap-3">
+          <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+          <span className="text-gray-600">Checking for existing background checks...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // If there's an existing completed background check
+  if (existingCheck && existingCheck.status?.overall === 'complete') {
+    const statusDisplay = getStatusDisplay(existingCheck);
+    const StatusIcon = statusDisplay.icon;
+    
+    return (
+      <div className="space-y-6">
+        <Card className={`${statusDisplay.borderColor} ${statusDisplay.bgColor}`}>
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <StatusIcon className={`w-6 h-6 ${statusDisplay.color}`} />
+              <div>
+                <CardTitle className={`text-xl ${statusDisplay.color}`}>
+                  {statusDisplay.label}
+                </CardTitle>
+                <CardDescription className={statusDisplay.color}>
+                  {statusDisplay.description}
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {/* Basic Information */}
+              <div className="space-y-3">
+                {existingCheck.candidate && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <User className="w-4 h-4" />
+                    <span>Background check for: {existingCheck.candidate.name}</span>
+                  </div>
+                )}
+                
+                {existingCheck.report?.completedAt && (
+                  <div className="text-sm text-gray-600">
+                    <strong>Completed:</strong> {new Date(existingCheck.report.completedAt).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+                )}
+                
+                {existingCheck.report?.package && (
+                  <div className="text-sm text-gray-600">
+                    <strong>Package:</strong> {existingCheck.report.package}
+                  </div>
+                )}
+              </div>
+
+              {/* Status Details */}
+              <div className="border rounded-lg p-4 bg-gray-50">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  Status Details
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <span className="text-gray-600">Overall Status:</span>
+                    <span className="ml-2 font-medium capitalize">
+                      {existingCheck.status.overall}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Report Status:</span>
+                    <span className="ml-2 font-medium capitalize">
+                      {existingCheck.status.report}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-gray-600">Invitation Status:</span>
+                    <span className="ml-2 font-medium capitalize">
+                      {existingCheck.status.invitation}
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Result and Adjudication */}
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-600">Result:</span>
+                      <Badge 
+                        variant={existingCheck.result === 'clear' ? 'default' : existingCheck.result === 'consider' ? 'secondary' : 'outline'}
+                        className="ml-2"
+                      >
+                        {existingCheck.result === 'clear' ? '✅ Clear' : 
+                         existingCheck.result === 'consider' ? '⚠️ Consider' : 
+                         existingCheck.result || 'Unknown'}
+                      </Badge>
+                    </div>
+                    {existingCheck.adjudication && (
+                      <div>
+                        <span className="text-gray-600">Adjudication:</span>
+                        <span className="ml-2 font-medium capitalize">
+                          {existingCheck.adjudication}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t">
+                <Button
+                  onClick={() => setExistingCheck(null)}
+                  variant="outline"
+                  size="sm"
+                >
+                  Start New Background Check
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <>
+      {/* Show existing in-progress check if any */}
+      {existingCheck && (existingCheck.status?.overall === 'processing' || existingCheck.status?.overall === 'pending') && (
+        <Card className="mb-6 border-blue-200 bg-blue-50">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <Clock className="w-5 h-5 text-blue-600" />
+              <div>
+                <CardTitle className="text-lg text-blue-900">
+                  Background Check In Progress
+                </CardTitle>
+                <CardDescription className="text-blue-700">
+                  You already have a background check being processed. We're monitoring its progress below.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+      )}
+
       {/* Real-time Polling Status */}
       {(pollingStatus.isPolling || pollingStatus.currentStatus) && (
         <Card className="mb-6 border-blue-200 bg-blue-50">
@@ -334,172 +607,172 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
       {/* Background Check Form */}
       <Card>
         <CardHeader>
-          <CardTitle>Start Background Check</CardTitle>
-          <CardDescription>
-            Please provide your information to begin the background check process
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Personal Information Section */}
-          <div className="space-y-4">
-            <h5 className="font-medium text-gray-900 border-b pb-2">Personal Information</h5>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="firstName" className="text-sm font-medium">First Name *</Label>
-                <Input
-                  id="firstName"
-                  value={hostedCheckForm.firstName}
-                  onChange={(e) => setHostedCheckForm(prev => ({ ...prev, firstName: e.target.value }))}
-                  placeholder="John"
-                  className="mt-1"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="middleName" className="text-sm font-medium">Middle Name</Label>
-                <Input
-                  id="middleName"
-                  value={hostedCheckForm.middleName}
-                  onChange={(e) => setHostedCheckForm(prev => ({ ...prev, middleName: e.target.value }))}
-                  placeholder="Optional"
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="lastName" className="text-sm font-medium">Last Name *</Label>
-                <Input
-                  id="lastName"
-                  value={hostedCheckForm.lastName}
-                  onChange={(e) => setHostedCheckForm(prev => ({ ...prev, lastName: e.target.value }))}
-                  placeholder="Doe"
-                  className="mt-1"
-                  required
-                />
-              </div>
-            </div>
-            
+          <div className="flex items-center gap-3">
+            <Shield className="w-6 h-6 text-blue-600" />
             <div>
-              <Label htmlFor="email" className="text-sm font-medium">Email Address *</Label>
-              <Input
-                id="email"
-                type="email"
-                value={hostedCheckForm.email}
-                onChange={(e) => setHostedCheckForm(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="john.doe@gmail.com"
-                className="mt-1"
-                required
-              />
+              <CardTitle className="text-xl">Background Check</CardTitle>
+              <CardDescription>
+                Complete your background check through our secure partner, Checkr.
+                {hostedCheckForm.firstName && hostedCheckForm.email && (
+                  <span className="block mt-1 text-green-600 font-medium">
+                    ✓ Form auto-populated with your account information
+                  </span>
+                )}
+              </CardDescription>
             </div>
           </div>
-
-          {/* Contact Information Section */}
-          <div className="space-y-4">
-            <h5 className="font-medium text-gray-900 border-b pb-2">Contact Information</h5>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="phone" className="text-sm font-medium">Phone Number</Label>
-                <Input
-                  id="phone"
-                  value={hostedCheckForm.phone}
-                  onChange={(e) => setHostedCheckForm(prev => ({ ...prev, phone: e.target.value }))}
-                  placeholder="+1 (555) 123-4567"
-                  className="mt-1"
-                />
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {/* Personal Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Personal Information</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="firstName" className="text-sm font-medium">First Name *</Label>
+                  <Input
+                    id="firstName"
+                    value={hostedCheckForm.firstName}
+                    onChange={(e) => setHostedCheckForm(prev => ({ ...prev, firstName: e.target.value }))}
+                    placeholder="John"
+                    className="mt-1"
+                    maxLength={35}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="middleName" className="text-sm font-medium">Middle Name</Label>
+                  <Input
+                    id="middleName"
+                    value={hostedCheckForm.middleName}
+                    onChange={(e) => setHostedCheckForm(prev => ({ ...prev, middleName: e.target.value }))}
+                    placeholder="M"
+                    className="mt-1"
+                    maxLength={35}
+                  />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="zipcode" className="text-sm font-medium">ZIP Code</Label>
-                <Input
-                  id="zipcode"
-                  value={hostedCheckForm.zipcode}
-                  onChange={(e) => setHostedCheckForm(prev => ({ ...prev, zipcode: e.target.value }))}
-                  placeholder="12345"
-                  className="mt-1"
-                />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="lastName" className="text-sm font-medium">Last Name *</Label>
+                  <Input
+                    id="lastName"
+                    value={hostedCheckForm.lastName}
+                    onChange={(e) => setHostedCheckForm(prev => ({ ...prev, lastName: e.target.value }))}
+                    placeholder="Smith"
+                    className="mt-1"
+                    maxLength={35}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email" className="text-sm font-medium">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={hostedCheckForm.email}
+                    onChange={(e) => setHostedCheckForm(prev => ({ ...prev, email: e.target.value }))}
+                    placeholder="john.smith@example.com"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="phone" className="text-sm font-medium">Phone</Label>
+                  <Input
+                    id="phone"
+                    value={hostedCheckForm.phone}
+                    onChange={(e) => setHostedCheckForm(prev => ({ ...prev, phone: e.target.value }))}
+                    placeholder="(555) 123-4567"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="zipcode" className="text-sm font-medium">Zip Code</Label>
+                  <Input
+                    id="zipcode"
+                    value={hostedCheckForm.zipcode}
+                    onChange={(e) => setHostedCheckForm(prev => ({ ...prev, zipcode: e.target.value }))}
+                    placeholder="65201"
+                    className="mt-1"
+                    maxLength={10}
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Work Location Section */}
-          <div className="space-y-4">
-            <h5 className="font-medium text-gray-900 border-b pb-2">Location Information</h5>
-            <p className="text-sm text-gray-600">Where will you be working or residing?</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="country" className="text-sm font-medium">Country *</Label>
-                <Input
-                  id="country"
-                  value={hostedCheckForm.workLocation.country}
-                  onChange={(e) => setHostedCheckForm(prev => ({ 
-                    ...prev, 
-                    workLocation: { ...prev.workLocation, country: e.target.value }
-                  }))}
-                  placeholder="US"
-                  className="mt-1 bg-gray-100"
-                  maxLength={2}
-                  required
-                  disabled
-                />
-                <p className="text-xs text-gray-500 mt-1">Fixed to US for this service</p>
-              </div>
-              <div>
-                <Label htmlFor="state" className="text-sm font-medium">State</Label>
-                <Input
-                  id="state"
-                  value={hostedCheckForm.workLocation.state}
-                  onChange={(e) => setHostedCheckForm(prev => ({ 
-                    ...prev, 
-                    workLocation: { ...prev.workLocation, state: e.target.value }
-                  }))}
-                  placeholder="CA"
-                  className="mt-1"
-                  maxLength={2}
-                />
-                <p className="text-xs text-gray-500 mt-1">2-letter state code (for US)</p>
-              </div>
-              <div>
-                <Label htmlFor="city" className="text-sm font-medium">City *</Label>
-                <Input
-                  id="city"
-                  value={hostedCheckForm.workLocation.city}
-                  onChange={(e) => setHostedCheckForm(prev => ({ 
-                    ...prev, 
-                    workLocation: { ...prev.workLocation, city: e.target.value }
-                  }))}
-                  placeholder="San Francisco"
-                  className="mt-1"
-                  required
-                />
+            {/* Work Location */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Work Location</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="country" className="text-sm font-medium">Country</Label>
+                  <Input
+                    id="country"
+                    value={hostedCheckForm.workLocation.country}
+                    disabled
+                    className="mt-1 bg-gray-100 text-gray-600"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Fixed to US for this service</p>
+                </div>
+                <div>
+                  <Label htmlFor="state" className="text-sm font-medium">State</Label>
+                  <Input
+                    id="state"
+                    value={hostedCheckForm.workLocation.state}
+                    onChange={(e) => setHostedCheckForm(prev => ({ 
+                      ...prev, 
+                      workLocation: { ...prev.workLocation, state: e.target.value }
+                    }))}
+                    placeholder="MO"
+                    className="mt-1"
+                    maxLength={2}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">2-letter state code (for US)</p>
+                </div>
+                <div>
+                  <Label htmlFor="city" className="text-sm font-medium">City *</Label>
+                  <Input
+                    id="city"
+                    value={hostedCheckForm.workLocation.city}
+                    onChange={(e) => setHostedCheckForm(prev => ({ 
+                      ...prev, 
+                      workLocation: { ...prev.workLocation, city: e.target.value }
+                    }))}
+                    placeholder="Columbia"
+                    className="mt-1"
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-medium text-blue-800 mb-2">What happens next?</h4>
-            <ul className="text-sm text-blue-700 space-y-1">
-              <li>• You'll be redirected to a secure Checkr portal to complete your background check</li>
-              <li>• We'll monitor the progress and notify you when it's complete</li>
-              <li>• The process typically takes 1-3 business days</li>
-            </ul>
+            {/* Submit Button */}
+            <div className="pt-6 border-t">
+              <Button
+                onClick={createHostedCheck}
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Creating Background Check...
+                  </>
+                ) : (
+                  <>
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Start Background Check
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                You'll be redirected to our secure partner, Checkr, to complete the process
+              </p>
+            </div>
           </div>
-
-          <Button 
-            onClick={createHostedCheck}
-            disabled={loading}
-            className="w-full"
-            size="lg"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating Background Check...
-              </>
-            ) : (
-              'Start Background Check'
-            )}
-          </Button>
         </CardContent>
       </Card>
     </>

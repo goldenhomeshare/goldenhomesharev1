@@ -13,8 +13,8 @@ const CreateHostedCheckSchema = z.object({
   workLocation: z.object({
     country: z.string().default('US'),
     state: z.string().optional(),
-    city: z.string().optional(),
-  }).optional(),
+    city: z.string().min(1, 'City is required'),
+  }),
 });
 
 export async function POST(request: NextRequest) {
@@ -154,12 +154,8 @@ export async function POST(request: NextRequest) {
       last_name: validatedData.lastName,
       phone: validatedData.phone,
       zipcode: validatedData.zipcode,
-      custom_id: user.id, // REQUIRED: Unique ID for cross-reference
-      work_locations: [validatedData.workLocation || { 
-        country: 'US', 
-        state: 'CA',
-        city: 'San Francisco' // RECOMMENDED: City for US checks
-      }], // REQUIRED: Work location for candidate
+      custom_id: user.id, // Auto-generated unique ID for cross-reference
+      work_locations: [validatedData.workLocation], // REQUIRED: Work location for candidate
     };
 
     // Generate idempotency key to prevent duplicate candidates (RECOMMENDED)
@@ -175,7 +171,7 @@ export async function POST(request: NextRequest) {
     const invitationData = {
       candidate_id: candidate.id,
       package: validatedData.package,
-      work_locations: [validatedData.workLocation || { country: 'US' }],
+      work_locations: [validatedData.workLocation],
     };
 
     const invitation = await checkr.createInvitation(invitationData);

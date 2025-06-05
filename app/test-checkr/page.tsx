@@ -25,11 +25,10 @@ interface HostedCheckForm {
   email: string;              // REQUIRED*
   phone: string;              // Optional but recommended
   zipcode: string;            // Optional but recommended
-  customId: string;           // REQUIRED* (unique ID for cross-reference)
   workLocation: {             // REQUIRED*
     country: string;          // REQUIRED* (two-character ISO country abbreviation)
     state: string;            // REQUIRED* (two-character ISO state abbreviation for US checks)
-    city: string;             // RECOMMENDED (highly recommended if in the US)
+    city: string;             // REQUIRED* (required for background checks)
   };
   package: string;
 }
@@ -105,7 +104,6 @@ export default function TestCheckrPage() {
     email: 'john.doe.test@gmail.com',     // REQUIRED*
     phone: '+1234567890',                 // Optional but recommended
     zipcode: '12345',                     // Optional but recommended
-    customId: 'test-user-' + Date.now(),  // REQUIRED* (unique ID for cross-reference)
     workLocation: {                       // REQUIRED*
       country: 'US',                      // REQUIRED* (two-character ISO country code)
       state: 'CA',                        // REQUIRED* (two-character ISO state code for US)
@@ -263,6 +261,12 @@ export default function TestCheckrPage() {
   });
 
   const testHostedCheck = async () => {
+    // Basic validation
+    if (!hostedCheckForm.firstName || !hostedCheckForm.lastName || !hostedCheckForm.email || !hostedCheckForm.workLocation.city || !hostedCheckForm.workLocation.country || !hostedCheckForm.workLocation.state) {
+      window.alert('Please fill in all required fields (First Name, Last Name, Email, Country, State, and City)');
+      return;
+    }
+
     setLoading('create-hosted-check');
     try {
       const response = await fetch('/api/checkr/create-hosted-check-test', {
@@ -922,98 +926,103 @@ export default function TestCheckrPage() {
                 {showHostedForm ? 'Hide' : 'Show'} Hosted Check Form
               </Button>
               
-              {showHostedForm && (
-                <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
-                  {/* Required Fields Header */}
-                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-                    <h4 className="font-medium text-blue-800 mb-1">Checkr Required Fields</h4>
-                    <p className="text-xs text-blue-700">All fields marked with * are required by Checkr API</p>
+                            {showHostedForm && (
+                <div className="space-y-6 border rounded-lg p-6 bg-white shadow-sm">
+                  {/* Header */}
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">Background Check Form</h4>
+                    <p className="text-sm text-blue-700">All fields marked with * are required by Checkr API</p>
                   </div>
 
-                  {/* Basic Information */}
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">First Name *</Label>
-                      <Input
-                        id="firstName"
-                        value={hostedCheckForm.firstName}
-                        onChange={(e) => setHostedCheckForm(prev => ({ ...prev, firstName: e.target.value }))}
-                        placeholder="John"
-                        className="border-blue-300"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="middleName">Middle Name</Label>
-                      <Input
-                        id="middleName"
-                        value={hostedCheckForm.middleName}
-                        onChange={(e) => setHostedCheckForm(prev => ({ ...prev, middleName: e.target.value }))}
-                        placeholder="Optional"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Last Name *</Label>
-                      <Input
-                        id="lastName"
-                        value={hostedCheckForm.lastName}
-                        onChange={(e) => setHostedCheckForm(prev => ({ ...prev, lastName: e.target.value }))}
-                        placeholder="Doe"
-                        className="border-blue-300"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="email">Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={hostedCheckForm.email}
-                      onChange={(e) => setHostedCheckForm(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="john.doe@example.com"
-                      className="border-blue-300"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="customId">Custom ID * (Cross-reference)</Label>
-                    <Input
-                      id="customId"
-                      value={hostedCheckForm.customId}
-                      onChange={(e) => setHostedCheckForm(prev => ({ ...prev, customId: e.target.value }))}
-                      placeholder="Unique identifier for this candidate"
-                      className="border-blue-300"
-                    />
-                  </div>
-                  
-                  {/* Contact Information */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input
-                        id="phone"
-                        value={hostedCheckForm.phone}
-                        onChange={(e) => setHostedCheckForm(prev => ({ ...prev, phone: e.target.value }))}
-                        placeholder="+1234567890"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="zipcode">Zipcode</Label>
-                      <Input
-                        id="zipcode"
-                        value={hostedCheckForm.zipcode}
-                        onChange={(e) => setHostedCheckForm(prev => ({ ...prev, zipcode: e.target.value }))}
-                        placeholder="12345"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Work Location - Required by Checkr */}
-                  <div>
-                    <Label className="text-sm font-medium text-blue-800">Work Location * (Required by Checkr)</Label>
-                    <div className="grid grid-cols-3 gap-4 mt-2">
+                  {/* Personal Information Section */}
+                  <div className="space-y-4">
+                    <h5 className="font-medium text-gray-900 border-b pb-2">Personal Information</h5>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <Label htmlFor="country">Country *</Label>
+                        <Label htmlFor="firstName" className="text-sm font-medium">First Name *</Label>
+                        <Input
+                          id="firstName"
+                          value={hostedCheckForm.firstName}
+                          onChange={(e) => setHostedCheckForm(prev => ({ ...prev, firstName: e.target.value }))}
+                          placeholder="John"
+                          className="mt-1"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="middleName" className="text-sm font-medium">Middle Name</Label>
+                        <Input
+                          id="middleName"
+                          value={hostedCheckForm.middleName}
+                          onChange={(e) => setHostedCheckForm(prev => ({ ...prev, middleName: e.target.value }))}
+                          placeholder="Optional"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="lastName" className="text-sm font-medium">Last Name *</Label>
+                        <Input
+                          id="lastName"
+                          value={hostedCheckForm.lastName}
+                          onChange={(e) => setHostedCheckForm(prev => ({ ...prev, lastName: e.target.value }))}
+                          placeholder="Doe"
+                          className="mt-1"
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="email" className="text-sm font-medium">Email *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={hostedCheckForm.email}
+                        onChange={(e) => setHostedCheckForm(prev => ({ ...prev, email: e.target.value }))}
+                        placeholder="john.doe@gmail.com"
+                        className="mt-1"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Contact Information Section */}
+                  <div className="space-y-4">
+                    <h5 className="font-medium text-gray-900 border-b pb-2">Contact Information</h5>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="phone" className="text-sm font-medium">Phone</Label>
+                        <Input
+                          id="phone"
+                          value={hostedCheckForm.phone}
+                          onChange={(e) => setHostedCheckForm(prev => ({ ...prev, phone: e.target.value }))}
+                          placeholder="+1234567890"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="zipcode" className="text-sm font-medium">Zipcode</Label>
+                        <Input
+                          id="zipcode"
+                          value={hostedCheckForm.zipcode}
+                          onChange={(e) => setHostedCheckForm(prev => ({ ...prev, zipcode: e.target.value }))}
+                          placeholder="12345"
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Work Location Section */}
+                  <div className="space-y-4">
+                    <h5 className="font-medium text-gray-900 border-b pb-2">Work Location *</h5>
+                    <p className="text-sm text-gray-600">Required by Checkr for background check processing</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="country" className="text-sm font-medium">Country *</Label>
                         <Input
                           id="country"
                           value={hostedCheckForm.workLocation.country}
@@ -1022,13 +1031,14 @@ export default function TestCheckrPage() {
                             workLocation: { ...prev.workLocation, country: e.target.value }
                           }))}
                           placeholder="US"
-                          className="border-blue-300"
+                          className="mt-1"
                           maxLength={2}
+                          required
                         />
-                        <p className="text-xs text-gray-600 mt-1">2-char ISO code</p>
+                        <p className="text-xs text-gray-500 mt-1">2-character ISO code</p>
                       </div>
                       <div>
-                        <Label htmlFor="state">State *</Label>
+                        <Label htmlFor="state" className="text-sm font-medium">State *</Label>
                         <Input
                           id="state"
                           value={hostedCheckForm.workLocation.state}
@@ -1037,13 +1047,14 @@ export default function TestCheckrPage() {
                             workLocation: { ...prev.workLocation, state: e.target.value }
                           }))}
                           placeholder="CA"
-                          className="border-blue-300"
+                          className="mt-1"
                           maxLength={2}
+                          required
                         />
-                        <p className="text-xs text-gray-600 mt-1">2-char ISO code</p>
+                        <p className="text-xs text-gray-500 mt-1">2-character ISO code</p>
                       </div>
                       <div>
-                        <Label htmlFor="city">City (Recommended)</Label>
+                        <Label htmlFor="city" className="text-sm font-medium">City *</Label>
                         <Input
                           id="city"
                           value={hostedCheckForm.workLocation.city}
@@ -1052,29 +1063,41 @@ export default function TestCheckrPage() {
                             workLocation: { ...prev.workLocation, city: e.target.value }
                           }))}
                           placeholder="San Francisco"
-                          className="border-yellow-300"
+                          className="mt-1"
+                          required
                         />
-                        <p className="text-xs text-gray-600 mt-1">Highly recommended for US</p>
+                        <p className="text-xs text-gray-500 mt-1">Required for background checks</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div>
-                    <Label htmlFor="package">Package</Label>
-                    <Select value={hostedCheckForm.package} onValueChange={(value) => setHostedCheckForm(prev => ({ ...prev, package: value }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a package" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="basic_for_golden_homeshare">Basic for Golden HomeShare</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  {/* Package Selection */}
+                  <div className="space-y-4">
+                    <h5 className="font-medium text-gray-900 border-b pb-2">Package Selection</h5>
+                    
+                    <div>
+                      <Label htmlFor="package" className="text-sm font-medium">Background Check Package</Label>
+                      <Select value={hostedCheckForm.package} onValueChange={(value) => setHostedCheckForm(prev => ({ ...prev, package: value }))}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select a package" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="basic_for_golden_homeshare">Basic for Golden HomeShare</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
-                  {/* Payload Preview */}
-                  <div className="p-3 bg-gray-50 border rounded-md">
-                    <h4 className="font-medium text-gray-800 mb-2">📋 Checkr API Payload Preview</h4>
-                    <pre className="text-xs bg-white p-3 rounded border overflow-x-auto">
+                  {/* API Payload Preview */}
+                  <div className="space-y-4">
+                    <h5 className="font-medium text-gray-900 border-b pb-2">API Payload Preview</h5>
+                    
+                    <div className="bg-gray-50 border rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-lg">📋</span>
+                        <h6 className="font-medium text-gray-800">Checkr API Request Data</h6>
+                      </div>
+                      <pre className="text-xs bg-white p-4 rounded border overflow-x-auto text-gray-700">
 {JSON.stringify({
   email: hostedCheckForm.email,
   first_name: hostedCheckForm.firstName,
@@ -1082,21 +1105,31 @@ export default function TestCheckrPage() {
   ...(hostedCheckForm.middleName && { middle_name: hostedCheckForm.middleName }),
   phone: hostedCheckForm.phone,
   zipcode: hostedCheckForm.zipcode,
-  custom_id: hostedCheckForm.customId,
   copy_requested: true,
   work_locations: [hostedCheckForm.workLocation]
 }, null, 2)}
-                    </pre>
+                      </pre>
+                    </div>
                   </div>
 
-                  <Button 
-                    onClick={testHostedCheck}
-                    disabled={loading === 'create-hosted-check'}
-                    className="w-full"
-                    size="lg"
-                  >
-                    {loading === 'create-hosted-check' ? 'Creating Invitation...' : 'Create Hosted Background Check'}
-                  </Button>
+                  {/* Action Button */}
+                  <div className="pt-4 border-t">
+                    <Button 
+                      onClick={testHostedCheck}
+                      disabled={loading === 'create-hosted-check'}
+                      className="w-full bg-blue-600 hover:bg-blue-700"
+                      size="lg"
+                    >
+                      {loading === 'create-hosted-check' ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Creating Invitation...
+                        </>
+                      ) : (
+                        'Create Hosted Background Check'
+                      )}
+                    </Button>
+                  </div>
 
                   <div className="text-xs text-muted-foreground space-y-1">
                     <p><strong>What this does:</strong></p>

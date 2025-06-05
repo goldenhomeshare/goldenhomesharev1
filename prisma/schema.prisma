@@ -20,6 +20,13 @@ model User {
   isVerified            Boolean @default(false)
   onboardingCompleted   Boolean @default(false)
 
+  // Additional fields required for Checkr integration
+  phone                 String?
+  zipcode               String?
+  dateOfBirth           DateTime? // Required for some background checks
+  middleName            String?
+  noMiddleName          Boolean @default(false)
+
   // Profile extensions
   homeownerProfile      HomeownerProfile?
   housemateProfile      HousemateProfile?
@@ -32,9 +39,9 @@ model User {
   housemateChats        ChatRoom[] @relation("HousemateChats")
   sentMessages          Message[]  @relation("SentMessages")
 
-  // Background check relations
-  background_checks_background_checks_candidateUserIdToUser background_checks[] @relation("background_checks_candidateUserIdToUser")
-  background_checks_background_checks_requestedByIdToUser   background_checks[] @relation("background_checks_requestedByIdToUser")
+  // Background check relations - simplified naming
+  backgroundChecks      BackgroundCheck[] @relation("UserBackgroundChecks")
+  requestedChecks       BackgroundCheck[] @relation("RequestedBackgroundChecks")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -165,39 +172,54 @@ enum AgreementStatus {
   CANCELLED             // Agreement cancelled
 }
 
-// Background checks model
-model background_checks {
-  id                                           String                @id
-  candidateId                                  String                @unique
-  invitationId                                 String?
-  reportId                                     String?
-  requestedById                                String?
-  candidateUserId                              String?
-  candidateEmail                               String
-  candidateName                                String
-  candidatePhone                               String?
-  status                                       BackgroundCheckStatus @default(PENDING)
-  checkrStatus                                 String?
-  invitationUrl                                String?
-  invitationStatus                             String?
-  completedAt                                  DateTime?
-  invitationSentAt                             DateTime?
-  createdAt                                    DateTime              @default(now())
-  updatedAt                                    DateTime
-  User_background_checks_candidateUserIdToUser User?                 @relation("background_checks_candidateUserIdToUser", fields: [candidateUserId], references: [id])
-  User_background_checks_requestedByIdToUser   User?                 @relation("background_checks_requestedByIdToUser", fields: [requestedById], references: [id])
+// Background checks model - using proper naming and structure
+model BackgroundCheck {
+  id                    String                @id @default(uuid())
+  candidateId           String                @unique
+  invitationId          String?               
+  reportId              String?               
+  requestedById         String?
+  candidateUserId       String?
+  candidateEmail        String
+  candidateName         String
+  candidatePhone        String?
+  candidateZipcode      String?
+  status                BackgroundCheckStatus @default(PENDING)
+  checkrStatus          String?
+  invitationUrl         String?
+  invitationStatus      String?
+  completedAt           DateTime?
+  invitationSentAt      DateTime?
+  reportData            Json?                 // Store full Checkr report data
+  packageName           String?               // Track which package was used
+  
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  
+  // Relations with proper naming
+  candidateUser         User?                 @relation("UserBackgroundChecks", fields: [candidateUserId], references: [id])
+  requestedBy           User?                 @relation("RequestedBackgroundChecks", fields: [requestedById], references: [id])
+  
+  @@map("background_checks") // Keep existing table name for migration compatibility
 }
 
 enum BackgroundCheckStatus {
   PENDING
+  INVITATION_SENT       // invitation.created
   IN_PROGRESS
   COMPLETED
   CLEAR
   CONSIDER
   DISPUTE
+  DISPUTED              // report.disputed (alias for DISPUTE)
   EXPIRED
   DECLINED
   FAILED
+  CANCELED              // For fully canceled reports
+  PARTIAL_COMPLETE      // For partially completed reports with canceled screenings
+  SUSPENDED             // report.suspended
+  PRE_ADVERSE_ACTION    // report.pre_adverse_action
+  POST_ADVERSE_ACTION   // report.post_adverse_action
 }
 
 // Chat-related models for realtime messaging

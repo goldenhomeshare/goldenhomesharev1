@@ -12,7 +12,7 @@ import prisma from "@/app/lib/db";
 async function checkAndUpdateUserVerificationStatus(userId: string, userEmail: string) {
   try {
     // Check if user has any completed background checks
-    const backgroundCheckModel = (prisma as any).background_checks;
+    const backgroundCheckModel = prisma.backgroundCheck;
     
     if (!backgroundCheckModel) {
       console.error("Background check model not found");
@@ -151,6 +151,23 @@ export default async function BackgroundCheckPage() {
             )}
           </div>
         </CardHeader>
+      </Card>
+
+      {/* Quick Status Check Section */}
+      <Card className="mb-8 border-blue-200 bg-blue-50">
+        <CardHeader>
+          <CardTitle className="text-lg text-blue-900">Check Your Status Automatically</CardTitle>
+          <p className="text-blue-700">
+            View your current background check status automatically using your account email ({user.email}).
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Link href="/my-background-check">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+              View My Status
+            </Button>
+          </Link>
+        </CardContent>
       </Card>
 
       {/* Form Section */}

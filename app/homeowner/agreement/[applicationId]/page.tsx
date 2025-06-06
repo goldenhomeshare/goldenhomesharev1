@@ -2,7 +2,8 @@ import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
 import prisma from "../../../lib/db";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, FileText, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CheckCircle, FileText, Clock, Download } from "lucide-react";
 import { HomeownerAgreementWizard } from "@/components/HomeownerAgreementWizard";
 
 async function getApplicationWithDetails(applicationId: string, userId: string) {
@@ -222,12 +223,71 @@ export default async function HomeownerAgreementPage({
           </Card>
         )}
 
-        {/* Agreement Wizard */}
-        <HomeownerAgreementWizard 
-          application={application}
-          homeownerData={homeownerData}
-          existingAgreement={agreement}
-        />
+        {/* Agreement Wizard or Completion View */}
+        {agreement?.status === 'COMPLETED' ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-green-800">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                Agreement Completed Successfully
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-green-800 font-medium mb-2">Both Parties Have Signed</p>
+                  <p className="text-green-700 text-sm">
+                    The agreement has been fully executed. Both you and the housemate have signed the agreement. 
+                    The housemate will now proceed with payment to finalize the arrangement.
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Your Signature</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <span className="text-green-600 font-medium">✓ Signed</span>
+                      <span className="text-sm text-gray-500">
+                        ({new Date(agreement.homeownerSignedAt!).toLocaleDateString()})
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Housemate Signature</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <span className="text-green-600 font-medium">✓ Signed</span>
+                      <span className="text-sm text-gray-500">
+                        ({new Date(agreement.housemateSignedAt!).toLocaleDateString()})
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+                  <Button asChild variant="outline" className="flex items-center gap-2">
+                    <a href={`/api/agreements/generate-filled`} target="_blank" rel="noopener noreferrer">
+                      <Download className="h-4 w-4" />
+                      Download Signed Agreement
+                    </a>
+                  </Button>
+                  <Button asChild className="flex items-center gap-2">
+                    <a href="/homeowner/applications">
+                      Back to Applications
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <HomeownerAgreementWizard 
+            application={application}
+            homeownerData={homeownerData}
+            existingAgreement={agreement}
+          />
+        )}
       </div>
     </div>
   );

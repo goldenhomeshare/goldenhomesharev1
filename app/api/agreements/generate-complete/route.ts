@@ -342,7 +342,7 @@ export async function POST(request: NextRequest) {
     // Section 4. Security Deposit - EXACT TEXT with field insertion and styling
     y = addText(page3, 'Section 4. Security Deposit', 50, y, 12, boldFont, 500, primaryColor);
     y -= 10;
-    const securityDepositAmount = formData.securityDeposit ? formatCurrency(formData.securityDeposit) : formatCurrency(formData.monthlyAmount);
+    const securityDepositAmount = formData.securityDeposit && formData.securityDeposit !== '0' ? formatCurrency(formData.securityDeposit) : formatCurrency('0');
     text = `On the Effective Date, Licensee must pay to Licensor ${securityDepositAmount} ("Security Deposit"). Licensor may apply the Security Deposit to any costs paid as a result of Licensee's breach of this Agreement. The Security Deposit (less any amounts applied by Licensor) will be returned to Licensee within 30 days after the End Date.`;
     y = addText(page3, text, 50, y, 10, font);
     y -= 15;
@@ -556,89 +556,208 @@ export async function POST(request: NextRequest) {
     y = addText(page8, text, 50, y, 10, font);
     y -= 30;
 
-    // ENHANCED SIGNATURE PAGE WITH STYLED BOXES
-    y = addText(page8, 'SIGNATURES', 250, y, 14, boldFont, 200, primaryColor);
-    y -= 20;
+    // =========================== SIGNATURE PAGE (9) ===========================
+    const signaturePage = pdfDoc.addPage([612, 792]);
+    y = 720;
+    y = addPageHeader(signaturePage, y);
+    y -= 40;
 
-    // Add signature boxes with better styling
-    page8.drawRectangle({
-      x: 40,
-      y: y - 80,
-      width: 250,
-      height: 80,
-      borderColor: primaryColor,
-      borderWidth: 2,
+    // CLEAN SIGNATURE PAGE DESIGN
+    y = addText(signaturePage, 'SIGNATURES', 250, y, 16, boldFont, 200, primaryColor);
+    y -= 60;
+
+    // Create structured signature sections
+    const leftColumnX = 60;
+    const rightColumnX = 320;
+
+    // Section headers
+    y = addText(signaturePage, 'Licensor (Homeowner)', leftColumnX, y, 12, boldFont, 200, primaryColor);
+    y = addText(signaturePage, 'Licensee (Housemate)', rightColumnX, y, 12, boldFont, 200, primaryColor);
+    y -= 30;
+
+    // Signature lines and labels
+    const signatureLineY = y - 10;
+    
+    // Draw signature lines
+    signaturePage.drawLine({
+      start: { x: leftColumnX, y: signatureLineY },
+      end: { x: leftColumnX + 200, y: signatureLineY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
     });
     
-    page8.drawRectangle({
-      x: 320,
-      y: y - 80,
-      width: 250,
-      height: 80,
-      borderColor: primaryColor,
-      borderWidth: 2,
+    signaturePage.drawLine({
+      start: { x: rightColumnX, y: signatureLineY },
+      end: { x: rightColumnX + 200, y: signatureLineY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
     });
 
-    y = addText(page8, 'Licensor', 50, y, 12, boldFont, 200, primaryColor);
-    y = addText(page8, 'Licensee', 350, y, 12, boldFont, 200, primaryColor);
-    y -= 30;
+    // Add actual signatures with clean styling
+    const handwritingFont = await pdfDoc.embedFont(StandardFonts.CourierOblique);
+    
+    if (formData.hostSignature) {
+      signaturePage.drawText(formData.hostSignature, {
+        x: leftColumnX + 5,
+        y: signatureLineY + 5,
+        size: 14,
+        font: handwritingFont,
+        color: rgb(0, 0, 0.7),
+      });
+    }
 
-    y = addText(page8, '_________________________', 50, y, 10, font);
-    y = addText(page8, '_________________________', 350, y, 10, font);
-    y -= 15;
+    if (formData.seekerSignature) {
+      signaturePage.drawText(formData.seekerSignature, {
+        x: rightColumnX + 5,
+        y: signatureLineY + 5,
+        size: 14,
+        font: handwritingFont,
+        color: rgb(0, 0, 0.7),
+      });
+    }
 
-    y = addText(page8, 'Signature', 50, y, 8, font);
-    y = addText(page8, 'Signature', 350, y, 8, font);
-    y -= 20;
+    y = signatureLineY - 15;
+    y = addText(signaturePage, 'Signature', leftColumnX, y, 9, font, 200, rgb(0.3, 0.3, 0.3));
+    y = addText(signaturePage, 'Signature', rightColumnX, y, 9, font, 200, rgb(0.3, 0.3, 0.3));
+    y -= 25;
 
-    y = addFilledField(page8, formData.hostName, 50, y, 10);
-    y = addFilledField(page8, formData.seekerName, 350, y, 10);
-    y -= 15;
+    // Printed name lines
+    const printedNameY = y;
+    
+    signaturePage.drawLine({
+      start: { x: leftColumnX, y: printedNameY },
+      end: { x: leftColumnX + 200, y: printedNameY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+    
+    signaturePage.drawLine({
+      start: { x: rightColumnX, y: printedNameY },
+      end: { x: rightColumnX + 200, y: printedNameY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
 
-    y = addText(page8, 'Printed Name', 50, y, 8, font);
-    y = addText(page8, 'Printed Name', 350, y, 8, font);
-    y -= 20;
+    // Add printed names
+    if (formData.hostName) {
+      signaturePage.drawText(formData.hostName, {
+        x: leftColumnX + 5,
+        y: printedNameY + 5,
+        size: 11,
+        font: font,
+        color: rgb(0, 0, 0),
+      });
+    }
 
-    const todaysDate = new Date().toLocaleDateString('en-US');
-    y = addFilledField(page8, todaysDate, 50, y, 10);
-    y = addFilledField(page8, todaysDate, 350, y, 10);
-    y -= 15;
+    if (formData.seekerName) {
+      signaturePage.drawText(formData.seekerName, {
+        x: rightColumnX + 5,
+        y: printedNameY + 5,
+        size: 11,
+        font: font,
+        color: rgb(0, 0, 0),
+      });
+    }
 
-    y = addText(page8, 'Date', 50, y, 8, font);
-    y = addText(page8, 'Date', 350, y, 8, font);
+    y = printedNameY - 15;
+    y = addText(signaturePage, 'Printed Name', leftColumnX, y, 9, font, 200, rgb(0.3, 0.3, 0.3));
+    y = addText(signaturePage, 'Printed Name', rightColumnX, y, 9, font, 200, rgb(0.3, 0.3, 0.3));
+    y -= 25;
 
-    // =========================== PROPERTY ADDENDUM PAGES (9-13) ===========================
-    // PAGE 9 - Property Addendum Start
-    const page9 = pdfDoc.addPage([612, 792]);
+    // Date lines
+    const dateY = y;
+    
+    signaturePage.drawLine({
+      start: { x: leftColumnX, y: dateY },
+      end: { x: leftColumnX + 120, y: dateY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+    
+    signaturePage.drawLine({
+      start: { x: rightColumnX, y: dateY },
+      end: { x: rightColumnX + 120, y: dateY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+
+    // Show signature dates if available
+    let hostSignDate = new Date().toLocaleDateString('en-US');
+    let seekerSignDate = '';
+
+    if (formData.hostSignedAt) {
+      try {
+        const signedDate = new Date(formData.hostSignedAt);
+        hostSignDate = signedDate.toLocaleDateString('en-US');
+      } catch (error) {
+        console.warn('Error parsing host signature date:', formData.hostSignedAt);
+      }
+    }
+
+    if (formData.seekerSignedAt) {
+      try {
+        const signedDate = new Date(formData.seekerSignedAt);
+        seekerSignDate = signedDate.toLocaleDateString('en-US');
+      } catch (error) {
+        console.warn('Error parsing seeker signature date:', formData.seekerSignedAt);
+      }
+    }
+
+    // Add dates
+    signaturePage.drawText(hostSignDate, {
+      x: leftColumnX + 5,
+      y: dateY + 5,
+      size: 11,
+      font: font,
+      color: rgb(0, 0, 0),
+    });
+
+    if (formData.seekerSignature && seekerSignDate) {
+      signaturePage.drawText(seekerSignDate, {
+        x: rightColumnX + 5,
+        y: dateY + 5,
+        size: 11,
+        font: font,
+        color: rgb(0, 0, 0),
+      });
+    }
+
+    y = dateY - 15;
+    y = addText(signaturePage, 'Date', leftColumnX, y, 9, font, 200, rgb(0.3, 0.3, 0.3));
+    y = addText(signaturePage, 'Date', rightColumnX, y, 9, font, 200, rgb(0.3, 0.3, 0.3));
+
+    // =========================== PROPERTY ADDENDUM PAGES (10-14) ===========================
+    // PAGE 10 - Property Addendum Start
+    const page10 = pdfDoc.addPage([612, 792]);
     y = 720;
-    y = addPageHeader(page9, y);
+    y = addPageHeader(page10, y);
     y -= 30;
 
-    y = addText(page9, 'Property Addendum', 200, y, 16, boldFont, 300, primaryColor);
+    y = addText(page10, 'Property Addendum', 200, y, 16, boldFont, 300, primaryColor);
     y -= 30;
 
-    y = addText(page9, 'This Property Addendum is attached to and forms part of the Golden HomeShare Limited License Agreement (the "Agreement") dated', 50, y, 10, font);
+    y = addText(page10, 'This Property Addendum is attached to and forms part of the Golden HomeShare Limited License Agreement (the "Agreement") dated', 50, y, 10, font);
     text = `${formatDate(formData.moveInDate)} between ${formData.hostName} (Licensor) and ${formData.seekerName} (Licensee) for the property located at ${formData.propertyAddress}.`;
-    y = addText(page9, text, 50, y, 10, font);
+    y = addText(page10, text, 50, y, 10, font);
     y -= 20;
 
     // Licensee Areas Section
-    y = addText(page9, 'LICENSEE AREAS', 50, y, 12, boldFont, 500, primaryColor);
+    y = addText(page10, 'LICENSEE AREAS', 50, y, 12, boldFont, 500, primaryColor);
     y -= 15;
-    text = `The following areas of the Residence are designated as "Licensee Areas" for the exclusive use of Licensee:`;
-    y = addText(page9, text, 50, y, 10, font);
+    text = `The following areas of the Residence are designated as "Licensee Areas" for non-exclusive shared occupancy by Licensee:`;
+    y = addText(page10, text, 50, y, 10, font);
     y -= 10;
 
     // Enhanced Bedroom Description
     if (formData.bedroomDescription) {
-      y = addText(page9, '[X] Bedroom: ' + formData.bedroomDescription, 70, y, 10, font, 450);
+      y = addText(page10, '[X] Bedroom: ' + formData.bedroomDescription, 70, y, 10, font, 450);
       y -= 8;
     }
     
     // Bathroom Access
     if (formData.bathroomType && formData.bathroomDescription) {
       const bathroomTypeLabel = formData.bathroomType === 'private' ? 'Private Bathroom' : 'Shared Bathroom';
-      y = addText(page9, '[X] ' + bathroomTypeLabel + ': ' + formData.bathroomDescription, 70, y, 10, font, 450);
+      y = addText(page10, '[X] ' + bathroomTypeLabel + ': ' + formData.bathroomDescription, 70, y, 10, font, 450);
       y -= 8;
     }
     
@@ -646,7 +765,7 @@ export async function POST(request: NextRequest) {
     if (formData.additionalRooms && formData.additionalRooms.length > 0) {
       formData.additionalRooms.forEach(room => {
         if (room.name && room.description) {
-          y = addText(page9, '[X] ' + room.name + ': ' + room.description, 70, y, 10, font, 450);
+          y = addText(page10, '[X] ' + room.name + ': ' + room.description, 70, y, 10, font, 450);
           y -= 8;
         }
       });
@@ -654,125 +773,125 @@ export async function POST(request: NextRequest) {
     
     // Legacy fallback for backward compatibility
     if (formData.bedroomAAccess && !formData.bedroomDescription) {
-      y = addText(page9, '[X] Bedroom A: ' + (formData.bedroomANotes || 'Private bedroom'), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Bedroom A: ' + (formData.bedroomANotes || 'Private bedroom'), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.bedroomBAccess) {
-      y = addText(page9, '[X] Bedroom B: ' + (formData.bedroomBNotes || 'Private bedroom'), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Bedroom B: ' + (formData.bedroomBNotes || 'Private bedroom'), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.otherAreasAccess) {
-      y = addText(page9, '[X] Other Areas: ' + (formData.otherAreasNotes || 'Additional private areas'), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Other Areas: ' + (formData.otherAreasNotes || 'Additional private areas'), 70, y, 10, font, 450);
       y -= 8;
     }
     
     // Room description if provided (legacy)
     if (formData.roomDescription && !formData.bedroomDescription) {
-      y = addText(page9, '[X] Room Description: ' + formData.roomDescription, 70, y, 10, font, 450);
+      y = addText(page10, '[X] Room Description: ' + formData.roomDescription, 70, y, 10, font, 450);
       y -= 8;
     }
 
     y -= 20;
 
     // Shared Areas Section
-    y = addText(page9, 'SHARED AREAS', 50, y, 12, boldFont, 500, primaryColor);
+    y = addText(page10, 'SHARED AREAS', 50, y, 12, boldFont, 500, primaryColor);
     y -= 15;
     text = `The following areas of the Residence are designated as "Shared Areas" for common use by both Licensor and Licensee:`;
-    y = addText(page9, text, 50, y, 10, font);
+    y = addText(page10, text, 50, y, 10, font);
     y -= 10;
 
     // Enhanced Shared Areas with new fields
     if (formData.kitchenAccess) {
-      y = addText(page9, '[X] Kitchen' + (formData.kitchenNotes ? ': ' + formData.kitchenNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Kitchen' + (formData.kitchenNotes ? ': ' + formData.kitchenNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.laundryAccess) {
-      y = addText(page9, '[X] Laundry' + (formData.laundryNotes ? ': ' + formData.laundryNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Laundry' + (formData.laundryNotes ? ': ' + formData.laundryNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.livingRoomAccess) {
-      y = addText(page9, '[X] Living Room' + (formData.livingRoomNotes ? ': ' + formData.livingRoomNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Living Room' + (formData.livingRoomNotes ? ': ' + formData.livingRoomNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.diningRoomAccess) {
-      y = addText(page9, '[X] Dining Room' + (formData.diningRoomNotes ? ': ' + formData.diningRoomNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Dining Room' + (formData.diningRoomNotes ? ': ' + formData.diningRoomNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.parkingAccess) {
-      y = addText(page9, '[X] Parking' + (formData.parkingNotes ? ': ' + formData.parkingNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Parking' + (formData.parkingNotes ? ': ' + formData.parkingNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.indoorStorageAccess) {
-      y = addText(page9, '[X] Indoor Storage' + (formData.indoorStorageNotes ? ': ' + formData.indoorStorageNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Indoor Storage' + (formData.indoorStorageNotes ? ': ' + formData.indoorStorageNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.outdoorAccess) {
-      y = addText(page9, '[X] Outdoor Access' + (formData.outdoorNotes ? ': ' + formData.outdoorNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Outdoor Access' + (formData.outdoorNotes ? ': ' + formData.outdoorNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.additionalSharedAreas) {
-      y = addText(page9, '[X] Additional Shared Areas: ' + formData.additionalSharedAreas, 70, y, 10, font, 450);
+      y = addText(page10, '[X] Additional Shared Areas: ' + formData.additionalSharedAreas, 70, y, 10, font, 450);
       y -= 8;
     }
     
     // Legacy fallback for backward compatibility
     if (formData.livingAreaAccess && !formData.livingRoomAccess) {
-      y = addText(page9, '[X] Living room/family room' + (formData.livingAreaNotes ? ': ' + formData.livingAreaNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Living room/family room' + (formData.livingAreaNotes ? ': ' + formData.livingAreaNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.diningAreaAccess && !formData.diningRoomAccess) {
-      y = addText(page9, '[X] Dining area' + (formData.diningAreaNotes ? ': ' + formData.diningAreaNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Dining area' + (formData.diningAreaNotes ? ': ' + formData.diningAreaNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.laundryAreaAccess && !formData.laundryAccess) {
-      y = addText(page9, '[X] Laundry room/facilities' + (formData.laundryAreaNotes ? ': ' + formData.laundryAreaNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Laundry room/facilities' + (formData.laundryAreaNotes ? ': ' + formData.laundryAreaNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.outdoorAreaAccess && !formData.outdoorAccess) {
-      y = addText(page9, '[X] Outdoor spaces (yard, patio, deck)' + (formData.outdoorAreaNotes ? ': ' + formData.outdoorAreaNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Outdoor spaces (yard, patio, deck)' + (formData.outdoorAreaNotes ? ': ' + formData.outdoorAreaNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.outdoorStorageAccess) {
-      y = addText(page9, '[X] Outdoor storage' + (formData.outdoorStorageNotes ? ': ' + formData.outdoorStorageNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Outdoor storage' + (formData.outdoorStorageNotes ? ': ' + formData.outdoorStorageNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     if (formData.otherSharedAccess) {
-      y = addText(page9, '[X] Other shared areas' + (formData.otherSharedNotes ? ': ' + formData.otherSharedNotes : ''), 70, y, 10, font, 450);
+      y = addText(page10, '[X] Other shared areas' + (formData.otherSharedNotes ? ': ' + formData.otherSharedNotes : ''), 70, y, 10, font, 450);
       y -= 8;
     }
     
     // Shared Space Guidelines
     if (formData.sharedSpaceConditions) {
       y -= 10;
-      y = addText(page9, 'SHARED SPACE GUIDELINES', 50, y, 12, boldFont, 500, primaryColor);
+      y = addText(page10, 'SHARED SPACE GUIDELINES', 50, y, 12, boldFont, 500, primaryColor);
       y -= 10;
-      y = addText(page9, formData.sharedSpaceConditions, 70, y, 10, font, 450);
+      y = addText(page10, formData.sharedSpaceConditions, 70, y, 10, font, 450);
       y -= 8;
     }
 
     // Specific Items if provided
     if (formData.specificItemsOwnership) {
       y -= 10;
-      y = addText(page9, 'SPECIFIC ITEMS OWNERSHIP', 50, y, 12, boldFont, 500, primaryColor);
+      y = addText(page10, 'SPECIFIC ITEMS OWNERSHIP', 50, y, 12, boldFont, 500, primaryColor);
       y -= 10;
-      y = addText(page9, formData.specificItemsOwnership, 70, y, 10, font, 450);
+      y = addText(page10, formData.specificItemsOwnership, 70, y, 10, font, 450);
       y -= 8;
     }
 
-    // =========================== PAGE 10 - HOUSE RULES SECTION ===========================
-    const page10 = pdfDoc.addPage([612, 792]);
+    // =========================== PAGE 11 - HOUSE RULES SECTION ===========================
+    const pageRules = pdfDoc.addPage([612, 792]);
     y = 720;
-    y = addPageHeader(page10, y);
+    y = addPageHeader(pageRules, y);
     y -= 30;
 
-    y = addText(page10, 'Section 3. House Rules', 50, y, 14, boldFont, 500, primaryColor);
+    y = addText(pageRules, 'Section 3. House Rules', 50, y, 14, boldFont, 500, primaryColor);
     y -= 20;
 
     // A. Use of Shared Areas
-    y = addText(page10, 'A. Use of Shared Areas', 50, y, 12, boldFont, 500, primaryColor);
+    y = addText(pageRules, 'A. Use of Shared Areas', 50, y, 12, boldFont, 500, primaryColor);
     y -= 15;
 
-    y = addText(page10, '1. We agree to use the TVs in the Shared Areas as follows:', 50, y, 10, boldFont);
+    y = addText(pageRules, '1. We agree to use the TVs in the Shared Areas as follows:', 50, y, 10, boldFont);
     y -= 10;
 
     // Use actual TV usage data
@@ -783,16 +902,16 @@ export async function POST(request: NextRequest) {
       'offlimits': '[X] TV off-limits'
     };
     
-    y = addText(page10, tvUsageText[formData.tvUsage as keyof typeof tvUsageText] || tvUsageText['anytime'], 70, y, 10, font);
+    y = addText(pageRules, tvUsageText[formData.tvUsage as keyof typeof tvUsageText] || tvUsageText['anytime'], 70, y, 10, font);
     y -= 8;
 
     if (formData.tvUsage === 'limited' && formData.tvLimitedHours) {
-      y = addText(page10, '    Hours: ' + formData.tvLimitedHours, 70, y, 10, font);
+      y = addText(pageRules, '    Hours: ' + formData.tvLimitedHours, 70, y, 10, font);
       y -= 8;
     }
     y -= 10;
 
-    y = addText(page10, '2. We agree to play music in the Shared Areas as follows:', 50, y, 10, boldFont);
+    y = addText(pageRules, '2. We agree to play music in the Shared Areas as follows:', 50, y, 10, boldFont);
     y -= 10;
 
     // Use actual music usage data
@@ -803,80 +922,80 @@ export async function POST(request: NextRequest) {
       'offlimits': '[X] Playing music off-limits'
     };
 
-    y = addText(page10, musicUsageText[formData.musicUsage as keyof typeof musicUsageText] || musicUsageText['anytime'], 70, y, 10, font);
+    y = addText(pageRules, musicUsageText[formData.musicUsage as keyof typeof musicUsageText] || musicUsageText['anytime'], 70, y, 10, font);
     y -= 8;
 
     if (formData.musicUsage === 'limited' && formData.musicLimitedHours) {
-      y = addText(page10, '    Hours: ' + formData.musicLimitedHours, 70, y, 10, font);
+      y = addText(pageRules, '    Hours: ' + formData.musicLimitedHours, 70, y, 10, font);
       y -= 8;
     }
     y -= 15;
 
     // B. Social and Leisure Time
-    y = addText(page10, 'B. Social and Leisure Time', 50, y, 12, boldFont, 500, primaryColor);
+    y = addText(pageRules, 'B. Social and Leisure Time', 50, y, 12, boldFont, 500, primaryColor);
     y -= 15;
 
-    y = addText(page10, 'We agree that the following activities are acceptable:', 50, y, 10, font);
+    y = addText(pageRules, 'We agree that the following activities are acceptable:', 50, y, 10, font);
     y -= 10;
 
     // Use actual social activities data
     if (formData.alcoholAllowed) {
-      y = addText(page10, '[X] Drinking alcohol', 70, y, 10, font);
+      y = addText(pageRules, '[X] Drinking alcohol', 70, y, 10, font);
       y -= 8;
       if (formData.alcoholParameters) {
-        y = addText(page10, '    Within these parameters: ' + formData.alcoholParameters, 70, y, 10, font);
+        y = addText(pageRules, '    Within these parameters: ' + formData.alcoholParameters, 70, y, 10, font);
         y -= 8;
       }
     } else {
-      y = addText(page10, '[ ] Drinking alcohol - Not permitted', 70, y, 10, font);
+      y = addText(pageRules, '[ ] Drinking alcohol - Not permitted', 70, y, 10, font);
       y -= 8;
     }
 
     if (formData.smokingAllowed) {
-      y = addText(page10, '[X] Smoking', 70, y, 10, font);
+      y = addText(pageRules, '[X] Smoking', 70, y, 10, font);
       y -= 8;
       if (formData.smokingParameters) {
-        y = addText(page10, '    Within these parameters: ' + formData.smokingParameters, 70, y, 10, font);
+        y = addText(pageRules, '    Within these parameters: ' + formData.smokingParameters, 70, y, 10, font);
         y -= 8;
       }
     } else {
-      y = addText(page10, '[ ] Smoking - Not permitted', 70, y, 10, font);
+      y = addText(pageRules, '[ ] Smoking - Not permitted', 70, y, 10, font);
       y -= 8;
     }
 
     if (formData.otherActivitiesAllowed && formData.otherActivitiesParameters) {
-      y = addText(page10, '[X] Other: ' + formData.otherActivitiesParameters, 70, y, 10, font);
+      y = addText(pageRules, '[X] Other: ' + formData.otherActivitiesParameters, 70, y, 10, font);
       y -= 8;
     }
     y -= 15;
 
     // C. Quiet Hours
-    y = addText(page10, 'C. Quiet Hours', 50, y, 12, boldFont, 500, primaryColor);
+    y = addText(pageRules, 'C. Quiet Hours', 50, y, 12, boldFont, 500, primaryColor);
     y -= 10;
 
     // Use actual quiet hours data
     const quietHoursText = `We agree that quiet hours will be from ${formData.quietHoursFrom || '22:00'} to ${formData.quietHoursTo || '07:00'} on ${formData.quietHoursDays || 'Daily'}`;
-    y = addText(page10, quietHoursText, 50, y, 10, font);
+    y = addText(pageRules, quietHoursText, 50, y, 10, font);
     y -= 15;
 
     // D. Pets
-    y = addText(page10, 'D. Pets', 50, y, 12, boldFont, 500, primaryColor);
+    y = addText(pageRules, 'D. Pets', 50, y, 12, boldFont, 500, primaryColor);
     y -= 10;
 
     // Use actual pet policy data
     if (formData.petsAllowed) {
-      y = addText(page10, '[X] Pets ARE permitted at the Residence', 70, y, 10, font);
+      y = addText(pageRules, '[X] Pets ARE permitted at the Residence', 70, y, 10, font);
       y -= 8;
       if (formData.petSpeciesRestrictions) {
-        y = addText(page10, 'Species and/or breed restrictions: ' + formData.petSpeciesRestrictions, 70, y, 10, font);
+        y = addText(pageRules, 'Species and/or breed restrictions: ' + formData.petSpeciesRestrictions, 70, y, 10, font);
         y -= 8;
       }
       if (formData.petOtherParameters) {
-        y = addText(page10, 'Other parameters: ' + formData.petOtherParameters, 70, y, 10, font);
+        y = addText(pageRules, 'Other parameters: ' + formData.petOtherParameters, 70, y, 10, font);
         y -= 8;
       }
     } else {
-      y = addText(page10, '[X] Pets ARE NOT permitted at the Residence', 70, y, 10, font);
+      y = addText(pageRules, '[X] Pets ARE NOT permitted at the Residence', 70, y, 10, font);
       y -= 8;
     }
 
@@ -1048,17 +1167,26 @@ export async function POST(request: NextRequest) {
         transportation: "Transportation"
       };
 
-      // Add headers
+      // Add table headers with better alignment
       y = addText(page12, 'Service', 70, y, 10, boldFont);
-      y = addText(page12, 'Hours per Week', 400, y, 10, boldFont);
-      y -= 10;
+      y = addText(page12, 'Hours per Week', 320, y, 10, boldFont);
+      y -= 15;
 
-      // List each support service
+      // Add underline for table headers
+      page12.drawLine({
+        start: { x: 70, y: y + 5 },
+        end: { x: 480, y: y + 5 },
+        thickness: 1,
+        color: rgb(0.5, 0.5, 0.5),
+      });
+      y -= 5;
+
+      // List each support service with better column alignment
       formData.supportRequested.forEach(support => {
         const supportLabel = supportLabels[support.id] || support.id;
         y = addText(page12, supportLabel, 70, y, 10, font);
-        y = addText(page12, `${support.hoursPerWeek} ${support.hoursPerWeek === 1 ? 'hour' : 'hours'}`, 400, y, 10, font);
-        y -= 8;
+        y = addText(page12, `${support.hoursPerWeek} ${support.hoursPerWeek === 1 ? 'hour' : 'hours'}`, 320, y, 10, font);
+        y -= 12;
       });
 
       y -= 10;
@@ -1066,34 +1194,72 @@ export async function POST(request: NextRequest) {
       y -= 20;
     }
 
-    // H. Custom Section (renumbered to J if support services are present)
-    const customSectionLetter = (formData.supportRequested && formData.supportRequested.length > 0) ? 'J' : 'H';
-    y = addText(page12, `${customSectionLetter}. Custom Section`, 50, y, 12, boldFont, 500, primaryColor);
-    y -= 10;
+    // Check if we need a new page for Section J (custom section)
+    if (y < 200) { // If less than 200 units from bottom, start new page
+      const page13 = pdfDoc.addPage([612, 792]);
+      y = 720;
+      y = addPageHeader(page13, y);
+      y -= 30;
 
-    y = addText(page12, 'We agree upon the following:', 50, y, 10, font);
-    y -= 10;
-
-    // Use actual custom agreements data
-    if (formData.customAgreements) {
-      y = addText(page12, formData.customAgreements, 50, y, 10, font, 500);
-    } else {
-      y = addText(page12, 'No additional custom agreements specified.', 50, y, 10, font);
-    }
-    y -= 20;
-
-    // Additional Information
-    if (formData.specialConditions) {
-      y = addText(page12, 'SPECIAL CONDITIONS', 50, y, 12, boldFont, 500, primaryColor);
+      // H. Custom Section (renumbered to J if support services are present)
+      const customSectionLetter = (formData.supportRequested && formData.supportRequested.length > 0) ? 'J' : 'H';
+      y = addText(page13, `${customSectionLetter}. Custom Section`, 50, y, 12, boldFont, 500, primaryColor);
       y -= 10;
-      y = addText(page12, formData.specialConditions, 50, y, 10, font, 500);
+
+      y = addText(page13, 'We agree upon the following:', 50, y, 10, font);
       y -= 15;
-    }
 
-    if (formData.additionalNotes) {
-      y = addText(page12, 'ADDITIONAL NOTES', 50, y, 12, boldFont, 500, primaryColor);
+      // Use actual custom agreements data
+      if (formData.customAgreements) {
+        y = addText(page13, formData.customAgreements, 50, y, 10, font, 500);
+      } else {
+        y = addText(page13, 'No additional custom agreements specified.', 50, y, 10, font);
+      }
+      y -= 25;
+
+      // Additional Information
+      if (formData.specialConditions) {
+        y = addText(page13, 'SPECIAL CONDITIONS', 50, y, 12, boldFont, 500, primaryColor);
+        y -= 10;
+        y = addText(page13, formData.specialConditions, 50, y, 10, font, 500);
+        y -= 20;
+      }
+
+      if (formData.additionalNotes) {
+        y = addText(page13, 'ADDITIONAL NOTES', 50, y, 12, boldFont, 500, primaryColor);
+        y -= 10;
+        y = addText(page13, formData.additionalNotes, 50, y, 10, font, 500);
+      }
+    } else {
+      // H. Custom Section (renumbered to J if support services are present)
+      const customSectionLetter = (formData.supportRequested && formData.supportRequested.length > 0) ? 'J' : 'H';
+      y = addText(page12, `${customSectionLetter}. Custom Section`, 50, y, 12, boldFont, 500, primaryColor);
       y -= 10;
-      y = addText(page12, formData.additionalNotes, 50, y, 10, font, 500);
+
+      y = addText(page12, 'We agree upon the following:', 50, y, 10, font);
+      y -= 15;
+
+      // Use actual custom agreements data
+      if (formData.customAgreements) {
+        y = addText(page12, formData.customAgreements, 50, y, 10, font, 500);
+      } else {
+        y = addText(page12, 'No additional custom agreements specified.', 50, y, 10, font);
+      }
+      y -= 25;
+
+      // Additional Information
+      if (formData.specialConditions) {
+        y = addText(page12, 'SPECIAL CONDITIONS', 50, y, 12, boldFont, 500, primaryColor);
+        y -= 10;
+        y = addText(page12, formData.specialConditions, 50, y, 10, font, 500);
+        y -= 20;
+      }
+
+      if (formData.additionalNotes) {
+        y = addText(page12, 'ADDITIONAL NOTES', 50, y, 12, boldFont, 500, primaryColor);
+        y -= 10;
+        y = addText(page12, formData.additionalNotes, 50, y, 10, font, 500);
+      }
     }
 
     // Generate PDF

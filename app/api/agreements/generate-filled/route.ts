@@ -247,7 +247,7 @@ export async function POST(request: NextRequest) {
       // Section 4. Security Deposit - EXACT TEXT with field insertion
       y = addText(page3, 'Section 4. Security Deposit', 50, y, 12, boldFont);
       y -= 10;
-      const securityDepositAmount = formData.securityDeposit ? formatCurrency(formData.securityDeposit) : formatCurrency(formData.monthlyAmount);
+      const securityDepositAmount = formData.securityDeposit && formData.securityDeposit !== '0' ? formatCurrency(formData.securityDeposit) : formatCurrency('0');
       text = `On the Effective Date, Licensee must pay to Licensor ${securityDepositAmount} ("Security Deposit"). Licensor may apply the Security Deposit to any costs paid as a result of Licensee's breach of this Agreement. The Security Deposit (less any amounts applied by Licensor) will be returned to Licensee within 30 days after the End Date.`;
       y = addText(page3, text, 50, y, 10, font);
       y -= 15;
@@ -466,42 +466,176 @@ export async function POST(request: NextRequest) {
       y = addText(page8, text, 50, y, 10, font);
       y -= 30;
 
-      // SIGNATURES - EXACT FORMAT
-      y = addText(page8, 'Licensor', 50, y, 12, boldFont);
-      y = addText(page8, 'Licensee', 350, y, 12, boldFont);
+      // =========================== SIGNATURE PAGE (9) ===========================
+      const signaturePage = pdfDoc.addPage([612, 792]);
+      y = 720;
+
+      y = addText(signaturePage, 'Golden HomeShare', 250, y, 14, boldFont, 200);
+      y -= 40;
+
+      // CLEAN SIGNATURE PAGE DESIGN
+      y = addText(signaturePage, 'SIGNATURES', 250, y, 16, boldFont, 200);
+      y -= 60;
+
+      // Create structured signature sections
+      const leftColumnX = 60;
+      const rightColumnX = 320;
+
+      // Section headers
+      y = addText(signaturePage, 'Licensor (Homeowner)', leftColumnX, y, 12, boldFont, 200);
+      y = addText(signaturePage, 'Licensee (Housemate)', rightColumnX, y, 12, boldFont, 200);
       y -= 30;
 
-      y = addText(page8, '_________________________', 50, y, 10, font);
-      y = addText(page8, '_________________________', 350, y, 10, font);
-      y -= 15;
+      // Signature lines and labels
+      const signatureLineY = y - 10;
+      
+      // Draw signature lines
+      signaturePage.drawLine({
+        start: { x: leftColumnX, y: signatureLineY },
+        end: { x: leftColumnX + 200, y: signatureLineY },
+        thickness: 1,
+        color: rgb(0, 0, 0),
+      });
+      
+      signaturePage.drawLine({
+        start: { x: rightColumnX, y: signatureLineY },
+        end: { x: rightColumnX + 200, y: signatureLineY },
+        thickness: 1,
+        color: rgb(0, 0, 0),
+      });
 
-      y = addText(page8, 'Licensor Signature', 50, y, 8, font);
-      y = addText(page8, 'Licensee Signature', 350, y, 8, font);
-      y -= 20;
+      // Add actual signatures with clean styling
+      const handwritingFont = await pdfDoc.embedFont(StandardFonts.CourierOblique);
+      
+      if (formData.hostSignature) {
+        signaturePage.drawText(formData.hostSignature, {
+          x: leftColumnX + 5,
+          y: signatureLineY + 5,
+          size: 14,
+          font: handwritingFont,
+          color: rgb(0, 0, 0.7),
+        });
+      }
 
-      y = addText(page8, '_________________________', 50, y, 10, font);
-      y = addText(page8, '_________________________', 350, y, 10, font);
-      y -= 15;
+      if (formData.seekerSignature) {
+        signaturePage.drawText(formData.seekerSignature, {
+          x: rightColumnX + 5,
+          y: signatureLineY + 5,
+          size: 14,
+          font: handwritingFont,
+          color: rgb(0, 0, 0.7),
+        });
+      }
 
-      y = addText(page8, formData.hostName, 50, y, 8, font);
-      y = addText(page8, formData.seekerName, 350, y, 8, font);
-      y -= 10;
+      y = signatureLineY - 15;
+      y = addText(signaturePage, 'Signature', leftColumnX, y, 9, font, 200);
+      y = addText(signaturePage, 'Signature', rightColumnX, y, 9, font, 200);
+      y -= 25;
 
-      y = addText(page8, 'Printed Name', 50, y, 8, font);
-      y = addText(page8, 'Printed Name', 350, y, 8, font);
-      y -= 20;
+      // Printed name lines
+      const printedNameY = y;
+      
+      signaturePage.drawLine({
+        start: { x: leftColumnX, y: printedNameY },
+        end: { x: leftColumnX + 200, y: printedNameY },
+        thickness: 1,
+        color: rgb(0, 0, 0),
+      });
+      
+      signaturePage.drawLine({
+        start: { x: rightColumnX, y: printedNameY },
+        end: { x: rightColumnX + 200, y: printedNameY },
+        thickness: 1,
+        color: rgb(0, 0, 0),
+      });
 
-      y = addText(page8, '_________________________', 50, y, 10, font);
-      y = addText(page8, '_________________________', 350, y, 10, font);
-      y -= 15;
+      // Add printed names
+      if (formData.hostName) {
+        signaturePage.drawText(formData.hostName, {
+          x: leftColumnX + 5,
+          y: printedNameY + 5,
+          size: 11,
+          font: font,
+          color: rgb(0, 0, 0),
+        });
+      }
 
-      const todaysDate = new Date().toLocaleDateString('en-US');
-      y = addText(page8, todaysDate, 50, y, 8, font);
-      y = addText(page8, todaysDate, 350, y, 8, font);
-      y -= 10;
+      if (formData.seekerName) {
+        signaturePage.drawText(formData.seekerName, {
+          x: rightColumnX + 5,
+          y: printedNameY + 5,
+          size: 11,
+          font: font,
+          color: rgb(0, 0, 0),
+        });
+      }
 
-      y = addText(page8, 'Date', 50, y, 8, font);
-      y = addText(page8, 'Date', 350, y, 8, font);
+      y = printedNameY - 15;
+      y = addText(signaturePage, 'Printed Name', leftColumnX, y, 9, font, 200);
+      y = addText(signaturePage, 'Printed Name', rightColumnX, y, 9, font, 200);
+      y -= 25;
+
+      // Date lines
+      const dateY = y;
+      
+      signaturePage.drawLine({
+        start: { x: leftColumnX, y: dateY },
+        end: { x: leftColumnX + 120, y: dateY },
+        thickness: 1,
+        color: rgb(0, 0, 0),
+      });
+      
+      signaturePage.drawLine({
+        start: { x: rightColumnX, y: dateY },
+        end: { x: rightColumnX + 120, y: dateY },
+        thickness: 1,
+        color: rgb(0, 0, 0),
+      });
+
+      // Show signature dates if available
+      let hostSignDate = new Date().toLocaleDateString('en-US');
+      let seekerSignDate = '';
+
+      if (formData.hostSignedAt) {
+        try {
+          const signedDate = new Date(formData.hostSignedAt);
+          hostSignDate = signedDate.toLocaleDateString('en-US');
+        } catch (error) {
+          console.warn('Error parsing host signature date:', formData.hostSignedAt);
+        }
+      }
+
+      if (formData.seekerSignedAt) {
+        try {
+          const signedDate = new Date(formData.seekerSignedAt);
+          seekerSignDate = signedDate.toLocaleDateString('en-US');
+        } catch (error) {
+          console.warn('Error parsing seeker signature date:', formData.seekerSignedAt);
+        }
+      }
+
+      // Add dates
+      signaturePage.drawText(hostSignDate, {
+        x: leftColumnX + 5,
+        y: dateY + 5,
+        size: 11,
+        font: font,
+        color: rgb(0, 0, 0),
+      });
+
+      if (formData.seekerSignature && seekerSignDate) {
+        signaturePage.drawText(seekerSignDate, {
+          x: rightColumnX + 5,
+          y: dateY + 5,
+          size: 11,
+          font: font,
+          color: rgb(0, 0, 0),
+        });
+      }
+
+      y = dateY - 15;
+      y = addText(signaturePage, 'Date', leftColumnX, y, 9, font, 200);
+      y = addText(signaturePage, 'Date', rightColumnX, y, 9, font, 200);
 
       // =========================== PAGE 9 - PROPERTY ADDENDUM ===========================
       const page9 = pdfDoc.addPage([612, 792]);
@@ -521,7 +655,7 @@ export async function POST(request: NextRequest) {
       // Licensee Areas Section
       y = addText(page9, 'LICENSEE AREAS', 50, y, 12, boldFont);
       y -= 15;
-      text = `The following areas of the Residence are designated as "Licensee Areas" for the exclusive use of Licensee:`;
+      text = `The following areas of the Residence are designated as "Licensee Areas" for non-exclusive shared occupancy by Licensee:`;
       y = addText(page9, text, 50, y, 10, font);
       y -= 10;
 
@@ -893,17 +1027,26 @@ export async function POST(request: NextRequest) {
           transportation: "Transportation"
         };
 
-        // Add headers
+        // Add headers with better alignment
         y = addText(page12, 'Service', 70, y, 10, boldFont);
-        y = addText(page12, 'Hours per Week', 400, y, 10, boldFont);
-        y -= 10;
+        y = addText(page12, 'Hours per Week', 320, y, 10, boldFont);
+        y -= 15;
 
-        // List each support service
+        // Add underline for table headers
+        page12.drawLine({
+          start: { x: 70, y: y + 5 },
+          end: { x: 480, y: y + 5 },
+          thickness: 1,
+          color: rgb(0.5, 0.5, 0.5),
+        });
+        y -= 5;
+
+        // List each support service with better alignment
         formData.supportRequested.forEach(support => {
           const supportLabel = supportLabels[support.id] || support.id;
           y = addText(page12, supportLabel, 70, y, 10, font);
-          y = addText(page12, `${support.hoursPerWeek} ${support.hoursPerWeek === 1 ? 'hour' : 'hours'}`, 400, y, 10, font);
-          y -= 8;
+          y = addText(page12, `${support.hoursPerWeek} ${support.hoursPerWeek === 1 ? 'hour' : 'hours'}`, 320, y, 10, font);
+          y -= 12;
         });
 
         y -= 10;

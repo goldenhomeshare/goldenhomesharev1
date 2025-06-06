@@ -160,6 +160,13 @@ export interface AgreementFormData {
   // Additional Information - kept for backwards compatibility but will be merged
   specialConditions: string;
   additionalNotes: string;
+  
+  // Electronic Signatures
+  hostSignature?: string;
+  hostSignedAt?: string;
+  seekerSignature?: string;
+  seekerSignedAt?: string;
+  currentUserSignature?: string;
 }
 
 interface FillableAgreementFormProps {
@@ -459,9 +466,9 @@ export function FillableAgreementForm({
       musicLimitedHours: "",
       
       // House Rules - Social Activities
-      alcoholPolicyChoice: '',
-      alcoholAllowed: false,
-      alcoholParameters: "",
+      alcoholPolicyChoice: 'moderate',
+      alcoholAllowed: true,
+      alcoholParameters: "Moderate alcohol consumption allowed in shared areas",
       smokingAllowed: false,
       smokingParameters: "",
       otherActivitiesAllowed: false,
@@ -578,7 +585,7 @@ export function FillableAgreementForm({
         }
         if (firstListing.price) {
           defaultData.monthlyAmount = firstListing.price.toString();
-          defaultData.securityDeposit = firstListing.price.toString(); // Default to same as monthly
+          // Keep security deposit as "0" unless explicitly provided
         }
         if (firstListing.description) {
           defaultData.roomDescription = extractTextFromTipTap(firstListing.description);
@@ -729,12 +736,25 @@ export function FillableAgreementForm({
 
     setIsLoading(true);
     try {
+      // Include any signature data if available
+      const formDataForPDF = {
+        ...formData,
+        ...(signature.trim() && {
+          currentUserSignature: signature.trim(),
+          hostSignedAt: new Date().toISOString(),
+          ...(currentUser?.email === formData.hostEmail 
+            ? { hostSignature: signature.trim() }
+            : { seekerSignature: signature.trim(), seekerSignedAt: new Date().toISOString() }
+          )
+        })
+      };
+
       const response = await fetch(getEndpoint(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formDataForPDF),
       });
 
       if (!response.ok) {
@@ -762,7 +782,7 @@ export function FillableAgreementForm({
       toast.success('Agreement generated and downloaded successfully!');
       
       if (onFormSubmit) {
-        onFormSubmit(formData);
+        onFormSubmit(formDataForPDF);
       }
       
     } catch (error) {
@@ -819,9 +839,21 @@ export function FillableAgreementForm({
 
     setIsLoading(true);
     try {
-      // First submit the form data
+      // Include signature data in form submission
+      const formDataWithSignature = {
+        ...formData,
+        currentUserSignature: signature.trim(),
+        hostSignedAt: new Date().toISOString(),
+        // Determine if current user is host or seeker and set appropriate signature
+        ...(currentUser?.email === formData.hostEmail 
+          ? { hostSignature: signature.trim() }
+          : { seekerSignature: signature.trim(), seekerSignedAt: new Date().toISOString() }
+        )
+      };
+
+      // First submit the form data with signature
       if (onFormSubmit) {
-        await onFormSubmit(formData);
+        await onFormSubmit(formDataWithSignature);
       }
 
       // Show success message
@@ -1758,7 +1790,9 @@ export function FillableAgreementForm({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="effectiveDate">Effective Date *</Label>
+                  <div className="h-7 flex items-center">
+                    <Label htmlFor="effectiveDate">Effective Date *</Label>
+                  </div>
                   <Input
                     id="effectiveDate"
                     type="date"
@@ -1767,12 +1801,12 @@ export function FillableAgreementForm({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="moveInDate">
-                    Start Date (Move-in) *
+                  <div className="h-7 flex items-center flex-wrap gap-1">
+                    <Label htmlFor="moveInDate">Start Date (Move-in) *</Label>
                     {isReadOnlyField('moveInDate') && (
-                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Auto-filled</span>
+                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Auto-filled</span>
                     )}
-                  </Label>
+                  </div>
                   <Input
                     id="moveInDate"
                     type="date"
@@ -1784,12 +1818,12 @@ export function FillableAgreementForm({
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="endDate">
-                    End Date *
+                  <div className="h-7 flex items-center flex-wrap gap-1">
+                    <Label htmlFor="endDate">End Date *</Label>
                     {isReadOnlyField('endDate') && (
-                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Auto-filled</span>
+                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Auto-filled</span>
                     )}
-                  </Label>
+                  </div>
                   <Input
                     id="endDate"
                     type="date"

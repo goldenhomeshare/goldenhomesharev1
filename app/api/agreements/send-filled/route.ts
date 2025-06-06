@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
       addWrappedText(page3, 'Section 4. Security Deposit', 50, currentY, 500, 12, boldFont);
       currentY -= 20;
 
-      const securityDepositAmount = formData.securityDeposit ? formatCurrency(formData.securityDeposit) : formatCurrency(formData.monthlyAmount);
+      const securityDepositAmount = formData.securityDeposit && formData.securityDeposit !== '0' ? formatCurrency(formData.securityDeposit) : formatCurrency('0');
       sectionText = `On the Effective Date, Licensee must pay to Licensor ${securityDepositAmount} ("Security Deposit"). Licensor may apply the Security Deposit to any costs paid as a result of Licensee's breach of this Agreement. The Security Deposit (less any amounts applied by Licensor) will be returned to Licensee within 30 days after the End Date.`;
       currentY = addWrappedText(page3, sectionText, 50, currentY, 500, 10, font, 12);
       currentY -= 15;
@@ -253,8 +253,17 @@ export async function POST(request: NextRequest) {
       currentY -= 30;
 
       // Signature lines
-      addWrappedText(finalPage, '_________________________________', 50, currentY, 200, 10, font);
-      addWrappedText(finalPage, '_________________________________', 350, currentY, 200, 10, font);
+      if (formData.hostSignature) {
+        addWrappedText(finalPage, formData.hostSignature, 50, currentY, 200, 10, boldFont);
+      } else {
+        addWrappedText(finalPage, '_________________________________', 50, currentY, 200, 10, font);
+      }
+
+      if (formData.seekerSignature) {
+        addWrappedText(finalPage, formData.seekerSignature, 350, currentY, 200, 10, boldFont);
+      } else {
+        addWrappedText(finalPage, '_________________________________', 350, currentY, 200, 10, font);
+      }
           currentY -= 15;
 
       addWrappedText(finalPage, 'Licensor Signature', 50, currentY, 200, 8, font);
@@ -275,13 +284,33 @@ export async function POST(request: NextRequest) {
       currentY -= 20;
 
       // Dates
-      addWrappedText(finalPage, '_________________________________', 50, currentY, 200, 10, font);
-      addWrappedText(finalPage, '_________________________________', 350, currentY, 200, 10, font);
-          currentY -= 15;
-        
-      const todaysDate = new Date().toLocaleDateString('en-US');
-      addWrappedText(finalPage, todaysDate, 50, currentY, 200, 8, font);
-      addWrappedText(finalPage, todaysDate, 350, currentY, 200, 8, font);
+      let hostSignDate = new Date().toLocaleDateString('en-US');
+      let seekerSignDate = '';
+
+      if (formData.hostSignedAt) {
+        try {
+          const signedDate = new Date(formData.hostSignedAt);
+          hostSignDate = signedDate.toLocaleDateString('en-US');
+        } catch (error) {
+          console.warn('Error parsing host signature date:', formData.hostSignedAt);
+        }
+      }
+
+      if (formData.seekerSignedAt) {
+        try {
+          const signedDate = new Date(formData.seekerSignedAt);
+          seekerSignDate = signedDate.toLocaleDateString('en-US');
+        } catch (error) {
+          console.warn('Error parsing seeker signature date:', formData.seekerSignedAt);
+        }
+      }
+
+      addWrappedText(finalPage, hostSignDate, 50, currentY, 200, 8, font);
+      if (formData.seekerSignature && seekerSignDate) {
+        addWrappedText(finalPage, seekerSignDate, 350, currentY, 200, 8, font);
+      } else {
+        addWrappedText(finalPage, '_________________________________', 350, currentY, 200, 10, font);
+      }
           currentY -= 15;
 
       addWrappedText(finalPage, 'Date', 50, currentY, 200, 8, font);

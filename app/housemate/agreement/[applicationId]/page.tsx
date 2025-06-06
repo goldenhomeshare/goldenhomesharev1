@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import prisma from "../../../lib/db";
 import { HousemateAgreementReview } from "@/components/HousemateAgreementReview";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, AlertTriangle, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CheckCircle, AlertTriangle, Clock, Download } from "lucide-react";
 
 async function getApplicationWithAgreement(applicationId: string, userId: string) {
   try {
@@ -57,9 +58,83 @@ export default async function HousemateAgreementPage({
 
   const agreement = application.agreement;
 
-  // If housemate has already signed, redirect to billing
+  // If housemate has already signed, show the completed agreement with billing option
   if (agreement.housemateSigned) {
-    redirect(`/billing?application=${applicationId}`);
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-green-600/10 rounded-xl flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Agreement Completed</h1>
+                <p className="text-gray-600">
+                  Both parties have signed the agreement for {application.product.name}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Agreement Status */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                Agreement Fully Executed
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Homeowner Signature</label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span className="text-green-600 font-medium">✓ Signed</span>
+                    <span className="text-sm text-gray-500">
+                      ({new Date(agreement.homeownerSignedAt!).toLocaleDateString()})
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Your Signature</label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span className="text-green-600 font-medium">✓ Signed</span>
+                    <span className="text-sm text-gray-500">
+                      ({new Date(agreement.housemateSignedAt!).toLocaleDateString()})
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Action Buttons */}
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button asChild variant="outline" size="lg" className="flex items-center gap-2">
+                    <a href={`/api/agreements/generate-filled`} target="_blank" rel="noopener noreferrer">
+                      <Download className="h-4 w-4" />
+                      Download Signed Agreement
+                    </a>
+                  </Button>
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700" size="lg">
+                    <a href={`/billing?application=${applicationId}`}>
+                      Continue to Payment
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
   }
 
   // If homeowner hasn't signed yet, show waiting message

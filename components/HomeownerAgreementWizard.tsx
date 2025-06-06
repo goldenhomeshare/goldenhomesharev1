@@ -159,7 +159,7 @@ export function HomeownerAgreementWizard({ application, homeownerData, existingA
       
       // FINANCIAL TERMS (from listing - READ-ONLY)
       monthlyAmount: application.product?.price?.toString() || '',
-      securityDeposit: application.product?.price?.toString() || '',
+      securityDeposit: '0',
       
       // REASONABLE DEFAULTS FOR EDITABLE FIELDS
       bedroomAAccess: true,

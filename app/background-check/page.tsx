@@ -3,11 +3,12 @@ import { redirect } from "next/navigation";
 import { BackgroundCheckForm } from "@/app/test-checkr/components/BackgroundCheckForm";
 import RefreshStatusButton from "@/app/components/RefreshStatusButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, CheckCircle, Clock, AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
+import { Shield, CheckCircle, Clock, AlertCircle, ArrowLeft, RefreshCw, Settings } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import prisma from "@/app/lib/db";
+import { isBackgroundCheckPollingEnabled, isMessagingPollingEnabled } from "@/app/lib/polling-config";
 
 async function checkAndUpdateUserVerificationStatus(userId: string, userEmail: string) {
   try {
@@ -151,6 +152,43 @@ export default async function BackgroundCheckPage() {
             )}
           </div>
         </CardHeader>
+      </Card>
+
+      {/* Polling Configuration Status */}
+      <Card className="mb-6 border-gray-200 bg-gray-50">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Settings className="w-5 h-5 text-gray-600" />
+            <div>
+              <CardTitle className="text-lg text-gray-900">System Configuration</CardTitle>
+              <p className="text-gray-600 text-sm">
+                Current polling settings for different features.
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center justify-between p-3 border rounded-lg bg-white">
+              <div>
+                <p className="font-medium text-gray-900">Background Check Polling</p>
+                <p className="text-sm text-gray-600">Automatic status updates</p>
+              </div>
+              <Badge variant={isBackgroundCheckPollingEnabled() ? "default" : "secondary"}>
+                {isBackgroundCheckPollingEnabled() ? "Enabled" : "Disabled"}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between p-3 border rounded-lg bg-white">
+              <div>
+                <p className="font-medium text-gray-900">Message Polling</p>
+                <p className="text-sm text-gray-600">Unread message updates</p>
+              </div>
+              <Badge variant={isMessagingPollingEnabled() ? "default" : "secondary"}>
+                {isMessagingPollingEnabled() ? "Enabled" : "Disabled"}
+              </Badge>
+            </div>
+          </div>
+        </CardContent>
       </Card>
 
       {/* Quick Status Check Section */}

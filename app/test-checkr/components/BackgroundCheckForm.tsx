@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Clock, CheckCircle, AlertCircle, RefreshCw, StopCircle, Loader2, Shield, ExternalLink, User } from 'lucide-react';
+import { isBackgroundCheckPollingEnabled, getBackgroundCheckPollingInterval } from '@/app/lib/polling-config';
 
 interface HostedCheckForm {
   firstName: string;
@@ -76,6 +77,7 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
     currentStatus: null,
     lastCheck: null,
   });
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
   
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -100,16 +102,19 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
           setExistingCheck(result.data);
           console.log('[AutoCheck] Found completed background check with result:', result.data.result);
         } else if (result.data.status?.overall === 'processing' || result.data.status?.overall === 'pending') {
-          // There's an in-progress check - start polling for it
-          console.log('[AutoCheck] Found in-progress background check, starting polling');
+          // There's an in-progress check - conditionally start polling based on config
+          console.log('[AutoCheck] Found in-progress background check');
           setExistingCheck(result.data);
           
-          if (result.data.candidateId || result.data.invitationId) {
+          if (isBackgroundCheckPollingEnabled() && (result.data.candidateId || result.data.invitationId)) {
+            console.log('[AutoCheck] Starting automatic polling');
             startPolling(
               result.data.candidateId,
               result.data.invitationId,
               result.data.user?.email || hostedCheckForm.email
             );
+          } else {
+            console.log('[AutoCheck] Automatic polling disabled - users can refresh manually');
           }
         }
       } else {
@@ -193,10 +198,11 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
       lastCheck: null,
     });
 
-    // Start polling every 10 seconds
+    // Start polling at configured interval
+    const pollingInterval = getBackgroundCheckPollingInterval();
     pollingIntervalRef.current = setInterval(() => {
       checkStatusForPolling();
-    }, 10000);
+    }, pollingInterval);
 
     // Check immediately
     checkStatusForPolling();
@@ -214,6 +220,34 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
       ...current,
       isPolling: false,
     }));
+  };
+
+  const manualRefresh = async () => {
+    console.log('[Manual Refresh] Checking background check status...');
+    setIsManualRefreshing(true);
+    
+    try {
+      const response = await fetch('/api/checkr/my-status');
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        console.log('[Manual Refresh] Status updated:', result.data);
+        setExistingCheck(result.data);
+        
+        // Update polling status if we had polling data
+        setPollingStatus(prev => ({
+          ...prev,
+          currentStatus: result,
+          lastCheck: new Date().toISOString(),
+        }));
+      } else {
+        console.log('[Manual Refresh] No background check data found');
+      }
+    } catch (error) {
+      console.error('[Manual Refresh] Error checking status:', error);
+    } finally {
+      setIsManualRefreshing(false);
+    }
   };
 
   const checkStatusForPolling = async () => {
@@ -281,6 +315,8 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
     setLoading(true);
     
     try {
+      console.log('[CreateHostedCheck] Sending request with data:', hostedCheckForm);
+      
       const response = await fetch('/api/checkr/create-hosted-check', {
         method: 'POST',
         headers: {
@@ -289,23 +325,69 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
         body: JSON.stringify(hostedCheckForm),
       });
 
-      const result = await response.json();
+      console.log('[CreateHostedCheck] Response status:', response.status);
+      console.log('[CreateHostedCheck] Response headers:', Object.fromEntries(response.headers.entries()));
+
+      // Check if response is ok
+      if (!response.ok) {
+        console.error('[CreateHostedCheck] HTTP error:', response.status, response.statusText);
+        alert(`HTTP Error: ${response.status} ${response.statusText}`);
+        return;
+      }
+
+      // Check if response has content
+      const responseText = await response.text();
+      console.log('[CreateHostedCheck] Raw response:', responseText);
+
+      if (!responseText) {
+        console.error('[CreateHostedCheck] Empty response received');
+        alert('Error: Server returned empty response');
+        return;
+      }
+
+      let result;
+      try {
+        result = JSON.parse(responseText);
+        console.log('[CreateHostedCheck] Parsed response:', result);
+      } catch (parseError) {
+        console.error('[CreateHostedCheck] Failed to parse response as JSON:', parseError);
+        console.error('[CreateHostedCheck] Response text was:', responseText);
+        alert('Error: Invalid response from server');
+        return;
+      }
       
       if (result.success && result.data?.invitationUrl) {
-        console.log('Background check invitation created:', result.data);
+        console.log('[CreateHostedCheck] Background check invitation created successfully:', result.data);
         
-        // Start polling for status updates
-        startPolling(result.data.candidateId, result.data.invitationId, hostedCheckForm.email);
+        // Conditionally start polling for status updates based on config
+        if (isBackgroundCheckPollingEnabled()) {
+          console.log('[CreateHostedCheck] Starting automatic polling for new background check');
+          startPolling(result.data.candidateId, result.data.invitationId, hostedCheckForm.email);
+        } else {
+          console.log('[CreateHostedCheck] Automatic polling disabled - users can refresh manually');
+        }
         
         // Redirect user to Checkr hosted flow
         window.open(result.data.invitationUrl, '_blank');
       } else {
-        console.error('Failed to create background check:', result);
-        alert(`Error: ${result.error || 'Failed to create background check'}`);
+        console.error('[CreateHostedCheck] Failed to create background check:', {
+          success: result.success,
+          error: result.error,
+          data: result.data,
+          fullResult: result
+        });
+        
+        const errorMessage = result.error || 'Failed to create background check - no error message provided';
+        alert(`Error: ${errorMessage}`);
       }
     } catch (error) {
-      console.error('Error creating hosted check:', error);
-      alert('Network error occurred. Please try again.');
+      console.error('[CreateHostedCheck] Network or unexpected error:', error);
+      console.error('[CreateHostedCheck] Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      alert(`Network error occurred: ${error.message}. Please try again.`);
     } finally {
       setLoading(false);
     }
@@ -459,16 +541,33 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
       {existingCheck && (existingCheck.status?.overall === 'processing' || existingCheck.status?.overall === 'pending') && (
         <Card className="mb-6 border-blue-200 bg-blue-50">
           <CardHeader>
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-blue-600" />
-              <div>
-                <CardTitle className="text-lg text-blue-900">
-                  Background Check In Progress
-                </CardTitle>
-                <CardDescription className="text-blue-700">
-                  You already have a background check being processed. We're monitoring its progress below.
-                </CardDescription>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Clock className="w-5 h-5 text-blue-600" />
+                <div>
+                  <CardTitle className="text-lg text-blue-900">
+                    Background Check In Progress
+                  </CardTitle>
+                  <CardDescription className="text-blue-700">
+                    {isBackgroundCheckPollingEnabled() 
+                      ? "You already have a background check being processed. We're monitoring its progress below."
+                      : "You already have a background check being processed. Click 'Refresh Status' to check for updates."
+                    }
+                  </CardDescription>
+                </div>
               </div>
+              {!isBackgroundCheckPollingEnabled() && (
+                <Button
+                  onClick={manualRefresh}
+                  variant="outline"
+                  size="sm"
+                  disabled={isManualRefreshing}
+                  className="border-blue-300 text-blue-700 hover:bg-blue-100 disabled:opacity-60"
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${isManualRefreshing ? 'animate-spin' : ''}`} />
+                  {isManualRefreshing ? 'Checking...' : 'Refresh Status'}
+                </Button>
+              )}
             </div>
           </CardHeader>
         </Card>
@@ -503,17 +602,31 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
                   </p>
                 </div>
               </div>
-              {pollingStatus.isPolling && (
-                <Button
-                  onClick={stopPolling}
-                  variant="outline"
-                  size="sm"
-                  className="border-red-300 text-red-700 hover:bg-red-100"
-                >
-                  <StopCircle className="w-4 h-4 mr-2" />
-                  Stop Monitoring
-                </Button>
-              )}
+              <div className="flex gap-2">
+                {!isBackgroundCheckPollingEnabled() && (
+                  <Button
+                    onClick={manualRefresh}
+                    variant="outline"
+                    size="sm"
+                    disabled={isManualRefreshing}
+                    className="border-blue-300 text-blue-700 hover:bg-blue-100 disabled:opacity-60"
+                  >
+                    <RefreshCw className={`w-4 h-4 mr-2 ${isManualRefreshing ? 'animate-spin' : ''}`} />
+                    {isManualRefreshing ? 'Checking...' : 'Refresh Status'}
+                  </Button>
+                )}
+                {pollingStatus.isPolling && (
+                  <Button
+                    onClick={stopPolling}
+                    variant="outline"
+                    size="sm"
+                    className="border-red-300 text-red-700 hover:bg-red-100"
+                  >
+                    <StopCircle className="w-4 h-4 mr-2" />
+                    Stop Monitoring
+                  </Button>
+                )}
+              </div>
             </div>
           </CardHeader>
           <CardContent>

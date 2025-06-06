@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Loader2 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
+import { isMessagingPollingEnabled, getMessagingPollingInterval } from '@/app/lib/polling-config';
 
 interface MessagesIconProps {
   userType?: "HOMEOWNER" | "HOUSEMATE" | "ADMIN" | null;
@@ -74,10 +75,15 @@ export function MessagesIcon({ userType }: MessagesIconProps) {
   useEffect(() => {
     fetchUnreadCount();
     
-    // Poll for updates every 30 seconds
-    const interval = setInterval(fetchUnreadCount, 30000);
+    // Conditionally set up polling based on configuration
+    let interval: NodeJS.Timeout | undefined;
     
-    // Refresh when page becomes visible (user returns from chat)
+    if (isMessagingPollingEnabled()) {
+      const pollingInterval = getMessagingPollingInterval();
+      interval = setInterval(fetchUnreadCount, pollingInterval);
+    }
+    
+    // Always refresh when page becomes visible (user returns from chat)
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         fetchUnreadCount();
@@ -87,7 +93,9 @@ export function MessagesIcon({ userType }: MessagesIconProps) {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     
     return () => {
-      clearInterval(interval);
+      if (interval) {
+        clearInterval(interval);
+      }
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [userType]);

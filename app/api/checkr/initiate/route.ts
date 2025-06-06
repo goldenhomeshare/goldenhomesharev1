@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { checkr, CheckrAPIError } from "@/app/lib/checkr";
+import { checkr, CheckrAPIError, createDefaultWorkLocations } from "@/app/lib/checkr";
 import { backgroundCheckService } from "@/app/lib/background-check-service";
 import { z } from "zod";
 
@@ -74,11 +74,7 @@ export async function POST(request: NextRequest) {
       last_name: user.lastName,
       copy_requested: true, // User gets a copy as per Checkr docs
       custom_id: user.id, // REQUIRED: Unique ID for cross-reference
-      work_locations: [{ // REQUIRED: Work location for candidate
-        country: "US",
-        state: "CA", // Default state - could be made dynamic based on user location
-        city: "San Francisco", // RECOMMENDED: City for US checks
-      }],
+      work_locations: createDefaultWorkLocations(),
     };
 
     console.log("[Checkr Initiate] Candidate data prepared:", {
@@ -163,10 +159,7 @@ export async function POST(request: NextRequest) {
     const invitationData: any = {
       candidate_id: candidate.id,
       package: validatedPackage,
-      work_locations: [{
-        country: "US",
-        state: "CA", // Default state - could be made dynamic based on user location
-      }],
+      work_locations: createDefaultWorkLocations(),
     };
 
     // Add node if we have one (required for account hierarchy support)

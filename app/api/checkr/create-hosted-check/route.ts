@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { checkr } from '@/app/lib/checkr';
+import { checkr, createDefaultWorkLocations } from '@/app/lib/checkr';
 import { BackgroundCheckService } from '@/app/lib/background-check-service';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 
@@ -13,8 +13,8 @@ const CreateHostedCheckSchema = z.object({
   workLocation: z.object({
     country: z.string().default('US'),
     state: z.string().optional(),
-    city: z.string().min(1, 'City is required'),
-  }),
+    city: z.string().optional(),
+  }).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
       phone: validatedData.phone,
       zipcode: validatedData.zipcode,
       custom_id: user.id, // Auto-generated unique ID for cross-reference
-      work_locations: [validatedData.workLocation], // REQUIRED: Work location for candidate
+      work_locations: validatedData.workLocation ? [validatedData.workLocation] : createDefaultWorkLocations(), // REQUIRED: Work location for candidate
     };
 
     // Generate idempotency key to prevent duplicate candidates (RECOMMENDED)
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
     const invitationData = {
       candidate_id: candidate.id,
       package: validatedData.package,
-      work_locations: [validatedData.workLocation],
+      work_locations: validatedData.workLocation ? [validatedData.workLocation] : createDefaultWorkLocations(),
     };
 
     const invitation = await checkr.createInvitation(invitationData);

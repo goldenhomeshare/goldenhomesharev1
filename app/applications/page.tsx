@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, CheckCircle, XCircle, Home, Users, FileText } from "lucide-react";
 import Link from "next/link";
 
+// Force this page to be dynamic since it requires authentication
+export const dynamic = 'force-dynamic';
+
 export default async function ApplicationsPage() {
   try {
     const { getUser } = getKindeServerSession();

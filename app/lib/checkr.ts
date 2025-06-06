@@ -22,11 +22,11 @@ interface CandidateData {
   driver_license_state?: string;
   copy_requested?: boolean;
   custom_id?: string; // Unique ID for cross-reference
-  work_locations?: Array<{
+  work_locations: Array<{
     country: string;
     state?: string;
     city?: string;
-  }>;
+  }>; // REQUIRED by Checkr API
 }
 
 interface InvitationData {
@@ -89,7 +89,8 @@ class CheckrClient {
 
   private async makeRequest<T = any>(
     endpoint: string, 
-    options: RequestInit = {}
+    options: RequestInit = {},
+    useFormData = false
   ): Promise<T> {
     const url = `${this.config.baseUrl}${endpoint}`;
     
@@ -97,7 +98,7 @@ class CheckrClient {
     const auth = Buffer.from(`${this.config.apiKey}:`).toString('base64');
     
     const defaultHeaders = {
-      'Content-Type': 'application/json',
+      'Content-Type': useFormData ? 'application/x-www-form-urlencoded' : 'application/json',
       'Authorization': `Basic ${auth}`,
     };
 
@@ -144,6 +145,18 @@ class CheckrClient {
   // Candidate Management based on Checkr API docs
   async createCandidate(data: CandidateData, headers?: Record<string, string>): Promise<CheckrApiResponse> {
     try {
+      // Validate work_locations is provided (required by Checkr API)
+      if (!data.work_locations || data.work_locations.length === 0) {
+        throw new CheckrAPIError("work_locations is required for candidate creation", 400, "validation_error", "work_locations");
+      }
+
+      // Validate work_locations structure
+      for (const location of data.work_locations) {
+        if (!location.country) {
+          throw new CheckrAPIError("work_locations.country is required", 400, "validation_error", "work_locations.country");
+        }
+      }
+
       console.log("[CheckrClient] Creating candidate with data:", {
         email: data.email,
         first_name: data.first_name,
@@ -151,13 +164,18 @@ class CheckrClient {
         phone: data.phone ? '***' : undefined,
         zipcode: data.zipcode,
         custom_id: data.custom_id,
+        work_locations: data.work_locations,
       });
+      
+      // Convert to form data format as required by Checkr API
+      const formData = objectToFormData(data);
+      console.log("[CheckrClient] Form data:", formData);
       
       return this.makeRequest('/candidates', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: formData,
         headers: headers ? { ...headers } : undefined,
-      });
+      }, true); // Use form data encoding
     } catch (error) {
       console.error("[CheckrClient] Failed to create candidate:", error);
       throw error;
@@ -187,16 +205,32 @@ class CheckrClient {
   // Invitation Management based on Checkr API docs
   async createInvitation(data: InvitationData): Promise<CheckrApiResponse> {
     try {
+      // Validate work_locations is provided (required by Checkr API)
+      if (!data.work_locations || data.work_locations.length === 0) {
+        throw new CheckrAPIError("work_locations is required for invitation creation", 400, "validation_error", "work_locations");
+      }
+
+      // Validate work_locations structure
+      for (const location of data.work_locations) {
+        if (!location.country) {
+          throw new CheckrAPIError("work_locations.country is required", 400, "validation_error", "work_locations.country");
+        }
+      }
+
       console.log("[CheckrClient] Creating invitation with data:", {
         candidate_id: data.candidate_id,
         package: data.package,
         work_locations: data.work_locations,
       });
       
+      // Convert to form data format as required by Checkr API
+      const formData = objectToFormData(data);
+      console.log("[CheckrClient] Form data:", formData);
+      
       return this.makeRequest('/invitations', {
         method: 'POST',
-        body: JSON.stringify(data),
-      });
+        body: formData,
+      }, true); // Use form data encoding
     } catch (error) {
       console.error("[CheckrClient] Failed to create invitation:", error);
       throw error;
@@ -337,4 +371,57 @@ class CheckrAPIError extends Error {
 }
 
 export const checkr = new CheckrClient();
+
+// Utility function to create default work locations
+export function createDefaultWorkLocations(userLocation?: { state?: string; city?: string }): Array<{ country: string; state?: string; city?: string }> {
+  return [{
+    country: "US",
+    state: userLocation?.state || "CA", // Default to California if no state provided
+    city: userLocation?.city || "San Francisco", // Default city for better Checkr processing
+  }];
+}
+
+// Utility function to validate work locations format
+export function validateWorkLocations(workLocations: any[]): boolean {
+  if (!Array.isArray(workLocations) || workLocations.length === 0) {
+    return false;
+  }
+  
+  return workLocations.every(location => 
+    location && 
+    typeof location.country === 'string' && 
+    location.country.length > 0
+  );
+}
+
+// Utility function to convert object data to form-encoded format for Checkr API
+function objectToFormData(obj: any): string {
+  const params = new URLSearchParams();
+  
+  for (const [key, value] of Object.entries(obj)) {
+    if (value === undefined || value === null) continue;
+    
+    if (key === 'work_locations' && Array.isArray(value)) {
+      // Handle work_locations array format: work_locations[][country]=US
+      value.forEach((location: any, index: number) => {
+        if (location.country) {
+          params.append(`work_locations[][country]`, location.country);
+        }
+        if (location.state) {
+          params.append(`work_locations[][state]`, location.state);
+        }
+        if (location.city) {
+          params.append(`work_locations[][city]`, location.city);
+        }
+      });
+    } else if (typeof value === 'boolean') {
+      params.append(key, value.toString());
+    } else if (typeof value === 'string' || typeof value === 'number') {
+      params.append(key, value.toString());
+    }
+  }
+  
+  return params.toString();
+}
+
 export { CheckrAPIError, type CandidateData, type InvitationData, type CheckrApiResponse }; 

@@ -1,6 +1,6 @@
 // Testing utilities for Checkr implementation
 
-import { checkr } from '@/app/lib/checkr';
+import { checkr, createDefaultWorkLocations } from '@/app/lib/checkr';
 import { backgroundCheckService } from '@/app/lib/background-check-service';
 
 export const mockCandidateData = {
@@ -9,20 +9,13 @@ export const mockCandidateData = {
   last_name: 'Doe',
   copy_requested: true,
   custom_id: 'test-user-123', // REQUIRED: Unique ID for cross-reference
-  work_locations: [{ // REQUIRED: Work location for candidate
-    country: 'US',
-    state: 'CA',
-    city: 'San Francisco', // RECOMMENDED: City for US checks
-  }],
+  work_locations: createDefaultWorkLocations(), // Use consistent default work locations
 };
 
 export const mockInvitationData = {
   candidate_id: 'cand_test_123',
   package: 'basic_plus_criminal',
-  work_locations: [{
-    country: 'US',
-    state: 'CA',
-  }],
+  work_locations: createDefaultWorkLocations(),
 };
 
 export const mockWebhookEvents = {

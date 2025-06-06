@@ -71,10 +71,6 @@ export default function FillAgreementPage() {
           <FillableAgreementForm 
             title="Complete Your Agreement Information"
             description="Fill in the details below to generate your personalized Golden HomeShare agreement"
-            onFormSubmit={(data) => {
-              console.log("Form submitted:", data);
-              // You can add additional logic here if needed
-            }}
           />
 
           {/* Help Section */}

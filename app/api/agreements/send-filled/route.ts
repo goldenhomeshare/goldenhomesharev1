@@ -6,8 +6,6 @@ import { join } from "path";
 import { Resend } from "resend";
 import type { AgreementFormData } from "@/components/FillableAgreementForm";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
@@ -364,6 +362,16 @@ export async function POST(request: NextRequest) {
           </div>
         </div>
       `;
+
+      // Initialize Resend with API key check
+      if (!process.env.RESEND_API_KEY) {
+        return NextResponse.json(
+          { error: "Email service not configured" }, 
+          { status: 500 }
+        );
+      }
+      
+      const resend = new Resend(process.env.RESEND_API_KEY);
 
       // Send email to host
       const hostEmailResult = await resend.emails.send({

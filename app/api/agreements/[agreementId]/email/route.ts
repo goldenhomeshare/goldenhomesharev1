@@ -4,8 +4,6 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ agreementId: string }> }
@@ -35,6 +33,16 @@ export async function POST(
       const userName = user.given_name && user.family_name 
         ? `${user.given_name} ${user.family_name}` 
         : user.email;
+
+      // Initialize Resend with API key check
+      if (!process.env.RESEND_API_KEY) {
+        return NextResponse.json(
+          { error: "Email service not configured" }, 
+          { status: 500 }
+        );
+      }
+      
+      const resend = new Resend(process.env.RESEND_API_KEY);
 
       // Send email with PDF attachment
       await resend.emails.send({

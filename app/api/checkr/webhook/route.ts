@@ -13,6 +13,37 @@ interface CheckrWebhookEvent {
   account_id?: string;
 }
 
+// Helper function to fetch candidate data when not included in payload
+async function fetchCandidateIfMissing(reportOrInvitation: any) {
+  try {
+    // If candidate data is already included, return it
+    if (reportOrInvitation.candidate && typeof reportOrInvitation.candidate === 'object') {
+      console.log("[Checkr Webhook] Candidate data already included in payload");
+      return reportOrInvitation.candidate;
+    }
+
+    // If we only have candidate_id, fetch the full candidate data
+    if (reportOrInvitation.candidate_id) {
+      console.log(`[Checkr Webhook] Fetching candidate data for ID: ${reportOrInvitation.candidate_id}`);
+      const candidateResponse = await checkr.getCandidate(reportOrInvitation.candidate_id);
+      
+      if (candidateResponse.success && candidateResponse.data) {
+        console.log("[Checkr Webhook] Successfully fetched candidate data");
+        return candidateResponse.data;
+      } else {
+        console.warn("[Checkr Webhook] Failed to fetch candidate data:", candidateResponse.error);
+        return null;
+      }
+    }
+
+    console.warn("[Checkr Webhook] No candidate data or candidate_id found");
+    return null;
+  } catch (error) {
+    console.error("[Checkr Webhook] Error fetching candidate data:", error);
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     console.log("[Checkr Webhook] Received webhook request");

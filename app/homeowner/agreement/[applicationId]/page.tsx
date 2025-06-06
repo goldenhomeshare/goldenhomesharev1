@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { CheckCircle, FileText, Clock, Download } from "lucide-react";
 import { HomeownerAgreementWizard } from "@/components/HomeownerAgreementWizard";
+import { HomeownerAgreementActions } from "@/components/HomeownerAgreementActions";
 
 async function getApplicationWithDetails(applicationId: string, userId: string) {
   try {
@@ -272,6 +273,61 @@ export default async function HomeownerAgreementPage({
                       Download Signed Agreement
                     </a>
                   </Button>
+                  <Button asChild className="flex items-center gap-2">
+                    <a href="/homeowner/applications">
+                      Back to Applications
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : agreement?.homeownerSigned ? (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-blue-800">
+                <CheckCircle className="h-5 w-5 text-blue-600" />
+                Agreement Signed by You
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-blue-800 font-medium mb-2">Waiting for Housemate</p>
+                  <p className="text-blue-700 text-sm">
+                    You have successfully signed the agreement. The housemate has been notified and will receive a link to review and sign the agreement.
+                    Once they sign, the agreement will be fully executed.
+                  </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Your Signature</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <span className="text-green-600 font-medium">✓ Signed</span>
+                      <span className="text-sm text-gray-500">
+                        ({new Date(agreement.homeownerSignedAt!).toLocaleDateString()})
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Housemate Signature</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Clock className="h-4 w-4 text-yellow-600" />
+                      <span className="text-yellow-600 font-medium">⏳ Pending</span>
+                      <span className="text-sm text-gray-500">
+                        (Notification sent)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+                  <HomeownerAgreementActions 
+                    agreement={agreement}
+                    applicationId={applicationId}
+                  />
                   <Button asChild className="flex items-center gap-2">
                     <a href="/homeowner/applications">
                       Back to Applications

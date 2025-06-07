@@ -12,6 +12,7 @@ const PROFILE_CHAT_PRODUCT_ID = "profile-chat-placeholder";
 
 interface iAppProps {
   category: "newest" | "templates" | "uikits" | "icons" | "rooms" | "housemates";
+  limit?: number;
 }
 
 interface ProductData {
@@ -37,7 +38,7 @@ interface GetDataResult {
   isHousemates?: boolean;
 }
 
-async function getData({ category }: iAppProps): Promise<GetDataResult> {
+async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResult> {
   switch (category) {
     case "rooms": {
       // Combine all room types (templates, uikits, icons) into one category
@@ -59,7 +60,7 @@ async function getData({ category }: iAppProps): Promise<GetDataResult> {
           images: true,
           amenities: true,
         },
-        take: 8, // Show more since we're combining categories
+        take: limit,
       });
 
       return {
@@ -85,7 +86,7 @@ async function getData({ category }: iAppProps): Promise<GetDataResult> {
           images: true,
           amenities: true,
         },
-        take: 4,
+        take: limit,
       });
 
       return {
@@ -113,7 +114,7 @@ async function getData({ category }: iAppProps): Promise<GetDataResult> {
         orderBy: {
           createdAt: "desc",
         },
-        take: 4,
+        take: limit,
       });
 
       return {
@@ -139,7 +140,7 @@ async function getData({ category }: iAppProps): Promise<GetDataResult> {
           images: true,
           amenities: true,
         },
-        take: 4,
+        take: limit,
       });
 
       return {
@@ -165,7 +166,7 @@ async function getData({ category }: iAppProps): Promise<GetDataResult> {
           images: true,
           amenities: true,
         },
-        take: 4,
+        take: limit,
       });
 
       return {
@@ -190,7 +191,7 @@ async function getData({ category }: iAppProps): Promise<GetDataResult> {
         orderBy: {
           createdAt: 'desc'
         },
-        take: 4,
+        take: limit,
       });
 
       // Transform the data to work with AirbnbStyleCard (similar to other categories)
@@ -252,18 +253,18 @@ async function getData({ category }: iAppProps): Promise<GetDataResult> {
   }
 }
 
-export function AirbnbStyleRow({ category }: iAppProps) {
+export function AirbnbStyleRow({ category, limit }: iAppProps) {
   return (
     <section className="mt-16">
-      <Suspense fallback={<LoadingState />}>
-        <LoadRows category={category} />
+      <Suspense fallback={<LoadingState limit={limit} />}>
+        <LoadRows category={category} limit={limit} />
       </Suspense>
     </section>
   );
 }
 
-async function LoadRows({ category }: iAppProps) {
-  const data = await getData({ category: category });
+async function LoadRows({ category, limit }: iAppProps) {
+  const data = await getData({ category, limit });
   
   return (
     <>
@@ -310,7 +311,7 @@ async function LoadRows({ category }: iAppProps) {
   );
 }
 
-function LoadingState() {
+function LoadingState({ limit = 4 }: { limit?: number }) {
   return (
     <div>
       <div className="mb-6">
@@ -320,7 +321,7 @@ function LoadingState() {
         </div>
       </div>
       <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:overflow-x-visible sm:pb-0">
-        {[...Array(4)].map((_, index) => (
+        {[...Array(limit)].map((_, index) => (
           <div key={index} className="flex-shrink-0 w-[280px] sm:w-auto h-[450px]">
             <LoadingAirbnbCard />
           </div>

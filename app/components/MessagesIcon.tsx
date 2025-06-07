@@ -129,16 +129,15 @@ export function MessagesIcon({ userType }: MessagesIconProps) {
         )}
         {!isLoading && !isNavigating && unreadCount > 0 && (
           <div 
-            className="absolute bg-red-500 text-white font-bold rounded-full flex items-center justify-center border-2 border-white animate-pulse"
+            className="absolute bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center min-w-[18px] h-[18px] px-1"
             style={{
-              width: '20px',
-              height: '20px',
-              top: '-8px',
-              right: '-8px',
-              fontSize: '11px'
+              top: '-6px',
+              right: '-6px',
+              fontSize: '11px',
+              lineHeight: '1'
             }}
           >
-            {unreadCount > 9 ? "9+" : unreadCount}
+            {unreadCount > 99 ? "99+" : unreadCount}
           </div>
         )}
       </div>

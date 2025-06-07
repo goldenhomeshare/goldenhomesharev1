@@ -108,28 +108,40 @@ export function MessagesIcon({ userType }: MessagesIconProps) {
   return (
     <Button 
       variant="ghost" 
-      size="sm" 
-      className="relative hover:bg-muted flex flex-col items-center gap-1 h-auto py-2 disabled:opacity-75 transition-all duration-200" 
+      className="relative hover:bg-transparent flex items-center justify-center disabled:opacity-75 transition-all duration-200" 
+      style={{ padding: '8px', width: '48px', height: '48px' }}
       onClick={handleClick}
       disabled={isNavigating}
     >
-      <div className="relative">
+      <div className="relative flex items-center justify-center">
         {isNavigating ? (
           <div className="flex items-center justify-center">
-            <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+            <Loader2 
+              className="animate-spin text-blue-600" 
+              style={{ width: '32px', height: '32px' }}
+            />
           </div>
         ) : (
-          <MessageCircle className={`h-12 w-12 transition-all duration-200 ${isNavigating ? 'opacity-0' : 'opacity-100'}`} />
+          <MessageCircle 
+            className={`transition-all duration-200 ${isNavigating ? 'opacity-0' : 'opacity-100'}`}
+            style={{ width: '32px', height: '32px' }}
+          />
         )}
         {!isLoading && !isNavigating && unreadCount > 0 && (
-          <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center min-w-[1.25rem] border-2 border-white animate-pulse">
+          <div 
+            className="absolute bg-red-500 text-white font-bold rounded-full flex items-center justify-center border-2 border-white animate-pulse"
+            style={{
+              width: '20px',
+              height: '20px',
+              top: '-8px',
+              right: '-8px',
+              fontSize: '11px'
+            }}
+          >
             {unreadCount > 9 ? "9+" : unreadCount}
           </div>
         )}
       </div>
-      <span className={`text-xs font-medium transition-all duration-200 ${isNavigating ? 'text-blue-600' : ''}`}>
-        {isNavigating ? "Loading..." : "Messages"}
-      </span>
     </Button>
   );
 } 

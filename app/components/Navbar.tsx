@@ -32,15 +32,21 @@ export async function Navbar() {
             </Link>
         </div>         
 
+        {/* Only show navigation links for non-signed-in users */}
         <div className="hidden lg:flex justify-center items-center flex-1 mx-8">
-            <NavbarLinks />
+            {!kindeUser && <NavbarLinks />}
         </div>
 
         <div className="flex items-center gap-x-1 ml-auto flex-shrink-0">
         {kindeUser ? (
-          <div className="flex items-center gap-x-1">
-            <MessagesIcon userType={(user as any)?.userType || null} />
-            <div className="hidden lg:flex">
+          <div className="flex items-center gap-x-4">
+            <div className="relative">
+              <MessagesIcon userType={(user as any)?.userType || null} />
+              <div className="hidden lg:block absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                <span className="text-xs font-medium text-gray-600 whitespace-nowrap">Messages</span>
+              </div>
+            </div>
+            <div className="hidden lg:flex relative">
               <UserNav
                 email={kindeUser.email as string}
                 name={kindeUser.given_name as string}
@@ -51,6 +57,9 @@ export async function Navbar() {
                 }
                 userType={(user as any)?.userType || null}
               />
+              <div className="hidden lg:block absolute top-full left-9 transform -translate-x-1/2 mt-1">
+                <span className="text-xs font-medium text-gray-600 whitespace-nowrap">Profile</span>
+              </div>
             </div>
           </div>
             ) : (

@@ -69,34 +69,7 @@ export function PersonalInfoStep({ formData, updateFormData }: PersonalInfoStepP
   return (
     <div className="space-y-8">
       <div className="space-y-6">
-        {/* Name Fields */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="firstName" className="text-base font-medium">
-              First Name *
-            </Label>
-            <Input
-              id="firstName"
-              placeholder="Your first name"
-              value={formData.firstName}
-              onChange={(e) => handleInputChange("firstName", e.target.value)}
-              className="mt-2 h-12 text-lg border-gray-200 rounded-xl focus:border-primary focus:ring-0"
-            />
-          </div>
 
-          <div>
-            <Label htmlFor="lastName" className="text-base font-medium">
-              Last Name *
-            </Label>
-            <Input
-              id="lastName"
-              placeholder="Your last name"
-              value={formData.lastName}
-              onChange={(e) => handleInputChange("lastName", e.target.value)}
-              className="mt-2 h-12 text-lg border-gray-200 rounded-xl focus:border-primary focus:ring-0"
-            />
-          </div>
-        </div>
 
         {/* Date of Birth */}
         <div>

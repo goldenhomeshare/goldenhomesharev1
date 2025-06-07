@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
+import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 
 interface iAppProps {
@@ -58,11 +59,12 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10">
+        <Button variant="ghost" className="relative flex items-center gap-2 px-2 py-1 rounded-full hover:bg-transparent transition-colors">
+          <Avatar className="h-12 w-12">
             <AvatarImage src={userImage} alt="User Image" />
-            <AvatarFallback>{name.slice(0, 3)}</AvatarFallback>
+            <AvatarFallback className="text-sm font-medium">{name.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -74,6 +76,26 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
             </p>
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        
+        {/* Browse Section */}
+        <DropdownMenuLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+          Browse
+        </DropdownMenuLabel>
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link href="/">Home</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/products/template">View Listings</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/products/icon">View Housemates</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/about">About</Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         
         {/* Manage Section */}

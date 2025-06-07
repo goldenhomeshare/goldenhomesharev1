@@ -35,6 +35,7 @@ model User {
   Product               Product[]
   backgroundChecks      BackgroundCheck[] @relation("UserBackgroundChecks")
   requestedChecks       BackgroundCheck[] @relation("RequestedBackgroundChecks")
+  signupLead            SignupLead?       @relation("UserSignupLead")
 }
 
 model HomeownerProfile {
@@ -167,6 +168,82 @@ model BackgroundCheck {
   requestedBy      User?                 @relation("RequestedBackgroundChecks", fields: [requestedById], references: [id])
 
   @@map("background_checks")
+}
+
+model SignupLead {
+  id                    String    @id @default(uuid())
+  userId                String?   @unique
+  sessionId             String?   @unique // For anonymous users
+  
+  // Contact Information (from Basic Details step)
+  firstName             String?
+  lastName              String?
+  email                 String?
+  phone                 String?
+  
+  // Demographics (from Personal Info step)
+  dateOfBirth           DateTime?
+  language              String?
+  gender                String?
+  
+  // Location (from Location step)
+  city                  String?
+  state                 String?
+  
+  // Budget (from Budget step)
+  maxBudget             Int?
+  
+  // Profile Picture (from Profile Picture step)
+  profilePicture        String?
+  
+  // Education & Occupation (from Education step)
+  educationLevel        String?
+  educationProgram      String?
+  stillAttending        Boolean?
+  isRetired             Boolean?
+  occupation            String?
+  
+  // Lifestyle (from Lifestyle step)
+  schedule              String?
+  socialPreference      String?
+  hobbies               Json?
+  hasPets               Boolean?
+  petDescription        String?
+  numberOfPeople        String?
+  smokingStatus         String?
+  guestPolicy           String?
+  
+  // Match Preferences (from Match Preferences step)
+  preferredGender       String?
+  canHelpWith           Json?
+  
+  // Bio (from Bio step)
+  bio                   String?
+  
+  // Tracking data
+  lastCompletedStep     Int       @default(0)
+  totalSteps            Int       @default(10)
+  isCompleted           Boolean   @default(false)
+  completedAt           DateTime?
+  
+  // Metadata for campaigns
+  source                String?   // e.g., 'organic', 'google-ads', 'facebook-ads'
+  campaign              String?   // campaign identifier
+  medium                String?   // e.g., 'cpc', 'social', 'email'
+  referrer              String?   // referring URL
+  userAgent             String?   // browser info
+  ipAddress             String?   // for geo-targeting insights
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  user                  User?     @relation("UserSignupLead", fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([email])
+  @@index([createdAt])
+  @@index([lastCompletedStep])
+  @@index([source, campaign])
+  @@map("signup_leads")
 }
 
 model ChatRoom {

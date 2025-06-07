@@ -4,8 +4,30 @@ import { Users, Shield, Layers, Sparkles, Salad, Flower, ShoppingBag, HeartHands
 import Link from "next/link";
 import { VideoSection } from "../components/VideoSection";
 import { videoConfig } from "../lib/video-config";
+import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  // Redirect logged-in users to their dashboard
+  const user = await getCurrentUser();
+  if (user) {
+    const userType = (user as any).userType;
+    switch (userType) {
+      case "HOMEOWNER":
+        redirect("/homeowner/dashboard");
+        break;
+      case "HOUSEMATE":
+        redirect("/housemate/dashboard");
+        break;
+      case "ADMIN":
+        redirect("/admin/dashboard");
+        break;
+      default:
+        // If user exists but hasn't completed onboarding, let them access home page
+        break;
+    }
+  }
+
   return (
     <>
       {/* Hero Section - Full width image with overlay content */}

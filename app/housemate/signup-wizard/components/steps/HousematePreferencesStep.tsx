@@ -49,7 +49,6 @@ export function HousematePreferencesStep({ formData, updateFormData }: Housemate
     <div className="space-y-10">
       <div className="text-center mb-8">
         <h3 className="text-xl font-semibold text-gray-900 mb-2">Housemate Preferences</h3>
-        <p className="text-gray-600">Tell us about your living situation and requirements</p>
       </div>
 
       {/* Pets Section */}

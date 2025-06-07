@@ -23,7 +23,7 @@ export function BudgetStep({ formData, updateFormData }: BudgetStepProps) {
     return numericValue.toLocaleString();
   };
 
-  const showMatchMessage = formData.maxBudget && parseInt(formData.maxBudget) > 0;
+  const showMatchMessage = formData.maxBudget && parseInt(formData.maxBudget) > 260;
 
   return (
     <div className="space-y-8">
@@ -40,7 +40,7 @@ export function BudgetStep({ formData, updateFormData }: BudgetStepProps) {
             <Input
               id="maxBudget"
               type="text"
-              placeholder="725"
+              placeholder="475"
               value={formatBudget(formData.maxBudget)}
               onChange={(e) => handleBudgetChange(e.target.value)}
               className="pl-12 h-16 text-2xl font-semibold text-center border-2 focus:border-primary"

@@ -2,7 +2,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { User, Home, FileText, MessageCircle, Settings } from "lucide-react";
+import { User, Home, FileText, MessageCircle, Settings, Shield, HelpCircle, Info, Heart, Users } from "lucide-react";
 import BackgroundCheckCard from "@/app/components/BackgroundCheckCard";
 import prisma from "@/app/lib/db";
 
@@ -57,6 +57,34 @@ export default async function HousemateDashboardPage() {
       description: "Update your information and preferences",
       href: "/housemate/profile/edit",
       color: "text-purple-600"
+    },
+    {
+      icon: Users,
+      title: "View Housemates",
+      description: "Connect with other housemates",
+      href: "/products/icon",
+      color: "text-indigo-600"
+    },
+    {
+      icon: Info,
+      title: "About",
+      description: "Learn more about Golden HomeShare",
+      href: "/about",
+      color: "text-cyan-600"
+    },
+    {
+      icon: Shield,
+      title: "Safety",
+      description: "Safety guidelines and resources",
+      href: "/safety",
+      color: "text-red-600"
+    },
+    {
+      icon: HelpCircle,
+      title: "Help & Support",
+      description: "Get help and find answers",
+      href: "/help",
+      color: "text-gray-600"
     }
   ];
 

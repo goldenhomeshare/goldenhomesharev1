@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
-import { ChevronDown, User, Shield, HelpCircle, FileText, Info } from "lucide-react";
+import { ChevronDown, User, Shield, HelpCircle, FileText, Info, Home } from "lucide-react";
 import Link from "next/link";
 
 interface iAppProps {
@@ -89,6 +89,14 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
               Edit Profile
             </Link>
           </DropdownMenuItem>
+          {userType === "HOMEOWNER" && (
+            <DropdownMenuItem asChild>
+              <Link href="/my-products" className="flex items-center gap-2">
+                <Home className="h-4 w-4" />
+                Manage Listings
+              </Link>
+            </DropdownMenuItem>
+          )}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         

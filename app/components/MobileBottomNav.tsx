@@ -91,7 +91,7 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
           <span className="text-xs font-medium text-gray-600 mt-1 truncate">Applications</span>
         </div>
 
-        {/* Browse Homes */}
+        {/* Browse Homes/Housemates */}
         <div className="flex flex-col items-center min-w-0 flex-1">
           <Button
             variant="ghost"
@@ -99,11 +99,13 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
             asChild
             className="flex items-center justify-center p-3 h-12 w-12 rounded-full hover:bg-accent"
           >
-            <Link href="/products/template">
+            <Link href={user.userType === "HOMEOWNER" ? "/products/icon" : "/products/template"}>
               <Search className="w-7 h-7" />
             </Link>
           </Button>
-          <span className="text-xs font-medium text-gray-600 mt-1 truncate">Browse Homes</span>
+          <span className="text-xs font-medium text-gray-600 mt-1 truncate">
+            {user.userType === "HOMEOWNER" ? "Browse Housemates" : "Browse Homes"}
+          </span>
         </div>
       </div>
     </div>

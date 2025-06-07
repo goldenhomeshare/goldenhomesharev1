@@ -9,16 +9,20 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 // Import step components
-import { PersonalInfoStep } from "./steps/PersonalInfoStep";
-import { ProfilePictureStep } from "./steps/ProfilePictureStep";
+import { BasicDetailsStep } from "./steps/BasicDetailsStep";
 import { DemographicsStep } from "./steps/DemographicsStep";
+import { LifestyleStep } from "./steps/LifestyleStep";
 import { LifestylePreferencesStep } from "./steps/LifestylePreferencesStep";
 import { HousematePreferencesStep } from "./steps/HousematePreferencesStep";
 import { BioStep } from "./steps/BioStep";
+import { ProfilePictureStep } from "./steps/ProfilePictureStep";
 
 // Import actions
 import { createHomeownerProfile } from "@/app/actions/profile-actions";
 import { UpdateUserSettings } from "@/app/actions";
+
+// Import hooks
+import { useSignupLead } from "../hooks/useSignupLead";
 
 interface HomeownerSignupWizardProps {
   userId: string;
@@ -31,6 +35,8 @@ export interface WizardFormData {
   // Personal Info
   firstName: string;
   lastName: string;
+  email: string;
+  phone: string;
   dateOfBirth: string;
   language: string;
   gender: string;
@@ -66,12 +72,13 @@ export interface WizardFormData {
 }
 
 const STEPS = [
-  { id: 1, title: "Demographics", description: "Basic information about you" },
-  { id: 2, title: "Profile Picture", description: "Add your photo" },
+  { id: 1, title: "Basic Details", description: "Your contact information" },
+  { id: 2, title: "Demographics", description: "Basic information about you" },
   { id: 3, title: "Lifestyle", description: "Your schedule and social preferences" },
   { id: 4, title: "Preferences", description: "Your household preferences" },
   { id: 5, title: "Match Preferences", description: "Who you'd like to live with" },
   { id: 6, title: "About You", description: "Tell us about yourself" },
+  { id: 7, title: "Profile Picture", description: "Add your photo" },
 ];
 
 export function HomeownerSignupWizard({ userId, firstName, lastName, email }: HomeownerSignupWizardProps) {
@@ -80,9 +87,14 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
   const [isRedirecting, setIsRedirecting] = useState(false);
   const router = useRouter();
   
+  // Initialize signup lead tracking
+  const { saveSignupLead, markCompleted } = useSignupLead({ userId });
+  
   const [formData, setFormData] = useState<WizardFormData>({
     firstName: firstName || "",
     lastName: lastName || "",
+    email: email || "",
+    phone: "",
     dateOfBirth: "",
     language: "",
     gender: "",
@@ -113,6 +125,12 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
 
   const nextStep = () => {
     if (currentStep < STEPS.length) {
+      // Save current step data before moving to next step (fire and forget)
+      saveSignupLead(formData, currentStep).catch(error => {
+        console.error('Error saving signup lead:', error);
+        // Don't block user flow
+      });
+      
       setCurrentStep(currentStep + 1);
     }
   };
@@ -127,6 +145,9 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
     setIsSubmitting(true);
     
     try {
+      // Mark signup as completed for marketing tracking
+      await markCompleted(formData);
+      
       // Update basic user info if changed
       if (formData.firstName !== firstName || formData.lastName !== lastName) {
         const userFormData = new FormData();
@@ -197,21 +218,21 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
     switch (currentStep) {
       case 1:
         return (
-          <PersonalInfoStep
+          <BasicDetailsStep
             formData={formData}
             updateFormData={updateFormData}
           />
         );
       case 2:
         return (
-          <ProfilePictureStep
+          <DemographicsStep
             formData={formData}
             updateFormData={updateFormData}
           />
         );
       case 3:
         return (
-          <DemographicsStep
+          <LifestyleStep
             formData={formData}
             updateFormData={updateFormData}
           />
@@ -237,17 +258,37 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
             updateFormData={updateFormData}
           />
         );
+      case 7:
+        return (
+          <ProfilePictureStep
+            formData={formData}
+            updateFormData={updateFormData}
+          />
+        );
       default:
         return null;
     }
   };
 
+  // Email validation
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Phone validation
+  const isValidPhone = (phone: string) => {
+    const phoneNumbers = phone.replace(/\D/g, '');
+    return phoneNumbers.length >= 10 && phoneNumbers.length <= 11;
+  };
+
   const isStepValid = () => {
     switch (currentStep) {
       case 1:
-        return formData.firstName && formData.lastName && formData.dateOfBirth && formData.language && formData.gender;
+        return formData.firstName && formData.lastName && formData.email && 
+               isValidEmail(formData.email) && formData.phone && isValidPhone(formData.phone);
       case 2:
-        return formData.profilePicture;
+        return formData.dateOfBirth && formData.language && formData.gender;
       case 3:
         return formData.schedule && formData.socialPreference;
       case 4:
@@ -259,7 +300,9 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
       case 5:
         return formData.preferredGender && formData.preferredCareerStage;
       case 6:
-        return formData.bio.trim().length > 0;
+        return formData.bio.trim().length >= 100; // Minimum 100 characters for bio
+      case 7:
+        return true; // Profile picture is optional
       default:
         return false;
     }
@@ -268,9 +311,10 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
   const isStepValidByNumber = (stepNumber: number) => {
     switch (stepNumber) {
       case 1:
-        return formData.firstName && formData.lastName && formData.dateOfBirth && formData.language && formData.gender;
+        return formData.firstName && formData.lastName && formData.email && 
+               isValidEmail(formData.email) && formData.phone && isValidPhone(formData.phone);
       case 2:
-        return formData.profilePicture;
+        return formData.dateOfBirth && formData.language && formData.gender;
       case 3:
         return formData.schedule && formData.socialPreference;
       case 4:
@@ -282,7 +326,9 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
       case 5:
         return formData.preferredGender && formData.preferredCareerStage;
       case 6:
-        return formData.bio.trim().length > 0;
+        return formData.bio.trim().length >= 100; // Minimum 100 characters for bio
+      case 7:
+        return true; // Profile picture is optional
       default:
         return false;
     }

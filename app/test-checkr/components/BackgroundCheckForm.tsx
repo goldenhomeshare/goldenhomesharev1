@@ -537,18 +537,20 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
 
   return (
     <>
-      {/* Show existing in-progress check if any */}
+      {/* Show existing in-progress check if any - Mobile Optimized */}
       {existingCheck && (existingCheck.status?.overall === 'processing' || existingCheck.status?.overall === 'pending') && (
-        <Card className="mb-6 border-blue-200 bg-blue-50">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-blue-600" />
-                <div>
-                  <CardTitle className="text-lg text-blue-900">
+        <Card className="mb-4 sm:mb-6 border-blue-200 bg-blue-50 rounded-xl sm:rounded-2xl">
+          <CardHeader className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+              <div className="flex items-start sm:items-center gap-3 flex-1 min-w-0">
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center shadow-sm">
+                  <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <CardTitle className="text-base sm:text-lg text-blue-900 mb-1 sm:mb-2">
                     Background Check In Progress
                   </CardTitle>
-                  <CardDescription className="text-blue-700">
+                  <CardDescription className="text-sm sm:text-base text-blue-700 leading-relaxed">
                     {isBackgroundCheckPollingEnabled() 
                       ? "You already have a background check being processed. We're monitoring its progress below."
                       : "You already have a background check being processed. Click 'Refresh Status' to check for updates."
@@ -562,7 +564,7 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
                   variant="outline"
                   size="sm"
                   disabled={isManualRefreshing}
-                  className="border-blue-300 text-blue-700 hover:bg-blue-100 disabled:opacity-60"
+                  className="border-blue-300 text-blue-700 hover:bg-blue-100 disabled:opacity-60 w-full sm:w-auto mt-3 sm:mt-0 flex-shrink-0"
                 >
                   <RefreshCw className={`w-4 h-4 mr-2 ${isManualRefreshing ? 'animate-spin' : ''}`} />
                   {isManualRefreshing ? 'Checking...' : 'Refresh Status'}

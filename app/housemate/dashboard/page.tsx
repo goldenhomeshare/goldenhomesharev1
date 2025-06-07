@@ -83,7 +83,7 @@ export default async function HousemateDashboardPage() {
                 </div>
                 <div className="flex items-center gap-3 text-sm w-full sm:w-auto">
                   <div className="flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-600 rounded-full font-bold text-sm flex-shrink-0">2</div>
-                  <span className="text-gray-600 font-medium">Wait 24-48 Hours</span>
+                  <span className="text-gray-600 font-medium">Wait 15 minutes</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm w-full sm:w-auto">
                   <div className="flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-600 rounded-full font-bold text-sm flex-shrink-0">3</div>

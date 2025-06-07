@@ -2,16 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
-import { 
-  User, 
-  Instagram, 
-  Facebook, 
-  Linkedin,
-  Users,
-  Home,
-  Heart
-} from "lucide-react";
+import { User } from "lucide-react";
 import { WizardFormData } from "../HomeownerSignupWizard";
 
 interface BioStepProps {
@@ -22,44 +13,6 @@ interface BioStepProps {
 export function BioStep({ formData, updateFormData }: BioStepProps) {
   const handleBioChange = (bio: string) => {
     updateFormData({ bio });
-  };
-
-  const handleSocialMediaChange = (platform: keyof WizardFormData['socialMedia'], value: string) => {
-    updateFormData({
-      socialMedia: {
-        ...formData.socialMedia,
-        [platform]: value
-      }
-    });
-  };
-
-  const validateAndFormatSocialLink = (platform: string, value: string) => {
-    if (!value.trim()) return value;
-    
-    const trimmedValue = value.trim();
-    
-    switch (platform) {
-      case 'instagram':
-        if (!trimmedValue.includes('instagram.com')) {
-          return `https://instagram.com/${trimmedValue.replace('@', '')}`;
-        }
-        return trimmedValue.startsWith('http') ? trimmedValue : `https://${trimmedValue}`;
-      
-      case 'facebook':
-        if (!trimmedValue.includes('facebook.com')) {
-          return `https://facebook.com/${trimmedValue}`;
-        }
-        return trimmedValue.startsWith('http') ? trimmedValue : `https://${trimmedValue}`;
-      
-      case 'linkedin':
-        if (!trimmedValue.includes('linkedin.com')) {
-          return `https://linkedin.com/in/${trimmedValue}`;
-        }
-        return trimmedValue.startsWith('http') ? trimmedValue : `https://${trimmedValue}`;
-      
-      default:
-        return trimmedValue;
-    }
   };
 
   const bioPrompts = [
@@ -130,80 +83,7 @@ export function BioStep({ formData, updateFormData }: BioStepProps) {
         </div>
       </div>
 
-      {/* Social Media Section */}
-      <div className="space-y-6">
-        <div>
-          <Label className="text-lg font-medium text-gray-900 flex items-center gap-2 mb-2">
-            <Users className="w-5 h-5" />
-            Social Media (Optional)
-          </Label>
-          <p className="text-sm text-gray-600 mb-4">
-            Adding social media links can help potential housemates get to know you better and build trust
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Instagram */}
-          <div className="space-y-2">
-            <Label htmlFor="instagram" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <Instagram className="w-4 h-4" />
-              Instagram
-            </Label>
-            <Input
-              id="instagram"
-              placeholder="@username or full URL"
-              value={formData.socialMedia.instagram}
-              onChange={(e) => handleSocialMediaChange("instagram", e.target.value)}
-              onBlur={(e) => {
-                const formatted = validateAndFormatSocialLink('instagram', e.target.value);
-                handleSocialMediaChange("instagram", formatted);
-              }}
-              className="h-12 border-gray-200 rounded-xl focus:border-primary focus:ring-0"
-            />
-            <p className="text-xs text-gray-500">Enter your Instagram username</p>
-          </div>
-
-          {/* Facebook */}
-          <div className="space-y-2">
-            <Label htmlFor="facebook" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <Facebook className="w-4 h-4" />
-              Facebook
-            </Label>
-            <Input
-              id="facebook"
-              placeholder="Profile name or full URL"
-              value={formData.socialMedia.facebook}
-              onChange={(e) => handleSocialMediaChange("facebook", e.target.value)}
-              onBlur={(e) => {
-                const formatted = validateAndFormatSocialLink('facebook', e.target.value);
-                handleSocialMediaChange("facebook", formatted);
-              }}
-              className="h-12 border-gray-200 rounded-xl focus:border-primary focus:ring-0"
-            />
-            <p className="text-xs text-gray-500">Enter your Facebook profile name</p>
-          </div>
-
-          {/* LinkedIn */}
-          <div className="space-y-2">
-            <Label htmlFor="linkedin" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <Linkedin className="w-4 h-4" />
-              LinkedIn
-            </Label>
-            <Input
-              id="linkedin"
-              placeholder="Profile name or full URL"
-              value={formData.socialMedia.linkedin}
-              onChange={(e) => handleSocialMediaChange("linkedin", e.target.value)}
-              onBlur={(e) => {
-                const formatted = validateAndFormatSocialLink('linkedin', e.target.value);
-                handleSocialMediaChange("linkedin", formatted);
-              }}
-              className="h-12 border-gray-200 rounded-xl focus:border-primary focus:ring-0"
-            />
-            <p className="text-xs text-gray-500">Enter your LinkedIn profile name</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 } 

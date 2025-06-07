@@ -344,6 +344,13 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
       
       // Provide more specific error messages based on the error type
       if (error instanceof Error) {
+        // Don't show error for NEXT_REDIRECT as it's normal redirect behavior
+        if (error.message === "NEXT_REDIRECT") {
+          // This is normal behavior when redirect() is called in server actions
+          console.log("Redirect in progress, listing created successfully");
+          return;
+        }
+        
         if (error.message.includes("Authentication") || error.message.includes("session")) {
           toast.error("Your session has expired. Please log in again.");
           window.location.href = "/api/auth/login?post_login_redirect_url=/sell";

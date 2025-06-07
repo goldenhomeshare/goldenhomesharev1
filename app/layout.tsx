@@ -3,11 +3,14 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
+import { MobileBottomNav } from "./components/MobileBottomNav";
 // import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 // import { extractRouterConfig } from "uploadthing/server";
 // import { ourFileRouter } from "./api/uploadthing/core";
 import { Toaster } from "@/components/ui/sonner";
 import { Suspense } from "react";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { getCurrentUser } from "@/lib/auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,11 +24,15 @@ export const metadata: Metadata = {
 //   return <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />;
 // }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { getUser } = getKindeServerSession();
+  const kindeUser = await getUser();
+  const user = await getCurrentUser();
+
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -33,8 +40,20 @@ export default function RootLayout({
           <UTSSRComponent />
         </Suspense> */}
         <Navbar />
-        {children}
+        <div className="pb-20 lg:pb-0">
+          {children}
+        </div>
         <Footer />
+        <MobileBottomNav 
+          user={kindeUser ? {
+            email: kindeUser.email as string,
+            name: kindeUser.given_name as string,
+            userImage: (user as any)?.homeownerProfile?.profilePicture || 
+                       (user as any)?.housemateProfile?.profilePicture || 
+                       (kindeUser.picture ?? `https://avatar.vercel.sh/${kindeUser.given_name}`),
+            userType: (user as any)?.userType || null
+          } : null}
+        />
         <Toaster richColors theme="light" closeButton />
       </body>
     </html>

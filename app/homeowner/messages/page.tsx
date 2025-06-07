@@ -105,22 +105,17 @@ export default async function HomeownerMessagesPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Mobile View */}
-      <div className="md:hidden flex-1 flex items-center justify-center bg-gray-50 min-h-[calc(100vh-6rem)]">
-        <div className="text-center p-8">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <MessageCircle className="w-8 h-8 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            Messages
-          </h3>
-          <p className="text-gray-500 max-w-md mb-4">
-            The messaging interface is optimized for desktop. Please use a larger screen.
-          </p>
-          <Button asChild>
-            <Link href="/homeowner/dashboard">Go to Dashboard</Link>
-          </Button>
-        </div>
+      {/* Mobile View - Full Messaging Interface */}
+      <div className="md:hidden bg-gray-50 min-h-[calc(100vh-6rem)]">
+        <Suspense fallback={<div className="p-4">Loading messages...</div>}>
+          <HomeownerConversationList 
+            chatRooms={validChatRooms}
+            currentUserId={user.id}
+            user={user}
+            isHidden={showHidden}
+            selectedChatId={selectedChatId}
+          />
+        </Suspense>
       </div>
 
       {/* Desktop View */}

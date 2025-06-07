@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs/components";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, User, Shield, HelpCircle, FileText, Info } from "lucide-react";
 import Link from "next/link";
 
 interface iAppProps {
@@ -78,50 +78,16 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        {/* Browse Section */}
-        <DropdownMenuLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-          Browse
-        </DropdownMenuLabel>
-        <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href="/">Home</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/products/template">View Listings</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/products/icon">View Housemates</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/about">About</Link>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        
-        {/* Manage Section */}
-        <DropdownMenuLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-          Manage
-        </DropdownMenuLabel>
-        <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href={getDashboardLink()}>Dashboard</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={getMessagesLink()}>Messages</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/applications">Applications</Link>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        
         {/* Account Section */}
         <DropdownMenuLabel className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
           Account
         </DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href={getProfileEditLink()}>Profile</Link>
+            <Link href={getProfileEditLink()} className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Edit Profile
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
@@ -132,13 +98,22 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
         </DropdownMenuLabel>
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href="/safety">Safety</Link>
+            <Link href="/about" className="flex items-center gap-2">
+              <Info className="h-4 w-4" />
+              About
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/help">Help</Link>
+            <Link href="/safety" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Safety
+            </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/fill-agreement">Agreement Form</Link>
+            <Link href="/help" className="flex items-center gap-2">
+              <HelpCircle className="h-4 w-4" />
+              Help
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

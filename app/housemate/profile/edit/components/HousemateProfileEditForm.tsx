@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { updateHousemateProfile } from "@/app/actions/profile-actions";
 import { useRouter } from "next/navigation";
-import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed, Camera, Armchair, CigaretteOff, Upload, X, Sparkles, Salad, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, MapPin, UserPlus } from "lucide-react";
+import { Loader2, User, Users, UserCheck, UserMinus, Sunrise, Moon, Clock, Heart, Coffee, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Gamepad2, Flower, Baby, GraduationCap, Briefcase, Crown, Scale, PartyPopper, UserX, Dice6, ChefHat, CircleDot, UserCircle, CircleDashed, Camera, Armchair, CigaretteOff, Upload, X, Sparkles, Salad, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, MapPin, UserPlus, Car, Monitor, Mars, Venus } from "lucide-react";
 import { toast } from "sonner";
 import { useUploadThing } from "@/app/lib/uploadthing";
 import Image from "next/image";
@@ -21,13 +21,15 @@ interface HousemateProfileEditFormProps {
   firstName: string;
   lastName: string;
   email: string;
+  phone: string;
 }
 
-export function HousemateProfileEditForm({ userId, initialData, firstName, lastName, email }: HousemateProfileEditFormProps) {
+export function HousemateProfileEditForm({ userId, initialData, firstName, lastName, email, phone }: HousemateProfileEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     firstName: firstName || "",
     lastName: lastName || "",
+    phone: phone || "",
     dateOfBirth: initialData?.lifestyle?.dateOfBirth || "",
     language: initialData?.lifestyle?.language || "",
     occupation: initialData?.occupation || "",
@@ -44,11 +46,6 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
     location: {
       city: initialData?.lifestyle?.location?.city || "",
       state: initialData?.lifestyle?.location?.state || "",
-    },
-    socialMedia: {
-      instagram: initialData?.socialMedia?.instagram || "",
-      facebook: initialData?.socialMedia?.facebook || "",
-      linkedin: initialData?.socialMedia?.linkedin || "",
     },
     lifestyle: {
       hasPets: initialData?.lifestyle?.hasPets || false,
@@ -141,19 +138,19 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
     { id: "crafting", label: "Crafting/Art", icon: Palette },
     { id: "music", label: "Music", icon: Music },
     { id: "tech", label: "Tech/Computers", icon: Laptop },
-    { id: "pets", label: "Pets/Animals", icon: PawPrint },
     { id: "games", label: "Board Games", icon: Dice6 },
   ];
 
   const supportOptions = [
     { id: "cleaning", label: "Cleaning", icon: Sparkles },
     { id: "cooking", label: "Cooking", icon: Salad },
-    { id: "gardening", label: "Gardening", icon: Flower },
-    { id: "errands", label: "Errands", icon: ShoppingBag },
+    { id: "gardening", label: "Yard Work", icon: Flower },
+    { id: "errands", label: "Shopping & Errands", icon: ShoppingBag },
     { id: "companionship", label: "Companionship", icon: HeartHandshake },
     { id: "petCare", label: "Pet Care", icon: Cat },
-    { id: "techSupport", label: "Tech Support", icon: Wrench },
-    { id: "homeSecurity", label: "Home Security", icon: Shield },
+    { id: "techSupport", label: "Tech Support", icon: Monitor },
+    { id: "homeMaintenance", label: "Home Maintenance", icon: Wrench },
+    { id: "transportation", label: "Transportation", icon: Car },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -182,6 +179,7 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
 
       // Update profile-specific info
       const submitData = {
+        phone: formData.phone,
         occupation: formData.occupation,
         bio: formData.bio,
         profilePicture: formData.profilePicture,
@@ -192,7 +190,6 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
         socialPreference: formData.socialPreference,
         hobbies: formData.hobbies,
         preferredGender: formData.preferredGender,
-        socialMedia: formData.socialMedia,
         lifestyle: {
           ...formData.lifestyle,
           dateOfBirth: formData.dateOfBirth,
@@ -219,35 +216,44 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
     }
   };
 
+  // Phone validation helper
+  const isValidPhone = (phone: string) => {
+    const phoneNumbers = phone.replace(/\D/g, '');
+    return phoneNumbers.length >= 10 && phoneNumbers.length <= 11;
+  };
+
   // Comprehensive validation function that matches signup wizard requirements
   const isFormValid = () => {
-    // Step 1: Location validation - city, state
-    if (!formData.location.city.trim()) return false;
-    if (!formData.location.state.trim()) return false;
-
-    // Step 2: Budget validation - maxBudget
-    if (!formData.maxBudget) return false;
-
-    // Step 3: Demographics validation - firstName, lastName, dateOfBirth, language, gender
+    // Step 1: Basic Details validation - firstName, lastName, phone
     if (!formData.firstName.trim()) return false;
     if (!formData.lastName.trim()) return false;
+    if (!formData.phone || !isValidPhone(formData.phone)) return false;
+
+    // Step 2: Demographics validation - dateOfBirth, language, gender
     if (!formData.dateOfBirth) return false;
     if (!formData.language) return false;
     if (!formData.gender) return false;
 
-    // Step 4: Profile Picture validation
+    // Step 3: Location validation - city, state
+    if (!formData.location.city.trim()) return false;
+    if (!formData.location.state.trim()) return false;
+
+    // Step 4: Budget validation - maxBudget
+    if (!formData.maxBudget) return false;
+
+    // Step 5: Profile Picture validation
     if (!formData.profilePicture) return false;
 
-    // Step 5: Education & Occupation validation - at least one must be provided
+    // Step 6: Education & Occupation validation - at least one must be provided
     const hasEducation = formData.education.level;
     const hasOccupation = formData.occupationDetails.isRetired || formData.occupationDetails.description;
     if (!hasEducation && !hasOccupation) return false;
 
-    // Step 6: Lifestyle validation - schedule, socialPreference
+    // Step 7: Lifestyle validation - schedule, socialPreference
     if (!formData.schedule) return false;
     if (!formData.socialPreference) return false;
 
-    // Step 7: Housemate Preferences validation - smokingStatus, guestPolicy, pets
+    // Step 8: Housemate Preferences validation - smokingStatus, guestPolicy, pets
     if (!formData.lifestyle.smokingStatus) return false;
     if (!formData.lifestyle.guestPolicy) return false;
     
@@ -256,10 +262,10 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
       return false;
     }
 
-    // Step 8: Match Preferences validation - preferredGender
+    // Step 9: Match Preferences validation - preferredGender
     if (!formData.preferredGender) return false;
 
-    // Step 9: Bio validation - must have content
+    // Step 10: Bio validation - must have content
     if (!formData.bio.trim()) return false;
 
     return true;
@@ -269,14 +275,15 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
   const getMissingFields = () => {
     const missing: string[] = [];
 
-    if (!formData.location.city.trim()) missing.push("City");
-    if (!formData.location.state.trim()) missing.push("State");
-    if (!formData.maxBudget) missing.push("Maximum Budget");
     if (!formData.firstName.trim()) missing.push("First Name");
     if (!formData.lastName.trim()) missing.push("Last Name");
+    if (!formData.phone || !isValidPhone(formData.phone)) missing.push("Phone Number");
     if (!formData.dateOfBirth) missing.push("Date of Birth");
     if (!formData.language) missing.push("Primary Language");
     if (!formData.gender) missing.push("Gender");
+    if (!formData.location.city.trim()) missing.push("City");
+    if (!formData.location.state.trim()) missing.push("State");
+    if (!formData.maxBudget) missing.push("Maximum Budget");
     if (!formData.profilePicture) missing.push("Profile Picture");
     
     const hasEducation = formData.education.level;
@@ -612,6 +619,36 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                 </p>
               </div>
 
+              {/* Phone Number */}
+              <div>
+                <Label htmlFor="phone" className="text-sm font-medium text-gray-700 mb-2 block">
+                  Phone Number
+                </Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  placeholder="(555) 123-4567"
+                  value={formData.phone}
+                  onChange={(e) => {
+                    // Format phone number as user types
+                    const phoneNumber = e.target.value.replace(/\D/g, '');
+                    let formattedPhone = phoneNumber;
+                    
+                    if (phoneNumber.length >= 6) {
+                      formattedPhone = `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3, 6)}-${phoneNumber.slice(6, 10)}`;
+                    } else if (phoneNumber.length >= 3) {
+                      formattedPhone = `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+                    }
+                    
+                    handleInputChange("phone", formattedPhone);
+                  }}
+                  className="h-12 border-gray-200 rounded-xl focus:border-primary focus:ring-0 text-gray-900"
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Your phone number will be used for verification and important account notifications
+                </p>
+              </div>
+
               {/* Date of Birth */}
               <div>
                 <Label htmlFor="dateOfBirth" className="text-sm font-medium text-gray-700 mb-2 block">
@@ -707,111 +744,7 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                 </p>
               </div>
 
-              {/* Social Media Links */}
-              <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Social Media Links
-                </Label>
-                <p className="text-xs text-gray-500 mb-4">
-                  Optional: Add your social media profiles to help homeowners get to know you better
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="instagram" className="text-xs font-medium text-gray-600 mb-1 block">
-                      Instagram
-                    </Label>
-                    <Input
-                      id="instagram"
-                      placeholder="https://instagram.com/username or @username"
-                      value={formData.socialMedia.instagram}
-                      onChange={(e) => setFormData(prev => ({
-                        ...prev,
-                        socialMedia: { ...prev.socialMedia, instagram: e.target.value }
-                      }))}
-                      onBlur={(e) => {
-                        const value = e.target.value.trim();
-                        if (value && !value.startsWith('http')) {
-                          let formattedValue = value;
-                          if (value.startsWith('@')) {
-                            formattedValue = `https://instagram.com/${value.substring(1)}`;
-                          } else if (!value.includes('instagram.com')) {
-                            formattedValue = `https://instagram.com/${value}`;
-                          } else if (!value.startsWith('https://')) {
-                            formattedValue = `https://${value}`;
-                          }
-                          setFormData(prev => ({
-                            ...prev,
-                            socialMedia: { ...prev.socialMedia, instagram: formattedValue }
-                          }));
-                        }
-                      }}
-                      className="h-11 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-0 text-gray-900"
-                    />
-                  </div>
 
-                  <div>
-                    <Label htmlFor="facebook" className="text-xs font-medium text-gray-600 mb-1 block">
-                      Facebook
-                    </Label>
-                    <Input
-                      id="facebook"
-                      placeholder="https://facebook.com/username"
-                      value={formData.socialMedia.facebook}
-                      onChange={(e) => setFormData(prev => ({
-                        ...prev,
-                        socialMedia: { ...prev.socialMedia, facebook: e.target.value }
-                      }))}
-                      onBlur={(e) => {
-                        const value = e.target.value.trim();
-                        if (value && !value.startsWith('http')) {
-                          let formattedValue = value;
-                          if (!value.includes('facebook.com')) {
-                            formattedValue = `https://facebook.com/${value}`;
-                          } else if (!value.startsWith('https://')) {
-                            formattedValue = `https://${value}`;
-                          }
-                          setFormData(prev => ({
-                            ...prev,
-                            socialMedia: { ...prev.socialMedia, facebook: formattedValue }
-                          }));
-                        }
-                      }}
-                      className="h-11 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-0 text-gray-900"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="linkedin" className="text-xs font-medium text-gray-600 mb-1 block">
-                      LinkedIn
-                    </Label>
-                    <Input
-                      id="linkedin"
-                      placeholder="https://linkedin.com/in/username"
-                      value={formData.socialMedia.linkedin}
-                      onChange={(e) => setFormData(prev => ({
-                        ...prev,
-                        socialMedia: { ...prev.socialMedia, linkedin: e.target.value }
-                      }))}
-                      onBlur={(e) => {
-                        const value = e.target.value.trim();
-                        if (value && !value.startsWith('http')) {
-                          let formattedValue = value;
-                          if (!value.includes('linkedin.com')) {
-                            formattedValue = `https://linkedin.com/in/${value}`;
-                          } else if (!value.startsWith('https://')) {
-                            formattedValue = `https://${value}`;
-                          }
-                          setFormData(prev => ({
-                            ...prev,
-                            socialMedia: { ...prev.socialMedia, linkedin: formattedValue }
-                          }));
-                        }
-                      }}
-                      className="h-11 border-gray-200 rounded-xl focus:border-gray-400 focus:ring-0 text-gray-900"
-                    />
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -1414,8 +1347,8 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
                 <p className="text-xs text-gray-500 mb-4">Select your preferred gender for living companions</p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {[
-                    { id: "male", label: "Male", icon: UserCircle },
-                    { id: "female", label: "Female", icon: User },
+                    { id: "male", label: "Male", icon: Mars },
+                    { id: "female", label: "Female", icon: Venus },
                     { id: "no-preference", label: "No Preference", icon: Users }
                   ].map((option) => {
                     const Icon = option.icon;

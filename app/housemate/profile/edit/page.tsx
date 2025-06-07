@@ -12,6 +12,7 @@ async function getUserData(userId: string) {
       firstName: true,
       lastName: true,
       email: true,
+      phone: true,
     },
   });
 
@@ -53,6 +54,7 @@ export default async function EditHousemateProfilePage() {
         firstName={userData.firstName || ""}
         lastName={userData.lastName || ""}
         email={userData.email || ""}
+        phone={userData.phone || ""}
       />
     </div>
   );

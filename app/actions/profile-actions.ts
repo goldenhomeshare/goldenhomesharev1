@@ -70,6 +70,7 @@ export async function updateHomeownerProfile(
 // Housemate profile update action
 export async function updateHousemateProfile(
   data: {
+    phone?: string;
     occupation?: string;
     bio?: string;
     profilePicture?: string;
@@ -81,47 +82,73 @@ export async function updateHousemateProfile(
     hobbies?: string[];
     preferredGender?: string;
     canHelpWith?: string[];
-    socialMedia?: {
-      instagram?: string;
-      facebook?: string;
-      linkedin?: string;
-    };
     lifestyle?: {
       hasPets?: boolean;
       petDescription?: string;
       numberOfPeople?: string;
       smokingStatus?: string;
+      guestPolicy?: string;
+      dateOfBirth?: string;
+      language?: string;
+      education?: {
+        level?: string;
+        stillAttending?: boolean;
+        degreeProgram?: string;
+      };
+      occupationDetails?: {
+        isRetired?: boolean;
+        description?: string;
+      };
+      location?: {
+        city?: string;
+        state?: string;
+      };
     };
   }
 ) {
   try {
     const user = await requireHousemate();
     
-    // Create the update data object, only including defined fields
-    const updateData: any = {};
+    // Separate data for User model vs HousemateProfile model
+    const userUpdateData: any = {};
+    const profileUpdateData: any = {};
     
-    if (data.occupation !== undefined) updateData.occupation = data.occupation;
-    if (data.bio !== undefined) updateData.bio = data.bio;
-    if (data.profilePicture !== undefined) updateData.profilePicture = data.profilePicture;
-    if (data.maxBudget !== undefined) updateData.maxBudget = data.maxBudget;
-    if (data.gender !== undefined) updateData.gender = data.gender;
-    if (data.ageRange !== undefined) updateData.ageRange = data.ageRange;
-    if (data.schedule !== undefined) updateData.schedule = data.schedule;
-    if (data.socialPreference !== undefined) updateData.socialPreference = data.socialPreference;
-    if (data.hobbies !== undefined) updateData.hobbies = data.hobbies;
-    if (data.preferredGender !== undefined) updateData.preferredGender = data.preferredGender;
-    if (data.canHelpWith !== undefined) updateData.canHelpWith = data.canHelpWith;
-    if (data.socialMedia !== undefined) updateData.socialMedia = data.socialMedia;
-    if (data.lifestyle !== undefined) updateData.lifestyle = data.lifestyle;
+    // User model fields
+    if (data.phone !== undefined) userUpdateData.phone = data.phone;
+    
+    // HousemateProfile model fields
+    if (data.occupation !== undefined) profileUpdateData.occupation = data.occupation;
+    if (data.bio !== undefined) profileUpdateData.bio = data.bio;
+    if (data.profilePicture !== undefined) profileUpdateData.profilePicture = data.profilePicture;
+    if (data.maxBudget !== undefined) profileUpdateData.maxBudget = data.maxBudget;
+    if (data.gender !== undefined) profileUpdateData.gender = data.gender;
+    if (data.ageRange !== undefined) profileUpdateData.ageRange = data.ageRange;
+    if (data.schedule !== undefined) profileUpdateData.schedule = data.schedule;
+    if (data.socialPreference !== undefined) profileUpdateData.socialPreference = data.socialPreference;
+    if (data.hobbies !== undefined) profileUpdateData.hobbies = data.hobbies;
+    if (data.preferredGender !== undefined) profileUpdateData.preferredGender = data.preferredGender;
+    if (data.canHelpWith !== undefined) profileUpdateData.canHelpWith = data.canHelpWith;
+    if (data.lifestyle !== undefined) profileUpdateData.lifestyle = data.lifestyle;
 
-    await prisma.housemateProfile.upsert({
-      where: { userId: user.id },
-      update: updateData,
-      create: {
-        userId: user.id,
-        ...updateData,
-      },
-    });
+    // Update User model if there are user fields to update
+    if (Object.keys(userUpdateData).length > 0) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: userUpdateData,
+      });
+    }
+
+    // Update HousemateProfile model
+    if (Object.keys(profileUpdateData).length > 0) {
+      await prisma.housemateProfile.upsert({
+        where: { userId: user.id },
+        update: profileUpdateData,
+        create: {
+          userId: user.id,
+          ...profileUpdateData,
+        },
+      });
+    }
 
     revalidatePath("/housemate/dashboard");
     revalidatePath("/housemate/profile/edit");

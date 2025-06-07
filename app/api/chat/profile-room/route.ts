@@ -41,12 +41,11 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Check if a profile chat room already exists, with optimized query
+    // Check if ANY chat room already exists between these users (unified approach)
     let chatRoom = await prisma.chatRoom.findFirst({
       where: {
         homeownerId,
         housemateId,
-        productId: PROFILE_CHAT_PRODUCT_ID,
       },
       select: {
         id: true,
@@ -75,7 +74,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create chat room if it doesn't exist
+    // Create chat room if it doesn't exist, using profile context
     if (!chatRoom) {
       chatRoom = await prisma.chatRoom.create({
         data: {

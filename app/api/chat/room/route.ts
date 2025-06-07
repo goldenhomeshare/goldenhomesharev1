@@ -17,10 +17,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Check if chat room already exists
+    // Check if ANY chat room already exists between these users (unified approach)
     let chatRoom = await prisma.chatRoom.findFirst({
       where: {
-        productId,
         homeownerId: hostId,
         housemateId,
       },
@@ -42,7 +41,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create chat room if it doesn't exist
+    // Create chat room if it doesn't exist, or update existing one with current product context
     if (!chatRoom) {
       chatRoom = await prisma.chatRoom.create({
         data: {
@@ -50,6 +49,28 @@ export async function POST(request: NextRequest) {
           homeownerId: hostId,
           housemateId,
         },
+        include: {
+          messages: {
+            include: {
+              sender: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  profileImage: true,
+                },
+              },
+            },
+            orderBy: {
+              createdAt: "asc",
+            },
+          },
+        },
+      });
+    } else if (chatRoom.productId !== productId) {
+      // Update existing chat room to reflect current product context
+      chatRoom = await prisma.chatRoom.update({
+        where: { id: chatRoom.id },
+        data: { productId },
         include: {
           messages: {
             include: {

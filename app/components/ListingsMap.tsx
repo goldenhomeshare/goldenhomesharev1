@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
+import { loadGoogleMapsAPI } from '../lib/google-maps-loader';
 
 interface Listing {
   id: string;
@@ -17,11 +18,6 @@ interface ListingsMapProps {
   onVisibleListingsChange?: (visibleListings: Listing[]) => void;
 }
 
-// Global variables to track script loading state
-let isGoogleMapsLoading = false;
-let isGoogleMapsLoaded = false;
-const googleMapsCallbacks: (() => void)[] = [];
-
 // Simple hash function for consistent offset generation
 function simpleHash(str: string): number {
   let hash = 0;
@@ -31,63 +27,6 @@ function simpleHash(str: string): number {
     hash = hash & hash;
   }
   return Math.abs(hash);
-}
-
-function loadGoogleMapsScript(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    // If already loaded, resolve immediately
-    if (isGoogleMapsLoaded && window.google && window.google.maps) {
-      resolve();
-      return;
-    }
-
-    // Add callback to queue
-    googleMapsCallbacks.push(resolve);
-
-    // If already loading, just wait for it
-    if (isGoogleMapsLoading) {
-      return;
-    }
-
-    // Check if script already exists
-    const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
-    if (existingScript) {
-      isGoogleMapsLoaded = true;
-      // Execute all callbacks
-      googleMapsCallbacks.forEach(callback => callback());
-      googleMapsCallbacks.length = 0;
-      return;
-    }
-
-    isGoogleMapsLoading = true;
-
-    // Check if API key is available
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-    if (!apiKey || apiKey === 'DEMO_KEY' || apiKey === '') {
-      isGoogleMapsLoading = false;
-      reject(new Error('Google Maps API key is not configured. Please set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY in your environment variables.'));
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=geometry`;
-    script.async = true;
-    
-    script.onload = () => {
-      isGoogleMapsLoaded = true;
-      isGoogleMapsLoading = false;
-      // Execute all callbacks
-      googleMapsCallbacks.forEach(callback => callback());
-      googleMapsCallbacks.length = 0;
-    };
-    
-    script.onerror = () => {
-      isGoogleMapsLoading = false;
-      reject(new Error('Failed to load Google Maps API. Please check your API key and ensure the Maps JavaScript API is enabled in Google Cloud Console.'));
-    };
-    
-    document.head.appendChild(script);
-  });
 }
 
 export function ListingsMap({ listings, className = "", onVisibleListingsChange }: ListingsMapProps) {
@@ -123,7 +62,7 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
       if (!mapRef.current) return;
 
       try {
-        await loadGoogleMapsScript();
+        await loadGoogleMapsAPI({ libraries: ['geometry'] });
 
         // Clear existing markers and info windows
         markersRef.current.forEach(marker => marker.setMap(null));
@@ -458,9 +397,4 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
   );
 }
 
-// Extend Window interface for TypeScript
-declare global {
-  interface Window {
-    google: any;
-  }
-} 
+ 

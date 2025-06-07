@@ -198,9 +198,9 @@ export function HomeownerProfileCard({ homeowner, canMessageHost, messageProps, 
               )}
             </div>
 
-            {/* Message Button - Positioned to the right */}
+            {/* Desktop: Message Button - Positioned to the right */}
             {canMessageHost && messageProps && (
-              <div className="flex-shrink-0">
+              <div className="hidden lg:flex flex-shrink-0">
                 <MessageHostButton 
                   productId={messageProps.productId}
                   hostId={messageProps.hostId}
@@ -210,6 +210,18 @@ export function HomeownerProfileCard({ homeowner, canMessageHost, messageProps, 
               </div>
             )}
           </div>
+
+          {/* Mobile: Message Button - Positioned below header */}
+          {canMessageHost && messageProps && (
+            <div className="lg:hidden mb-6">
+              <MessageHostButton 
+                productId={messageProps.productId}
+                hostId={messageProps.hostId}
+                hostName={homeowner.firstName}
+                productName={messageProps.productName}
+              />
+            </div>
+          )}
 
           {/* Bio Section */}
           {profile?.bio && (

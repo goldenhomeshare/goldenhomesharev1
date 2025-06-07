@@ -113,7 +113,7 @@ export function ApplicationForm({
       setIsLoading(true);
       await submitApplication(productId, message, moveInDate, moveOutDate);
       
-      toast.success("Application submitted successfully! The homeowner will review your application.");
+      toast.success("Application submitted successfully! A chat has been started with the homeowner and they will review your application.");
       setSubmitted(true);
       setMessage("");
       setMoveInDate(undefined);

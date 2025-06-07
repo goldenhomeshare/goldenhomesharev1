@@ -288,34 +288,62 @@ export default async function ProductPage({
               supportRequested={supportRequested}
             />
           )}
+
+          {/* Mobile: Application Form right after HomeownerProfileCard */}
+          <div className="lg:hidden mt-6">
+            {!isOwner && data.id ? (
+              <ApplicationForm
+                productId={data.id}
+                productName={data.name || 'Property'}
+                price={data.price}
+                hasExistingApplication={!!existingApplication}
+                existingApplicationStatus={existingApplication?.status || undefined}
+                applicationId={existingApplication?.id}
+              />
+            ) : isOwner ? (
+              <Card>
+                <CardContent className="py-6 text-center">
+                  <h3 className="text-lg font-medium mb-2">This is your listing</h3>
+                  <p className="text-muted-foreground mb-4">
+                    You can view and manage applications from interested housemates in your dashboard.
+                  </p>
+                  <Button asChild variant="outline">
+                    <a href="/applications">View Applications</a>
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : null}
+          </div>
           
           <ProductDescription content={data.description as JSONContent} />
         </div>
 
         <div className="max-w-2xl mx-auto mt-4 lg:max-w-none lg:mt-0 lg:col-span-3">
-          {/* Application Form for all users except owners */}
-          {!isOwner && data.id ? (
-            <ApplicationForm
-              productId={data.id}
-              productName={data.name || 'Property'}
-              price={data.price}
-              hasExistingApplication={!!existingApplication}
-              existingApplicationStatus={existingApplication?.status || undefined}
-              applicationId={existingApplication?.id}
-            />
-          ) : isOwner ? (
-            <Card>
-              <CardContent className="py-6 text-center">
-                <h3 className="text-lg font-medium mb-2">This is your listing</h3>
-                <p className="text-muted-foreground mb-4">
-                  You can view and manage applications from interested housemates in your dashboard.
-                </p>
-                <Button asChild variant="outline">
-                  <a href="/applications">View Applications</a>
-                </Button>
-              </CardContent>
-            </Card>
-          ) : null}
+          {/* Desktop: Application Form for all users except owners */}
+          <div className="hidden lg:block">
+            {!isOwner && data.id ? (
+              <ApplicationForm
+                productId={data.id}
+                productName={data.name || 'Property'}
+                price={data.price}
+                hasExistingApplication={!!existingApplication}
+                existingApplicationStatus={existingApplication?.status || undefined}
+                applicationId={existingApplication?.id}
+              />
+            ) : isOwner ? (
+              <Card>
+                <CardContent className="py-6 text-center">
+                  <h3 className="text-lg font-medium mb-2">This is your listing</h3>
+                  <p className="text-muted-foreground mb-4">
+                    You can view and manage applications from interested housemates in your dashboard.
+                  </p>
+                  <Button asChild variant="outline">
+                    <a href="/applications">View Applications</a>
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : null}
+          </div>
 
           {amenities.length > 0 && (
             <>

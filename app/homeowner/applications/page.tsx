@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, CheckCircle, XCircle, User, MessageSquare, Calendar, CalendarDays, FileText } from "lucide-react";
+import { Clock, CheckCircle, XCircle, User, MessageSquare, Calendar, CalendarDays, FileText, Users, Home } from "lucide-react";
 import Link from "next/link";
 import { ApplicationActionButtons } from "../../components/ApplicationActionButtons";
 import { format } from "date-fns";
@@ -78,175 +78,223 @@ export default async function HomeownerApplicationsPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "PENDING":
-        return <Clock className="h-4 w-4" />;
+        return <Clock className="w-4 h-4 sm:w-5 sm:h-5" />;
       case "APPROVED":
-        return <CheckCircle className="h-4 w-4" />;
+        return <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
       case "REJECTED":
-        return <XCircle className="h-4 w-4" />;
+        return <XCircle className="w-4 h-4 sm:w-5 sm:h-5" />;
       default:
-        return <Clock className="h-4 w-4" />;
+        return <Clock className="w-4 h-4 sm:w-5 sm:h-5" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "PENDING":
-        return "bg-yellow-100 text-yellow-800";
+        return "bg-primary/10 text-primary border-primary/20";
       case "APPROVED":
-        return "bg-green-100 text-green-800";
+        return "bg-green-50 text-green-700 border-green-200";
       case "REJECTED":
-        return "bg-red-100 text-red-800";
+        return "bg-red-50 text-red-700 border-red-200";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-gray-50 text-gray-700 border-gray-200";
     }
   };
 
   const ApplicationCard = ({ application, showActions = false }: { application: any, showActions?: boolean }) => (
-    <Card key={application.id}>
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div className="flex items-start space-x-4">
-            <Avatar className="h-12 w-12">
+    <Card className="shadow-lg border-0 w-full overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
+          <div className="flex items-start space-x-3 sm:space-x-4">
+            <Avatar className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full">
               <AvatarImage src={application.housemate.housemateProfile?.profilePicture} />
-              <AvatarFallback>
+              <AvatarFallback className="bg-primary/10 text-primary text-sm sm:text-base font-semibold">
                 {application.housemate.firstName?.[0]}{application.housemate.lastName?.[0]}
               </AvatarFallback>
             </Avatar>
-            <div className="space-y-1">
-              <CardTitle className="text-lg">
+            <div className="space-y-1 sm:space-y-2 flex-1 min-w-0">
+              <CardTitle className="text-lg sm:text-xl text-gray-900 break-words">
                 {application.housemate.firstName} {application.housemate.lastName}
               </CardTitle>
-              <CardDescription>
-                Applied for: {application.product.name}
+              <CardDescription className="text-sm sm:text-base text-gray-600">
+                Applied for: <span className="font-medium">{application.product.name}</span>
               </CardDescription>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-gray-600 break-words">
                 {application.housemate.housemateProfile?.occupation && 
                   `${application.housemate.housemateProfile.occupation} • `
                 }
-                Budget: ${application.housemate.housemateProfile?.maxBudget || 'Not specified'}/month
+                Budget: <span className="font-medium text-primary">${application.housemate.housemateProfile?.maxBudget || 'Not specified'}/month</span>
               </p>
             </div>
           </div>
           <Badge
-            className={`${getStatusColor(application.status)} flex items-center gap-1`}
+            className={`${getStatusColor(application.status)} flex items-center gap-1 sm:gap-2 border text-xs sm:text-sm px-2 sm:px-3 py-1 min-h-[32px] sm:min-h-[36px] shrink-0`}
           >
             {getStatusIcon(application.status)}
-            {application.status === "APPROVED" 
-              ? (application.agreement 
-                  ? (application.agreement?.homeownerSigned 
-                      ? (application.agreement?.housemateSigned ? "AGREEMENT COMPLETE" : "AWAITING HOUSEMATE SIGNATURE")
-                      : "AGREEMENT NEEDS SIGNATURE") 
-                  : "NEEDS AGREEMENT")
-              : application.status}
+            <span className="break-words">
+              {application.status === "APPROVED" 
+                ? (application.agreement 
+                    ? (application.agreement?.homeownerSigned 
+                        ? (application.agreement?.housemateSigned ? "AGREEMENT COMPLETE" : "AWAITING HOUSEMATE SIGNATURE")
+                        : "AGREEMENT NEEDS SIGNATURE") 
+                    : "NEEDS AGREEMENT")
+                : application.status}
+            </span>
           </Badge>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {/* Stay Duration Section */}
-          {application.moveInDate && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium mb-3 flex items-center gap-2">
-                <CalendarDays className="h-4 w-4 text-blue-600" />
-                Intended Stay Period
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-blue-600" />
-                  <div>
-                    <span className="font-medium">Move-in Date:</span>
-                    <br />
-                    <span className="text-blue-700">
-                      {format(new Date(application.moveInDate), "MMMM dd, yyyy")}
-                    </span>
-                  </div>
+      
+      <CardContent className="p-4 sm:p-6 bg-white rounded-b-lg space-y-4 sm:space-y-6 max-w-full">
+        {/* Stay Duration Section */}
+        {application.moveInDate && (
+          <div className="bg-primary/5 border border-primary/20 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+            <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <CalendarDays className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              </div>
+              Intended Stay Period
+            </h4>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+              <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
+                <div className="w-10 h-10 bg-primary/10 rounded-full mx-auto mb-3 flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-primary" />
                 </div>
-                {application.moveOutDate && (
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-blue-600" />
-                    <div>
-                      <span className="font-medium">Move-out Date:</span>
-                      <br />
-                      <span className="text-blue-700">
-                        {format(new Date(application.moveOutDate), "MMMM dd, yyyy")}
-                      </span>
-                    </div>
-                  </div>
-                )}
-                {!application.moveOutDate && (
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-gray-400" />
-                    <div>
-                      <span className="font-medium">Move-out Date:</span>
-                      <br />
-                      <span className="text-gray-500">Not specified (long-term)</span>
-                    </div>
-                  </div>
-                )}
+                <div className="text-sm sm:text-base font-semibold text-gray-900">Move-in Date</div>
+                <div className="text-xs sm:text-sm text-primary font-medium mt-1">
+                  {format(new Date(application.moveInDate), "MMMM dd, yyyy")}
+                </div>
+              </div>
+              
+              <div className="bg-white border border-gray-200 rounded-xl p-4 text-center">
+                <div className={`w-10 h-10 ${application.moveOutDate ? 'bg-primary/10' : 'bg-gray-100'} rounded-full mx-auto mb-3 flex items-center justify-center`}>
+                  <Calendar className={`w-5 h-5 ${application.moveOutDate ? 'text-primary' : 'text-gray-400'}`} />
+                </div>
+                <div className="text-sm sm:text-base font-semibold text-gray-900">Move-out Date</div>
+                <div className={`text-xs sm:text-sm ${application.moveOutDate ? 'text-primary' : 'text-gray-500'} font-medium mt-1`}>
+                  {application.moveOutDate 
+                    ? format(new Date(application.moveOutDate), "MMMM dd, yyyy")
+                    : "Not specified (long-term)"
+                  }
+                </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {application.housemate.housemateProfile?.bio && (
-            <div>
-              <h4 className="font-medium mb-2">About:</h4>
-              <p className="text-sm text-muted-foreground">
-                {application.housemate.housemateProfile.bio}
-              </p>
-            </div>
-          )}
+        {/* Bio Section */}
+        {application.housemate.housemateProfile?.bio && (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+            <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              </div>
+              About This Applicant
+            </h4>
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed break-words">
+              {application.housemate.housemateProfile.bio}
+            </p>
+          </div>
+        )}
+        
+        {/* Application Message Section */}
+        {application.message && (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+            <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+              </div>
+              Application Message
+            </h4>
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed break-words bg-white p-3 sm:p-4 rounded-lg border border-gray-100">
+              {application.message}
+            </p>
+          </div>
+        )}
+        
+        {/* Actions Section - Mobile: Stacked, Desktop: Horizontal */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0 pt-4 sm:pt-6 border-t border-gray-100">
+          <span className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
+            Applied on {new Date(application.createdAt).toLocaleDateString()}
+          </span>
           
-          {application.message && (
-            <div>
-              <h4 className="font-medium mb-2">Application Message:</h4>
-              <p className="text-sm text-muted-foreground bg-gray-50 p-3 rounded-md">
-                {application.message}
-              </p>
+          {/* Mobile: Stacked buttons */}
+          <div className="flex flex-col sm:hidden space-y-3">
+                         <div className="grid grid-cols-2 gap-3">
+               <Link href={`/profile/${application.housemate.id}`} className="w-full">
+                 <Button variant="outline" size="sm" className="w-full min-h-[44px] text-xs">
+                   <User className="w-4 h-4 mr-2" />
+                   View Profile
+                 </Button>
+               </Link>
+                             <Link href={`/homeowner/messages?housemate=${application.housemate.id}&product=${application.product.id}`} className="w-full">
+                 <Button variant="outline" size="sm" className="w-full min-h-[44px] text-xs">
+                   <MessageSquare className="w-4 h-4 mr-2" />
+                   Message
+                 </Button>
+               </Link>
             </div>
-          )}
-          
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">
-              Applied on {new Date(application.createdAt).toLocaleDateString()}
-            </span>
-            <div className="flex gap-2">
-              <Link href={`/housemate/profile/${application.housemate.id}`}>
-                <Button variant="outline" size="sm">
-                  <User className="h-4 w-4 mr-2" />
-                  View Profile
+            
+            {showActions && application.status === "PENDING" && (
+              <ApplicationActionButtons applicationId={application.id} />
+            )}
+            
+            {application.status === "APPROVED" && (
+              <Link href={`/homeowner/agreement/${application.id}`} className="w-full">
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  className={`w-full min-h-[44px] text-xs ${
+                    application.agreement 
+                      ? 'bg-blue-600 hover:bg-blue-700' 
+                      : 'bg-green-600 hover:bg-green-700'
+                  }`}
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  {application.agreement 
+                    ? (application.agreement?.homeownerSigned 
+                        ? (application.agreement?.housemateSigned ? "View Agreement" : "View Agreement (Pending)")
+                        : "Complete Agreement")
+                    : "Create Agreement"}
                 </Button>
               </Link>
-              <Link href={`/homeowner/messages?housemate=${application.housemate.id}&product=${application.product.id}`}>
-                <Button variant="outline" size="sm">
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Message
+            )}
+          </div>
+          
+                     {/* Desktop: Horizontal buttons */}
+           <div className="hidden sm:flex gap-2 lg:gap-3">
+             <Link href={`/profile/${application.housemate.id}`}>
+               <Button variant="outline" size="sm">
+                 <User className="w-4 h-4 mr-2" />
+                 View Profile
+               </Button>
+             </Link>
+            <Link href={`/homeowner/messages?housemate=${application.housemate.id}&product=${application.product.id}`}>
+              <Button variant="outline" size="sm">
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Message
+              </Button>
+            </Link>
+            {showActions && application.status === "PENDING" && (
+              <ApplicationActionButtons applicationId={application.id} />
+            )}
+            {application.status === "APPROVED" && (
+              <Link href={`/homeowner/agreement/${application.id}`}>
+                <Button 
+                  variant="default" 
+                  size="sm" 
+                  className={application.agreement 
+                    ? 'bg-blue-600 hover:bg-blue-700' 
+                    : 'bg-green-600 hover:bg-green-700'}
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  {application.agreement 
+                    ? (application.agreement?.homeownerSigned 
+                        ? (application.agreement?.housemateSigned ? "View Agreement" : "View Agreement (Pending)")
+                        : "Complete Agreement")
+                    : "Create Agreement"}
                 </Button>
               </Link>
-              {showActions && application.status === "PENDING" && (
-                <ApplicationActionButtons applicationId={application.id} />
-              )}
-              {application.status === "APPROVED" && (
-                application.agreement ? (
-                  // Agreement exists - show different button based on signing status
-                  <Link href={`/homeowner/agreement/${application.id}`}>
-                    <Button variant="default" size="sm" className="bg-blue-600 hover:bg-blue-700">
-                      <FileText className="h-4 w-4 mr-2" />
-                      {application.agreement?.homeownerSigned 
-                        ? (application.agreement?.housemateSigned ? "View Agreement" : "View Agreement (Pending Housemate)")
-                        : "Complete Agreement"}
-                    </Button>
-                  </Link>
-                ) : (
-                  // No agreement exists - show create button
-                  <Link href={`/homeowner/agreement/${application.id}`}>
-                    <Button variant="default" size="sm" className="bg-green-600 hover:bg-green-700">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Create Agreement
-                    </Button>
-                  </Link>
-                )
-              )}
-            </div>
+            )}
           </div>
         </div>
       </CardContent>
@@ -254,37 +302,56 @@ export default async function HomeownerApplicationsPage() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Property Applications</h1>
-        <p className="text-muted-foreground">
-          Review and manage applications from potential housemates
-        </p>
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      {/* Header Section */}
+      <div className="mb-6 sm:mb-8">
+        <Card className="shadow-lg border-0 w-full">
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg p-4 sm:p-6 lg:p-8 text-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+              <Users className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />
+            </div>
+            <CardTitle className="text-xl sm:text-2xl text-gray-900 mb-2">Property Applications</CardTitle>
+            <CardDescription className="text-sm sm:text-base text-gray-600">
+              Review and manage applications from potential housemates
+            </CardDescription>
+          </CardHeader>
+        </Card>
       </div>
 
-      <Tabs defaultValue="pending" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="pending">
-            Pending ({pendingApplications.length})
+      {/* Tabs Section */}
+      <Tabs defaultValue="pending" className="space-y-4 sm:space-y-6">
+        <TabsList className="grid w-full grid-cols-2 h-12 sm:h-14 bg-gray-100 rounded-xl p-1">
+          <TabsTrigger 
+            value="pending" 
+            className="text-sm sm:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
+          >
+            <Clock className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">Pending </span>({pendingApplications.length})
           </TabsTrigger>
-          <TabsTrigger value="reviewed">
-            Reviewed ({reviewedApplications.length})
+          <TabsTrigger 
+            value="reviewed"
+            className="text-sm sm:text-base font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg"
+          >
+            <CheckCircle className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">Reviewed </span>({reviewedApplications.length})
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="pending" className="space-y-4">
+        <TabsContent value="pending" className="space-y-4 sm:space-y-6">
           {pendingApplications.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center">
-                <Clock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Pending Applications</h3>
-                <p className="text-muted-foreground">
-                  You don't have any pending applications at the moment.
+            <Card className="shadow-lg border-0 w-full">
+              <CardContent className="p-6 sm:p-8 lg:p-12 text-center bg-white rounded-lg">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 rounded-full mx-auto mb-4 sm:mb-6 flex items-center justify-center">
+                  <Clock className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Pending Applications</h3>
+                <p className="text-sm sm:text-base text-gray-600 max-w-md mx-auto">
+                  You don't have any pending applications at the moment. Check back later for new applications.
                 </p>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-6">
+            <div className="space-y-4 sm:space-y-6">
               {pendingApplications.map((application) => (
                 <ApplicationCard 
                   key={application.id} 
@@ -296,19 +363,21 @@ export default async function HomeownerApplicationsPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="reviewed" className="space-y-4">
+        <TabsContent value="reviewed" className="space-y-4 sm:space-y-6">
           {reviewedApplications.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center">
-                <CheckCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No Reviewed Applications</h3>
-                <p className="text-muted-foreground">
-                  You haven't reviewed any applications yet.
+            <Card className="shadow-lg border-0 w-full">
+              <CardContent className="p-6 sm:p-8 lg:p-12 text-center bg-white rounded-lg">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 rounded-full mx-auto mb-4 sm:mb-6 flex items-center justify-center">
+                  <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-primary" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">No Reviewed Applications</h3>
+                <p className="text-sm sm:text-base text-gray-600 max-w-md mx-auto">
+                  You haven't reviewed any applications yet. Approved and rejected applications will appear here.
                 </p>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid gap-6">
+            <div className="space-y-4 sm:space-y-6">
               {reviewedApplications.map((application) => (
                 <ApplicationCard key={application.id} application={application} />
               ))}

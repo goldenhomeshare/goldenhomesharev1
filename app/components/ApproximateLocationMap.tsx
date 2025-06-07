@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
+import { loadGoogleMapsAPI, isGoogleMapsReady } from '../lib/google-maps-loader';
 
 interface ApproximateLocationMapProps {
   address: string;
@@ -32,19 +33,22 @@ export function ApproximateLocationMap({ address, className = "" }: ApproximateL
   const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadGoogleMaps = async () => {
-      if (!address || !window.google) {
-        setMapError("Unable to load map");
-        return;
-      }
-
-      // Check if geometry library is available
-      if (!window.google.maps.geometry || !window.google.maps.geometry.spherical) {
-        setMapError("Google Maps geometry library not available");
+    const initializeMap = async () => {
+      if (!address) {
+        setMapError("No address provided");
         return;
       }
 
       try {
+        // Load Google Maps API with geometry library
+        await loadGoogleMapsAPI({ libraries: ['geometry'] });
+
+        // Check if geometry library is available
+        if (!window.google?.maps?.geometry?.spherical) {
+          setMapError("Google Maps geometry library not available");
+          return;
+        }
+
         const geocoder = new google.maps.Geocoder();
         
         // Geocode the EXACT address to get precise coordinates
@@ -140,27 +144,9 @@ export function ApproximateLocationMap({ address, className = "" }: ApproximateL
       }
     };
 
-    // Load Google Maps API if not already loaded
+    // Initialize the map
     if (typeof window !== 'undefined') {
-      if (window.google && window.google.maps && window.google.maps.geometry) {
-        loadGoogleMaps();
-      } else {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=geometry`;
-        script.async = true;
-        script.onload = () => {
-          // Add a small delay to ensure geometry library is fully initialized
-          setTimeout(() => {
-            if (window.google && window.google.maps && window.google.maps.geometry) {
-              loadGoogleMaps();
-            } else {
-              setMapError('Google Maps geometry library failed to load');
-            }
-          }, 100);
-        };
-        script.onerror = () => setMapError('Failed to load Google Maps');
-        document.head.appendChild(script);
-      }
+      initializeMap();
     }
   }, [address]);
 
@@ -181,11 +167,4 @@ export function ApproximateLocationMap({ address, className = "" }: ApproximateL
       <div ref={mapRef} className="w-full h-full min-h-[300px]" />
     </div>
   );
-}
-
-// Extend Window interface for TypeScript
-declare global {
-  interface Window {
-    google: any;
-  }
 } 

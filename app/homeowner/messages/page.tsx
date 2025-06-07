@@ -66,7 +66,7 @@ async function getHomeownerChats(userId: string, showHidden: boolean = false) {
 export default async function HomeownerMessagesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ showHidden?: string; chatId?: string }>;
+  searchParams: Promise<{ showHidden?: string; chatId?: string; housemate?: string; product?: string }>;
 }) {
   const user = await getCurrentUser();
   
@@ -82,7 +82,49 @@ export default async function HomeownerMessagesPage({
 
   const resolvedSearchParams = await searchParams;
   const showHidden = resolvedSearchParams.showHidden === "true";
-  const selectedChatId = resolvedSearchParams.chatId;
+  let selectedChatId = resolvedSearchParams.chatId;
+  const housemateId = resolvedSearchParams.housemate;
+  const productId = resolvedSearchParams.product;
+
+  // If housemate parameter is provided, find or create a unified conversation
+  if (housemateId && !selectedChatId) {
+    try {
+      // Find existing conversation between these users
+      const existingChatRoom = await prisma.chatRoom.findFirst({
+        where: {
+          homeownerId: user.id,
+          housemateId: housemateId,
+        },
+      });
+
+      if (existingChatRoom) {
+        // Redirect to the existing conversation
+        const url = new URL('/homeowner/messages', 'http://localhost');
+        url.searchParams.set('chatId', existingChatRoom.id);
+        if (showHidden) url.searchParams.set('showHidden', 'true');
+        redirect(url.pathname + url.search);
+      } else if (productId) {
+        // Create new conversation for this product context
+        const newChatRoom = await prisma.chatRoom.create({
+          data: {
+            homeownerId: user.id,
+            housemateId: housemateId,
+            productId: productId,
+          },
+        });
+        
+        // Redirect to the new conversation
+        const url = new URL('/homeowner/messages', 'http://localhost');
+        url.searchParams.set('chatId', newChatRoom.id);
+        if (showHidden) url.searchParams.set('showHidden', 'true');
+        redirect(url.pathname + url.search);
+      }
+    } catch (error) {
+      console.error("Error finding/creating conversation:", error);
+      // Continue with normal flow if there's an error
+    }
+  }
+
   const chatRooms = await getHomeownerChats(user.id, showHidden);
   
   // Filter out chat rooms without required data

@@ -1,9 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
-import { ChatModal } from "./ChatModal";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface HousemateChatButtonProps {
   productId: string;
@@ -18,27 +19,77 @@ export function HousemateChatButton({
   hostName, 
   productName 
 }: HousemateChatButtonProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const handleContinueConversation = async () => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    
+    try {
+      // Get current user first
+      const userResponse = await fetch("/api/auth/user");
+      if (!userResponse.ok) {
+        toast.error("Please log in to send messages.");
+        router.push("/api/auth/login");
+        return;
+      }
+      
+      const userData = await userResponse.json();
+      
+      // Create or get the chat room for this product
+      const chatResponse = await fetch("/api/chat/room", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId: productId,
+          hostId: hostId,
+          housemateId: userData.id, // Current user is the housemate
+        }),
+      });
+
+      if (chatResponse.ok) {
+        const { chatRoom } = await chatResponse.json();
+        
+        // Navigate to messages page with the chat room selected
+        const userType = userData.userType;
+        const messagesUrl = userType === "HOMEOWNER" 
+          ? `/homeowner/messages?chatId=${chatRoom.id}` 
+          : `/housemate/messages?chatId=${chatRoom.id}`;
+          
+        router.push(messagesUrl);
+      } else {
+        toast.error("Failed to continue conversation. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error continuing conversation:", error);
+      toast.error("Failed to continue conversation. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <>
-      <Button 
-        onClick={() => setIsModalOpen(true)}
-        size="sm"
-        variant="outline"
-      >
-        <MessageCircle className="w-4 h-4 mr-2" />
-        Continue Chat
-      </Button>
-
-      <ChatModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        productId={productId}
-        hostId={hostId}
-        hostName={hostName}
-        productName={productName}
-      />
-    </>
+    <Button 
+      onClick={handleContinueConversation}
+      size="sm"
+      variant="outline"
+      disabled={isLoading}
+    >
+      {isLoading ? (
+        <>
+          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          Loading...
+        </>
+      ) : (
+        <>
+          <MessageCircle className="w-4 h-4 mr-2" />
+          Continue Chat
+        </>
+      )}
+    </Button>
   );
 } 

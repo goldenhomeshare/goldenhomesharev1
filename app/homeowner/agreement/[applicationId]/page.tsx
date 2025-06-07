@@ -93,6 +93,17 @@ export default async function HomeownerAgreementPage({
     redirect("/homeowner/dashboard");
   }
 
+  // Check if homeowner has Stripe Connect setup before allowing agreement creation
+  console.log('Checking Stripe Connect status for homeowner:', {
+    userId: user.id,
+    stripeConnectedLinked: homeownerData.user.stripeConnectedLinked
+  });
+  
+  if (!homeownerData.user.stripeConnectedLinked) {
+    console.log('Homeowner does not have Stripe Connect setup, redirecting to billing');
+    redirect("/billing");
+  }
+
   // Get the agreement if it exists
   const agreement = application.agreement;
 
@@ -114,166 +125,106 @@ export default async function HomeownerAgreementPage({
           </div>
         </div>
 
-        {/* Application Summary */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-              Application Approved
-            </CardTitle>
-            <CardDescription>
-              Review the application details before proceeding with the agreement
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div>
-                <label className="text-sm font-medium text-gray-500">Housemate</label>
-                <p className="text-lg font-semibold">
-                  {application.housemate.firstName} {application.housemate.lastName}
-                </p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Property</label>
-                <p className="text-lg font-semibold">{application.product.name}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Monthly Rate</label>
-                <p className="text-lg font-semibold">${application.product.price}</p>
-              </div>
-            </div>
-            {application.moveInDate && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Move-in Date</label>
-                    <p className="text-lg font-semibold">
-                      {new Date(application.moveInDate).toLocaleDateString()}
-                    </p>
-                  </div>
-                  {application.moveOutDate && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500">Move-out Date</label>
-                      <p className="text-lg font-semibold">
-                        {new Date(application.moveOutDate).toLocaleDateString()}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-            {application.message && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <label className="text-sm font-medium text-gray-500">Application Message</label>
-                <p className="text-gray-700 mt-1">{application.message}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
-        {/* Agreement Status */}
-        {agreement ? (
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-blue-600" />
-                Agreement Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Homeowner Signature</label>
-                  <p className={`text-lg font-semibold ${agreement.homeownerSigned ? 'text-green-600' : 'text-yellow-600'}`}>
-                    {agreement.homeownerSigned ? '✓ Signed' : '⏳ Pending'}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Housemate Signature</label>
-                  <p className={`text-lg font-semibold ${agreement.housemateSigned ? 'text-green-600' : 'text-yellow-600'}`}>
-                    {agreement.housemateSigned ? '✓ Signed' : '⏳ Pending'}
-                  </p>
-                </div>
-              </div>
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <label className="text-sm font-medium text-gray-500">Agreement Status</label>
-                <p className={`text-lg font-semibold ${agreement.status === 'COMPLETED' ? 'text-green-600' : 'text-blue-600'}`}>
-                  {agreement.status.replace('_', ' ')}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="mb-8 border-green-200 bg-green-50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-800">
-                <Clock className="h-5 w-5 text-green-600" />
-                Action Required: Create Agreement
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-green-700 mb-4 font-medium">
-                Please complete the agreement form below to finalize the arrangement with your housemate.
-              </p>
-              <div className="space-y-2 text-sm text-green-600">
-                <p>• Application ID: {application.id}</p>
-                <p>• Housemate: {application.housemate.firstName} {application.housemate.lastName}</p>
-                <p>• Property: {application.product.name}</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
+
+
 
         {/* Agreement Wizard or Completion View */}
         {agreement?.status === 'COMPLETED' ? (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-green-800">
-                <CheckCircle className="h-5 w-5 text-green-600" />
-                Agreement Completed Successfully
-              </CardTitle>
+          <Card className="shadow-lg border-0">
+            <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-10 h-10 text-primary" />
+                </div>
+                <CardTitle className="text-2xl text-gray-900 mb-2">
+                  Agreement Completed Successfully
+                </CardTitle>
+                <p className="text-gray-600">
+                  Both parties have signed the agreement and it's now fully executed
+                </p>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="text-green-800 font-medium mb-2">Both Parties Have Signed</p>
-                  <p className="text-green-700 text-sm">
+            <CardContent className="p-8 bg-white rounded-b-lg">
+              <div className="space-y-8">
+                {/* Application Details */}
+                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Agreement Details</h3>
+                  <div className="grid md:grid-cols-3 gap-6 mb-6">
+                    <div className="text-center">
+                      <label className="text-sm font-medium text-gray-500">Housemate</label>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {application.housemate.firstName} {application.housemate.lastName}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <label className="text-sm font-medium text-gray-500">Property</label>
+                      <p className="text-lg font-semibold text-gray-900">{application.product.name}</p>
+                    </div>
+                    <div className="text-center">
+                      <label className="text-sm font-medium text-gray-500">Monthly Rate</label>
+                      <p className="text-lg font-semibold text-gray-900">${application.product.price}</p>
+                    </div>
+                  </div>
+                  {application.moveInDate && (
+                    <div className="grid md:grid-cols-2 gap-6 pt-4 border-t border-gray-200">
+                      <div className="text-center">
+                        <label className="text-sm font-medium text-gray-500">Move-in Date</label>
+                        <p className="text-lg font-semibold text-gray-900">
+                          {new Date(application.moveInDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                      {application.moveOutDate && (
+                        <div className="text-center">
+                          <label className="text-sm font-medium text-gray-500">Move-out Date</label>
+                          <p className="text-lg font-semibold text-gray-900">
+                            {new Date(application.moveOutDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 text-center">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Both Parties Have Signed</h3>
+                  <p className="text-gray-600">
                     The agreement has been fully executed. Both you and the housemate have signed the agreement. 
                     The housemate will now proceed with payment to finalize the arrangement.
                   </p>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Your Signature</label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-green-600 font-medium">✓ Signed</span>
-                      <span className="text-sm text-gray-500">
-                        ({new Date(agreement.homeownerSignedAt!).toLocaleDateString()})
-                      </span>
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="text-center">
+                      <CheckCircle className="w-8 h-8 text-primary mx-auto mb-3" />
+                      <h4 className="font-medium text-gray-900 mb-1">Your Signature</h4>
+                      <p className="text-sm text-primary font-medium">Signed</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(agreement.homeownerSignedAt!).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Housemate Signature</label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-green-600 font-medium">✓ Signed</span>
-                      <span className="text-sm text-gray-500">
-                        ({new Date(agreement.housemateSignedAt!).toLocaleDateString()})
-                      </span>
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="text-center">
+                      <CheckCircle className="w-8 h-8 text-primary mx-auto mb-3" />
+                      <h4 className="font-medium text-gray-900 mb-1">Housemate Signature</h4>
+                      <p className="text-sm text-primary font-medium">Signed</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(agreement.housemateSignedAt!).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-                  <Button asChild variant="outline" className="flex items-center gap-2">
-                    <a href={`/api/agreements/generate-filled`} target="_blank" rel="noopener noreferrer">
-                      <Download className="h-4 w-4" />
-                      Download Signed Agreement
-                    </a>
-                  </Button>
-                  <Button asChild className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
+                  <div className="flex-1">
+                    <HomeownerAgreementActions 
+                      agreement={agreement}
+                      applicationId={applicationId}
+                    />
+                  </div>
+                  <Button asChild variant="outline" className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2">
                     <a href="/homeowner/applications">
                       Back to Applications
                     </a>
@@ -283,52 +234,100 @@ export default async function HomeownerAgreementPage({
             </CardContent>
           </Card>
         ) : agreement?.homeownerSigned ? (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-800">
-                <CheckCircle className="h-5 w-5 text-blue-600" />
-                Agreement Signed by You
-              </CardTitle>
+          <Card className="shadow-lg border-0">
+            <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-10 h-10 text-primary" />
+                </div>
+                <CardTitle className="text-2xl text-gray-900 mb-2">
+                  Agreement Signed by You
+                </CardTitle>
+                <p className="text-gray-600">
+                  Waiting for the housemate to review and sign the agreement
+                </p>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-blue-800 font-medium mb-2">Waiting for Housemate</p>
-                  <p className="text-blue-700 text-sm">
+            <CardContent className="p-8 bg-white rounded-b-lg">
+              <div className="space-y-8">
+                {/* Application Details */}
+                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Agreement Details</h3>
+                  <div className="grid md:grid-cols-3 gap-6 mb-6">
+                    <div className="text-center">
+                      <label className="text-sm font-medium text-gray-500">Housemate</label>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {application.housemate.firstName} {application.housemate.lastName}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <label className="text-sm font-medium text-gray-500">Property</label>
+                      <p className="text-lg font-semibold text-gray-900">{application.product.name}</p>
+                    </div>
+                    <div className="text-center">
+                      <label className="text-sm font-medium text-gray-500">Monthly Rate</label>
+                      <p className="text-lg font-semibold text-gray-900">${application.product.price}</p>
+                    </div>
+                  </div>
+                  {application.moveInDate && (
+                    <div className="grid md:grid-cols-2 gap-6 pt-4 border-t border-gray-200">
+                      <div className="text-center">
+                        <label className="text-sm font-medium text-gray-500">Move-in Date</label>
+                        <p className="text-lg font-semibold text-gray-900">
+                          {new Date(application.moveInDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                      {application.moveOutDate && (
+                        <div className="text-center">
+                          <label className="text-sm font-medium text-gray-500">Move-out Date</label>
+                          <p className="text-lg font-semibold text-gray-900">
+                            {new Date(application.moveOutDate).toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 text-center">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Waiting for Housemate</h3>
+                  <p className="text-gray-600">
                     You have successfully signed the agreement. The housemate has been notified and will receive a link to review and sign the agreement.
                     Once they sign, the agreement will be fully executed.
                   </p>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Your Signature</label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-green-600 font-medium">✓ Signed</span>
-                      <span className="text-sm text-gray-500">
-                        ({new Date(agreement.homeownerSignedAt!).toLocaleDateString()})
-                      </span>
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="text-center">
+                      <CheckCircle className="w-8 h-8 text-primary mx-auto mb-3" />
+                      <h4 className="font-medium text-gray-900 mb-1">Your Signature</h4>
+                      <p className="text-sm text-primary font-medium">Signed</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {new Date(agreement.homeownerSignedAt!).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Housemate Signature</label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Clock className="h-4 w-4 text-yellow-600" />
-                      <span className="text-yellow-600 font-medium">⏳ Pending</span>
-                      <span className="text-sm text-gray-500">
-                        (Notification sent)
-                      </span>
+                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                    <div className="text-center">
+                      <Clock className="w-8 h-8 text-gray-400 mx-auto mb-3" />
+                      <h4 className="font-medium text-gray-900 mb-1">Housemate Signature</h4>
+                      <p className="text-sm text-gray-500 font-medium">Pending</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Notification sent
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-                  <HomeownerAgreementActions 
-                    agreement={agreement}
-                    applicationId={applicationId}
-                  />
-                  <Button asChild className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
+                  <div className="flex-1">
+                    <HomeownerAgreementActions 
+                      agreement={agreement}
+                      applicationId={applicationId}
+                    />
+                  </div>
+                  <Button asChild variant="outline" className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2">
                     <a href="/homeowner/applications">
                       Back to Applications
                     </a>

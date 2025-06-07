@@ -383,11 +383,11 @@ export function BackgroundCheckForm({ initialData }: BackgroundCheckFormProps) {
     } catch (error) {
       console.error('[CreateHostedCheck] Network or unexpected error:', error);
       console.error('[CreateHostedCheck] Error details:', {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
+        name: (error as any).name,
+        message: (error as any).message,
+        stack: (error as any).stack
       });
-      alert(`Network error occurred: ${error.message}. Please try again.`);
+              alert(`Network error occurred: ${(error as any).message}. Please try again.`);
     } finally {
       setLoading(false);
     }

@@ -9,128 +9,242 @@ datasource db {
 }
 
 model User {
-  id                    String  @id @unique
+  id                    String            @id @unique
   email                 String
   firstName             String
   lastName              String
   profileImage          String
-  connectedAccountId    String  @unique
-  stripeConnectedLinked Boolean @default(false)
-  userType              UserType? // New field - nullable initially for existing users
-  isVerified            Boolean @default(false)
-  onboardingCompleted   Boolean @default(false)
-
-  // Additional fields required for Checkr integration
+  connectedAccountId    String?           @unique
+  stripeConnectedLinked Boolean           @default(false)
+  createdAt             DateTime          @default(now())
+  isVerified            Boolean           @default(false)
+  onboardingCompleted   Boolean           @default(false)
+  updatedAt             DateTime          @updatedAt
+  userType              UserType?
+  dateOfBirth           DateTime?
+  middleName            String?
+  noMiddleName          Boolean           @default(false)
   phone                 String?
   zipcode               String?
-  dateOfBirth           DateTime? // Required for some background checks
-  middleName            String?
-  noMiddleName          Boolean @default(false)
-
-  // Profile extensions
+  Applications          Application[]
+  homeownerChats        ChatRoom[]        @relation("HomeownerChats")
+  housemateChats        ChatRoom[]        @relation("HousemateChats")
   homeownerProfile      HomeownerProfile?
   housemateProfile      HousemateProfile?
-
-  Product Product[]
-  Applications Application[]
-  
-  // Chat relations
-  homeownerChats        ChatRoom[] @relation("HomeownerChats")
-  housemateChats        ChatRoom[] @relation("HousemateChats")
-  sentMessages          Message[]  @relation("SentMessages")
-
-  // Background check relations - simplified naming
+  sentMessages          Message[]         @relation("SentMessages")
+  Product               Product[]
   backgroundChecks      BackgroundCheck[] @relation("UserBackgroundChecks")
   requestedChecks       BackgroundCheck[] @relation("RequestedBackgroundChecks")
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model HomeownerProfile {
+  id                   String   @id @default(uuid())
+  userId               String   @unique
+  propertyCount        Int      @default(0)
+  averageRating        Float?
+  bio                  String?
+  emergencyContact     Json?
+  backgroundCheck      Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  ageRange             String?
+  gender               String?
+  hobbies              Json?
+  profilePicture       String?
+  schedule             String?
+  socialPreference     String?
+  lifestyle            Json?
+  preferredGender      String?
+  socialMedia          Json?
+  preferredCareerStage String?
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HousemateProfile {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  age              Int?
+  occupation       String?
+  bio              String?
+  lifestyle        Json?
+  references       Json?
+  budgetRange      Json?
+  backgroundCheck  Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  ageRange         String?
+  gender           String?
+  hobbies          Json?
+  profilePicture   String?
+  schedule         String?
+  socialPreference String?
+  maxBudget        Int?
+  preferredGender  String?
+  socialMedia      Json?
+  canHelpWith      Json?
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Application {
+  id           String            @id @default(uuid())
+  housemateId  String
+  productId    String
+  status       ApplicationStatus @default(PENDING)
+  message      String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  moveInDate   DateTime?
+  moveOutDate  DateTime?
+  agreement    Agreement?
+  housemate    User              @relation(fields: [housemateId], references: [id], onDelete: Cascade)
+  product      Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  Subscription Subscription?
+
+  @@unique([housemateId, productId])
+}
+
+model Agreement {
+  id                 String          @id @default(uuid())
+  applicationId      String          @unique
+  agreementData      Json
+  homeownerSigned    Boolean         @default(false)
+  homeownerSignedAt  DateTime?
+  homeownerSignature String?
+  housemateSigned    Boolean         @default(false)
+  housemateSignedAt  DateTime?
+  housemateSignature String?
+  status             AgreementStatus @default(PENDING_HOMEOWNER)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  application        Application     @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id                   String                @id @default(uuid())
+  applicationId        String                @unique
+  stripeSubscriptionId String                @unique
+  stripeCustomerId     String
+  stripePriceId        String?
+  stripeProductId      String?
+  status               SubscriptionStatus    @default(ACTIVE)
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  amount               Int
+  currency             String                @default("usd")
+  housemateId          String
+  homeownerId          String
+  productId            String
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  canceledAt           DateTime?
+  pausedAt             DateTime?
+  Application          Application           @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  SubscriptionPayment  SubscriptionPayment[]
+}
+
+model BackgroundCheck {
+  id               String                @id @default(uuid())
+  candidateId      String                @unique
+  invitationId     String?
+  reportId         String?
+  requestedById    String?
+  candidateUserId  String?
+  candidateEmail   String
+  candidateName    String
+  candidatePhone   String?
+  candidateZipcode String?
+  status           BackgroundCheckStatus @default(PENDING)
+  checkrStatus     String?
+  invitationUrl    String?
+  invitationStatus String?
+  completedAt      DateTime?
+  invitationSentAt DateTime?
+  reportData       Json?
+  packageName      String?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  candidateUser    User?                 @relation("UserBackgroundChecks", fields: [candidateUserId], references: [id])
+  requestedBy      User?                 @relation("RequestedBackgroundChecks", fields: [requestedById], references: [id])
+
+  @@map("background_checks")
+}
+
+model ChatRoom {
+  id                String    @id @default(uuid())
+  homeownerId       String
+  housemateId       String
+  productId         String?
+  lastMessageAt     DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  hiddenByHomeowner Boolean   @default(false)
+  hiddenByHousemate Boolean   @default(false)
+  homeownerHiddenAt DateTime?
+  housemateHiddenAt DateTime?
+  homeowner         User      @relation("HomeownerChats", fields: [homeownerId], references: [id], onDelete: Cascade)
+  housemate         User      @relation("HousemateChats", fields: [housemateId], references: [id], onDelete: Cascade)
+  product           Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  messages          Message[]
+
+  @@unique([homeownerId, housemateId, productId])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String
+  senderId   String
+  chatRoomId String
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id                   String         @id @default(uuid())
+  name                 String
+  price                Int
+  smallDescription     String
+  description          Json
+  images               String[]
+  productFile          String
+  category             CategoryTypes?
+  amenities            Json?
+  supportRequested     Json?
+  houseRules           Json?
+  createdAt            DateTime       @default(now())
+  userId               String?
+  address              String?
+  isSubscription       Boolean        @default(true)
+  stripePriceId        String?
+  stripeProductId      String?
+  subscriptionInterval String         @default("month")
+  applications         Application[]
+  chatRooms            ChatRoom[]
+  User                 User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SubscriptionPayment {
+  id                    String        @id
+  subscriptionId        String
+  stripeInvoiceId       String        @unique
+  stripePaymentIntentId String?
+  amount                Int
+  currency              String        @default("usd")
+  status                PaymentStatus
+  billingPeriodStart    DateTime
+  billingPeriodEnd      DateTime
+  paidAt                DateTime?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime
+  Subscription          Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
 }
 
 enum UserType {
   HOMEOWNER
   HOUSEMATE
   ADMIN
-}
-
-// Homeowner-specific profile
-model HomeownerProfile {
-  id                String @id @default(uuid())
-  userId            String @unique
-  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  profilePicture    String? // URL to uploaded profile picture
-  propertyCount     Int    @default(0)
-  averageRating     Float? 
-  bio               String?
-  emergencyContact  Json?  // Contact details for emergencies
-  backgroundCheck   Boolean @default(false)
-  
-  // Profile fields
-  gender            String? // Male, Female, Other
-  ageRange          String? // 18–24, 25–34, 35–44, 45–54, 55–64, 65+
-  schedule          String? // Early Riser, Night Owl, Flexible
-  socialPreference  String? // Social, Independent, Balanced
-  hobbies           Json?   // Array of selected hobbies
-  preferredGender   String? // Preferred gender for housemates
-  preferredCareerStage String? // Preferred career stage for housemates (student, professional, retired, no-preference)
-  socialMedia       Json?   // Social media links (instagram, facebook, linkedin)
-  lifestyle         Json?   // Lifestyle preferences (pets, smoking policy, etc.)
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// Housemate-specific profile  
-model HousemateProfile {
-  id                String @id @default(uuid())
-  userId            String @unique
-  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  profilePicture    String? // URL to uploaded profile picture
-  age               Int?
-  occupation        String?
-  bio               String?
-  lifestyle         Json?  // Preferences, habits, etc.
-  references        Json?  // Previous landlord/housemate references
-  budgetRange       Json?  // Min/max budget
-  maxBudget         Int?   // Maximum budget
-  backgroundCheck   Boolean @default(false)
-  
-  // Profile fields
-  gender            String? // Male, Female, Other
-  ageRange          String? // 18–24, 25–34, 35–44, 45–54, 55–64, 65+
-  schedule          String? // Early Riser, Night Owl, Flexible
-  socialPreference  String? // Social, Independent, Balanced
-  hobbies           Json?   // Array of selected hobbies
-  preferredGender   String? // Preferred gender for living companions
-  socialMedia       Json?   // Social media links (instagram, facebook, linkedin)
-  canHelpWith       Json?   // Array of services the housemate can help with (cleaning, cooking, etc.)
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// Applications from housemates to homeowners
-model Application {
-  id              String @id @default(uuid())
-  housemateId     String
-  housemate       User   @relation(fields: [housemateId], references: [id], onDelete: Cascade)
-  productId       String
-  product         Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
-  status          ApplicationStatus @default(PENDING)
-  message         String?
-  moveInDate      DateTime?         // When the applicant wants to move in
-  moveOutDate     DateTime?         // When the applicant plans to move out (optional)
-  
-  // Agreement relation
-  agreement       Agreement?
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@unique([housemateId, productId])
 }
 
 enum ApplicationStatus {
@@ -140,150 +254,47 @@ enum ApplicationStatus {
   WITHDRAWN
 }
 
-// Agreement model for tracking the signing flow
-model Agreement {
-  id                    String @id @default(uuid())
-  applicationId         String @unique
-  application           Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  
-  // Agreement content (form data from the agreement wizard)
-  agreementData         Json
-  
-  // Signing status
-  homeownerSigned       Boolean @default(false)
-  homeownerSignedAt     DateTime?
-  homeownerSignature    String?  // Name typed for e-signature
-  
-  housemateSigned       Boolean @default(false)
-  housemateSignedAt     DateTime?
-  housemateSignature    String?  // Name typed for e-signature
-  
-  // Status tracking
-  status                AgreementStatus @default(PENDING_HOMEOWNER)
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 enum AgreementStatus {
-  PENDING_HOMEOWNER     // Waiting for homeowner to sign
-  PENDING_HOUSEMATE     // Waiting for housemate to sign
-  COMPLETED             // Both parties signed
-  CANCELLED             // Agreement cancelled
+  PENDING_HOMEOWNER
+  PENDING_HOUSEMATE
+  COMPLETED
+  CANCELLED
 }
 
-// Background checks model - using proper naming and structure
-model BackgroundCheck {
-  id                    String                @id @default(uuid())
-  candidateId           String                @unique
-  invitationId          String?               
-  reportId              String?               
-  requestedById         String?
-  candidateUserId       String?
-  candidateEmail        String
-  candidateName         String
-  candidatePhone        String?
-  candidateZipcode      String?
-  status                BackgroundCheckStatus @default(PENDING)
-  checkrStatus          String?
-  invitationUrl         String?
-  invitationStatus      String?
-  completedAt           DateTime?
-  invitationSentAt      DateTime?
-  reportData            Json?                 // Store full Checkr report data
-  packageName           String?               // Track which package was used
-  
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
-  
-  // Relations with proper naming
-  candidateUser         User?                 @relation("UserBackgroundChecks", fields: [candidateUserId], references: [id])
-  requestedBy           User?                 @relation("RequestedBackgroundChecks", fields: [requestedById], references: [id])
-  
-  @@map("background_checks") // Keep existing table name for migration compatibility
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELED
+  PAST_DUE
+  INCOMPLETE
+  TRIALING
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELED
+  REFUNDED
 }
 
 enum BackgroundCheckStatus {
   PENDING
-  INVITATION_SENT       // invitation.created
+  INVITATION_SENT
   IN_PROGRESS
   COMPLETED
   CLEAR
   CONSIDER
   DISPUTE
-  DISPUTED              // report.disputed (alias for DISPUTE)
+  DISPUTED
   EXPIRED
   DECLINED
   FAILED
-  CANCELED              // For fully canceled reports
-  PARTIAL_COMPLETE      // For partially completed reports with canceled screenings
-  SUSPENDED             // report.suspended
-  PRE_ADVERSE_ACTION    // report.pre_adverse_action
-  POST_ADVERSE_ACTION   // report.post_adverse_action
-}
-
-// Chat-related models for realtime messaging
-model ChatRoom {
-  id          String @id @default(uuid())
-  homeownerId String
-  housemateId String
-  productId   String?
-  
-  homeowner   User     @relation("HomeownerChats", fields: [homeownerId], references: [id], onDelete: Cascade)
-  housemate   User     @relation("HousemateChats", fields: [housemateId], references: [id], onDelete: Cascade)
-  product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
-  messages    Message[]
-  
-  lastMessageAt DateTime?
-  
-  // Hide conversation fields
-  hiddenByHomeowner Boolean @default(false)
-  hiddenByHousemate Boolean @default(false)
-  homeownerHiddenAt DateTime?
-  housemateHiddenAt DateTime?
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  @@unique([homeownerId, housemateId, productId])
-}
-
-model Message {
-  id         String   @id @default(uuid())
-  content    String
-  senderId   String
-  chatRoomId String
-  
-  sender     User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
-  
-  isRead     Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
-
-model Product {
-  id               String        @id @default(uuid())
-  name             String
-  price            Int
-  smallDescription String
-  description      Json
-  images           String[]
-  productFile      String
-  category         CategoryTypes?
-  address          String?       // Address of the property
-  amenities        Json?         // Array of selected amenities
-  supportRequested Json?         // Array of objects with id and hoursPerWeek fields for support options
-  houseRules       Json?         // Array of house rules
-
-  createdAt DateTime @default(now())
-  User      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String?
-  
-  // New field for applications
-  applications    Application[]
-  chatRooms       ChatRoom[]
+  CANCELED
+  PARTIAL_COMPLETE
+  SUSPENDED
+  PRE_ADVERSE_ACTION
+  POST_ADVERSE_ACTION
 }
 
 enum CategoryTypes {

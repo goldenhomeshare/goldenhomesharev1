@@ -200,31 +200,40 @@ export async function POST(request: NextRequest) {
     const addPageHeader = (page: any, y: number) => {
       let currentY = y;
       
-      // Add logo if available
+      // Add logo if available - smaller and better positioned
       if (logoImage) {
-        const logoScale = 0.2;
+        const logoScale = 0.15; // Smaller logo
         const logoDims = logoImage.scale(logoScale);
         page.drawImage(logoImage, {
-          x: 50,
+          x: 40,
           y: currentY - logoDims.height,
           width: logoDims.width,
           height: logoDims.height,
         });
         
-        // Add company name next to logo
+        // Add company name next to logo with professional spacing
         page.drawText('Golden HomeShare', {
-          x: 50 + logoDims.width + 10,
-          y: currentY - 10,
-          size: 14,
+          x: 40 + logoDims.width + 12,
+          y: currentY - 12,
+          size: 12,
           font: boldFont,
           color: primaryColor,
         });
         
-        currentY -= logoDims.height + 10;
+        currentY -= logoDims.height + 15;
       } else {
-        // Fallback without logo
-        currentY = addText(page, 'Golden HomeShare', 250, currentY, 14, boldFont, 200, primaryColor);
-        currentY -= 10;
+        // Fallback without logo - centered
+        const pageWidth = 612;
+        const textWidth = boldFont.widthOfTextAtSize('Golden HomeShare', 12);
+        const centerX = (pageWidth - textWidth) / 2;
+        page.drawText('Golden HomeShare', {
+          x: centerX,
+          y: currentY,
+          size: 12,
+          font: boldFont,
+          color: primaryColor,
+        });
+        currentY -= 25;
       }
       
       return currentY;
@@ -232,12 +241,14 @@ export async function POST(request: NextRequest) {
 
     // =========================== PAGE 1 - TITLE PAGE ===========================
     const page1 = pdfDoc.addPage([612, 792]);
-    let y = 720;
+    let y = 680; // Start a bit lower for better balance
+    const pageWidth = 612;
     
+    // Professional title page layout
     if (logoImage) {
-      const logoScale = 0.6;
+      const logoScale = 0.3; // Smaller, more professional logo
       const logoDims = logoImage.scale(logoScale);
-      const logoX = (612 - logoDims.width) / 2; // Center horizontally
+      const logoX = (pageWidth - logoDims.width) / 2; // Center horizontally
       
       page1.drawImage(logoImage, {
         x: logoX,
@@ -246,74 +257,93 @@ export async function POST(request: NextRequest) {
         height: logoDims.height,
       });
       
-      y -= logoDims.height + 40;
+      y -= logoDims.height + 50;
     }
     
-    // Title styling
-    y = addText(page1, 'Golden HomeShare', 220, y, 18, boldFont, 200, primaryColor);
-    y -= 30;
-    y = addText(page1, 'Limited License Agreement', 180, y, 16, boldFont, 300, primaryColor);
-    y -= 60;
+    // Centered title styling with proper measurements
+    const companyNameWidth = boldFont.widthOfTextAtSize('Golden HomeShare', 20);
+    const companyNameX = (pageWidth - companyNameWidth) / 2;
+    page1.drawText('Golden HomeShare', {
+      x: companyNameX,
+      y: y,
+      size: 20,
+      font: boldFont,
+      color: primaryColor,
+    });
+    y -= 35;
     
-    // Add decorative line
+    const titleWidth = boldFont.widthOfTextAtSize('Limited License Agreement', 18);
+    const titleX = (pageWidth - titleWidth) / 2;
+    page1.drawText('Limited License Agreement', {
+      x: titleX,
+      y: y,
+      size: 18,
+      font: boldFont,
+      color: primaryColor,
+    });
+    y -= 50;
+    
+    // Professional decorative line - centered and proportional
+    const lineWidth = 250;
+    const lineX = (pageWidth - lineWidth) / 2;
     page1.drawLine({
-      start: { x: 150, y: y },
-      end: { x: 462, y: y },
+      start: { x: lineX, y: y },
+      end: { x: lineX + lineWidth, y: y },
       thickness: 2,
       color: primaryColor,
     });
 
     // =========================== PAGE 2 - SECTIONS 1-3 ===========================
     const page2 = pdfDoc.addPage([612, 792]);
-    y = 720;
+    y = 750; // Better starting position
     y = addPageHeader(page2, y);
-    y -= 30;
+    y -= 40; // More professional spacing after header
 
     // Section 1. Parties - EXACT TEXT with field insertions and styling
-    y = addText(page2, 'Section 1. Parties', 50, y, 12, boldFont, 500, primaryColor);
-    y -= 15;
+    y = addText(page2, 'Section 1. Parties', 60, y, 12, boldFont, 500, primaryColor);
+    y -= 18; // Better section spacing
     let text = `This Limited License Agreement (this "Agreement") is made on ${formatDate(formData.moveInDate)} (the "Effective Date") between ${formData.hostName} ("Licensor"), and ${formData.seekerName} ("Licensee"). Licensor and Licensee agree to comply with the terms and conditions of this Agreement at all times during the Term (defined in Section 3.B).`;
-    y = addText(page2, text, 50, y, 10, font);
-    y -= 10;
+    y = addText(page2, text, 60, y, 10, font, 490); // Better text width
+    y -= 15; // More space between sections
 
     // Section 2. Property - EXACT TEXT with field insertions and styling
-    y = addText(page2, 'Section 2. Property', 50, y, 12, boldFont, 500, primaryColor);
-    y -= 10;
+    y = addText(page2, 'Section 2. Property', 60, y, 12, boldFont, 500, primaryColor);
+    y -= 15;
 
-    y = addText(page2, 'A. Residence.', 50, y, 10, boldFont, 500, primaryColor);
+    y = addText(page2, 'A. Residence.', 60, y, 10, boldFont, 500, primaryColor);
     text = `Licensor owns or leases the residence located at ${formData.propertyAddress} ("Residence"). If Licensor leases the Residence, Licensee should request a copy of the lease agreement between Licensor and the landlord. Licensee agrees to comply with the terms of that lease agreement (other than paying rent to the landlord, which is Licensor's responsibility).`;
-    y = addText(page2, text, 70, y, 10, font, 480);
-    y -= 5;
+    y = addText(page2, text, 80, y, 10, font, 470); // Better indentation and width
+    y -= 8;
 
-    y = addText(page2, 'B. Licensee Areas.', 50, y, 10, boldFont, 500, primaryColor);
+    y = addText(page2, 'B. Licensee Areas.', 60, y, 10, boldFont, 500, primaryColor);
     text = `Licensor agrees that Licensee will have the right to use and occupy the bedroom(s) and other areas identified by Licensor in the Property Addendum attached to this Agreement ("Licensee Areas"). Licensor agrees not to access, or attempt to access, the Licensee Areas, except in accordance with this Agreement.`;
-    y = addText(page2, text, 70, y, 10, font, 480);
-    y -= 5;
+    y = addText(page2, text, 80, y, 10, font, 470);
+    y -= 8;
 
-    y = addText(page2, 'C. Shared Areas.', 50, y, 10, boldFont, 500, primaryColor);
+    y = addText(page2, 'C. Shared Areas.', 60, y, 10, boldFont, 500, primaryColor);
     text = `Licensor agrees that Licensee will have the right, in common with Licensor, to use and occupy shared areas within the Residence that are identified by Licensor in the Property Addendum ("Shared Areas"). The Licensee Areas and the Shared Areas are referred to as the "Accessible Property". Licensor and Licensee agree to be respectful of each other in using the Shared Areas. When using the Shared Areas, Licensor and Licensee will each clean-up after themselves and keep such Shared Areas neat and clean at all times. Licensee agrees not to access, or attempt to access, any part of the Residence other than the Accessible Property without Licensor's permission.`;
-    y = addText(page2, text, 70, y, 10, font, 480);
-    y -= 5;
+    y = addText(page2, text, 80, y, 10, font, 470);
+    y -= 8;
 
-    y = addText(page2, 'D. House Rules.', 50, y, 10, boldFont, 500, primaryColor);
+    y = addText(page2, 'D. House Rules.', 60, y, 10, boldFont, 500, primaryColor);
     text = `Licensor and Licensee agree to comply with the "House Rules" included in the Property Addendum ("House Rules").`;
-    y = addText(page2, text, 70, y, 10, font, 480);
-    y -= 10;
+    y = addText(page2, text, 80, y, 10, font, 470);
+    y -= 15;
 
     // Section 3. Term - EXACT TEXT with field insertions and styling
-    y = addText(page2, 'Section 3. Term', 50, y, 12, boldFont, 500, primaryColor);
-    y -= 10;
+    y = addText(page2, 'Section 3. Term', 60, y, 12, boldFont, 500, primaryColor);
+    y -= 15;
 
-    y = addText(page2, 'A. Start Date and End Date.', 50, y, 10, boldFont, 500, primaryColor);
+    y = addText(page2, 'A. Start Date and End Date.', 60, y, 10, boldFont, 500, primaryColor);
     const endDate = calculateEndDate(formData.moveInDate, formData.agreementLength || '12');
     text = `The initial term of this Agreement ("Initial Term") will begin on ${formatDate(formData.moveInDate)} ("Start Date") and will end on ${endDate} ("End Date"). Upon the End Date, Licensee shall be required to vacate the Residence unless Licensor and Licensee extend this Agreement in writing or create and execute a new, written Homesharing Agreement ("Extended Term"). "Term" means the Initial Term and the Extended Term, if applicable.`;
-    y = addText(page2, text, 70, y, 10, font, 480);
+    y = addText(page2, text, 80, y, 10, font, 470);
 
     // =========================== PAGE 3 - SECTIONS 3 (CONT'D), 4, 5 ===========================
     const page3 = pdfDoc.addPage([612, 792]);
-    y = 720;
+    y = 750;
     y = addPageHeader(page3, y);
-    y -= 30;
+    y -= 40;
 
     // Section 3.B - EXACT TEXT
     y = addText(page3, 'B. Termination Rights.', 50, y, 10, boldFont, 500, primaryColor);
@@ -355,9 +385,9 @@ export async function POST(request: NextRequest) {
 
     // =========================== PAGE 4 - SECTIONS 5 (CONT'D), 6, 7 ===========================
     const page4 = pdfDoc.addPage([612, 792]);
-    y = 720;
+    y = 750;
     y = addPageHeader(page4, y);
-    y -= 30;
+    y -= 40;
 
     // Continue Section 5 - EXACT TEXT
     text = `agencies. All License Fee shall be prorated for any partial calendar month, notwithstanding the foregoing, if Licensee sends a Termination Notice or moves out prior to the End Date, Licensee will not receive a refund of any portion of the License Fee.`;
@@ -398,9 +428,9 @@ export async function POST(request: NextRequest) {
 
     // =========================== PAGE 5 - SECTIONS 7 (CONT'D), 8, 9 ===========================
     const page5 = pdfDoc.addPage([612, 792]);
-    y = 720;
+    y = 750;
     y = addPageHeader(page5, y);
-    y -= 30;
+    y -= 40;
 
     // Continue Section 7.B - EXACT TEXT
     text = `any fees, fines or other charges assessed against Licensor for Licensee's violation of this Section 7.B.`;
@@ -437,9 +467,9 @@ export async function POST(request: NextRequest) {
 
     // =========================== PAGE 6 - SECTIONS 9 (CONT'D), 10 ===========================
     const page6 = pdfDoc.addPage([612, 792]);
-    y = 720;
+    y = 750;
     y = addPageHeader(page6, y);
-    y -= 30;
+    y -= 40;
 
     // Continue Section 9 - EXACT TEXT
     text = `Licensee should secure renters insurance and/other insurance coverages for protection against liabilities and losses.`;
@@ -476,9 +506,9 @@ export async function POST(request: NextRequest) {
 
     // =========================== PAGE 7 - SECTIONS 10 (CONT'D), 11, 12 ===========================
     const page7 = pdfDoc.addPage([612, 792]);
-    y = 720;
+    y = 750;
     y = addPageHeader(page7, y);
-    y -= 30;
+    y -= 40;
 
     // Continue Section 10.B - EXACT TEXT
     text = `The remedies in this Section 10.B are Licensee's sole remedies for an Licensor Default.`;
@@ -514,9 +544,9 @@ export async function POST(request: NextRequest) {
 
     // =========================== PAGE 8 - SECTIONS 15, 16, 17, 18 & SIGNATURES ===========================
     const page8 = pdfDoc.addPage([612, 792]);
-    y = 720;
+    y = 750;
     y = addPageHeader(page8, y);
-    y -= 30;
+    y -= 40;
 
     // Section 15. Entire Agreement, Binding Effect, Waivers and Notices - EXACT TEXT
     y = addText(page8, 'Section 15. Entire Agreement, Binding Effect, Waivers and Notices', 50, y, 12, boldFont, 500, primaryColor);
@@ -729,9 +759,9 @@ export async function POST(request: NextRequest) {
     // =========================== PROPERTY ADDENDUM PAGES (10-14) ===========================
     // PAGE 10 - Property Addendum Start
     const page10 = pdfDoc.addPage([612, 792]);
-    y = 720;
+    y = 750;
     y = addPageHeader(page10, y);
-    y -= 30;
+    y -= 40;
 
     y = addText(page10, 'Property Addendum', 200, y, 16, boldFont, 300, primaryColor);
     y -= 30;
@@ -1001,9 +1031,9 @@ export async function POST(request: NextRequest) {
 
     // =========================== PAGE 11 - HOUSE RULES CONTINUED ===========================
     const page11 = pdfDoc.addPage([612, 792]);
-    y = 720;
+    y = 750;
     y = addPageHeader(page11, y);
-    y -= 30;
+    y -= 40;
 
     // E. Guests
     y = addText(page11, 'E. Guests', 50, y, 12, boldFont, 500, primaryColor);
@@ -1129,9 +1159,9 @@ export async function POST(request: NextRequest) {
 
     // =========================== PAGE 12 - HOUSE RULES FINAL SECTION ===========================
     const page12 = pdfDoc.addPage([612, 792]);
-    y = 720;
+    y = 750;
     y = addPageHeader(page12, y);
-    y -= 30;
+    y -= 40;
 
     // Use actual expired food policy data
     y = addText(page12, '2. Expired food should be thrown out:', 50, y, 10, boldFont);
@@ -1167,26 +1197,29 @@ export async function POST(request: NextRequest) {
         transportation: "Transportation"
       };
 
-      // Add table headers with better alignment
-      y = addText(page12, 'Service', 70, y, 10, boldFont);
-      y = addText(page12, 'Hours per Week', 320, y, 10, boldFont);
-      y -= 15;
+      // Professional table layout with better spacing
+      const tableStartX = 80;
+      const hoursColumnX = 350; // Better centered position for hours column
+      
+      y = addText(page12, 'Service', tableStartX, y, 10, boldFont);
+      y = addText(page12, 'Hours per Week', hoursColumnX, y, 10, boldFont);
+      y -= 18;
 
-      // Add underline for table headers
+      // Professional table header underline
       page12.drawLine({
-        start: { x: 70, y: y + 5 },
-        end: { x: 480, y: y + 5 },
+        start: { x: tableStartX, y: y + 8 },
+        end: { x: 500, y: y + 8 },
         thickness: 1,
-        color: rgb(0.5, 0.5, 0.5),
+        color: rgb(0.3, 0.3, 0.3),
       });
-      y -= 5;
+      y -= 8;
 
-      // List each support service with better column alignment
+      // List each support service with professional spacing
       formData.supportRequested.forEach(support => {
         const supportLabel = supportLabels[support.id] || support.id;
-        y = addText(page12, supportLabel, 70, y, 10, font);
-        y = addText(page12, `${support.hoursPerWeek} ${support.hoursPerWeek === 1 ? 'hour' : 'hours'}`, 320, y, 10, font);
-        y -= 12;
+        y = addText(page12, supportLabel, tableStartX, y, 10, font);
+        y = addText(page12, `${support.hoursPerWeek} ${support.hoursPerWeek === 1 ? 'hour' : 'hours'}`, hoursColumnX, y, 10, font);
+        y -= 14; // Better row spacing
       });
 
       y -= 10;
@@ -1197,9 +1230,9 @@ export async function POST(request: NextRequest) {
     // Check if we need a new page for Section J (custom section)
     if (y < 200) { // If less than 200 units from bottom, start new page
       const page13 = pdfDoc.addPage([612, 792]);
-      y = 720;
+      y = 750;
       y = addPageHeader(page13, y);
-      y -= 30;
+      y -= 40;
 
       // H. Custom Section (renumbered to J if support services are present)
       const customSectionLetter = (formData.supportRequested && formData.supportRequested.length > 0) ? 'J' : 'H';

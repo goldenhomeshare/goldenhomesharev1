@@ -23,7 +23,11 @@ async function updateApplicationStatus(applicationId: string, status: "APPROVED"
   });
 
   if (!response.ok) {
-    throw new Error("Failed to update application status");
+    const errorData = await response.json();
+    const errorMessage = errorData.error === "stripe_connect_required" 
+      ? "stripe_connect_required" 
+      : "Failed to update application status";
+    throw new Error(errorMessage);
   }
 
   return response.json();
@@ -48,9 +52,21 @@ export function ApplicationActionButtons({ applicationId }: ApplicationActionBut
         router.push(`/homeowner/agreement/${applicationId}`);
       }, 1000);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error approving application:", error);
-      toast.error("Failed to approve application. Please try again.");
+      
+      // Check if the error is due to missing Stripe Connect
+      if (error.message && error.message.includes("stripe_connect_required")) {
+        toast.error("You need to set up Stripe Connect before approving applications. Redirecting to billing setup...", {
+          duration: 5000,
+        });
+        
+        setTimeout(() => {
+          router.push("/billing");
+        }, 1500);
+      } else {
+        toast.error("Failed to approve application. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

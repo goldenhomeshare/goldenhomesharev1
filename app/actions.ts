@@ -5,6 +5,7 @@ import prisma from "./lib/db";
 import { CategoryTypes } from "@prisma/client";
 import { stripe } from "./lib/stripe";
 import { redirect } from "next/navigation";
+import { calculatePlatformFeePercent, PLATFORM_FEE_AMOUNT } from "./lib/platform-fee";
 
 export type State = {
   status: "error" | "success" | undefined;
@@ -370,10 +371,25 @@ export async function BuyProduct(formData: FormData) {
       User: {
         select: {
           connectedAccountId: true,
+          stripeConnectedLinked: true,
         },
       },
     },
   });
+
+  if (!data) {
+    throw new Error("Product not found");
+  }
+
+  // Check if homeowner has Stripe Connect setup and linked
+  if (!data.User || !data.User.connectedAccountId || !data.User.stripeConnectedLinked) {
+    throw new Error("Seller has not completed Stripe Connect setup.");
+  }
+
+  // Calculate the platform fee (flat $200, but convert to cents)
+  const productPrice = data.price as number;
+  const platformFeeAmount = Math.min(PLATFORM_FEE_AMOUNT, productPrice * 0.95); // Cap at 95% of product price
+  const platformFeeCents = Math.round(platformFeeAmount * 100);
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
@@ -381,24 +397,24 @@ export async function BuyProduct(formData: FormData) {
       {
         price_data: {
           currency: "usd",
-          unit_amount: Math.round((data?.price as number) * 100),
+          unit_amount: Math.round(productPrice * 100),
           product_data: {
-            name: data?.name as string,
-            description: data?.smallDescription,
-            images: data?.images,
+            name: data.name as string,
+            description: data.smallDescription,
+            images: data.images,
           },
         },
         quantity: 1,
       },
     ],
     metadata: {
-      link: data?.productFile as string,
+      link: data.productFile as string,
     },
 
     payment_intent_data: {
-      application_fee_amount: Math.round((data?.price as number) * 100) * 0.1,
+      application_fee_amount: platformFeeCents,
       transfer_data: {
-        destination: data?.User?.connectedAccountId as string,
+        destination: data.User.connectedAccountId,
       },
     },
     success_url:
@@ -414,38 +430,76 @@ export async function BuyProduct(formData: FormData) {
   return redirect(session.url as string);
 }
 
-export async function CreateStripeAccoutnLink() {
+export async function CreateStripeConnectForHomeowner() {
   const { getUser } = getKindeServerSession();
-
   const user = await getUser();
 
   if (!user) {
-    throw new Error();
+    throw new Error("Unauthorized");
   }
 
-  const data = await prisma.user.findUnique({
-    where: {
-      id: user.id,
-    },
-    select: {
-      connectedAccountId: true,
-    },
+  // Check if user is a homeowner
+  const currentUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { userType: true, connectedAccountId: true, stripeConnectedLinked: true }
   });
 
+  if (!currentUser || currentUser.userType !== "HOMEOWNER") {
+    throw new Error("Only homeowners can set up Stripe Connect accounts");
+  }
+
+  // If they already have a connected account that's linked, redirect to dashboard
+  if (currentUser.stripeConnectedLinked) {
+    return redirect("/billing");
+  }
+
+  let accountId = currentUser.connectedAccountId;
+
+  // If they don't have a connected account yet, create one
+  if (!accountId) {
+    const account = await stripe.accounts.create({
+      email: user.email as string,
+      controller: {
+        losses: {
+          payments: "application",
+        },
+        fees: {
+          payer: "application",
+        },
+        stripe_dashboard: {
+          type: "express",
+        },
+      },
+    });
+
+    // Update user with the new connected account ID
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { connectedAccountId: account.id }
+    });
+
+    accountId = account.id;
+  }
+
   const accountLink = await stripe.accountLinks.create({
-    account: data?.connectedAccountId as string,
+    account: accountId,
     refresh_url:
       process.env.NODE_ENV === "development"
         ? `http://localhost:3000/billing`
         : `https://${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'goldenhomeshare.com'}/billing`,
     return_url:
       process.env.NODE_ENV === "development"
-        ? `http://localhost:3000/return/${data?.connectedAccountId}`
-        : `https://${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'goldenhomeshare.com'}/return/${data?.connectedAccountId}`,
+        ? `http://localhost:3000/return/${accountId}`
+        : `https://${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'goldenhomeshare.com'}/return/${accountId}`,
     type: "account_onboarding",
   });
 
   return redirect(accountLink.url);
+}
+
+export async function CreateStripeAccoutnLink() {
+  // For backward compatibility, redirect to the new homeowner-specific function
+  return CreateStripeConnectForHomeowner();
 }
 
 export async function GetStripeDashboardLink() {
@@ -522,6 +576,7 @@ export async function ProcessApplicationPayment(formData: FormData) {
           User: {
             select: {
               connectedAccountId: true,
+              stripeConnectedLinked: true,
             },
           },
         },
@@ -550,23 +605,46 @@ export async function ProcessApplicationPayment(formData: FormData) {
 
   const product = application.product;
 
-  // Create checkout session configuration
+  // Check if homeowner has Stripe Connect setup and linked
+  if (!product.User || !product.User.connectedAccountId || !product.User.stripeConnectedLinked) {
+    throw new Error("Homeowner has not completed Stripe Connect setup. Please contact the homeowner.");
+  }
+
+  // Calculate the platform fee percentage for the flat $200 fee
+  const subscriptionAmount = product.price as number;
+  const feePercent = calculatePlatformFeePercent(subscriptionAmount);
+
+  // Create checkout session for subscription with destination charges
   const sessionConfig: any = {
-    mode: "payment",
+    mode: "subscription",
     line_items: [
       {
         price_data: {
           currency: "usd",
-          unit_amount: Math.round((product.price as number) * 100),
+          unit_amount: Math.round(subscriptionAmount * 100),
+          recurring: {
+            interval: "month",
+          },
           product_data: {
             name: `Monthly Contribution - ${product.name}`,
-            description: `First month's contribution for ${product.name}`,
+            description: `Monthly contribution for ${product.name}`,
             images: product.images,
           },
         },
         quantity: 1,
       },
     ],
+    subscription_data: {
+      application_fee_percent: feePercent,
+      transfer_data: {
+        destination: product.User.connectedAccountId,
+      },
+      metadata: {
+        applicationId: applicationId,
+        productId: product.id,
+        housemateId: user.id,
+      },
+    },
     metadata: {
       applicationId: applicationId,
       productId: product.id,
@@ -574,18 +652,14 @@ export async function ProcessApplicationPayment(formData: FormData) {
     },
     success_url:
       process.env.NODE_ENV === "development"
-        ? `http://localhost:3001/payment/success?application=${applicationId}`
+        ? `http://localhost:3000/payment/success?application=${applicationId}`
         : `https://${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'goldenhomeshare.com'}/payment/success?application=${applicationId}`,
     cancel_url:
       process.env.NODE_ENV === "development"
-        ? `http://localhost:3001/billing?application=${applicationId}`
+        ? `http://localhost:3000/billing?application=${applicationId}`
         : `https://${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'goldenhomeshare.com'}/billing?application=${applicationId}`,
   };
 
-  // Only add payment_intent_data if connected account exists and is properly configured
-  // For now, we'll skip the transfer to avoid capability errors
-  // TODO: Add proper account capability checking before enabling transfers
-  
   const session = await stripe.checkout.sessions.create(sessionConfig);
 
   return redirect(session.url as string);

@@ -1,5 +1,4 @@
 import prisma from "@/app/lib/db";
-import { stripe } from "@/app/lib/stripe";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { NextResponse } from "next/server";
 import { unstable_noStore as noStore } from "next/cache";
@@ -22,30 +21,19 @@ export async function GET() {
     });
 
     if (!dbUser) {
-      const account = await stripe.accounts.create({
-        email: user.email as string,
-        controller: {
-          losses: {
-            payments: "application",
-          },
-          fees: {
-            payer: "application",
-          },
-          stripe_dashboard: {
-            type: "express",
-          },
-        },
-      });
-
+      // Create user without Stripe Connect account initially
+      // Connect accounts will be created only when users become homeowners
       dbUser = await prisma.user.create({
         data: {
           id: user.id,
           firstName: user.given_name ?? "",
           lastName: user.family_name ?? "",
           email: user.email ?? "",
+          connectedAccountId: null,
           profileImage:
             user.picture ?? `https://avatar.vercel.sh/${user.given_name}`,
-          connectedAccountId: account.id,
+          // connectedAccountId is optional now - will be set when user becomes homeowner
+          stripeConnectedLinked: false,
         },
       });
     }
@@ -60,9 +48,9 @@ export async function GET() {
     return NextResponse.redirect(`${baseUrl}/onboarding`);
     
   } catch (error) {
-    console.error("Auth creation error:", error);
+    console.error("Error during user creation:", error);
     
-    // Fallback redirect on error
+    // Fallback to onboarding if there's an error
     const baseUrl = process.env.NODE_ENV === "development"
       ? "http://localhost:3000"
       : `https://${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'goldenhomeshare.com'}`;

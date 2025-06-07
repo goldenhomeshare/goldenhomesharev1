@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Download, FileText } from "lucide-react";
 import { toast } from "sonner";
 
-interface HomeownerAgreementActionsProps {
+interface HousemateAgreementActionsProps {
   agreement: any;
   applicationId: string;
 }
 
-export function HomeownerAgreementActions({ agreement, applicationId }: HomeownerAgreementActionsProps) {
+export function HousemateAgreementActions({ agreement, applicationId }: HousemateAgreementActionsProps) {
   const handleDownloadAgreement = async () => {
     if (!agreement?.agreementData) {
       toast.error("No agreement data found");

@@ -39,6 +39,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized to update this application" }, { status: 403 });
     }
 
+    // If approving, check if homeowner has Stripe Connect setup
+    if (status === "APPROVED") {
+      const homeowner = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { stripeConnectedLinked: true }
+      });
+
+      if (!homeowner || !homeowner.stripeConnectedLinked) {
+        return NextResponse.json({ 
+          error: "stripe_connect_required",
+          message: "You must set up Stripe Connect before approving applications. This allows you to receive payments from housemates."
+        }, { status: 400 });
+      }
+    }
+
     // Update the application status
     const updatedApplication = await prisma.application.update({
       where: {

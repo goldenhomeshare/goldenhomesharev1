@@ -33,9 +33,9 @@ export async function POST(req: Request) {
       // Only send email if Resend is properly initialized
       if (resend) {
         const { data, error } = await resend.emails.send({
-          from: "MarshalUI <onboarding@resend.dev>",
-          to: ["your_email"],
-          subject: "Your Product from MarshalUI",
+          from: "Golden HomeShare <noreply@goldenhomeshare.com>",
+          to: [session.customer_details?.email || session.metadata?.email || "noreply@goldenhomeshare.com"],
+          subject: "Payment Confirmation - Golden HomeShare",
           react: ProductEmail({
             link: link as string,
           }),

@@ -35,32 +35,33 @@ function SigningStep({ agreementData, onSign, isLoading }: SigningStepProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <FileSignature className="w-12 h-12 text-green-600" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+        {/* Mobile header */}
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="w-12 h-12 sm:w-20 sm:h-20 bg-gradient-to-r from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+            <FileSignature className="w-6 h-6 sm:w-12 sm:h-12 text-green-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">Sign Agreement</h1>
-          <p className="text-gray-600 max-w-xl mx-auto">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">Sign Agreement</h1>
+          <p className="text-sm sm:text-base text-gray-600 max-w-xl mx-auto px-4">
             Review and sign your agreement to proceed with the housemate arrangement
           </p>
         </div>
 
-        <Card className="shadow-lg border-0">
-          <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg">
+        <Card className="shadow-lg border-0 w-full">
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg p-4 sm:p-6 lg:p-8">
             <div className="text-center">
-              <CardTitle className="text-xl text-gray-900 mb-2">
+              <CardTitle className="text-lg sm:text-xl text-gray-900 mb-2">
                 Electronic Signature Required
               </CardTitle>
-              <p className="text-gray-600 text-sm">
+              <p className="text-sm text-gray-600">
                 Complete your electronic signature to finalize the agreement
               </p>
             </div>
           </CardHeader>
-          <CardContent className="p-8 bg-white rounded-b-lg">
+          <CardContent className="p-4 sm:p-6 lg:p-8 bg-white rounded-b-lg">
             <div className="space-y-6">
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4">
                 <p className="text-blue-800 font-medium mb-2">Ready to Sign</p>
                 <p className="text-blue-700 text-sm">
                   By signing this agreement, you confirm that all information is accurate and you agree to the terms. 
@@ -89,7 +90,7 @@ function SigningStep({ agreementData, onSign, isLoading }: SigningStepProps) {
                   <Button
                     onClick={handleSign}
                     disabled={isLoading || !signature.trim()}
-                    className="w-full py-6 text-lg bg-primary hover:bg-primary/90 rounded-xl font-semibold"
+                    className="w-full py-6 text-lg bg-primary hover:bg-primary/90 rounded-xl font-semibold min-h-[44px]"
                     size="lg"
                   >
                     {isLoading ? (

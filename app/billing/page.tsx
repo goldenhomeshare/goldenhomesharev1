@@ -8,7 +8,7 @@ import {
   import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
   import prisma from "../lib/db";
   import { Button } from "@/components/ui/button";
-  import { CreateStripeAccoutnLink, GetStripeDashboardLink, ProcessApplicationPayment } from "../actions";
+  import { CreateStripeAccoutnLink, GetStripeDashboardLink, ProcessApplicationPayment, CreateCustomerPortalSession } from "../actions";
   import { Submitbutton } from "../components/SubmitButtons";
   import { unstable_noStore as noStore } from "next/cache";
   import { Badge } from "@/components/ui/badge";
@@ -19,18 +19,45 @@ import { HousemateAgreementActions } from "@/components/HousemateAgreementAction
 import { getCurrentUser } from "@/lib/auth";
   
   async function getData(userId: string) {
-    const data = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        stripeConnectedLinked: true,
-        connectedAccountId: true,
-      },
-    });
-  
-    return data;
-  }
+  const data = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      stripeConnectedLinked: true,
+      connectedAccountId: true,
+    },
+  });
+
+  return data;
+}
+
+async function getUserSubscriptions(userId: string) {
+  const subscriptions = await prisma.subscription.findMany({
+    where: {
+      housemateId: userId,
+      status: {
+        in: ["ACTIVE", "TRIALING", "PAST_DUE"]
+      }
+    },
+    include: {
+      Application: {
+        include: {
+          product: {
+            include: {
+              User: true
+            }
+          }
+        }
+      }
+    },
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
+
+  return subscriptions;
+}
   
   async function getApprovedApplication(applicationId: string, userId: string) {
     const application = await prisma.application.findUnique({
@@ -69,11 +96,14 @@ import { getCurrentUser } from "@/lib/auth";
       throw new Error("Unauthorized");
     }
   
-    const data = await getData(user.id);
-    const currentUser = await getCurrentUser();
-    const userType = currentUser?.userType;
-    const resolvedSearchParams = await searchParams;
-    const applicationId = resolvedSearchParams.application;
+      const data = await getData(user.id);
+  const currentUser = await getCurrentUser();
+  const userType = currentUser?.userType;
+  const resolvedSearchParams = await searchParams;
+  const applicationId = resolvedSearchParams.application;
+  
+  // Get user's active subscriptions for subscription management
+  const userSubscriptions = userType === "HOUSEMATE" ? await getUserSubscriptions(user.id) : [];
     
     let approvedApplication = null;
     if (applicationId) {
@@ -171,6 +201,46 @@ import { getCurrentUser } from "@/lib/auth";
             {/* Housemate flow - no Stripe Connect required */}
             {userType === "HOUSEMATE" && (
               <div className="space-y-6">
+                {/* Subscription Management Section */}
+                {userSubscriptions.length > 0 && (
+                  <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Active Subscriptions</h3>
+                    <div className="space-y-4">
+                      {userSubscriptions.map((subscription) => (
+                        <div key={subscription.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-medium text-gray-900">{subscription.Application.product.name}</h4>
+                              <p className="text-sm text-gray-600">
+                                ${subscription.amount / 100}/month • {subscription.status}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Next billing: {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge className={subscription.status === "ACTIVE" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}>
+                                {subscription.status}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      <div className="text-center pt-4 border-t border-gray-200">
+                        <form action={CreateCustomerPortalSession}>
+                          <Button variant="outline" type="submit">
+                            <CreditCard className="mr-2 h-4 w-4" />
+                            Manage Subscriptions
+                          </Button>
+                        </form>
+                        <p className="text-xs text-gray-500 mt-2">
+                          Update payment methods, view invoices, or cancel subscriptions
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {!approvedApplication ? (
                   <div className="bg-gray/5 border border-gray/20 rounded-2xl p-6 text-center">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">No Active Applications</h3>

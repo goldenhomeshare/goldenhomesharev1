@@ -122,15 +122,9 @@ export default async function HousemateApplicationsPage() {
                     </CardTitle>
                     <CardDescription className="text-sm sm:text-base mt-1">
                       <span className="font-semibold">${application.product.price}/month</span>
-                      {application.product.address && (
-                        <>
-                          <span className="mx-1">•</span>
-                          <span className="break-words">{application.product.address}</span>
-                        </>
-                      )}
                     </CardDescription>
                     <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                      Host: {application.product.User?.firstName} {application.product.User?.lastName}
+                      Host: {application.product.User?.firstName}
                     </p>
                   </div>
                   <div className="flex-shrink-0">

@@ -664,3 +664,40 @@ export async function ProcessApplicationPayment(formData: FormData) {
 
   return redirect(session.url as string);
 }
+
+export async function CreateCustomerPortalSession() {
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+
+  // Get the user's active subscription to find their customer ID
+  const subscription = await prisma.subscription.findFirst({
+    where: {
+      housemateId: user.id,
+      status: {
+        in: ["ACTIVE", "TRIALING", "PAST_DUE"]
+      }
+    },
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
+
+  if (!subscription) {
+    throw new Error("No active subscription found");
+  }
+
+  // Create a portal session using the customer ID from the subscription
+  const portalSession = await stripe.billingPortal.sessions.create({
+    customer: subscription.stripeCustomerId,
+    return_url: process.env.NODE_ENV === "development"
+      ? `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/housemate/dashboard`
+      : `https://${process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'goldenhomeshare.com'}/housemate/dashboard`,
+  });
+
+  // redirect() throws a special Next.js error, which is expected behavior
+  redirect(portalSession.url);
+}

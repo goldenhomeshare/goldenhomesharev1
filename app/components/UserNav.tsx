@@ -60,7 +60,7 @@ export function UserNav({ email, name, userImage, userType }: iAppProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative flex items-center gap-2 px-2 py-1 rounded-full hover:bg-transparent transition-colors">
-          <Avatar className="h-12 w-12">
+          <Avatar className="size-12">
             <AvatarImage src={userImage} alt="User Image" />
             <AvatarFallback className="text-sm font-medium">{name.slice(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>

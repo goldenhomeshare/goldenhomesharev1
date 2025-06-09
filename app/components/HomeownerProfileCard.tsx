@@ -151,7 +151,7 @@ export function HomeownerProfileCard({ homeowner, canMessageHost, messageProps, 
           <div className="flex items-start gap-4 mb-6">
             {/* Host Avatar with Verification Badge */}
             <div className="relative">
-              <div className="relative w-16 h-16 rounded-full overflow-hidden ring-2 ring-gray-100">
+              <div className="relative w-16 h-16 rounded-full overflow-hidden">
                 {profile?.profilePicture ? (
                   <Image
                     src={profile.profilePicture}

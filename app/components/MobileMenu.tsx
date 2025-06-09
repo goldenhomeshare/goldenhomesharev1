@@ -58,7 +58,7 @@ export function MobileMenu({ user }: MobileMenuProps) {
         {user && (
           <SheetTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0">
-              <Avatar className="h-8 w-8">
+              <Avatar className="size-8">
                 <AvatarImage src={user.userImage} alt="User Image" />
                 <AvatarFallback className="bg-gray-500 text-white text-xs font-semibold">
                   {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
@@ -77,7 +77,7 @@ export function MobileMenu({ user }: MobileMenuProps) {
             {/* User Profile Section */}
             <div className="px-6 py-6 border-b border-gray-200">
               <div className="flex items-center space-x-3">
-                <Avatar className="h-12 w-12">
+                <Avatar className="size-12">
                   <AvatarImage src={user.userImage} alt="User Image" />
                   <AvatarFallback className="bg-gray-500 text-white font-semibold">
                     {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
@@ -140,30 +140,16 @@ export function MobileMenu({ user }: MobileMenuProps) {
               </div>
             </div>
 
-            {/* Logout Button */}
-            <div className="absolute bottom-6 left-6 right-6">
-              <LogoutLink className="w-full">
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-center font-medium border-gray-300 text-gray-700 hover:bg-gray-50"
-                >
-                  Log out
-                </Button>
+            {/* Logout Section */}
+            <div className="px-6 py-4 border-t border-gray-200">
+              <LogoutLink className="flex items-center px-3 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors w-full text-left">
+                Log out
               </LogoutLink>
             </div>
           </>
         ) : (
-          <div className="px-6 py-6">
-            <h4 className="text-sm font-semibold text-gray-900 mb-3">Welcome to Golden HomeShare</h4>
-            <p className="text-sm text-gray-600 mb-4">Sign in to access your account and start your homesharing journey.</p>
-            <div className="space-y-2">
-              <Link href="/api/auth/login">
-                <Button className="w-full">Sign In</Button>
-              </Link>
-              <Link href="/api/auth/register">
-                <Button variant="outline" className="w-full">Create Account</Button>
-              </Link>
-            </div>
+          <div className="p-6">
+            <p className="text-gray-500">Please log in to access your profile.</p>
           </div>
         )}
       </SheetContent>

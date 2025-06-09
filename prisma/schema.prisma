@@ -18,6 +18,7 @@ model User {
   stripeConnectedLinked Boolean           @default(false)
   createdAt             DateTime          @default(now())
   isVerified            Boolean           @default(false)
+  canMessage            Boolean           @default(false)
   onboardingCompleted   Boolean           @default(false)
   updatedAt             DateTime          @updatedAt
   userType              UserType?

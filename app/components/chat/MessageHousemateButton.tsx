@@ -53,6 +53,31 @@ export function MessageHousemateButton({ housemateId, housemateName }: MessageHo
           : `/housemate/messages?chatId=${chatRoom.id}`;
           
         router.push(messagesUrl);
+      } else if (chatResponse.status === 403) {
+        // Handle messaging permission error
+        const errorData = await chatResponse.json();
+        console.error("Messaging permission error:", errorData);
+        
+        if (errorData.needsApproval) {
+          toast.error("Messaging requires background check approval. Redirecting to background check page...", {
+            duration: 4000,
+          });
+          // Redirect to background check page after a short delay
+          setTimeout(() => {
+            router.push("/background-check");
+          }, 2000);
+        } else {
+          toast.error(errorData.reason || "You don't have permission to send messages.", {
+            description: "Complete your profile setup to enable messaging",
+            duration: 4000,
+          });
+          // If onboarding not completed, redirect to onboarding
+          if (errorData.reason?.includes("profile setup")) {
+            setTimeout(() => {
+              router.push("/onboarding");
+            }, 2000);
+          }
+        }
       } else {
         toast.error("Failed to start conversation. Please try again.");
       }

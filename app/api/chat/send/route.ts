@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/app/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import { checkMessagingPermissions } from "@/app/lib/messaging-permissions";
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,6 +9,16 @@ export async function POST(request: NextRequest) {
     
     if (!user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
+    // Check messaging permissions
+    const permissionCheck = await checkMessagingPermissions(user.id);
+    if (!permissionCheck.canMessage) {
+      return NextResponse.json({ 
+        error: "Messaging not allowed", 
+        reason: permissionCheck.reason,
+        needsApproval: permissionCheck.needsApproval 
+      }, { status: 403 });
     }
 
     const body = await request.json();

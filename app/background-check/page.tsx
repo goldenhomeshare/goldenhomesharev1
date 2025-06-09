@@ -2,13 +2,21 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { BackgroundCheckForm } from "@/app/test-checkr/components/BackgroundCheckForm";
 import RefreshStatusButton from "@/app/components/RefreshStatusButton";
-import { Shield, CheckCircle, Clock, AlertCircle, ArrowLeft, RefreshCw, Users, Zap } from "lucide-react";
+import { Shield, CheckCircle, Clock, AlertCircle, ArrowLeft, RefreshCw, Users, Zap, Mail, Phone, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import prisma from "@/app/lib/db";
 
+// Feature flag for Checkr API integration
+const CHECKR_API_ENABLED = process.env.CHECKR_API_ENABLED === 'true';
+
 async function checkAndUpdateUserVerificationStatus(userId: string, userEmail: string) {
+  // Only check if Checkr API is enabled
+  if (!CHECKR_API_ENABLED) {
+    return false;
+  }
+
   try {
     // Check if user has any completed background checks
     const backgroundCheckModel = prisma.backgroundCheck;
@@ -69,8 +77,8 @@ export default async function BackgroundCheckPage() {
     }
   });
 
-  // If user is not verified, check if they have completed background checks
-  if (!userWithStatus?.isVerified) {
+  // If user is not verified and Checkr API is enabled, check if they have completed background checks
+  if (!userWithStatus?.isVerified && CHECKR_API_ENABLED) {
     console.log("User not verified, checking for completed background checks...");
     const isNowVerified = await checkAndUpdateUserVerificationStatus(user.id, user.email);
     if (isNowVerified) {
@@ -116,28 +124,37 @@ export default async function BackgroundCheckPage() {
           </div>
           
           {/* Content */}
-          <div className="p-6 sm:p-8 bg-white rounded-b-xl sm:rounded-b-2xl">
-            <div className="bg-primary/5 border border-primary/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center">
-              <Badge variant="default" className="mb-3 sm:mb-4">
-                Verified
-              </Badge>
-              <p className="text-sm sm:text-base text-gray-700 mb-4 px-2">
-                <span className="font-semibold">Congratulations!</span>
-                <br />
-                You can now connect directly with homeowners and access all platform features.
-              </p>
-              <Link
-                href={dashboardPath}
-                className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold transition-all duration-200 text-sm sm:text-base w-full sm:w-auto justify-center"
-              >
-                Return to Dashboard
-              </Link>
+          <div className="p-6 sm:p-8 bg-white text-center">
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <Badge variant="default" className="bg-green-100 text-green-800 border-green-200 px-4 py-2">
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Verified Member
+                </Badge>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t">
+                <div className="text-center">
+                  <Shield className="w-6 h-6 text-primary mx-auto mb-2" />
+                  <h3 className="font-semibold text-gray-900 text-sm">Secure</h3>
+                  <p className="text-xs text-gray-600">Background verified</p>
+                </div>
+                <div className="text-center">
+                  <Users className="w-6 h-6 text-primary mx-auto mb-2" />
+                  <h3 className="font-semibold text-gray-900 text-sm">Trusted</h3>
+                  <p className="text-xs text-gray-600">By the community</p>
+                </div>
+                <div className="text-center">
+                  <MessageCircle className="w-6 h-6 text-primary mx-auto mb-2" />
+                  <h3 className="font-semibold text-gray-900 text-sm">Connected</h3>
+                  <p className="text-xs text-gray-600">Full messaging access</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Enhanced Background Check Form - Mobile Optimized */}
+      {/* Unverified users */}
       {!userWithStatus?.isVerified && (
         <div className="shadow-xl border-0 rounded-xl sm:rounded-2xl overflow-hidden mb-6 sm:mb-8 bg-white">
           <div className="bg-gradient-to-br from-primary/8 via-primary/5 to-primary/3 border-b border-primary/10 p-6 sm:p-8 lg:p-10 text-center relative">
@@ -158,23 +175,78 @@ export default async function BackgroundCheckPage() {
               </div>
             </div>
           </div>
+          
           <div className="p-6 sm:p-8 lg:p-10 bg-white">
-            <BackgroundCheckForm 
-              initialData={{
-                firstName: user.firstName || '',
-                middleName: '',
-                lastName: user.lastName || '',
-                email: user.email || '',
-                phone: '',
-                zipcode: '',
-                workLocation: {
-                  country: 'US',
-                  state: '',
-                  city: '',
-                },
-                package: 'basic_for_golden_homeshare',
-              }}
-            />
+            {CHECKR_API_ENABLED ? (
+              <BackgroundCheckForm 
+                initialData={{
+                  firstName: user.firstName || '',
+                  middleName: '',
+                  lastName: user.lastName || '',
+                  email: user.email || '',
+                  phone: '',
+                  zipcode: '',
+                  workLocation: {
+                    country: 'US',
+                    state: '',
+                    city: '',
+                  },
+                  package: 'basic_for_golden_homeshare',
+                }}
+              />
+            ) : (
+              /* Contact Information for Background Checks */
+              <div className="space-y-6">
+                <div className="text-center mb-8">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
+                    Contact Us for Background Verification
+                  </h3>
+                                     <p className="text-gray-600 max-w-2xl mx-auto">
+                     We're currently processing background checks manually. Contact us and we'll send you a secure link to complete your verification.
+                   </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Email Contact */}
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 text-center">
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Mail className="w-6 h-6 text-white" />
+                    </div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Email Us</h4>
+                                         <p className="text-sm text-gray-600 mb-4">
+                       Email us your details and we'll send you a secure verification link
+                     </p>
+                     <a 
+                       href="mailto:support@goldenhomeshare.com?subject=Background Check Request&body=Hi, I'd like to start my background check process for Golden HomeShare. My details are:%0A%0AName: %0AEmail: %0APhone: %0A%0APlease send me a secure link to complete my background verification.%0A%0AThank you!"
+                       className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                     >
+                      <Mail className="w-4 h-4" />
+                      support@goldenhomeshare.com
+                    </a>
+                  </div>
+
+                  {/* Phone Contact */}
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-6 text-center">
+                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Phone className="w-6 h-6 text-white" />
+                    </div>
+                    <h4 className="font-semibold text-gray-900 mb-2">Call Us</h4>
+                                         <p className="text-sm text-gray-600 mb-4">
+                       Call us and we'll send you a secure verification link
+                     </p>
+                     <a 
+                       href="tel:+1-816-433-2979"
+                       className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+                     >
+                       <Phone className="w-4 h-4" />
+                       (816) 433-2979
+                     </a>
+                  </div>
+                </div>
+
+                
+              </div>
+            )}
           </div>
         </div>
       )}

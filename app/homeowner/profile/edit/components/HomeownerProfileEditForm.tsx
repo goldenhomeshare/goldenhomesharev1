@@ -184,7 +184,7 @@ export function HomeownerProfileEditForm({ userId, initialData, firstName, lastN
         userFormData.append("firstName", formData.firstName);
         userFormData.append("lastName", formData.lastName);
         
-        const userResult = await UpdateUserSettings(null, userFormData);
+        const userResult = await UpdateUserSettings({ status: undefined }, userFormData);
         if (userResult.status === "error") {
           throw new Error(userResult.message || "Failed to update basic information");
         }

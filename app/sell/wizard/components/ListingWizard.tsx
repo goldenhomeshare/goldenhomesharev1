@@ -319,7 +319,7 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
       console.log("FormData being sent to server:", formDataEntries);
       
       const { SellProduct } = await import("@/app/actions");
-      const result = await SellProduct(null, submitFormData);
+      const result = await SellProduct({ status: undefined }, submitFormData);
       
       if (result && result.status === "error") {
         console.error("Validation errors:", result.errors);

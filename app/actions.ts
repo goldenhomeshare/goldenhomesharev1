@@ -1,6 +1,6 @@
 "use server";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { ZodStringDef, z } from "zod";
+import { z } from "zod";
 import prisma from "./lib/db";
 import { CategoryTypes } from "@prisma/client";
 import { stripe } from "./lib/stripe";
@@ -62,7 +62,7 @@ const userSettingsSchema = z.object({
     .optional(),
 });
 
-export async function SellProduct(prevState: any, formData: FormData) {
+export async function SellProduct(prevState: State, formData: FormData) {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
@@ -170,7 +170,7 @@ export async function SellProduct(prevState: any, formData: FormData) {
       return state;
     }
 
-    const productData: any = {
+    const productData = {
       name: validateFields.data.name,
       category: (validateFields.data.category as CategoryTypes) || "template",
       smallDescription: validateFields.data.smallDescription,
@@ -183,20 +183,17 @@ export async function SellProduct(prevState: any, formData: FormData) {
         connect: {
           id: user.id
         }
-      }
+      },
+      ...(validateFields.data.amenities && validateFields.data.amenities.length > 0 && {
+        amenities: validateFields.data.amenities
+      }),
+      ...(validateFields.data.supportRequested && validateFields.data.supportRequested.length > 0 && {
+        supportRequested: validateFields.data.supportRequested
+      }),
+      ...(validateFields.data.houseRules && validateFields.data.houseRules.length > 0 && {
+        houseRules: validateFields.data.houseRules
+      })
     };
-
-    if (validateFields.data.amenities && validateFields.data.amenities.length > 0) {
-      productData.amenities = validateFields.data.amenities;
-    }
-
-    if (validateFields.data.supportRequested && validateFields.data.supportRequested.length > 0) {
-      productData.supportRequested = validateFields.data.supportRequested;
-    }
-
-    if (validateFields.data.houseRules && validateFields.data.houseRules.length > 0) {
-      productData.houseRules = validateFields.data.houseRules;
-    }
 
     console.log("Creating product in database with:", productData);
 
@@ -231,7 +228,7 @@ export async function SellProduct(prevState: any, formData: FormData) {
   }
 }
 
-export async function EditProduct(prevState: any, formData: FormData) {
+export async function EditProduct(prevState: State, formData: FormData) {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
@@ -315,7 +312,7 @@ export async function EditProduct(prevState: any, formData: FormData) {
   return state;
 }
 
-export async function UpdateUserSettings(prevState: any, formData: FormData) {
+export async function UpdateUserSettings(prevState: State, formData: FormData) {
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 

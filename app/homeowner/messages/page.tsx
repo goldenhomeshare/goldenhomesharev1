@@ -99,7 +99,7 @@ export default async function HomeownerMessagesPage({
 
       if (existingChatRoom) {
         // Redirect to the existing conversation
-        const url = new URL('/homeowner/messages', 'http://localhost');
+        const url = new URL('/homeowner/messages', 'https://goldenhomeshare.com');
         url.searchParams.set('chatId', existingChatRoom.id);
         if (showHidden) url.searchParams.set('showHidden', 'true');
         redirect(url.pathname + url.search);
@@ -114,7 +114,7 @@ export default async function HomeownerMessagesPage({
         });
         
         // Redirect to the new conversation
-        const url = new URL('/homeowner/messages', 'http://localhost');
+        const url = new URL('/homeowner/messages', 'https://goldenhomeshare.com');
         url.searchParams.set('chatId', newChatRoom.id);
         if (showHidden) url.searchParams.set('showHidden', 'true');
         redirect(url.pathname + url.search);

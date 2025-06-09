@@ -171,7 +171,7 @@ export function HousemateProfileEditForm({ userId, initialData, firstName, lastN
         formDataForUser.append("firstName", formData.firstName);
         formDataForUser.append("lastName", formData.lastName);
         
-        const userResult = await UpdateUserSettings(null, formDataForUser);
+        const userResult = await UpdateUserSettings({ status: undefined }, formDataForUser);
         if (userResult.status === "error") {
           throw new Error(userResult.message || "Failed to update basic information");
         }

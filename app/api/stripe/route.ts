@@ -30,6 +30,9 @@ export async function POST(req: Request) {
 
       const link = session.metadata?.link;
 
+      // Post-purchase email disabled temporarily
+      // TODO: Re-enable when ready for production
+      /*
       // Only send email if Resend is properly initialized
       if (resend) {
         const { data, error } = await resend.emails.send({
@@ -41,6 +44,7 @@ export async function POST(req: Request) {
           }),
         });
       }
+      */
 
       break;
     }

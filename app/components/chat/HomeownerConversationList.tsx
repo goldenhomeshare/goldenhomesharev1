@@ -22,7 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { HomeownerChatModal } from "./HomeownerChatModal";
+// import { HomeownerChatModal } from "./HomeownerChatModal"; // Not needed for mobile routing
 
 interface HomeownerConversationListProps {
   chatRooms: any[];
@@ -42,7 +42,6 @@ interface ConversationItemProps {
 }
 
 function ConversationItem({ chatRoom, currentUserId, user, isHidden = false, onToggleHidden, selectedChatId }: ConversationItemProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   
@@ -113,9 +112,18 @@ function ConversationItem({ chatRoom, currentUserId, user, isHidden = false, onT
   const isSelected = selectedChatId === chatRoom.id;
 
   const handleConversationClick = () => {
-    const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set('chatId', chatRoom.id);
-    router.push(currentUrl.toString());
+    // Check if we're on mobile (screen width < 768px)
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile) {
+      // Navigate to full-screen mobile chat view
+      router.push(`/homeowner/messages/chat/${chatRoom.id}`);
+    } else {
+      // Desktop behavior - update URL params to select chat in sidebar
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('chatId', chatRoom.id);
+      router.push(currentUrl.toString());
+    }
   };
 
   return (
@@ -265,18 +273,8 @@ function ConversationItem({ chatRoom, currentUserId, user, isHidden = false, onT
         </div>
       </div>
 
-      {/* Chat Modal */}
-      <HomeownerChatModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        productId={chatRoom.productId}
-        housemateId={chatRoom.housemateId}
-        housemateName={`${housemate?.firstName} ${housemate?.lastName?.charAt(0) || ''}.`}
-        productName={product?.name}
-        hostId={chatRoom.homeownerId}
-        hostName={`${user.firstName} ${user.lastName}`}
-        onMessagesRead={() => router.refresh()}
-      />
+      {/* Chat Modal - Only used for desktop when needed */}
+      {/* Note: Mobile now uses direct routing to chat view */}
     </>
   );
 }

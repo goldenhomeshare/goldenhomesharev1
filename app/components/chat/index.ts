@@ -6,4 +6,5 @@ export { HousemateChatCard } from './HousemateChatCard';
 export { HomeownerChatCard } from './HomeownerChatCard';
 export { MobileMessagingView } from './MobileMessagingView';
 export { ChatWindow } from './ChatWindow';
-export { InlineChatInterface } from './InlineChatInterface'; 
+export { InlineChatInterface } from './InlineChatInterface';
+export { MobileChatView } from './MobileChatView'; 

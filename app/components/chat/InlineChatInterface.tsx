@@ -220,8 +220,8 @@ export function InlineChatInterface({ selectedChatRoom, userType, currentUserId,
 
   return (
     <div className="flex flex-col h-full">
-      {/* Chat Header */}
-      <div className="p-4 border-b border-gray-200 bg-white flex-shrink-0">
+      {/* Chat Header - Hidden on mobile when used in MobileChatView */}
+      <div className="hidden md:block p-4 border-b border-gray-200 bg-white flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
@@ -368,7 +368,8 @@ export function InlineChatInterface({ selectedChatRoom, userType, currentUserId,
             placeholder="Type a message..."
             onKeyPress={handleKeyPress}
             disabled={isLoading || !selectedChatRoom.id || isSending}
-            className="flex-1"
+            className="flex-1 text-base md:text-sm"
+            style={{ fontSize: '16px' }} // Prevents zoom on iOS
           />
           <Button 
             onClick={sendMessage} 

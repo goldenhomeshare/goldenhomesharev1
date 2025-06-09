@@ -21,7 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChatModal } from "./ChatModal";
+// import { ChatModal } from "./ChatModal"; // Not needed for mobile routing
 
 interface HousemateConversationListProps {
   chatRooms: any[];
@@ -39,7 +39,6 @@ interface ConversationItemProps {
 }
 
 function ConversationItem({ chatRoom, currentUserId, isHidden = false, onToggleHidden, selectedChatId }: ConversationItemProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   
@@ -105,9 +104,18 @@ function ConversationItem({ chatRoom, currentUserId, isHidden = false, onToggleH
   const isSelected = selectedChatId === chatRoom.id;
 
   const handleConversationClick = () => {
-    const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set('chatId', chatRoom.id);
-    router.push(currentUrl.toString());
+    // Check if we're on mobile (screen width < 768px)
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile) {
+      // Navigate to full-screen mobile chat view
+      router.push(`/housemate/messages/chat/${chatRoom.id}`);
+    } else {
+      // Desktop behavior - update URL params to select chat in sidebar
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('chatId', chatRoom.id);
+      router.push(currentUrl.toString());
+    }
   };
 
   return (
@@ -239,16 +247,8 @@ function ConversationItem({ chatRoom, currentUserId, isHidden = false, onToggleH
         </div>
       </div>
 
-      {/* Chat Modal */}
-      <ChatModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        productId={chatRoom.productId}
-        hostId={chatRoom.homeownerId}
-        hostName={`${homeowner?.firstName} ${homeowner?.lastName}`}
-        productName={product?.name}
-        onMessagesRead={() => router.refresh()}
-      />
+      {/* Chat Modal - Only used for desktop when needed */}
+      {/* Note: Mobile now uses direct routing to chat view */}
     </>
   );
 }

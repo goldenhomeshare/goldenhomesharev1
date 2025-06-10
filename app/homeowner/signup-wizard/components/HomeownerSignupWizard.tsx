@@ -302,7 +302,7 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
       case 6:
         return formData.bio.trim().length >= 100; // Minimum 100 characters for bio
       case 7:
-        return true; // Profile picture is optional
+        return formData.profilePicture; // Check if profile picture has been uploaded
       default:
         return false;
     }
@@ -328,7 +328,7 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
       case 6:
         return formData.bio.trim().length >= 100; // Minimum 100 characters for bio
       case 7:
-        return true; // Profile picture is optional
+        return formData.profilePicture; // Check if profile picture has been uploaded
       default:
         return false;
     }

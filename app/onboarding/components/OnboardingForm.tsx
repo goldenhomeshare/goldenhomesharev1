@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { completeOnboarding } from "../actions";
 import { useRouter } from "next/navigation";
-import { Loader2, Home, User } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import Image from "next/image";
 
 type UserType = "HOMEOWNER" | "HOUSEMATE" | "ADMIN";
 
@@ -36,7 +36,7 @@ export function OnboardingForm({ userId }: { userId: string }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 sm:py-12">
+    <div className="min-h-screen bg-gray-50">
       {/* Loading Overlay */}
       {isSubmitting && (
         <div className="fixed inset-0 bg-white/90 z-50 flex items-center justify-center">
@@ -49,18 +49,31 @@ export function OnboardingForm({ userId }: { userId: string }) {
         </div>
       )}
 
-      <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}>
-        {/* I have a home to share */}
-        <Card className="border-2 border-gray-200 rounded-3xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
-          <CardContent className="text-center space-y-3 sm:space-y-4">
-            {/* Home icon */}
-            <div className="flex justify-center py-4 sm:py-6">
-              <Home className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 stroke-1" />
+      <div className={`grid grid-cols-1 lg:grid-cols-2 lg:min-h-screen ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}>
+        {/* Homeowner Side */}
+        <div className="bg-gradient-to-br from-green-50 to-green-100 flex flex-col items-center justify-center p-4 py-8 lg:p-12 relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+          
+          <div className="relative z-10 text-center space-y-4 lg:space-y-6 max-w-md">
+            {/* Large homeowner image */}
+            <div className="flex justify-center mb-4 lg:mb-8">
+              <div className="relative w-48 h-48 lg:w-64 lg:h-64">
+                <Image
+                  src="/Homeowner-Onboarding.png"
+                  alt="Homeowner illustration"
+                  fill
+                  className="object-contain drop-shadow-lg"
+                  priority
+                />
+              </div>
             </div>
             
-            <div className="space-y-1 sm:space-y-2">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900">I have a home to share</h2>
-              <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
+            <div className="space-y-2 lg:space-y-4">
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
+                I have a home to share
+              </h2>
+              <p className="hidden lg:block text-gray-700 text-base lg:text-lg leading-relaxed">
                 Connect with trusted housemates in your area and start earning from your extra space.
               </p>
             </div>
@@ -68,31 +81,45 @@ export function OnboardingForm({ userId }: { userId: string }) {
             <Button 
               onClick={() => handleRoleSelection("HOMEOWNER")}
               disabled={isSubmitting}
-              className="w-full bg-green-800 hover:bg-green-900 text-white py-4 sm:py-5 text-sm sm:text-base font-medium rounded-full"
+              size="lg"
+              className="w-full bg-green-800 hover:bg-green-900 text-white py-4 lg:py-6 text-base lg:text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Setting up...
                 </>
               ) : (
                 "List my home"
               )}
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* I'm looking for housing */}
-        <Card className="border-2 border-gray-200 rounded-3xl p-4 sm:p-6 hover:shadow-lg transition-shadow">
-          <CardContent className="text-center space-y-3 sm:space-y-4">
-            {/* User icon */}
-            <div className="flex justify-center py-4 sm:py-6">
-              <User className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 stroke-1" />
+        {/* Housemate Side */}
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center justify-center p-4 py-8 lg:p-12 relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+          
+          <div className="relative z-10 text-center space-y-4 lg:space-y-6 max-w-md">
+            {/* Large housemate image */}
+            <div className="flex justify-center mb-4 lg:mb-8">
+              <div className="relative w-48 h-48 lg:w-64 lg:h-64">
+                <Image
+                  src="/Housemate-Onboarding.png"
+                  alt="Housemate illustration"
+                  fill
+                  className="object-contain drop-shadow-lg"
+                  priority
+                />
+              </div>
             </div>
             
-            <div className="space-y-1 sm:space-y-2">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900">I'm looking for housing</h2>
-              <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
+            <div className="space-y-2 lg:space-y-4">
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
+                I'm looking for housing
+              </h2>
+              <p className="hidden lg:block text-gray-700 text-base lg:text-lg leading-relaxed">
                 Find welcoming homes and caring homeowners in your preferred location.
               </p>
             </div>
@@ -100,19 +127,20 @@ export function OnboardingForm({ userId }: { userId: string }) {
             <Button 
               onClick={() => handleRoleSelection("HOUSEMATE")}
               disabled={isSubmitting}
-              className="w-full bg-green-800 hover:bg-green-900 text-white py-4 sm:py-5 text-sm sm:text-base font-medium rounded-full"
+              size="lg"
+              className="w-full bg-green-800 hover:bg-green-900 text-white py-4 lg:py-6 text-base lg:text-lg font-medium rounded-full shadow-lg hover:shadow-xl transition-all"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Setting up...
                 </>
               ) : (
                 "Find housing"
               )}
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

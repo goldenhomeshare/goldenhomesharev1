@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 // async function UTSSRComponent() {
-//   // For React 19 and Next.js 15 compatibility
+//   // For React 19 and Next.js 15 compatibility/
 //   return <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />;
 // }
 

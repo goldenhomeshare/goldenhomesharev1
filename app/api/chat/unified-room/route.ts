@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     // First, check if ANY chat room exists between these two users
-    let existingChatRoom = await prisma.chatRoom.findFirst({
+    const existingChatRoom = await prisma.chatRoom.findFirst({
       where: {
         homeownerId,
         housemateId,

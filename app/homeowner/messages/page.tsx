@@ -82,7 +82,7 @@ export default async function HomeownerMessagesPage({
 
   const resolvedSearchParams = await searchParams;
   const showHidden = resolvedSearchParams.showHidden === "true";
-  let selectedChatId = resolvedSearchParams.chatId;
+  const selectedChatId = resolvedSearchParams.chatId;
   const housemateId = resolvedSearchParams.housemate;
   const productId = resolvedSearchParams.product;
 

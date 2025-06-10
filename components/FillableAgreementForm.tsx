@@ -1478,8 +1478,8 @@ export function FillableAgreementForm({
                 <Settings className="h-5 w-5 text-stone-600" />
                 <h3 className="text-lg font-semibold text-stone-900">Support Expected</h3>
               </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-                <p className="text-sm text-amber-800">
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-4">
+                <p className="text-sm text-primary">
                   <strong>Note:</strong> This support is in addition to typical expectations of keeping shared areas tidy and picking up after oneself.
                 </p>
               </div>
@@ -1832,6 +1832,11 @@ export function FillableAgreementForm({
                     placeholder="0 (enter amount if required)"
                     type="number"
                   />
+                  <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mt-2">
+                    <p className="text-sm text-primary">
+                      <strong>Note:</strong> Security deposits should be discussed directly with your housemate. Golden HomeShare does not collect or hold security deposits.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

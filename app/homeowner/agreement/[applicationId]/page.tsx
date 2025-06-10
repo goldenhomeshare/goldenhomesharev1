@@ -108,360 +108,160 @@ export default async function HomeownerAgreementPage({
   const agreement = application.agreement;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          {/* Mobile-first breadcrumb */}
-          <div className="flex items-center gap-2 mb-4 sm:mb-6">
-            <Button 
-              asChild 
-              variant="ghost" 
-              size="sm"
-              className="text-primary hover:text-primary/80 hover:bg-primary/5 p-2"
-            >
-              <a href="/homeowner/applications" className="flex items-center gap-1">
-                <ArrowLeft className="h-4 w-4" />
-                <span className="hidden sm:inline">Back to Applications</span>
-              </a>
-            </Button>
-          </div>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-4xl mx-auto px-4 py-4">
+        {/* Simplified Header */}
+        <div className="mb-6">
+          {/* Back button */}
+          <Button 
+            asChild 
+            variant="ghost" 
+            size="sm"
+            className="text-primary hover:text-primary/80 mb-4"
+          >
+            <a href="/homeowner/applications" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back to Applications</span>
+            </a>
+          </Button>
 
-          {/* Desktop header layout */}
-          <div className="hidden sm:flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-primary/10 to-primary/15 rounded-2xl flex items-center justify-center">
-              <FileText className="h-8 w-8 text-primary" />
+          {/* Simplified header */}
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+              <FileText className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">Finalize Agreement</h1>
-              <p className="text-lg text-gray-600 mt-1">
-                Complete the agreement for {application.housemate.firstName} {application.housemate.lastName}
-              </p>
+              <h1 className="text-xl font-bold text-gray-900">Finalize Agreement</h1>
             </div>
           </div>
-
-          {/* Mobile header layout */}
-          <div className="sm:hidden text-center">
-            <div className="w-12 h-12 bg-gradient-to-r from-primary/10 to-primary/15 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <FileText className="h-6 w-6 text-primary" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Finalize Agreement</h1>
-            <p className="text-gray-600">
-              Complete the agreement for {application.housemate.firstName} {application.housemate.lastName}
-            </p>
-          </div>
+          <p className="text-gray-600 ml-13">
+            Complete the agreement for {application.housemate.firstName} {application.housemate.lastName}
+          </p>
         </div>
 
-        {/* Agreement Wizard or Completion View */}
+        {/* Agreement Status and Content */}
         {agreement?.status === 'COMPLETED' ? (
-          <Card className="shadow-lg border-0 w-full">
-            <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg p-4 sm:p-6 lg:p-8">
-              <div className="text-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+          <div className="space-y-6">
+            {/* Success Status */}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+              <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
+              <h2 className="text-lg font-semibold text-gray-900 mb-1">Agreement Completed</h2>
+              <p className="text-gray-600 text-sm">Both parties have signed the agreement</p>
+            </div>
+
+            {/* Application Details */}
+            <div className="space-y-3">
+              <h3 className="font-medium text-gray-900">Agreement Details</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm text-gray-500">Housemate</p>
+                  <p className="font-medium">{application.housemate.firstName} {application.housemate.lastName}</p>
                 </div>
-                <CardTitle className="text-xl sm:text-2xl text-gray-900 mb-2">
-                  Agreement Completed Successfully
-                </CardTitle>
-                <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
-                  Both parties have signed the agreement and it's now fully executed
-                </p>
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm text-gray-500">Property</p>
+                  <p className="font-medium">{application.product.name}</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm text-gray-500">Monthly Rate</p>
+                  <p className="font-medium">${application.product.price}</p>
+                </div>
+                {application.moveInDate && (
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-sm text-gray-500">Move-in Date</p>
+                    <p className="font-medium">{new Date(application.moveInDate).toLocaleDateString()}</p>
+                  </div>
+                )}
               </div>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-6 lg:p-8 bg-white rounded-b-lg">
-              <div className="space-y-6 sm:space-y-8">
-                {/* Application Details */}
-                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6 text-center">Agreement Details</h3>
-                  
-                  {/* Desktop grid layout */}
-                  <div className="hidden sm:grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                    <div className="text-center">
-                      <label className="text-sm font-medium text-gray-500">Housemate</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">
-                        {application.housemate.firstName} {application.housemate.lastName}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <label className="text-sm font-medium text-gray-500">Property</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">{application.product.name}</p>
-                    </div>
-                    <div className="text-center">
-                      <label className="text-sm font-medium text-gray-500">Monthly Rate</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">${application.product.price}</p>
-                    </div>
-                  </div>
+            </div>
 
-                  {/* Mobile stacked layout */}
-                  <div className="sm:hidden space-y-4 mb-6">
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Housemate</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">
-                        {application.housemate.firstName} {application.housemate.lastName}
-                      </p>
-                    </div>
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Property</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">{application.product.name}</p>
-                    </div>
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Monthly Rate</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">${application.product.price}</p>
-                    </div>
-                  </div>
-
-                  {application.moveInDate && (
-                    <>
-                      {/* Desktop dates layout */}
-                      <div className="hidden sm:grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 border-t border-gray-200">
-                        <div className="text-center">
-                          <label className="text-sm font-medium text-gray-500">Move-in Date</label>
-                          <p className="text-lg font-semibold text-gray-900 mt-1">
-                            {new Date(application.moveInDate).toLocaleDateString()}
-                          </p>
-                        </div>
-                        {application.moveOutDate && (
-                          <div className="text-center">
-                            <label className="text-sm font-medium text-gray-500">Move-out Date</label>
-                            <p className="text-lg font-semibold text-gray-900 mt-1">
-                              {new Date(application.moveOutDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Mobile dates layout */}
-                      <div className="sm:hidden space-y-4 pt-4 border-t border-gray-200">
-                        <div className="bg-white rounded-xl p-4 border border-gray-100">
-                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Move-in Date</label>
-                          <p className="text-lg font-semibold text-gray-900 mt-1">
-                            {new Date(application.moveInDate).toLocaleDateString()}
-                          </p>
-                        </div>
-                        {application.moveOutDate && (
-                          <div className="bg-white rounded-xl p-4 border border-gray-100">
-                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Move-out Date</label>
-                            <p className="text-lg font-semibold text-gray-900 mt-1">
-                              {new Date(application.moveOutDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
+            {/* Signature Status */}
+            <div className="space-y-3">
+              <h3 className="font-medium text-gray-900">Signatures</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                  <CheckCircle className="w-6 h-6 text-green-600 mx-auto mb-1" />
+                  <p className="font-medium text-sm">Your Signature</p>
+                  <p className="text-xs text-gray-500">{new Date(agreement.homeownerSignedAt!).toLocaleDateString()}</p>
                 </div>
-
-                <div className="bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 rounded-2xl p-4 sm:p-6 text-center">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Both Parties Have Signed</h3>
-                  <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
-                    The agreement has been fully executed. Both you and the housemate have signed the agreement. 
-                    The housemate will now proceed with payment to finalize the arrangement.
-                  </p>
-                </div>
-
-                {/* Signature status - Desktop grid, Mobile stack */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
-                    <div className="text-center">
-                      <CheckCircle className="w-8 h-8 text-primary mx-auto mb-3" />
-                      <h4 className="font-medium text-gray-900 mb-1">Your Signature</h4>
-                      <p className="text-sm text-primary font-medium">Signed</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {new Date(agreement.homeownerSignedAt!).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
-                    <div className="text-center">
-                      <CheckCircle className="w-8 h-8 text-primary mx-auto mb-3" />
-                      <h4 className="font-medium text-gray-900 mb-1">Housemate Signature</h4>
-                      <p className="text-sm text-primary font-medium">Signed</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {new Date(agreement.housemateSignedAt!).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions - Mobile stack, Desktop row */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
-                  <div className="flex-1">
-                    <HomeownerAgreementActions 
-                      agreement={agreement}
-                      applicationId={applicationId}
-                    />
-                  </div>
-                  <Button 
-                    asChild 
-                    variant="outline" 
-                    className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-xl border-2 hover:bg-gray-50 transition-colors min-h-[44px]"
-                  >
-                    <a href="/homeowner/applications">
-                      <ArrowLeft className="h-4 w-4" />
-                      <span className="hidden sm:inline">Back to Applications</span>
-                      <span className="sm:hidden">Back</span>
-                    </a>
-                  </Button>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                  <CheckCircle className="w-6 h-6 text-green-600 mx-auto mb-1" />
+                  <p className="font-medium text-sm">Housemate Signature</p>
+                  <p className="text-xs text-gray-500">{new Date(agreement.housemateSignedAt!).toLocaleDateString()}</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <div className="flex-1">
+                <HomeownerAgreementActions 
+                  agreement={agreement}
+                  applicationId={applicationId}
+                />
+              </div>
+            </div>
+          </div>
         ) : agreement?.homeownerSigned ? (
-          <Card className="shadow-lg border-0 w-full">
-            <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg p-4 sm:p-6 lg:p-8">
-              <div className="text-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-6 h-6 sm:w-10 sm:h-10 text-primary" />
+          <div className="space-y-6">
+            {/* Waiting Status */}
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
+              <Clock className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+              <h2 className="text-lg font-semibold text-gray-900 mb-1">Waiting for Housemate</h2>
+              <p className="text-gray-600 text-sm">You've signed the agreement. Waiting for housemate to sign.</p>
+            </div>
+
+            {/* Application Details */}
+            <div className="space-y-3">
+              <h3 className="font-medium text-gray-900">Agreement Details</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm text-gray-500">Housemate</p>
+                  <p className="font-medium">{application.housemate.firstName} {application.housemate.lastName}</p>
                 </div>
-                <CardTitle className="text-xl sm:text-2xl text-gray-900 mb-2">
-                  Agreement Signed by You
-                </CardTitle>
-                <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
-                  Waiting for the housemate to review and sign the agreement
-                </p>
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm text-gray-500">Property</p>
+                  <p className="font-medium">{application.product.name}</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <p className="text-sm text-gray-500">Monthly Rate</p>
+                  <p className="font-medium">${application.product.price}</p>
+                </div>
+                {application.moveInDate && (
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-sm text-gray-500">Move-in Date</p>
+                    <p className="font-medium">{new Date(application.moveInDate).toLocaleDateString()}</p>
+                  </div>
+                )}
               </div>
-            </CardHeader>
-            <CardContent className="p-4 sm:p-6 lg:p-8 bg-white rounded-b-lg">
-              <div className="space-y-6 sm:space-y-8">
-                {/* Application Details */}
-                <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6 text-center">Agreement Details</h3>
-                  
-                  {/* Desktop grid layout */}
-                  <div className="hidden sm:grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                    <div className="text-center">
-                      <label className="text-sm font-medium text-gray-500">Housemate</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">
-                        {application.housemate.firstName} {application.housemate.lastName}
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <label className="text-sm font-medium text-gray-500">Property</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">{application.product.name}</p>
-                    </div>
-                    <div className="text-center">
-                      <label className="text-sm font-medium text-gray-500">Monthly Rate</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">${application.product.price}</p>
-                    </div>
-                  </div>
+            </div>
 
-                  {/* Mobile stacked layout */}
-                  <div className="sm:hidden space-y-4 mb-6">
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Housemate</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">
-                        {application.housemate.firstName} {application.housemate.lastName}
-                      </p>
-                    </div>
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Property</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">{application.product.name}</p>
-                    </div>
-                    <div className="bg-white rounded-xl p-4 border border-gray-100">
-                      <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Monthly Rate</label>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">${application.product.price}</p>
-                    </div>
-                  </div>
-
-                  {application.moveInDate && (
-                    <>
-                      {/* Desktop dates layout */}
-                      <div className="hidden sm:grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4 border-t border-gray-200">
-                        <div className="text-center">
-                          <label className="text-sm font-medium text-gray-500">Move-in Date</label>
-                          <p className="text-lg font-semibold text-gray-900 mt-1">
-                            {new Date(application.moveInDate).toLocaleDateString()}
-                          </p>
-                        </div>
-                        {application.moveOutDate && (
-                          <div className="text-center">
-                            <label className="text-sm font-medium text-gray-500">Move-out Date</label>
-                            <p className="text-lg font-semibold text-gray-900 mt-1">
-                              {new Date(application.moveOutDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Mobile dates layout */}
-                      <div className="sm:hidden space-y-4 pt-4 border-t border-gray-200">
-                        <div className="bg-white rounded-xl p-4 border border-gray-100">
-                          <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Move-in Date</label>
-                          <p className="text-lg font-semibold text-gray-900 mt-1">
-                            {new Date(application.moveInDate).toLocaleDateString()}
-                          </p>
-                        </div>
-                        {application.moveOutDate && (
-                          <div className="bg-white rounded-xl p-4 border border-gray-100">
-                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider">Move-out Date</label>
-                            <p className="text-lg font-semibold text-gray-900 mt-1">
-                              {new Date(application.moveOutDate).toLocaleDateString()}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
+            {/* Signature Status */}
+            <div className="space-y-3">
+              <h3 className="font-medium text-gray-900">Signatures</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                  <CheckCircle className="w-6 h-6 text-green-600 mx-auto mb-1" />
+                  <p className="font-medium text-sm">Your Signature</p>
+                  <p className="text-xs text-gray-500">{new Date(agreement.homeownerSignedAt!).toLocaleDateString()}</p>
                 </div>
-
-                <div className="bg-gradient-to-r from-amber/5 to-amber/10 border border-amber/20 rounded-2xl p-4 sm:p-6 text-center">
-                  <div className="w-12 h-12 bg-amber/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Clock className="w-6 h-6 text-amber-600" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Waiting for Housemate</h3>
-                  <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
-                    You have successfully signed the agreement. The housemate has been notified and will receive a link to review and sign the agreement.
-                    Once they sign, the agreement will be fully executed.
-                  </p>
-                </div>
-
-                {/* Signature status - Desktop grid, Mobile stack */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
-                    <div className="text-center">
-                      <CheckCircle className="w-8 h-8 text-primary mx-auto mb-3" />
-                      <h4 className="font-medium text-gray-900 mb-1">Your Signature</h4>
-                      <p className="text-sm text-primary font-medium">Signed</p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {new Date(agreement.homeownerSignedAt!).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                    <div className="text-center">
-                      <Clock className="w-8 h-8 text-gray-400 mx-auto mb-3" />
-                      <h4 className="font-medium text-gray-900 mb-1">Housemate Signature</h4>
-                      <p className="text-sm text-gray-500 font-medium">Pending</p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Notification sent
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions - Mobile stack, Desktop row */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-100">
-                  <div className="flex-1">
-                    <HomeownerAgreementActions 
-                      agreement={agreement}
-                      applicationId={applicationId}
-                    />
-                  </div>
-                  <Button 
-                    asChild 
-                    variant="outline" 
-                    className="flex items-center justify-center gap-2 px-4 sm:px-6 py-3 rounded-xl border-2 hover:bg-gray-50 transition-colors min-h-[44px]"
-                  >
-                    <a href="/homeowner/applications">
-                      <ArrowLeft className="h-4 w-4" />
-                      <span className="hidden sm:inline">Back to Applications</span>
-                      <span className="sm:hidden">Back</span>
-                    </a>
-                  </Button>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
+                  <Clock className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                  <p className="font-medium text-sm">Housemate Signature</p>
+                  <p className="text-xs text-gray-500">Pending</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <div className="flex-1">
+                <HomeownerAgreementActions 
+                  agreement={agreement}
+                  applicationId={applicationId}
+                />
+              </div>
+            </div>
+          </div>
         ) : (
           <HomeownerAgreementWizard 
             application={application}

@@ -398,69 +398,21 @@ export function HomeownerAgreementWizard({ application, homeownerData, existingA
 
   // Default: Show the form
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Modern Header */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <FileText className="w-12 h-12 text-green-600" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">Create Housemate Agreement</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Complete the agreement form for {application.housemate?.firstName} {application.housemate?.lastName}
-          </p>
-        </div>
-
-        {/* Progress Steps */}
-        <div className="mb-10">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-            <div className="flex flex-wrap gap-3 justify-center">
-              <div className="px-4 py-3 text-sm font-medium rounded-xl bg-primary text-white shadow-md">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  <span>Complete Agreement Form</span>
-                </div>
-              </div>
-              <div className="text-gray-400">→</div>
-              <div className="px-4 py-3 text-sm font-medium rounded-xl text-gray-400 bg-gray-50 border border-gray-100">
-                Sign & Send to Housemate
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Card */}
-        <Card className="shadow-lg border-0">
-          <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b border-gray-100 rounded-t-lg">
-            <div className="text-center">
-              <CardTitle className="text-2xl text-gray-900 mb-2">
-                Housemate Agreement Form
-              </CardTitle>
-              <p className="text-gray-600">
-                Complete all required fields to create the agreement. Pre-filled information cannot be modified for security.
-              </p>
-            </div>
-          </CardHeader>
-          <CardContent className="p-8 bg-white rounded-b-lg">
-            <FillableAgreementForm
-              title=""
-              description=""
-              onFormSubmit={handleFormSubmit}
-              homeownerData={homeownerData}
-              currentUser={homeownerData?.user}
-              prePopulatedData={getPrePopulatedFormData()}
-              readOnlyFields={[
-                'seekerName',
-                'propertyAddress',
-                'hostName',
-                'moveInDate',
-                'endDate',
-                'monthlyAmount'
-              ]}
-            />
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    <FillableAgreementForm
+      title=""
+      description=""
+      onFormSubmit={handleFormSubmit}
+      homeownerData={homeownerData}
+      currentUser={homeownerData?.user}
+      prePopulatedData={getPrePopulatedFormData()}
+      readOnlyFields={[
+        'seekerName',
+        'propertyAddress',
+        'hostName',
+        'moveInDate',
+        'endDate',
+        'monthlyAmount'
+      ]}
+    />
   );
 } 

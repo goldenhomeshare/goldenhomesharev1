@@ -402,7 +402,7 @@ export default async function Home() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Background checks and references</h3>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Background checks</h3>
                   <p className="text-gray-600 text-sm">Thorough verification for safety and peace of mind</p>
                 </div>
               </div>

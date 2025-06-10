@@ -19,13 +19,18 @@ export async function POST(request: NextRequest) {
     // Parse form data
     const formData: AgreementFormData = await request.json();
 
-    // Validate required fields
-    const requiredFields = ['hostName', 'hostEmail', 'seekerName', 'seekerEmail', 'propertyAddress', 'monthlyAmount', 'moveInDate'];
+    // Validate required fields - Note: This endpoint requires email addresses to send emails
+    const requiredFields = ['hostName', 'seekerName', 'propertyAddress', 'monthlyAmount', 'moveInDate'];
     for (const field of requiredFields) {
       if (!formData[field as keyof AgreementFormData]) {
         return NextResponse.json({ error: `Missing required field: ${field}` }, { status: 400 });
       }
     }
+
+    // Note: This endpoint is deprecated since email fields were removed from the form
+    return NextResponse.json({ 
+      error: "Email functionality not available - contact information fields have been removed" 
+    }, { status: 400 });
 
     try {
       // Generate the filled PDF (same logic as generate-filled route)

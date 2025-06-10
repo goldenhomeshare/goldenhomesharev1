@@ -342,10 +342,7 @@ export function HousemateAgreementReview({ application, agreement }: HousemateAg
               <h3 className="font-semibold text-gray-900 mb-2">Housemate (You)</h3>
               <div className="space-y-1 text-sm">
                 <p><span className="font-medium">Name:</span> {agreementData?.seekerName}</p>
-                <p><span className="font-medium">Email:</span> {agreementData?.seekerEmail}</p>
-                {agreementData?.seekerPhone && (
-                  <p><span className="font-medium">Phone:</span> {agreementData.seekerPhone}</p>
-                )}
+                
                 <div className="flex items-center gap-2 mt-2">
                   <AlertCircle className="h-4 w-4 text-amber-600" />
                   <span className="text-amber-700 text-xs">Pending Signature</span>

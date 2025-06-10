@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     console.log("Received form data for PDF generation:", JSON.stringify(formData, null, 2));
 
     // Validate required fields
-    const requiredFields = ['hostName', 'hostEmail', 'seekerName', 'seekerEmail', 'propertyAddress', 'monthlyAmount', 'moveInDate'];
+    const requiredFields = ['hostName', 'seekerName', 'propertyAddress', 'monthlyAmount', 'moveInDate'];
     for (const field of requiredFields) {
       if (!formData[field as keyof AgreementFormData]) {
         console.error(`Missing required field: ${field}`);

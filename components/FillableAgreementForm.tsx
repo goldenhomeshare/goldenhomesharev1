@@ -20,13 +20,9 @@ export interface AgreementFormData {
   // Host Information (Licensor)
   hostName: string;
   hostAddress: string;
-  hostPhone: string;
-  hostEmail: string;
   
   // Seeker Information (Licensee)
   seekerName: string;
-  seekerPhone: string;
-  seekerEmail: string;
   
   // Property Information
   propertyAddress: string;
@@ -437,13 +433,9 @@ export function FillableAgreementForm({
       // Host Information (Licensor)
       hostName: "",
       hostAddress: "",
-      hostPhone: "",
-      hostEmail: "",
       
       // Seeker Information (Licensee)
       seekerName: "",
-      seekerPhone: "",
-      seekerEmail: "",
       
       // Property Information
       propertyAddress: "",
@@ -569,11 +561,9 @@ export function FillableAgreementForm({
       // Auto-populate host info
       if (user) {
         defaultData.hostName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
-        defaultData.hostEmail = user.email || '';
       }
       
       if (homeownerProfile) {
-        defaultData.hostPhone = homeownerProfile.phone || '';
         defaultData.hostAddress = homeownerProfile.address || '';
       }
       
@@ -664,7 +654,7 @@ export function FillableAgreementForm({
 
   const validateForm = (): boolean => {
     const requiredFields: (keyof AgreementFormData)[] = [
-      'effectiveDate', 'hostName', 'hostEmail', 'seekerName', 'seekerEmail',
+      'effectiveDate', 'hostName', 'seekerName',
       'propertyAddress', 'monthlyAmount', 'moveInDate', 'endDate'
     ];
     
@@ -672,17 +662,6 @@ export function FillableAgreementForm({
     
     if (missingFields.length > 0) {
       toast.error(`Please fill in all required fields: ${missingFields.join(', ')}`);
-      return false;
-    }
-    
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.hostEmail)) {
-      toast.error("Please enter a valid host email address");
-      return false;
-    }
-    if (!emailRegex.test(formData.seekerEmail)) {
-      toast.error("Please enter a valid seeker email address");
       return false;
     }
     
@@ -742,10 +721,8 @@ export function FillableAgreementForm({
         ...(signature.trim() && {
           currentUserSignature: signature.trim(),
           hostSignedAt: new Date().toISOString(),
-          ...(currentUser?.email === formData.hostEmail 
-            ? { hostSignature: signature.trim() }
-            : { seekerSignature: signature.trim(), seekerSignedAt: new Date().toISOString() }
-          )
+          // Since we removed email fields, assume current user is always the host
+          hostSignature: signature.trim()
         })
       };
 
@@ -844,11 +821,8 @@ export function FillableAgreementForm({
         ...formData,
         currentUserSignature: signature.trim(),
         hostSignedAt: new Date().toISOString(),
-        // Determine if current user is host or seeker and set appropriate signature
-        ...(currentUser?.email === formData.hostEmail 
-          ? { hostSignature: signature.trim() }
-          : { seekerSignature: signature.trim(), seekerSignedAt: new Date().toISOString() }
-        )
+        // Since we removed email fields, assume current user is always the host
+        hostSignature: signature.trim()
       };
 
       // First submit the form data with signature
@@ -1013,34 +987,7 @@ export function FillableAgreementForm({
                     disabled={isReadOnlyField('hostName')}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="hostEmail">
-                    Email Address *
-                    {isReadOnlyField('hostEmail') && (
-                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Auto-filled</span>
-                    )}
-                  </Label>
-                  <Input
-                    id="hostEmail"
-                    type="email"
-                    value={formData.hostEmail}
-                    onChange={(e) => handleInputChange('hostEmail', e.target.value)}
-                    placeholder="host@example.com"
-                    className={`${isReadOnlyField('hostEmail') ? 'bg-gray-100 border-gray-300 text-gray-600' : 'bg-white'}`}
-                    readOnly={isReadOnlyField('hostEmail')}
-                    disabled={isReadOnlyField('hostEmail')}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="hostPhone">Phone Number</Label>
-                  <Input
-                    id="hostPhone"
-                    value={formData.hostPhone}
-                    onChange={(e) => handleInputChange('hostPhone', e.target.value)}
-                    placeholder="(555) 123-4567"
-                    className="bg-white"
-                  />
-                </div>
+
               </div>
             </div>
 
@@ -1863,33 +1810,7 @@ export function FillableAgreementForm({
                     disabled={isReadOnlyField('seekerName')}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="seekerEmail">
-                    Email Address *
-                    {isReadOnlyField('seekerEmail') && (
-                      <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Auto-filled</span>
-                    )}
-                  </Label>
-                  <Input
-                    id="seekerEmail"
-                    type="email"
-                    value={formData.seekerEmail}
-                    onChange={(e) => handleInputChange('seekerEmail', e.target.value)}
-                    placeholder="seeker@example.com"
-                    className={`${isReadOnlyField('seekerEmail') ? 'bg-gray-100 border-gray-300 text-gray-600' : ''}`}
-                    readOnly={isReadOnlyField('seekerEmail')}
-                    disabled={isReadOnlyField('seekerEmail')}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="seekerPhone">Phone Number</Label>
-                  <Input
-                    id="seekerPhone"
-                    value={formData.seekerPhone}
-                    onChange={(e) => handleInputChange('seekerPhone', e.target.value)}
-                    placeholder="(555) 987-6543"
-                  />
-                </div>
+
               </div>
             </div>
 

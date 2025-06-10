@@ -142,16 +142,12 @@ export function HomeownerAgreementWizard({ application, homeownerData, existingA
     return {
       // SEEKER INFORMATION (from application - READ-ONLY)
       seekerName: `${application.housemate?.firstName || ''} ${application.housemate?.lastName || ''}`.trim(),
-      seekerEmail: application.housemate?.email || '',
-      seekerPhone: application.housemate?.housemateProfile?.phone || '',
       
       // PROPERTY INFORMATION (from listing - READ-ONLY)
       propertyAddress: application.product?.address || '',
       
       // HOMEOWNER INFORMATION (from owner data - READ-ONLY)
       hostName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim(),
-      hostEmail: user?.email || '',
-      hostPhone: homeownerProfile?.phone || '',
       
       // AGREEMENT DATES (from application - READ-ONLY)
       moveInDate: application.moveInDate ? new Date(application.moveInDate).toISOString().split('T')[0] : '',
@@ -455,10 +451,8 @@ export function HomeownerAgreementWizard({ application, homeownerData, existingA
               prePopulatedData={getPrePopulatedFormData()}
               readOnlyFields={[
                 'seekerName',
-                'seekerEmail', 
                 'propertyAddress',
                 'hostName',
-                'hostEmail',
                 'moveInDate',
                 'endDate',
                 'monthlyAmount'

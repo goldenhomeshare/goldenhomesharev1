@@ -15,6 +15,7 @@ export async function GET() {
       lastName: user.lastName,
       email: user.email,
       userType: (user as any).userType,
+      profileImage: user.profileImage,
     });
   } catch (error) {
     console.error("Error getting user:", error);

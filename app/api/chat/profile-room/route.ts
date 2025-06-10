@@ -74,6 +74,16 @@ export async function POST(request: NextRequest) {
                 firstName: true,
                 lastName: true,
                 profileImage: true,
+                homeownerProfile: {
+                  select: {
+                    profilePicture: true,
+                  },
+                },
+                housemateProfile: {
+                  select: {
+                    profilePicture: true,
+                  },
+                },
               },
             },
           },
@@ -109,6 +119,16 @@ export async function POST(request: NextRequest) {
                   firstName: true,
                   lastName: true,
                   profileImage: true,
+                  homeownerProfile: {
+                    select: {
+                      profilePicture: true,
+                    },
+                  },
+                  housemateProfile: {
+                    select: {
+                      profilePicture: true,
+                    },
+                  },
                 },
               },
             },
@@ -120,6 +140,17 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Transform messages to use uploaded profile picture if available, fallback to Google profile image
+    const transformedMessages = chatRoom.messages.map(message => ({
+      ...message,
+      sender: {
+        ...message.sender,
+        profileImage: message.sender.homeownerProfile?.profilePicture || 
+                     message.sender.housemateProfile?.profilePicture || 
+                     message.sender.profileImage,
+      },
+    }));
+
     return NextResponse.json({
       chatRoom: {
         id: chatRoom.id,
@@ -127,7 +158,7 @@ export async function POST(request: NextRequest) {
         housemateId: chatRoom.housemateId,
         productId: chatRoom.productId,
       },
-      messages: chatRoom.messages,
+      messages: transformedMessages,
     });
   } catch (error) {
     console.error("Error managing profile chat room:", error);

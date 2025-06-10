@@ -55,10 +55,32 @@ export async function POST(request: NextRequest) {
           select: {
             firstName: true,
             lastName: true,
+            profileImage: true,
+            homeownerProfile: {
+              select: {
+                profilePicture: true,
+              },
+            },
+            housemateProfile: {
+              select: {
+                profilePicture: true,
+              },
+            },
           },
         },
       },
     });
+
+    // Transform message to use uploaded profile picture if available, fallback to Google profile image
+    const transformedMessage = {
+      ...message,
+      sender: {
+        ...message.sender,
+        profileImage: message.sender.homeownerProfile?.profilePicture || 
+                     message.sender.housemateProfile?.profilePicture || 
+                     message.sender.profileImage,
+      },
+    };
 
     // Update chat room's lastMessageAt
     await prisma.chatRoom.update({
@@ -66,7 +88,7 @@ export async function POST(request: NextRequest) {
       data: { lastMessageAt: new Date() },
     });
 
-    return NextResponse.json(message);
+    return NextResponse.json(transformedMessage);
   } catch (error) {
     console.error("Error sending message:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

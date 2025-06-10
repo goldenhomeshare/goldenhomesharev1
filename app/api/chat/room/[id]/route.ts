@@ -29,6 +29,11 @@ export async function GET(
             firstName: true,
             lastName: true,
             profileImage: true,
+            homeownerProfile: {
+              select: {
+                profilePicture: true,
+              },
+            },
           },
         },
         housemate: {
@@ -37,6 +42,11 @@ export async function GET(
             firstName: true,
             lastName: true,
             profileImage: true,
+            housemateProfile: {
+              select: {
+                profilePicture: true,
+              },
+            },
           },
         },
         product: {
@@ -58,6 +68,16 @@ export async function GET(
                 firstName: true,
                 lastName: true,
                 profileImage: true,
+                homeownerProfile: {
+                  select: {
+                    profilePicture: true,
+                  },
+                },
+                housemateProfile: {
+                  select: {
+                    profilePicture: true,
+                  },
+                },
               },
             },
           },
@@ -72,7 +92,29 @@ export async function GET(
     // Reverse messages to show oldest first (since we took desc from DB)
     chatRoom.messages = chatRoom.messages.reverse();
 
-    return NextResponse.json(chatRoom);
+    // Transform data to use uploaded profile pictures
+    const transformedChatRoom = {
+      ...chatRoom,
+      homeowner: {
+        ...chatRoom.homeowner,
+        profileImage: chatRoom.homeowner.homeownerProfile?.profilePicture || chatRoom.homeowner.profileImage,
+      },
+      housemate: {
+        ...chatRoom.housemate,
+        profileImage: chatRoom.housemate.housemateProfile?.profilePicture || chatRoom.housemate.profileImage,
+      },
+      messages: chatRoom.messages.map(message => ({
+        ...message,
+        sender: {
+          ...message.sender,
+          profileImage: message.sender.homeownerProfile?.profilePicture || 
+                       message.sender.housemateProfile?.profilePicture || 
+                       message.sender.profileImage,
+        },
+      })),
+    };
+
+    return NextResponse.json(transformedChatRoom);
   } catch (error) {
     console.error("Error fetching chat room:", error);
     return NextResponse.json(

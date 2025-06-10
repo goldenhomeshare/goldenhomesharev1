@@ -16,6 +16,17 @@ export async function getCurrentUser() {
       },
     });
     
+    if (user) {
+      // Use uploaded profile picture if available, fallback to Google profile image
+      const uploadedProfilePicture = user.homeownerProfile?.profilePicture || user.housemateProfile?.profilePicture;
+      if (uploadedProfilePicture) {
+        return {
+          ...user,
+          profileImage: uploadedProfilePicture,
+        };
+      }
+    }
+    
     return user;
   } catch (error) {
     console.error("Error fetching user:", error);

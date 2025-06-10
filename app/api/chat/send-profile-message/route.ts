@@ -101,6 +101,16 @@ export async function POST(request: NextRequest) {
               firstName: true,
               lastName: true,
               profileImage: true,
+              homeownerProfile: {
+                select: {
+                  profilePicture: true,
+                },
+              },
+              housemateProfile: {
+                select: {
+                  profilePicture: true,
+                },
+              },
             },
           },
         },
@@ -115,8 +125,19 @@ export async function POST(request: NextRequest) {
       return { chatRoom, message };
     });
 
+    // Transform message to use uploaded profile picture if available, fallback to Google profile image
+    const transformedMessage = {
+      ...result.message,
+      sender: {
+        ...result.message.sender,
+        profileImage: result.message.sender.homeownerProfile?.profilePicture || 
+                     result.message.sender.housemateProfile?.profilePicture || 
+                     result.message.sender.profileImage,
+      },
+    };
+
     return NextResponse.json({ 
-      message: result.message,
+      message: transformedMessage,
       chatRoomId: result.chatRoom.id,
       success: true 
     });

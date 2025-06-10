@@ -30,6 +30,11 @@ async function getHomeownerChats(userId: string, showHidden: boolean = false) {
           firstName: true,
           lastName: true,
           profileImage: true,
+          housemateProfile: {
+            select: {
+              profilePicture: true,
+            },
+          },
         },
       },
       product: {
@@ -50,6 +55,16 @@ async function getHomeownerChats(userId: string, showHidden: boolean = false) {
               firstName: true,
               lastName: true,
               profileImage: true,
+              homeownerProfile: {
+                select: {
+                  profilePicture: true,
+                },
+              },
+              housemateProfile: {
+                select: {
+                  profilePicture: true,
+                },
+              },
             },
           },
         },
@@ -60,7 +75,25 @@ async function getHomeownerChats(userId: string, showHidden: boolean = false) {
     },
   });
 
-  return chatRooms;
+  // Transform chat rooms to use uploaded profile pictures
+  const transformedChatRooms = chatRooms.map(chatRoom => ({
+    ...chatRoom,
+    housemate: {
+      ...chatRoom.housemate,
+      profileImage: chatRoom.housemate.housemateProfile?.profilePicture || chatRoom.housemate.profileImage,
+    },
+    messages: chatRoom.messages.map(message => ({
+      ...message,
+      sender: {
+        ...message.sender,
+        profileImage: message.sender.homeownerProfile?.profilePicture || 
+                     message.sender.housemateProfile?.profilePicture || 
+                     message.sender.profileImage,
+      },
+    })),
+  }));
+
+  return transformedChatRooms;
 }
 
 export default async function HomeownerMessagesPage({

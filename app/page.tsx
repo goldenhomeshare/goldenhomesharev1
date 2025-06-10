@@ -1,6 +1,6 @@
 import { AirbnbStyleRow } from "../app/components/AirbnbStyleRow";
 import Image from "next/image";
-import { Users, Shield, Layers, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Monitor, Car } from "lucide-react";
+import { Users, Shield, Layers, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Monitor, Car, Umbrella } from "lucide-react";
 import Link from "next/link";
 import { VideoSection } from "../components/VideoSection";
 import { videoConfig } from "../lib/video-config";
@@ -248,8 +248,8 @@ export default async function Home() {
             
             {/* Feature Points */}
             <div className="space-y-6 mb-8">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 flex items-center justify-center flex-shrink-0 mt-1">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                     <path d="m9 12 2 2 4-4"/>
@@ -263,18 +263,7 @@ export default async function Home() {
               </div>
               
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 flex items-center justify-center flex-shrink-0 mt-1">
-                  <Users size={32} className="text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl text-gray-900">
-                    Sophisticated matching algorithm with human support
-                  </h3>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                     <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                     <path d="M2 17l10 5 10-5"/>
@@ -284,6 +273,17 @@ export default async function Home() {
                 <div>
                   <h3 className="text-xl text-gray-900">
                     Complete platform with chat, payment, and secure agreements
+                  </h3>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
+                  <Umbrella size={32} className="text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-xl text-gray-900">
+                    Golden Cover: $10,000 protection against housemate damages
                   </h3>
                 </div>
               </div>
@@ -381,16 +381,15 @@ export default async function Home() {
               <div className="flex items-start gap-5">
                 <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14,2 14,8 20,8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
-                    <polyline points="10,9 9,9 8,9"/>
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="8.5" cy="7" r="4"/>
+                    <line x1="20" y1="8" x2="20" y2="14"/>
+                    <line x1="23" y1="11" x2="17" y2="11"/>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Application</h3>
-                  <p className="text-gray-600 text-sm">Complete our comprehensive application to get started</p>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Signup and Give Preferences</h3>
+                  <p className="text-gray-600 text-sm">Create your profile and tell us about your housing preferences</p>
                 </div>
               </div>
               
@@ -402,7 +401,7 @@ export default async function Home() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Background checks</h3>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Background Check</h3>
                   <p className="text-gray-600 text-sm">Thorough verification for safety and peace of mind</p>
                 </div>
               </div>
@@ -414,39 +413,8 @@ export default async function Home() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Interview</h3>
-                  <p className="text-gray-600 text-sm">Personal interview to understand your needs and preferences</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-5">
-                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5"/>
-                    <path d="M2 12l10 5 10-5"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Match Search</h3>
-                  <p className="text-gray-600 text-sm">We search for compatible matches based on your criteria</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-5">
-                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M16 3h5v5"/>
-                    <path d="M8 3H3v5"/>
-                    <path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/>
-                    <path d="m21 3-7.9 7.9"/>
-                    <path d="M16 21h5v-5"/>
-                    <path d="M8 21H3v-5"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Match Introduction</h3>
-                  <p className="text-gray-600 text-sm">Facilitated introduction to your potential housemate</p>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Message to Find Your Match</h3>
+                  <p className="text-gray-600 text-sm">Connect and communicate with potential housemates to find your perfect match</p>
                 </div>
               </div>
               
@@ -459,20 +427,35 @@ export default async function Home() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Match Agreement</h3>
-                  <p className="text-gray-600 text-sm">Secure legal agreements to protect both parties</p>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Make an Agreement</h3>
+                  <p className="text-gray-600 text-sm">Secure legal agreements to protect both parties in your living arrangement</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-5">
                 <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"/>
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                    <line x1="8" y1="21" x2="16" y2="21"/>
+                    <line x1="12" y1="17" x2="12" y2="21"/>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Ongoing support</h3>
-                  <p className="text-gray-600 text-sm">Continued guidance and support throughout your arrangement</p>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Pay Through Our Platform</h3>
+                  <p className="text-gray-600 text-sm">Secure and convenient payment processing through our trusted platform</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-5">
+                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                    <path d="M9 12l2 2 4-4"/>
+                    <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-base mb-1">Homeshare with Peace of Mind</h3>
+                  <p className="text-gray-600 text-sm">Enjoy your new living arrangement with ongoing support and confidence</p>
                 </div>
               </div>
             </div>

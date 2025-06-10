@@ -44,6 +44,16 @@ export async function GET(request: NextRequest) {
             firstName: true,
             lastName: true,
             profileImage: true,
+            homeownerProfile: {
+              select: {
+                profilePicture: true,
+              },
+            },
+            housemateProfile: {
+              select: {
+                profilePicture: true,
+              },
+            },
           },
         },
       },
@@ -52,7 +62,18 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(messages);
+    // Transform messages to use uploaded profile picture if available, fallback to Google profile image
+    const transformedMessages = messages.map(message => ({
+      ...message,
+      sender: {
+        ...message.sender,
+        profileImage: message.sender.homeownerProfile?.profilePicture || 
+                     message.sender.housemateProfile?.profilePicture || 
+                     message.sender.profileImage,
+      },
+    }));
+
+    return NextResponse.json(transformedMessages);
   } catch (error) {
     console.error("Error fetching messages:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

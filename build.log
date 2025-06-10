@@ -1,0 +1,1114 @@
+
+> golden-homeshare-marketplace@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.9.0) to ./node_modules/@prisma/client in 61ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+   ▲ Next.js 15.3.1
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 3.0s
+   Linting and checking validity of types ...
+
+./app/about/page.tsx
+16:17  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+135:116  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+144:52  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/actions/profile-actions.ts
+36:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+113:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+114:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+184:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+195:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+258:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+269:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/actions.ts
+279:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+338:9  Warning: 'data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+615:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/admin/cleanup/route.ts
+5:28  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+14:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/agreements/[agreementId]/email/route.ts
+109:16  Warning: 'fetchAgreementData' is defined but never used.  @typescript-eslint/no-unused-vars
+109:35  Warning: 'agreementId' is defined but never used.  @typescript-eslint/no-unused-vars
+109:56  Warning: 'userId' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/agreements/[agreementId]/pdf/route.ts
+57:16  Warning: 'checkUserAgreementAccess' is defined but never used.  @typescript-eslint/no-unused-vars
+57:41  Warning: 'agreementId' is defined but never used.  @typescript-eslint/no-unused-vars
+57:62  Warning: 'userId' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/agreements/generate-complete/route.ts
+35:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+40:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+130:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+179:11  Warning: 'addFilledField' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+179:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+200:34  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+722:16  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+731:16  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/agreements/generate-filled/route.ts
+4:10  Warning: 'readFileSync' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'join' is defined but never used.  @typescript-eslint/no-unused-vars
+103:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+603:18  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+612:18  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/agreements/send-filled/route.ts
+4:10  Warning: 'readFileSync' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'join' is defined but never used.  @typescript-eslint/no-unused-vars
+78:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+294:18  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+303:18  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/auth/user/route.ts
+17:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/chat/consolidate-rooms/route.ts
+5:28  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+31:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/chat/send-profile-message/route.ts
+34:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/chat/toggle-hidden/route.ts
+35:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/checkr/check-status/route.ts
+24:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+25:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+26:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+27:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+55:71  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+62:115  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+122:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+133:62  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/checkr/create-hosted-check/route.ts
+81:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+82:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+88:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+92:12  Warning: 'existingCandidateId' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+228:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+232:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+233:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/checkr/initiate/route.ts
+107:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+122:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+142:67  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+159:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/checkr/my-status/route.ts
+23:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+24:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+25:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+26:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+59:69  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+101:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+111:62  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/checkr/verify-status/route.ts
+1:10  Warning: 'NextRequest' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/checkr/webhook/route.ts
+11:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+17:16  Warning: 'fetchCandidateIfMissing' is defined but never used.  @typescript-eslint/no-unused-vars
+17:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+148:40  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+311:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+338:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+377:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+404:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+432:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+454:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+454:77  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+470:63  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+477:40  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+481:64  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+528:53  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+558:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+588:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+628:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+658:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+688:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+718:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+739:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+743:62  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+773:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+815:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/debug/messaging-status/route.ts
+6:27  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/messages/unread-count/route.ts
+5:27  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+13:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/api/messaging/permissions/route.ts
+5:27  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/signup-lead/route.ts
+180:27  Warning: 'request' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/stripe/connect/route.ts
+56:15  Warning: 'data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+102:15  Warning: 'data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+130:17  Warning: 'data' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/stripe/route.ts
+1:8  Warning: 'ProductEmail' is defined but never used.  @typescript-eslint/no-unused-vars
+8:7  Warning: 'resend' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+23:12  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+31:13  Warning: 'link' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/api/uploadthing/core.ts
+17:26  Warning: 'req' is defined but never used.  @typescript-eslint/no-unused-vars
+48:26  Warning: 'req' is defined but never used.  @typescript-eslint/no-unused-vars
+79:26  Warning: 'req' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/applications/page.tsx
+6:10  Warning: 'Badge' is defined but never used.  @typescript-eslint/no-unused-vars
+7:30  Warning: 'XCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/background-check/callback/page.tsx
+124:22  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/background-check/page.tsx
+4:8  Warning: 'RefreshStatusButton' is defined but never used.  @typescript-eslint/no-unused-vars
+5:31  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+5:38  Warning: 'AlertCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+5:62  Warning: 'RefreshCw' is defined but never used.  @typescript-eslint/no-unused-vars
+8:10  Warning: 'Button' is defined but never used.  @typescript-eslint/no-unused-vars
+205:24  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+205:94  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+217:52  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+235:38  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/billing/page.tsx
+15:43  Warning: 'FileText' is defined but never used.  @typescript-eslint/no-unused-vars
+15:53  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+248:30  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+288:94  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/components/AirbnbStyleCard.tsx
+3:10  Warning: 'Heart' is defined but never used.  @typescript-eslint/no-unused-vars
+3:149  Warning: 'DollarSign' is defined but never used.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'Button' is defined but never used.  @typescript-eslint/no-unused-vars
+31:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+83:3  Warning: 'smallDescription' is defined but never used.  @typescript-eslint/no-unused-vars
+85:3  Warning: 'showEditButton' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+89:3  Warning: 'availabilityText' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+98:9  Warning: 'remainingCount' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/AirbnbStyleRow.tsx
+24:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+204:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+305:61  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/ApplicationActionButtons.tsx
+55:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/ApproximateLocationMap.tsx
+4:29  Warning: 'isGoogleMapsReady' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/ContactHousemateModal.tsx
+36:3  Warning: 'housemateEmail' is defined but never used.  @typescript-eslint/no-unused-vars
+44:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+61:6  Warning: React Hook useEffect has a missing dependency: 'initializeChat'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/components/DeleteProductButton.tsx
+36:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+54:45  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+54:59  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./app/components/Editor.tsx
+11:10  Warning: 'useState' is defined but never used.  @typescript-eslint/no-unused-vars
+81:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/HomeownerProfileCard.tsx
+4:29  Warning: 'CardHeader' is defined but never used.  @typescript-eslint/no-unused-vars
+4:41  Warning: 'CardTitle' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'Button' is defined but never used.  @typescript-eslint/no-unused-vars
+7:223  Warning: 'Heart' is defined but never used.  @typescript-eslint/no-unused-vars
+7:255  Warning: 'Dog' is defined but never used.  @typescript-eslint/no-unused-vars
+7:260  Warning: 'Star' is defined but never used.  @typescript-eslint/no-unused-vars
+7:274  Warning: 'MessageCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+7:289  Warning: 'MapPin' is defined but never used.  @typescript-eslint/no-unused-vars
+52:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+55:7  Warning: 'genderIcons' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+61:7  Warning: 'ageRangeIcons' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+70:7  Warning: 'scheduleIcons' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+76:7  Warning: 'socialIcons' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+108:7  Warning: 'smokingIcons' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+114:7  Warning: 'peopleCountIcons' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+122:7  Warning: 'ensureHttps' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+365:55  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/HousemateCard.tsx
+6:16  Warning: 'MapPin' is defined but never used.  @typescript-eslint/no-unused-vars
+6:64  Warning: 'Mail' is defined but never used.  @typescript-eslint/no-unused-vars
+22:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+97:3  Warning: 'id' is defined but never used.  @typescript-eslint/no-unused-vars
+108:3  Warning: 'preferredGender' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/HousemateHorizontalCard.tsx
+5:10  Warning: 'useState' is defined but never used.  @typescript-eslint/no-unused-vars
+6:48  Warning: 'Star' is defined but never used.  @typescript-eslint/no-unused-vars
+22:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+42:3  Warning: 'id' is defined but never used.  @typescript-eslint/no-unused-vars
+55:3  Warning: 'experience' is defined but never used.  @typescript-eslint/no-unused-vars
+68:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/HousemateProfileCard.tsx
+4:8  Warning: 'Link' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'useState' is defined but never used.  @typescript-eslint/no-unused-vars
+6:16  Warning: 'MapPin' is defined but never used.  @typescript-eslint/no-unused-vars
+6:24  Warning: 'MessageCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+6:39  Warning: 'CheckCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+7:10  Warning: 'Button' is defined but never used.  @typescript-eslint/no-unused-vars
+19:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+22:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+27:7  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+33:7  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+65:7  Warning: 'scheduleLabels' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+72:7  Warning: 'socialLabels' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+78:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+85:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+91:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+106:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+264:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+368:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/HousemateProfileCardNew.tsx
+5:10  Warning: 'useState' is defined but never used.  @typescript-eslint/no-unused-vars
+22:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+48:3  Warning: 'id' is defined but never used.  @typescript-eslint/no-unused-vars
+73:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/ListingCard.tsx
+19:7  Warning: 'amenityIcons' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+19:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+75:3  Warning: 'amenities' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/ListingsMap.tsx
+35:10  Warning: 'selectedListing' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+50:15  Warning: 'position' is defined but never used.  @typescript-eslint/no-unused-vars
+372:6  Warning: React Hook useEffect has a missing dependency: 'updateVisibleListings'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/components/MessagesIcon.tsx
+4:8  Warning: 'Link' is defined but never used.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'Badge' is defined but never used.  @typescript-eslint/no-unused-vars
+60:14  Warning: 'navigationResult' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+101:6  Warning: React Hook useEffect has a missing dependency: 'fetchUnreadCount'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/components/Navbar.tsx
+46:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+58:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+74:40  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+81:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+90:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+91:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+94:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+117:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+118:41  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+120:40  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/RefreshStatusButton.tsx
+5:21  Warning: 'CheckCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/UserNav.tsx
+13:49  Warning: 'FileText' is defined but never used.  @typescript-eslint/no-unused-vars
+24:9  Warning: 'getDashboardLink' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+37:9  Warning: 'getMessagesLink' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/chat/ChatModal.tsx
+8:16  Warning: 'X' is defined but never used.  @typescript-eslint/no-unused-vars
+40:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+61:6  Warning: React Hook useEffect has a missing dependency: 'initializeChat'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+147:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/chat/ChatWindow.tsx
+7:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+10:10  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/chat/HomeownerChatButton.tsx
+21:3  Warning: 'housemateName' is defined but never used.  @typescript-eslint/no-unused-vars
+22:3  Warning: 'productName' is defined but never used.  @typescript-eslint/no-unused-vars
+23:3  Warning: 'hostId' is defined but never used.  @typescript-eslint/no-unused-vars
+24:3  Warning: 'hostName' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/chat/HomeownerChatCard.tsx
+8:10  Warning: 'MessageCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+19:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+20:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:59  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/chat/HomeownerChatModal.tsx
+8:16  Warning: 'X' is defined but never used.  @typescript-eslint/no-unused-vars
+44:3  Warning: 'hostId' is defined but never used.  @typescript-eslint/no-unused-vars
+45:3  Warning: 'hostName' is defined but never used.  @typescript-eslint/no-unused-vars
+52:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+73:6  Warning: React Hook useEffect has a missing dependency: 'initializeChat'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+160:9  Warning: 'subscribeToMessages' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+160:32  Warning: 'roomId' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/chat/HomeownerConversationList.tsx
+28:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+30:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+36:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+38:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+44:54  Warning: 'user' is defined but never used.  @typescript-eslint/no-unused-vars
+44:78  Warning: 'onToggleHidden' is defined but never used.  @typescript-eslint/no-unused-vars
+54:59  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+289:23  Warning: 'setSearchQuery' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/chat/HousemateChatButton.tsx
+19:3  Warning: 'hostName' is defined but never used.  @typescript-eslint/no-unused-vars
+20:3  Warning: 'productName' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/chat/HousemateChatCard.tsx
+8:10  Warning: 'MessageCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+19:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+49:73  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/chat/HousemateConversationList.tsx
+12:3  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+27:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+34:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+41:72  Warning: 'onToggleHidden' is defined but never used.  @typescript-eslint/no-unused-vars
+51:59  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+262:23  Warning: 'setSearchQuery' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/chat/InlineChatInterface.tsx
+25:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+28:10  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+36:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+103:27  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+104:53  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+149:6  Warning: React Hook useEffect has missing dependencies: 'selectedChatRoom', 'supabase', and 'user'. Either include them or remove the dependency array. If 'setCurrentUser' needs the current value of 'user', you can also switch to useReducer instead of useState and read 'user' in the reducer.  react-hooks/exhaustive-deps
+258:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./app/components/chat/MessageHostButton.tsx
+16:56  Warning: 'hostName' is defined but never used.  @typescript-eslint/no-unused-vars
+16:66  Warning: 'productName' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/chat/MobileChatView.tsx
+13:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+24:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/components/chat/MobileMessagingView.tsx
+3:31  Warning: 'useRef' is defined but never used.  @typescript-eslint/no-unused-vars
+4:10  Warning: 'Card' is defined but never used.  @typescript-eslint/no-unused-vars
+4:16  Warning: 'CardContent' is defined but never used.  @typescript-eslint/no-unused-vars
+8:10  Warning: 'ScrollArea' is defined but never used.  @typescript-eslint/no-unused-vars
+13:3  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+15:3  Warning: 'MapPin' is defined but never used.  @typescript-eslint/no-unused-vars
+16:3  Warning: 'Eye' is defined but never used.  @typescript-eslint/no-unused-vars
+18:3  Warning: 'MoreHorizontal' is defined but never used.  @typescript-eslint/no-unused-vars
+19:3  Warning: 'Send' is defined but never used.  @typescript-eslint/no-unused-vars
+22:3  Warning: 'Filter' is defined but never used.  @typescript-eslint/no-unused-vars
+30:3  Warning: 'DropdownMenu' is defined but never used.  @typescript-eslint/no-unused-vars
+31:3  Warning: 'DropdownMenuContent' is defined but never used.  @typescript-eslint/no-unused-vars
+32:3  Warning: 'DropdownMenuItem' is defined but never used.  @typescript-eslint/no-unused-vars
+33:3  Warning: 'DropdownMenuTrigger' is defined but never used.  @typescript-eslint/no-unused-vars
+37:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+42:9  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+46:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+52:65  Warning: 'onToggleHidden' is defined but never used.  @typescript-eslint/no-unused-vars
+54:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+81:73  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+231:3  Warning: 'user' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/chat/ProfileChatModal.tsx
+42:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+54:6  Warning: React Hook useEffect has a missing dependency: 'initializeChat'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/components/form/EditListingForm.tsx
+23:192  Warning: 'VolumeX' is defined but never used.  @typescript-eslint/no-unused-vars
+23:201  Warning: 'Cigarette' is defined but never used.  @typescript-eslint/no-unused-vars
+23:226  Warning: 'Wine' is defined but never used.  @typescript-eslint/no-unused-vars
+23:232  Warning: 'GlassWater' is defined but never used.  @typescript-eslint/no-unused-vars
+23:251  Warning: 'UserMinus' is defined but never used.  @typescript-eslint/no-unused-vars
+23:265  Warning: 'Plus' is defined but never used.  @typescript-eslint/no-unused-vars
+23:279  Warning: 'Trash' is defined but never used.  @typescript-eslint/no-unused-vars
+24:10  Warning: 'Button' is defined but never used.  @typescript-eslint/no-unused-vars
+38:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+43:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+44:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+45:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+59:10  Warning: 'selectedImageModal' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+59:30  Warning: 'setSelectedImageModal' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+70:21  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+301:71  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+600:29  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/components/messaging/MessagingPermissionCard.tsx
+7:10  Warning: 'MessageCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+23:43  Warning: 'userId' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/dashboard/page.tsx
+11:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/help/page.tsx
+3:3  Warning: 'HelpCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+4:3  Warning: 'Users' is defined but never used.  @typescript-eslint/no-unused-vars
+9:3  Warning: 'MessageCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+10:3  Warning: 'FileText' is defined but never used.  @typescript-eslint/no-unused-vars
+12:3  Warning: 'Settings' is defined but never used.  @typescript-eslint/no-unused-vars
+15:3  Warning: 'HeadphonesIcon' is defined but never used.  @typescript-eslint/no-unused-vars
+29:72  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+131:66  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+131:78  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+131:104  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+136:55  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+137:22  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+140:55  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+149:64  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+152:55  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+204:55  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/homeowner/agreement/[applicationId]/page.tsx
+4:29  Warning: 'CardDescription' is defined but never used.  @typescript-eslint/no-unused-vars
+6:40  Warning: 'Download' is defined but never used.  @typescript-eslint/no-unused-vars
+167:64  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/homeowner/applications/page.tsx
+9:101  Warning: 'Home' is defined but never used.  @typescript-eslint/no-unused-vars
+104:81  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+349:26  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+375:28  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/homeowner/dashboard/page.tsx
+5:34  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+5:41  Warning: 'CheckCircle2' is defined but never used.  @typescript-eslint/no-unused-vars
+5:55  Warning: 'Plus' is defined but never used.  @typescript-eslint/no-unused-vars
+16:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+35:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/homeowner/messages/page.tsx
+14:3  Warning: 'Mail' is defined but never used.  @typescript-eslint/no-unused-vars
+25:10  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+77:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+137:66  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+140:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/homeowner/profile/edit/components/HomeownerProfileEditForm.tsx
+14:3  Warning: 'UserCheck' is defined but never used.  @typescript-eslint/no-unused-vars
+30:3  Warning: 'UserCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+31:3  Warning: 'CircleDashed' is defined but never used.  @typescript-eslint/no-unused-vars
+39:3  Warning: 'Crown' is defined but never used.  @typescript-eslint/no-unused-vars
+40:3  Warning: 'CigaretteOff' is defined but never used.  @typescript-eslint/no-unused-vars
+41:3  Warning: 'UserPlus' is defined but never used.  @typescript-eslint/no-unused-vars
+56:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+62:44  Warning: 'userId' is defined but never used.  @typescript-eslint/no-unused-vars
+220:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+307:21  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+328:16  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/homeowner/profile/edit/page.tsx
+28:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+34:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/homeowner/signup-wizard/components/HomeownerSignupWizard.tsx
+7:10  Warning: 'ArrowLeft' is defined but never used.  @typescript-eslint/no-unused-vars
+7:21  Warning: 'ArrowRight' is defined but never used.  @typescript-eslint/no-unused-vars
+138:9  Warning: 'prevStep' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+352:9  Warning: 'progress' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+370:46  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/homeowner/signup-wizard/components/steps/HousematePreferencesStep.tsx
+45:58  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+90:94  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+124:95  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+125:30  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+127:42  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/homeowner/signup-wizard/components/steps/LifestylePreferencesStep.tsx
+10:3  Warning: 'Home' is defined but never used.  @typescript-eslint/no-unused-vars
+11:3  Warning: 'Shield' is defined but never used.  @typescript-eslint/no-unused-vars
+41:83  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+188:54  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/homeowner/signup-wizard/page.tsx
+28:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+31:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/housemate/agreement/[applicationId]/page.tsx
+8:23  Warning: 'AlertTriangle' is defined but never used.  @typescript-eslint/no-unused-vars
+8:45  Warning: 'Download' is defined but never used.  @typescript-eslint/no-unused-vars
+173:40  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+245:68  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+246:22  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/housemate/applications/page.tsx
+106:24  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/housemate/dashboard/page.tsx
+5:24  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+5:31  Warning: 'CheckCircle2' is defined but never used.  @typescript-eslint/no-unused-vars
+48:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+65:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/housemate/messages/page.tsx
+14:3  Warning: 'Mail' is defined but never used.  @typescript-eslint/no-unused-vars
+25:10  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+77:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+95:66  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+98:65  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/housemate/profile/edit/components/HousemateProfileEditForm.tsx
+5:10  Warning: 'Card' is defined but never used.  @typescript-eslint/no-unused-vars
+5:16  Warning: 'CardContent' is defined but never used.  @typescript-eslint/no-unused-vars
+5:29  Warning: 'CardHeader' is defined but never used.  @typescript-eslint/no-unused-vars
+5:41  Warning: 'CardTitle' is defined but never used.  @typescript-eslint/no-unused-vars
+11:43  Warning: 'UserMinus' is defined but never used.  @typescript-eslint/no-unused-vars
+11:76  Warning: 'Heart' is defined but never used.  @typescript-eslint/no-unused-vars
+11:83  Warning: 'Coffee' is defined but never used.  @typescript-eslint/no-unused-vars
+11:164  Warning: 'Gamepad2' is defined but never used.  @typescript-eslint/no-unused-vars
+11:182  Warning: 'Baby' is defined but never used.  @typescript-eslint/no-unused-vars
+11:221  Warning: 'Scale' is defined but never used.  @typescript-eslint/no-unused-vars
+11:228  Warning: 'PartyPopper' is defined but never used.  @typescript-eslint/no-unused-vars
+11:241  Warning: 'UserX' is defined but never used.  @typescript-eslint/no-unused-vars
+11:333  Warning: 'Upload' is defined but never used.  @typescript-eslint/no-unused-vars
+11:341  Warning: 'X' is defined but never used.  @typescript-eslint/no-unused-vars
+11:403  Warning: 'Shield' is defined but never used.  @typescript-eslint/no-unused-vars
+20:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+27:44  Warning: 'userId' is defined but never used.  @typescript-eslint/no-unused-vars
+103:9  Warning: 'ageRangeOptions' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+124:9  Warning: 'occupationOptions' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+212:14  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+387:21  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+743:59  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+1391:82  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/housemate/profile/edit/page.tsx
+29:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+35:37  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/housemate/signup-wizard/components/HousemateSignupWizard.tsx
+7:10  Warning: 'ArrowLeft' is defined but never used.  @typescript-eslint/no-unused-vars
+7:21  Warning: 'ArrowRight' is defined but never used.  @typescript-eslint/no-unused-vars
+177:9  Warning: 'prevStep' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+449:9  Warning: 'progress' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+467:46  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/housemate/signup-wizard/components/steps/BasicDetailsStep.tsx
+103:6  Warning: React Hook useEffect has missing dependencies: 'formData.email' and 'formData.phone'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/housemate/signup-wizard/components/steps/BioStep.tsx
+4:10  Warning: 'Input' is defined but never used.  @typescript-eslint/no-unused-vars
+24:9  Warning: 'bioPrompts' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/housemate/signup-wizard/components/steps/HousematePreferencesStep.tsx
+10:3  Warning: 'Check' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/housemate/signup-wizard/components/steps/MatchPreferencesStep.tsx
+15:3  Warning: 'Shield' is defined but never used.  @typescript-eslint/no-unused-vars
+17:3  Warning: 'Eye' is defined but never used.  @typescript-eslint/no-unused-vars
+102:36  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/housemate/signup-wizard/components/steps/ProfilePictureStep.tsx
+26:21  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/housemate/signup-wizard/page.tsx
+28:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+31:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/layout.tsx
+11:10  Warning: 'Suspense' is defined but never used.  @typescript-eslint/no-unused-vars
+87:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+88:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+90:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/lib/address-utils.ts
+70:9  Warning: 'offsetLat' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+71:9  Warning: 'offsetLng' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/lib/background-check-service.ts
+23:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+45:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+219:12  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+289:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/lib/categoryitems.tsx
+1:54  Warning: 'Users' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/lib/checkr.ts
+48:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+54:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+57:11  Warning: 'CheckrError' is defined but never used.  @typescript-eslint/no-unused-vars
+90:33  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+280:80  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+385:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+398:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+406:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+406:37  Warning: 'index' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/lib/google-maps-loader.ts
+106:13  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/my-background-check/page.tsx
+49:23  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+52:26  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+57:33  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/onboarding/actions.ts
+8:34  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+28:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+54:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+55:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+59:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/onboarding/components/OnboardingForm.tsx
+94:75  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/onboarding/page.tsx
+13:40  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+14:40  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+15:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/page.tsx
+3:17  Warning: 'Shield' is defined but never used.  @typescript-eslint/no-unused-vars
+3:25  Warning: 'Layers' is defined but never used.  @typescript-eslint/no-unused-vars
+14:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+228:19  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+302:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+312:19  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+312:115  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+325:17  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+325:113  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+345:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+355:19  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+355:51  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+355:176  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+368:17  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+368:49  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+368:174  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./app/payment/success/page.tsx
+4:10  Warning: 'getKindeServerSession' is defined but never used.  @typescript-eslint/no-unused-vars
+5:10  Warning: 'redirect' is defined but never used.  @typescript-eslint/no-unused-vars
+6:8  Warning: 'prisma' is defined but never used.  @typescript-eslint/no-unused-vars
+10:41  Warning: 'Phone' is defined but never used.  @typescript-eslint/no-unused-vars
+10:48  Warning: 'Mail' is defined but never used.  @typescript-eslint/no-unused-vars
+28:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+29:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+33:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+243:60  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+461:74  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+477:73  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+510:61  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/privacy/page.tsx
+2:10  Warning: 'Shield' is defined but never used.  @typescript-eslint/no-unused-vars
+2:18  Warning: 'Lock' is defined but never used.  @typescript-eslint/no-unused-vars
+2:24  Warning: 'Eye' is defined but never used.  @typescript-eslint/no-unused-vars
+2:29  Warning: 'FileText' is defined but never used.  @typescript-eslint/no-unused-vars
+29:33  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+29:37  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+29:39  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+29:44  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+29:49  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+29:52  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+29:234  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+29:243  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+
+./app/product/[id]/page.tsx
+12:3  Warning: 'Carousel' is defined but never used.  @typescript-eslint/no-unused-vars
+13:3  Warning: 'CarouselContent' is defined but never used.  @typescript-eslint/no-unused-vars
+14:3  Warning: 'CarouselItem' is defined but never used.  @typescript-eslint/no-unused-vars
+15:3  Warning: 'CarouselNext' is defined but never used.  @typescript-eslint/no-unused-vars
+16:3  Warning: 'CarouselPrevious' is defined but never used.  @typescript-eslint/no-unused-vars
+19:8  Warning: 'Image' is defined but never used.  @typescript-eslint/no-unused-vars
+20:192  Warning: 'VolumeX' is defined but never used.  @typescript-eslint/no-unused-vars
+20:201  Warning: 'Cigarette' is defined but never used.  @typescript-eslint/no-unused-vars
+20:226  Warning: 'Wine' is defined but never used.  @typescript-eslint/no-unused-vars
+20:232  Warning: 'GlassWater' is defined but never used.  @typescript-eslint/no-unused-vars
+20:251  Warning: 'UserMinus' is defined but never used.  @typescript-eslint/no-unused-vars
+23:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+38:7  Warning: 'supportIcons' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+38:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+49:39  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+118:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+119:20  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+122:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+195:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+222:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+227:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+238:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+243:9  Warning: 'isHousemate' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+243:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+377:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+429:49  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+434:56  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/products/[category]/page.tsx
+7:10  Warning: 'HousemateCard' is defined but never used.  @typescript-eslint/no-unused-vars
+12:10  Warning: 'HousemateProfileCardNew' is defined but never used.  @typescript-eslint/no-unused-vars
+14:10  Warning: 'isHousemateWithinRadius' is defined but never used.  @typescript-eslint/no-unused-vars
+39:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+271:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+534:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+885:80  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+994:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+1325:82  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/profile/[id]/page.tsx
+6:10  Warning: 'Button' is defined but never used.  @typescript-eslint/no-unused-vars
+7:10  Warning: 'ProfileNavigation' is defined but never used.  @typescript-eslint/no-unused-vars
+11:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+22:34  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+71:9  Warning: 'userType' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+71:36  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+75:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+99:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+112:19  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+114:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+115:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+116:34  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/return/[id]/page.tsx
+23:15  Warning: 'accountId' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./app/safety/page.tsx
+3:75  Warning: 'Clock' is defined but never used.  @typescript-eslint/no-unused-vars
+3:88  Warning: 'MessageCircle' is defined but never used.  @typescript-eslint/no-unused-vars
+266:29  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+339:70  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+381:115  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/sell/wizard/components/ListingWizard.tsx
+8:10  Warning: 'ChevronLeft' is defined but never used.  @typescript-eslint/no-unused-vars
+8:23  Warning: 'ChevronRight' is defined but never used.  @typescript-eslint/no-unused-vars
+66:33  Warning: 'userId' is defined but never used.  @typescript-eslint/no-unused-vars
+87:9  Warning: 'router' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+108:9  Warning: 'prevStep' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+315:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/sell/wizard/components/steps/AmenitiesStep.tsx
+43:77  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+90:39  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/sell/wizard/components/steps/BasicInfoStep.tsx
+18:14  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/sell/wizard/components/steps/ConfirmAddressStep.tsx
+45:16  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/sell/wizard/components/steps/DescriptionStep.tsx
+66:72  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/sell/wizard/components/steps/PhotosStep.tsx
+30:21  Warning: 'error' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./app/sell/wizard/components/steps/PricingStep.tsx
+55:15  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+204:31  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/sell/wizard/components/steps/ReviewStep.tsx
+3:31  Warning: 'DollarSign' is defined but never used.  @typescript-eslint/no-unused-vars
+3:161  Warning: 'Sparkles' is defined but never used.  @typescript-eslint/no-unused-vars
+3:171  Warning: 'Salad' is defined but never used.  @typescript-eslint/no-unused-vars
+3:178  Warning: 'Flower' is defined but never used.  @typescript-eslint/no-unused-vars
+3:186  Warning: 'ShoppingBag' is defined but never used.  @typescript-eslint/no-unused-vars
+3:199  Warning: 'HeartHandshake' is defined but never used.  @typescript-eslint/no-unused-vars
+3:215  Warning: 'Cat' is defined but never used.  @typescript-eslint/no-unused-vars
+3:220  Warning: 'Monitor' is defined but never used.  @typescript-eslint/no-unused-vars
+3:229  Warning: 'Wrench' is defined but never used.  @typescript-eslint/no-unused-vars
+32:60  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/sell/wizard/components/steps/SupportStep.tsx
+43:11  Warning: 'currentItem' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+152:102  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/terms/page.tsx
+2:30  Warning: 'Users' is defined but never used.  @typescript-eslint/no-unused-vars
+2:53  Warning: 'Calendar' is defined but never used.  @typescript-eslint/no-unused-vars
+33:63  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+33:72  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+33:74  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+33:78  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+33:80  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+33:84  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+33:86  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+33:90  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+36:128  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+36:133  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+36:233  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+36:245  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+36:267  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+36:276  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+125:268  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+125:276  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+125:355  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+125:361  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+131:83  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+131:89  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+141:86  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+141:108  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+164:56  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+164:78  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+170:138  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+170:150  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+177:473  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+177:487  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+200:73  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+200:95  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+206:237  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+223:225  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+223:249  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+324:60  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+399:174  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+399:194  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+408:101  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+408:122  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+408:327  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+408:347  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+454:268  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+454:281  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+505:138  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+505:146  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+505:170  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+505:179  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+505:227  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+505:233  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+505:257  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+505:265  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+520:150  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+520:154  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+520:188  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+520:247  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+520:266  Warning: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.  react/no-unescaped-entities
+575:110  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+613:274  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./app/test-agreements/page.tsx
+34:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./app/test-checkr/components/BackgroundCheckForm.tsx
+38:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+87:6  Warning: React Hook useEffect has a missing dependency: 'checkForExistingBackgroundCheck'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+386:25  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+387:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+388:26  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+390:58  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+887:20  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./components/FillableAgreementForm.tsx
+11:10  Warning: 'Badge' is defined but never used.  @typescript-eslint/no-unused-vars
+12:10  Warning: 'Switch' is defined but never used.  @typescript-eslint/no-unused-vars
+13:20  Warning: 'Download' is defined but never used.  @typescript-eslint/no-unused-vars
+13:35  Warning: 'Send' is defined but never used.  @typescript-eslint/no-unused-vars
+152:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+178:11  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+179:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+180:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+182:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+202:42  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+212:46  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+219:32  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+249:52  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+250:21  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+260:54  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+261:28  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+262:32  Warning: 'index' is defined but never used.  @typescript-eslint/no-unused-vars
+286:48  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+286:73  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+734:9  Warning: 'handleGeneratePDF' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+881:6  Warning: React Hook useEffect has a missing dependency: 'validateForm'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+1596:114  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./components/HomeownerAgreementActions.tsx
+8:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/HomeownerAgreementWizard.tsx
+8:42  Warning: 'PenTool' is defined but never used.  @typescript-eslint/no-unused-vars
+14:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+15:18  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+16:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+26:24  Warning: 'agreementData' is defined but never used.  @typescript-eslint/no-unused-vars
+135:6  Warning: React Hook useEffect has a missing dependency: 'getPrePopulatedFormData'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/HousemateAgreementActions.tsx
+8:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/HousemateAgreementReview.tsx
+13:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+14:14  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+229:90  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+398:31  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+
+./components/ModernAgreementWizard.tsx
+3:10  Warning: 'useState' is defined but never used.  @typescript-eslint/no-unused-vars
+5:33  Warning: 'Download' is defined but never used.  @typescript-eslint/no-unused-vars
+5:43  Warning: 'Eye' is defined but never used.  @typescript-eslint/no-unused-vars
+5:48  Warning: 'Send' is defined but never used.  @typescript-eslint/no-unused-vars
+5:54  Warning: 'Info' is defined but never used.  @typescript-eslint/no-unused-vars
+5:60  Warning: 'Shield' is defined but never used.  @typescript-eslint/no-unused-vars
+10:11  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+11:23  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+12:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+14:17  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./components/VideoSection.tsx
+5:16  Warning: 'X' is defined but never used.  @typescript-eslint/no-unused-vars
+22:3  Warning: 'autoplay' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+87:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./components/scheduling/TimeSlots.tsx
+4:3  Warning: 'addMinutes' is defined but never used.  @typescript-eslint/no-unused-vars
+6:3  Warning: 'fromUnixTime' is defined but never used.  @typescript-eslint/no-unused-vars
+7:3  Warning: 'isAfter' is defined but never used.  @typescript-eslint/no-unused-vars
+8:3  Warning: 'isBefore' is defined but never used.  @typescript-eslint/no-unused-vars
+9:3  Warning: 'parse' is defined but never used.  @typescript-eslint/no-unused-vars
+23:3  Warning: 'userName' is defined but never used.  @typescript-eslint/no-unused-vars
+24:3  Warning: 'meetingDuration' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./lib/age-utils.ts
+56:47  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./lib/auth.ts
+37:29  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+68:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+69:42  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+70:39  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+71:39  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/80) ...
+   Generating static pages (20/80) 
+   Generating static pages (40/80) 
+FillableAgreementForm getInitialFormData called with: {
+  hasHomeownerData: false,
+  homeownerListings: 0,
+  hasPrePopulatedData: false
+}
+   Generating static pages (60/80) 
+FillableAgreementForm getInitialFormData called with: {
+  hasHomeownerData: false,
+  homeownerListings: 0,
+  hasPrePopulatedData: false
+}
+ ✓ Generating static pages (80/80)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                  Size  First Load JS
+┌ ƒ /                                      249 kB         363 kB
+├ ƒ /_not-found                             990 B         103 kB
+├ ƒ /about                                  191 B         110 kB
+├ ƒ /api/admin/cleanup                      275 B         102 kB
+├ ƒ /api/admin/toggle-verification          275 B         102 kB
+├ ƒ /api/agreements/[agreementId]/email     275 B         102 kB
+├ ƒ /api/agreements/[agreementId]/pdf       275 B         102 kB
+├ ƒ /api/agreements/create                  275 B         102 kB
+├ ƒ /api/agreements/generate-complete       275 B         102 kB
+├ ƒ /api/agreements/generate-filled         275 B         102 kB
+├ ƒ /api/agreements/send-filled             275 B         102 kB
+├ ƒ /api/agreements/sign-homeowner          275 B         102 kB
+├ ƒ /api/agreements/sign-housemate          275 B         102 kB
+├ ƒ /api/applications/[applicationId]       275 B         102 kB
+├ ƒ /api/applications/submit                275 B         102 kB
+├ ƒ /api/applications/update-status         275 B         102 kB
+├ ƒ /api/auth/[kindeAuth]                   275 B         102 kB
+├ ƒ /api/auth/creation                      275 B         102 kB
+├ ƒ /api/auth/user                          275 B         102 kB
+├ ƒ /api/chat/consolidate-rooms             275 B         102 kB
+├ ƒ /api/chat/delete                        275 B         102 kB
+├ ƒ /api/chat/messages                      275 B         102 kB
+├ ƒ /api/chat/profile-room                  275 B         102 kB
+├ ƒ /api/chat/room                          275 B         102 kB
+├ ƒ /api/chat/room/[id]                     275 B         102 kB
+├ ƒ /api/chat/send                          275 B         102 kB
+├ ƒ /api/chat/send-profile-message          275 B         102 kB
+├ ƒ /api/chat/toggle-hidden                 275 B         102 kB
+├ ƒ /api/chat/unified-room                  275 B         102 kB
+├ ƒ /api/checkr/account-info                275 B         102 kB
+├ ƒ /api/checkr/check-status                275 B         102 kB
+├ ƒ /api/checkr/create-hosted-check         275 B         102 kB
+├ ƒ /api/checkr/eta                         275 B         102 kB
+├ ƒ /api/checkr/initiate                    275 B         102 kB
+├ ƒ /api/checkr/my-status                   275 B         102 kB
+├ ƒ /api/checkr/nodes                       275 B         102 kB
+├ ƒ /api/checkr/status                      275 B         102 kB
+├ ƒ /api/checkr/verify-status               275 B         102 kB
+├ ƒ /api/checkr/webhook                     275 B         102 kB
+├ ƒ /api/debug/messaging-status             275 B         102 kB
+├ ƒ /api/homeshare-agreement                275 B         102 kB
+├ ƒ /api/messages/mark-read                 275 B         102 kB
+├ ƒ /api/messages/unread-count              275 B         102 kB
+├ ƒ /api/messaging/permissions              275 B         102 kB
+├ ƒ /api/product/delete                     275 B         102 kB
+├ ƒ /api/products                           275 B         102 kB
+├ ƒ /api/signup-lead                        275 B         102 kB
+├ ƒ /api/stripe                             275 B         102 kB
+├ ƒ /api/stripe/connect                     275 B         102 kB
+├ ƒ /api/stripe/customer-portal             275 B         102 kB
+├ ƒ /api/uploadthing                        275 B         102 kB
+├ ƒ /api/user/delete                        275 B         102 kB
+├ ƒ /applications                           201 B         105 kB
+├ ƒ /background-check                       192 B         122 kB
+├ ƒ /background-check/callback              201 B         105 kB
+├ ƒ /billing                              2.08 kB         126 kB
+├ ƒ /cost-savings                         2.49 kB         107 kB
+├ ƒ /dashboard                              275 B         102 kB
+├ ƒ /fill-agreement                         210 B         165 kB
+├ ƒ /help                                   201 B         105 kB
+├ ƒ /homeowner/agreement/[applicationId]   4.1 kB         166 kB
+├ ƒ /homeowner/applications               7.54 kB         132 kB
+├ ƒ /homeowner/dashboard                  2.05 kB         115 kB
+├ ƒ /homeowner/messages                     172 B         220 kB
+├ ƒ /homeowner/messages/chat/[id]         2.46 kB         177 kB
+├ ƒ /homeowner/profile/edit               8.35 kB         162 kB
+├ ƒ /homeowner/signup-wizard              11.8 kB         166 kB
+├ ƒ /homeshare-agreement                  2.61 kB         126 kB
+├ ƒ /housemate/agreement/[applicationId]  5.45 kB         126 kB
+├ ƒ /housemate/applications                 201 B         105 kB
+├ ƒ /housemate/dashboard                  2.05 kB         115 kB
+├ ƒ /housemate/messages                     172 B         220 kB
+├ ƒ /housemate/messages/chat/[id]         2.46 kB         177 kB
+├ ƒ /housemate/profile/edit               11.5 kB         166 kB
+├ ƒ /housemate/signup-wizard              14.9 kB         169 kB
+├ ƒ /list                                 3.29 kB         230 kB
+├ ƒ /my-background-check                   3.8 kB         118 kB
+├ ƒ /my-products                          3.13 kB         152 kB
+├ ƒ /onboarding                           2.68 kB         114 kB
+├ ƒ /payment/cancel                         201 B         105 kB
+├ ƒ /payment/success                       8.2 kB         129 kB
+├ ƒ /privacy                                201 B         105 kB
+├ ƒ /product/[id]                         27.6 kB         273 kB
+├ ƒ /products/[category]                  20.3 kB         174 kB
+├ ƒ /profile/[id]                         2.27 kB         128 kB
+├ ƒ /return/[id]                            201 B         105 kB
+├ ƒ /safety                                 191 B         110 kB
+├ ƒ /sell                                 17.3 kB         172 kB
+├ ƒ /sell/edit/[id]                       13.6 kB         255 kB
+├ ƒ /terms                                  201 B         105 kB
+├ ƒ /test-agreements                        892 B         162 kB
+└ ƒ /test-checkr                            179 B         119 kB
++ First Load JS shared by all              102 kB
+  ├ chunks/1684-4d46973fb7b0d2c5.js       46.4 kB
+  ├ chunks/4bd1b696-f8a37da644da3469.js   53.2 kB
+  └ other shared chunks (total)           2.02 kB
+
+
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -84,7 +84,7 @@ export default function CategoryPage() {
   const [loading, setLoading] = useState(true);
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
   const [visibleListings, setVisibleListings] = useState<Listing[]>([]);
-  const [showMobileMap, setShowMobileMap] = useState(false);
+  const [showMobileMap, setShowMobileMap] = useState(true);
   
   // Form state for filters
   const [location, setLocation] = useState("");

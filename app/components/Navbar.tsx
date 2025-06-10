@@ -100,10 +100,10 @@ export async function Navbar() {
             </div>
           </div>
             ) : (
-                <div className="flex items-center gap-x-1">
-                <Button asChild size="sm" className="text-xs px-2">
+                <div className="flex items-center gap-x-2">
+                <Button asChild className="px-4 py-2.5 font-medium rounded-lg transition-all duration-200 ease-in-out transform hover:scale-[1.02] active:scale-[0.98] hover:shadow-sm">
                     <LoginLink>Login</LoginLink></Button>
-                <Button variant="secondary" asChild size="sm" className="text-xs px-2">
+                <Button variant="secondary" asChild className="px-4 py-2.5 font-medium rounded-lg transition-all duration-200 ease-in-out transform hover:scale-[1.02] active:scale-[0.98] hover:shadow-sm">
                     <RegisterLink>Register</RegisterLink></Button>
 
                 </div>

@@ -87,7 +87,7 @@ export default async function Home() {
       />
 
       {/* Golden HomeShare Benefits Section */}
-      <section className="mt-16 mb-24">
+      <section className="mb-24">
         <div className="grid md:grid-cols-2 gap-0 items-center">
           {/* Left Side - Background Image */}
           <div className="relative">
@@ -107,7 +107,7 @@ export default async function Home() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-8">What is homesharing?</h2>
             
             <p className="text-lg text-gray-700 leading-relaxed text-center">
-              Housemates help homeowners by providing <strong>up to 10 hours weekly support (depending on arrangement)</strong> plus overnight presence <strong>(5-6 nights per week)</strong> in exchange for affordable accommodation.
+              Homesharing connects trusted housemates with homeowners who want to age in place. Housemates provide <strong>up to 10 hours of weekly household support (depending on arrangement)</strong> plus reassuring overnight presence <strong>(5-6 nights per week)</strong> in exchange for significantly reduced rent and a welcoming home environment.
             </p>
             
             <div className="space-y-6">

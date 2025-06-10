@@ -62,7 +62,7 @@ export function VideoSection({
 
   return (
     <>
-      <section className="py-16 px-4 md:px-8 bg-white">
+      <section className="px-4 md:px-8 pt-24 pb-16 bg-white">
         <div className="max-w-6xl mx-auto">
           {title && (
             <div className="text-center mb-8">

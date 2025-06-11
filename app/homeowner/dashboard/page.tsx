@@ -2,7 +2,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { User, Home, ArrowRight, Clock, CheckCircle2, Plus, Shield } from "lucide-react";
+import { User, Home, ArrowRight, Clock, CheckCircle2, Plus, Shield, Phone } from "lucide-react";
 import prisma from "@/app/lib/db";
 import { AirbnbStyleRow } from "@/app/components/AirbnbStyleRow";
 
@@ -62,6 +62,29 @@ export default async function HomeownerDashboardPage() {
               Manage your properties and connect with potential housemates
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Support Section */}
+      <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-200 p-4 sm:p-6 lg:p-8 text-center shadow-sm mb-8 sm:mb-12">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center bg-blue-50 rounded-full mx-auto mb-4 sm:mb-6">
+          <Phone className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
+        </div>
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 sm:mb-3">
+          Need Help?
+        </h3>
+        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-md mx-auto">
+          Our support team is here to help you with any questions or concerns.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+          <span className="text-sm sm:text-base text-gray-700 font-medium">Call Support:</span>
+          <a
+            href="tel:+18164332979"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors duration-200 text-sm sm:text-base"
+          >
+            <Phone className="w-4 h-4" />
+            (816) 433-2979
+          </a>
         </div>
       </div>
 

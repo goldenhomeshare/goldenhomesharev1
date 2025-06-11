@@ -132,12 +132,16 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
       });
       
       setCurrentStep(currentStep + 1);
+      // Scroll to top when moving to next step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      // Scroll to top when moving to previous step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -349,6 +353,14 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
     return stepNumber <= Math.max(highestCompleted + 1, currentStep);
   };
 
+  const navigateToStep = (stepNumber: number) => {
+    if (canNavigateToStep(stepNumber)) {
+      setCurrentStep(stepNumber);
+      // Scroll to top when navigating to a step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const progress = (currentStep / STEPS.length) * 100;
 
   // Show loading state when redirecting to dashboard
@@ -421,7 +433,7 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
                   <button
                     key={step.id}
                     type="button"
-                    onClick={() => canNavigate && setCurrentStep(step.id)}
+                    onClick={() => navigateToStep(step.id)}
                     disabled={!canNavigate}
                     className={`px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                       isCurrent

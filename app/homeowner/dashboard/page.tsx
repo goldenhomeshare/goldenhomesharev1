@@ -155,7 +155,7 @@ export default async function HomeownerDashboardPage() {
 
       {/* Available Housemates - Already Mobile Optimized */}
       <div className="w-full">
-        <AirbnbStyleRow category="housemates" limit={3} />
+        <AirbnbStyleRow category="housemates" limit={12} />
       </div>
     </div>
   );

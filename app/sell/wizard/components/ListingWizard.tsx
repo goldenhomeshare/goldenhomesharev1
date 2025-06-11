@@ -102,12 +102,16 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
       setCurrentStep(newStep);
       // Mark the new step as visited
       setVisitedSteps(prev => new Set([...prev, newStep]));
+      // Scroll to top when moving to next step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      // Scroll to top when moving to previous step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -166,6 +170,8 @@ export function ListingWizard({ userId, firstName, lastName, email }: ListingWiz
       setCurrentStep(stepNumber);
       // Mark the step as visited when navigating to it
       setVisitedSteps(prev => new Set([...prev, stepNumber]));
+      // Scroll to top when navigating to a step
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 

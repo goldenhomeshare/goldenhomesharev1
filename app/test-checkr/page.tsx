@@ -1,7 +1,13 @@
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import { BackgroundCheckForm } from './components/BackgroundCheckForm';
+import { redirect } from 'next/navigation';
 
 export default async function BackgroundCheckPage() {
+  // Disable test interface in production
+  if (process.env.NODE_ENV === 'production') {
+    redirect('/background-check');
+  }
+
   const { getUser } = getKindeServerSession();
   const user = await getUser();
 
@@ -23,9 +29,9 @@ export default async function BackgroundCheckPage() {
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Background Check</h1>
+        <h1 className="text-3xl font-bold mb-2">Background Check Testing</h1>
         <p className="text-muted-foreground">
-          Complete your background check to continue with the verification process
+          Development testing interface for background check implementation
         </p>
         {!user && (
           <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">

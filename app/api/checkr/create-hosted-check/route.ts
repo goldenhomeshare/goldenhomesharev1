@@ -215,23 +215,47 @@ export async function POST(request: NextRequest) {
     console.error('[CreateHostedCheck] Full error object:', error);
     console.error('[CreateHostedCheck] Error name:', error?.constructor?.name);
     console.error('[CreateHostedCheck] Error message:', error instanceof Error ? error.message : 'Non-Error object');
+    console.error('[CreateHostedCheck] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
 
     if (error instanceof z.ZodError) {
+      console.error('[CreateHostedCheck] Zod validation errors:', error.errors);
       return NextResponse.json({
         success: false,
         error: 'Validation failed',
         details: error.errors,
+        message: 'Form data validation failed. Please check all required fields.',
       }, { status: 400 });
     }
 
     // Better Checkr API error handling
     if ((error as any)?.name === 'CheckrAPIError' || (error instanceof Error && error.message.includes('CheckrAPIError'))) {
+      console.error('[CreateHostedCheck] Checkr API Error Details:', {
+        message: (error as any).message,
+        statusCode: (error as any).statusCode,
+        type: (error as any).type,
+        param: (error as any).param,
+      });
+      
       return NextResponse.json({
         success: false,
         error: 'Checkr API error',
         details: (error as any).message || 'Checkr API error occurred',
         checkrStatus: (error as any).statusCode || 'unknown',
+        checkrType: (error as any).type || 'unknown',
+        checkrParam: (error as any).param || 'unknown',
+        message: 'Background check service error. Please try again or contact support.',
       }, { status: 400 });
+    }
+
+    // Network or configuration errors
+    if (error instanceof Error && (error.message.includes('CHECKR_API_KEY') || error.message.includes('environment'))) {
+      console.error('[CreateHostedCheck] Configuration error:', error.message);
+      return NextResponse.json({
+        success: false,
+        error: 'Configuration error',
+        details: 'Background check service not properly configured',
+        message: 'Service temporarily unavailable. Please contact support.',
+      }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -239,6 +263,7 @@ export async function POST(request: NextRequest) {
       error: 'Failed to create background check invitation',
       details: error instanceof Error ? error.message : 'Unknown error',
       errorType: error?.constructor?.name || 'unknown',
+      message: 'An unexpected error occurred. Please try again or contact support.',
     }, { status: 500 });
   }
 } 

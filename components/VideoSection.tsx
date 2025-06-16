@@ -96,18 +96,18 @@ export function VideoSection({
                 {/* Play Button - Smooth and Professional */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className={`
-                    relative bg-white/95 backdrop-blur-sm rounded-full p-8 shadow-2xl
+                    relative bg-white/95 backdrop-blur-sm rounded-full p-4 sm:p-8 shadow-2xl
                     transform transition-all duration-500 ease-out
                     ${isLoading ? 'scale-95 opacity-75' : 'group-hover:scale-110 group-hover:bg-white'}
                     group-hover:shadow-3xl
                   `}>
                     {isLoading ? (
                       // Loading spinner
-                      <div className="w-12 h-12 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
                     ) : (
                       <Play 
-                        size={48} 
-                        className="text-primary ml-1 transition-all duration-300 group-hover:text-primary/90" 
+                        size={32} 
+                        className="text-primary ml-0.5 sm:ml-1 transition-all duration-300 group-hover:text-primary/90" 
                         fill="currentColor"
                       />
                     )}

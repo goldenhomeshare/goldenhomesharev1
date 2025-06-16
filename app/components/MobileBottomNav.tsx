@@ -55,7 +55,7 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
 
   // Show bottom nav for both logged in and non-logged in users
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-6 py-3 pb-safe z-50 shadow-lg">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-6 pt-3 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] z-40 shadow-lg">
       <div className="flex items-center justify-around max-w-sm mx-auto">
         {user ? (
           // Logged in user navigation
@@ -65,14 +65,14 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                className="flex items-center justify-center p-3 h-12 w-12 rounded-full hover:bg-accent disabled:opacity-75 transition-all duration-200"
+                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent disabled:opacity-75 transition-all duration-200"
                 onClick={handleMessagesClick}
                 disabled={isNavigating}
               >
                 {isNavigating ? (
-                  <Loader2 className="w-7 h-7 animate-spin text-blue-600" />
+                  <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
                 ) : (
-                  <MessageCircle className="w-7 h-7" />
+                  <MessageCircle className="w-6 h-6" />
                 )}
               </Button>
               <span className="text-xs font-medium text-gray-600 mt-1 truncate">Messages</span>
@@ -84,10 +84,10 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
                 variant="ghost"
                 size="sm"
                 asChild
-                className="flex items-center justify-center p-3 h-12 w-12 rounded-full hover:bg-accent"
+                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent"
               >
                 <Link href={`/${user.userType?.toLowerCase() || 'housemate'}/applications`}>
-                  <FileText className="w-7 h-7" />
+                  <FileText className="w-6 h-6" />
                 </Link>
               </Button>
               <span className="text-xs font-medium text-gray-600 mt-1 truncate">Applications</span>
@@ -99,10 +99,10 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
                 variant="ghost"
                 size="sm"
                 asChild
-                className="flex items-center justify-center p-3 h-12 w-12 rounded-full hover:bg-accent"
+                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent"
               >
                 <Link href={user.userType === "HOMEOWNER" ? "/products/icon" : "/products/template"}>
-                  <Search className="w-7 h-7" />
+                  <Search className="w-6 h-6" />
                 </Link>
               </Button>
               <span className="text-xs font-medium text-gray-600 mt-1 truncate">
@@ -119,10 +119,10 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
                 variant="ghost"
                 size="sm"
                 asChild
-                className="flex items-center justify-center p-3 h-12 w-12 rounded-full hover:bg-accent"
+                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent"
               >
                 <Link href="/products/icon">
-                  <Search className="w-7 h-7" />
+                  <Search className="w-6 h-6" />
                 </Link>
               </Button>
               <span className="text-xs font-medium text-gray-600 mt-1 truncate">Housemates</span>
@@ -134,10 +134,10 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
                 variant="ghost"
                 size="sm"
                 asChild
-                className="flex items-center justify-center p-3 h-12 w-12 rounded-full hover:bg-accent"
+                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent"
               >
                 <Link href="/products/template">
-                  <FileText className="w-7 h-7" />
+                  <FileText className="w-6 h-6" />
                 </Link>
               </Button>
               <span className="text-xs font-medium text-gray-600 mt-1 truncate">Homes</span>
@@ -149,10 +149,10 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
                 variant="ghost"
                 size="sm"
                 asChild
-                className="flex items-center justify-center p-3 h-12 w-12 rounded-full hover:bg-accent"
+                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent"
               >
                 <Link href="/about">
-                  <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </Link>

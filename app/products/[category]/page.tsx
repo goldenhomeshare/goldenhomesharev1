@@ -415,7 +415,7 @@ export default function CategoryPage() {
           </div>
 
           {/* Mobile Layout */}
-          <div className="lg:hidden h-screen flex flex-col">
+          <div className="lg:hidden flex flex-col">
             {/* Mobile Header with Filters Button */}
             <div className="bg-white p-4">
               <div className="flex items-center justify-between">
@@ -472,7 +472,7 @@ export default function CategoryPage() {
               </div>
             </div>
 
-            {/* Mobile Housemates List - Stacked Cards */}
+            {/* Housemates List - Stacked */}
             <div className="p-6">
               {/* Sort Dropdown */}
               <div className="flex justify-between items-center mb-6">
@@ -487,7 +487,6 @@ export default function CategoryPage() {
                     <span>{sortBy}</span>
                     <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isMobileDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
-                  
                   {/* Custom Dropdown Menu */}
                   {isMobileDropdownOpen && (
                     <>
@@ -496,7 +495,6 @@ export default function CategoryPage() {
                         className="fixed inset-0 z-10" 
                         onClick={() => setIsMobileDropdownOpen(false)}
                       />
-                      
                       {/* Dropdown Options */}
                       <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
                         {[
@@ -526,9 +524,8 @@ export default function CategoryPage() {
                   )}
                 </div>
               </div>
-
               {/* Housemates List - Stacked */}
-              <div className="space-y-6 pb-20">
+              <div className="space-y-6 pb-40 lg:pb-20">
                 {filteredHousemates.map((housemate) => {
                   // Parse lifestyle data to get location
                   let lifestyleData: any = {};

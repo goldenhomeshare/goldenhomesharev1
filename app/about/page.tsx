@@ -1,6 +1,12 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Users, Shield, Heart, Calculator } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "About Us | Golden HomeShare",
+  description: "Learn about Golden HomeShare's mission to connect older adults with trusted housemates, creating meaningful relationships while addressing housing affordability.",
+};
 
 export default function About() {
   return (

@@ -19,6 +19,10 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Golden HomeShare",
   description: "Connect with trusted housemates and find affordable housing solutions",
+  icons: {
+    icon: "/Logo.png",
+    apple: "/Logo.png",
+  },
 };
 
 // async function UTSSRComponent() {

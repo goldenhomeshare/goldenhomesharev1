@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     // Load and embed logo
     let logoImage: any = null;
     try {
-      const logoPath = join(process.cwd(), 'public', 'logo.png');
+      const logoPath = join(process.cwd(), 'public', 'golden-logo.png');
       const logoBytes = readFileSync(logoPath);
       logoImage = await pdfDoc.embedPng(logoBytes);
     } catch (error) {

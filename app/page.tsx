@@ -1,11 +1,22 @@
 import { AirbnbStyleRow } from "../app/components/AirbnbStyleRow";
 import Image from "next/image";
-import { Users, Shield, Layers, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Monitor, Car, Umbrella } from "lucide-react";
+
 import Link from "next/link";
-import { VideoSection } from "../components/VideoSection";
-import { videoConfig } from "../lib/video-config";
+
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { 
+  Sparkles, 
+  ChefHat, 
+  Trees, 
+  ShoppingBag, 
+  Heart, 
+  PawPrint, 
+  Monitor, 
+  Wrench, 
+  Car,
+  Search
+} from "lucide-react";
 
 export default async function Home() {
   // Redirect logged-in users to their dashboard
@@ -30,462 +41,234 @@ export default async function Home() {
 
   return (
     <>
-      {/* Hero Section - Full width image with overlay content */}
-      <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden rounded-b-[120px] md:rounded-b-[144px]">
-        {/* Background Image */}
-        <Image 
-          src="/old-young-hero.jpg" 
-          alt="Homeowner and homesharer together" 
-          fill
-          style={{ objectFit: "cover" }}
-          priority
-        />
-        
-        {/* Content Overlay */}
-        <div className="absolute inset-0 bg-black/20 flex items-end pb-8 md:pb-16">
-          <div className="max-w-7xl mx-auto px-4 md:px-8 w-full">
-            <div className="flex justify-between items-end">
-              <div className="max-w-xl mx-auto md:mx-0 mb-8 md:mb-0">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight text-white mb-6 text-center md:text-left">
-                  Turn a Spare Room Into Support, Extra Income, and Community
-                </h1>
-                
-                {/* Get Started Button - Mobile only, below text */}
-                <div className="md:hidden text-center">
-                  <Link 
-                    href="/onboarding"
-                    className="inline-flex items-center bg-primary hover:bg-primary/90 text-white px-12 py-6 rounded-2xl font-semibold text-lg transition-colors shadow-lg"
-                  >
-                    Get Started
-                  </Link>
-                </div>
-              </div>
-              
-              {/* Get Started Button - Desktop only, bottom right */}
-              <div className="hidden md:block">
-                <Link 
-                  href="/onboarding"
-                  className="inline-flex items-center bg-primary hover:bg-primary/90 text-white px-12 py-6 rounded-2xl font-semibold text-lg transition-colors shadow-lg"
-                >
-                  Get Started
-                </Link>
-              </div>
+      {/* Search Bar Section */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200">
+            <div className="flex-1 px-6 py-3 relative">
+              <div className="text-xs font-semibold text-gray-900 mb-1">Where</div>
+              <input 
+                type="text" 
+                placeholder="Search destinations" 
+                className="w-full text-sm text-gray-600 placeholder-gray-400 bg-transparent border-none outline-none"
+              />
+              <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-px h-8 bg-gray-300"></div>
+            </div>
+            <div className="flex-1 px-6 py-3 relative">
+              <div className="text-xs font-semibold text-gray-900 mb-1">Check in</div>
+              <input 
+                type="text" 
+                placeholder="Add dates" 
+                className="w-full text-sm text-gray-600 placeholder-gray-400 bg-transparent border-none outline-none"
+              />
+              <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-px h-8 bg-gray-300"></div>
+            </div>
+            <div className="flex-1 px-6 py-3 relative">
+              <div className="text-xs font-semibold text-gray-900 mb-1">Check out</div>
+              <input 
+                type="text" 
+                placeholder="Add dates" 
+                className="w-full text-sm text-gray-600 placeholder-gray-400 bg-transparent border-none outline-none"
+              />
+              <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-px h-8 bg-gray-300"></div>
+            </div>
+            <div className="flex-1 px-6 py-3">
+              <div className="text-xs font-semibold text-gray-900 mb-1">Who</div>
+              <input 
+                type="text" 
+                placeholder="Add guests" 
+                className="w-full text-sm text-gray-600 placeholder-gray-400 bg-transparent border-none outline-none"
+              />
+            </div>
+            <div className="pr-2">
+              <button className="bg-rose-500 hover:bg-rose-600 text-white rounded-full p-4 transition-colors duration-200">
+                <Search className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Video Section */}
-      <VideoSection 
-        playbackId={videoConfig.homePageVideo.playbackId}
-        title={videoConfig.homePageVideo.title}
-        description={videoConfig.homePageVideo.description}
-        thumbnailUrl={videoConfig.homePageVideo.thumbnailUrl}
-        autoplay={videoConfig.homePageVideo.autoplay}
-        muted={videoConfig.homePageVideo.muted}
-        loop={videoConfig.homePageVideo.loop}
-      />
+      {/* What is homesharing Section */}
+      <section className="pt-8 mb-24 px-6 md:px-12">
+        <div className="max-w-7xl mx-auto">
 
-      {/* Golden HomeShare Benefits Section */}
-      <section className="mb-24">
-        <div className="grid md:grid-cols-2 gap-0 items-center">
-          {/* Left Side - Background Image */}
-          <div className="relative">
-            <div className="relative w-full h-[400px] md:h-[600px] rounded-bl-[60px] overflow-hidden">
-              <Image 
-                src="/helping-happy-bg.jpg" 
-                alt="Helping hands providing support" 
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-          </div>
+
           
-          {/* Right Side - Text Content */}
-          <div className="px-6 md:px-12 py-8 md:py-16 space-y-6">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-8">What is homesharing?</h2>
-            
-            <p className="text-lg text-gray-700 leading-relaxed text-center">
-              Homesharing connects trusted housemates with homeowners who want to age in place. Housemates provide <strong>up to 10 hours of weekly household support (depending on arrangement)</strong> plus reassuring overnight presence <strong>(5-6 nights per week)</strong> in exchange for significantly reduced rent and a welcoming home environment.
-            </p>
-            
-            <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-900 text-center">Types of Support Available:</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Sparkles size={16} className="text-gray-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Cleaning</span>
+          {/* Host and Helper Layout with Exchange in Middle */}
+          <div className="grid md:grid-cols-3 gap-8 md:gap-12 items-start mb-16">
+            {/* Host Section */}
+            <div className="text-center space-y-6 flex flex-col h-full">
+              <h3 className="text-3xl md:text-4xl font-bold text-gray-900">Host</h3>
+              <p className="text-lg text-gray-600">
+                Has a room to share and could use a little help around the house.
+              </p>
+              
+              {/* Host Illustration */}
+              <div className="flex justify-center py-6">
+                <div className="relative w-56 h-42 md:w-64 md:h-48">
+                  <Image 
+                    src="/host-hero.png" 
+                    alt="Host hero image" 
+                    fill
+                    className="object-contain"
+                  />
                 </div>
-                
-                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Salad size={16} className="text-gray-600" />
+              </div>
+              
+              {/* What Host Provides */}
+              <div className="space-y-4">
+                <p className="text-base font-semibold text-gray-900">
+                  Provides:
+                </p>
+                <div className="space-y-2">
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-gray-700">Private room & shared living space</p>
                   </div>
-                  <span className="text-sm font-medium text-gray-700">Cooking</span>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Flower size={16} className="text-gray-600" />
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-gray-700">Discounted rent in exchange for help</p>
                   </div>
-                  <span className="text-sm font-medium text-gray-700">Yard Work</span>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <ShoppingBag size={16} className="text-gray-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Shopping & Errands</span>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <HeartHandshake size={16} className="text-gray-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Companionship</span>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Cat size={16} className="text-gray-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Pet Care</span>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Monitor size={16} className="text-gray-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Tech Support</span>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Wrench size={16} className="text-gray-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Home Maintenance</span>
-                </div>
-                
-                <div className="flex items-center gap-3 bg-gray-100 p-3 rounded-xl">
-                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Car size={16} className="text-gray-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">Transportation</span>
                 </div>
               </div>
             </div>
-            
-            <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-700">
-              <p className="text-green-800 text-sm">
-                <strong>Important:</strong> This program provides companionship and practical household support only. <strong>No medical care, personal hygiene assistance, or professional services</strong> are included. Housemates are not trained caregivers or medical professionals.
+
+            {/* Exchange Section - Now in the middle */}
+            <div className="flex items-center justify-center h-full relative">
+              {/* Curved Arrow - Top */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-24 hidden md:block">
+                <svg width="160" height="60" viewBox="0 0 160 60" className="text-gray-500">
+                  <path d="M15 45 Q80 15 145 45" stroke="currentColor" strokeWidth="2.5" fill="none" markerEnd="url(#arrowhead)" />
+                  <defs>
+                    <marker id="arrowhead" markerWidth="12" markerHeight="8" 
+                      refX="11" refY="4" orient="auto">
+                      <polygon points="0 0, 12 4, 0 8" fill="currentColor" />
+                    </marker>
+                  </defs>
+                </svg>
+              </div>
+              
+              <div className="text-center px-8">
+                <h4 className="text-xl font-bold text-gray-900 mb-2">A simple exchange:</h4>
+                <p className="text-lg text-gray-700 font-medium">housing for help</p>
+              </div>
+              
+              {/* Curved Arrow - Bottom */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-12 hidden md:block">
+                <svg width="160" height="60" viewBox="0 0 160 60" className="text-gray-500">
+                  <path d="M145 15 Q80 45 15 15" stroke="currentColor" strokeWidth="2.5" fill="none" markerEnd="url(#arrowhead2)" />
+                  <defs>
+                    <marker id="arrowhead2" markerWidth="12" markerHeight="8" 
+                      refX="11" refY="4" orient="auto">
+                      <polygon points="0 0, 12 4, 0 8" fill="currentColor" />
+                    </marker>
+                  </defs>
+                </svg>
+              </div>
+            </div>
+
+            {/* Helper Section */}
+            <div className="text-center space-y-6 flex flex-col h-full">
+              <h3 className="text-3xl md:text-4xl font-bold text-gray-900">Helper</h3>
+              <p className="text-lg text-gray-600">
+                Looking for affordable living and a meaningful place to stay.
+              </p>
+              
+              {/* Helper Illustration */}
+              <div className="flex justify-center py-6">
+                <div className="relative w-56 h-42 md:w-64 md:h-48">
+                  <Image 
+                    src="/Housemate-Onboarding.png" 
+                    alt="Housemate helper onboarding" 
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+              
+              {/* What Helper Provides */}
+              <div className="space-y-4">
+                <p className="text-base font-semibold text-gray-900">
+                  Provides:
+                </p>
+                <div className="space-y-2">
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-gray-700">Up to 10 hours per week of household support</p>
+                  </div>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-gray-700">Overnight presence 5-6 days per week</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Types of Support Available */}
+          <div className="max-w-5xl mx-auto mb-12">
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">Types of Support Available:</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="bg-gray-50 p-4 rounded-lg flex items-center space-x-3">
+                <Sparkles className="flex-shrink-0 w-5 h-5 text-gray-600" />
+                <span className="text-gray-700 font-medium">Cleaning</span>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg flex items-center space-x-3">
+                <ChefHat className="flex-shrink-0 w-5 h-5 text-gray-600" />
+                <span className="text-gray-700 font-medium">Cooking</span>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg flex items-center space-x-3">
+                <Trees className="flex-shrink-0 w-5 h-5 text-gray-600" />
+                <span className="text-gray-700 font-medium">Yard Work</span>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg flex items-center space-x-3">
+                <ShoppingBag className="flex-shrink-0 w-5 h-5 text-gray-600" />
+                <span className="text-gray-700 font-medium">Shopping & Errands</span>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg flex items-center space-x-3">
+                <Heart className="flex-shrink-0 w-5 h-5 text-gray-600" />
+                <span className="text-gray-700 font-medium">Companionship</span>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg flex items-center space-x-3">
+                <PawPrint className="flex-shrink-0 w-5 h-5 text-gray-600" />
+                <span className="text-gray-700 font-medium">Pet Care</span>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg flex items-center space-x-3">
+                <Monitor className="flex-shrink-0 w-5 h-5 text-gray-600" />
+                <span className="text-gray-700 font-medium">Tech Support</span>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg flex items-center space-x-3">
+                <Wrench className="flex-shrink-0 w-5 h-5 text-gray-600" />
+                <span className="text-gray-700 font-medium">Home Maintenance</span>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg flex items-center space-x-3">
+                <Car className="flex-shrink-0 w-5 h-5 text-gray-600" />
+                <span className="text-gray-700 font-medium">Transportation</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Important Notice */}
+          <div className="max-w-4xl mx-auto mb-12">
+            <div className="bg-gray-50 border-l-4 border-gray-400 rounded-lg p-6">
+
+              <p className="text-gray-600">
+                <strong>No medical care, personal hygiene assistance, or professional services</strong> are included. Housemates are not trained caregivers or medical professionals.
               </p>
             </div>
           </div>
-        </div>
-        
-        {/* Buttons Below Section */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8 px-6">
-          <Link 
-            href="/onboarding"
-            className="inline-flex items-center bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-colors shadow-lg"
-          >
-            Start Your Journey
-          </Link>
-          <Link 
-            href="/about"
-            className="inline-flex items-center bg-white hover:bg-gray-50 text-primary border-2 border-primary px-8 py-4 rounded-2xl font-semibold text-lg transition-colors"
-          >
-            Learn More
-          </Link>
+
         </div>
       </section>
 
       {/* Available Housemates Section - Full Width */}
-      <section className="mb-8 px-6">
+      <section className="pt-8 pb-8 px-6">
         <AirbnbStyleRow category="housemates" />
       </section>
 
-      {/* Partners Section */}
-      <section className="mb-24 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="max-w-5xl mx-auto mb-20">
-            {/* Our Partners Section */}
-            <div className="mb-20">
-              <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-12">
-                Partnered with
-              </h2>
-              
-              <div className="flex justify-center">
-                <Link 
-                  href="https://lovecolumbia.org/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-8 shadow-sm border border-gray-100 w-80 h-40 flex items-center justify-center hover:shadow-md transition-shadow"
-                >
-                  <img 
-                    src="/love-columbia-logo.png" 
-                    alt="Love Columbia" 
-                    className="max-w-full max-h-full object-contain"
-                  />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section - Full Width */}
-      <section className="mb-24">
-        <div className="grid md:grid-cols-2 gap-0 items-center">
-          {/* Left Content */}
-          <div className="px-6 md:px-12 py-8 md:py-16 space-y-6">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">
-              Find your perfect homesharing match
-            </h2>
-            
-            {/* Feature Points */}
-            <div className="space-y-6 mb-8">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    <path d="m9 12 2 2 4-4"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl text-gray-900">
-                    100% of participants are background checked before connecting
-                  </h3>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5"/>
-                    <path d="M2 12l10 5 10-5"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl text-gray-900">
-                    Complete platform with chat, payment, and secure agreements
-                  </h3>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 flex items-center justify-center flex-shrink-0">
-                  <Umbrella size={32} className="text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl text-gray-900">
-                    Golden Cover: $10,000 protection against housemate damages
-                  </h3>
-                </div>
-              </div>
-            </div>
-            
-            <Link 
-              href="/onboarding"
-              className="inline-flex items-center bg-primary hover:bg-primary/90 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
-            >
-              Get Matched
-            </Link>
-          </div>
-          
-          {/* Right Image - Full width to edge */}
-          <div className="relative">
-            <img 
-              src="/kitchen-woman.jpg" 
-              alt="Happy woman in kitchen" 
-              className="object-cover w-full h-[400px] md:h-[600px] rounded-br-[60px]"
-            />
-            
-            {/* Review Overlay - Desktop only */}
-            <div className="hidden md:block absolute top-6 left-6 right-6">
-              <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20 max-w-md">
-                <blockquote className="text-gray-800 font-medium text-base mb-3">
-                  "Golden HomeShare made finding a housemate so easy. The background checks gave me peace of mind."
-                </blockquote>
-                <cite className="text-gray-600 text-sm font-semibold not-italic">
-                  Margaret S, Golden HomeShare member
-                </cite>
-              </div>
-            </div>
-          </div>
-          
-          {/* Review Below Image - Mobile only */}
-          <div className="md:hidden px-6 py-4">
-            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
-              <blockquote className="text-gray-800 font-medium text-base mb-3">
-                "Golden HomeShare made finding a housemate so easy. The background checks gave me peace of mind."
-              </blockquote>
-              <cite className="text-gray-600 text-sm font-semibold not-italic">
-                Margaret S, Golden HomeShare member
-              </cite>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Rooms Available Section - Moved here from the end */}
-      <section className="mb-4 px-6">
+      <section className="pt-8 pb-8 px-6">
         <AirbnbStyleRow category="rooms" />
       </section>
 
-      {/* Our Process Section - Full Width */}
-      <section className="mb-12">
-        <div className="grid md:grid-cols-2 gap-0 items-center">
-          {/* Left Image - Full width to edge */}
-          <div className="relative">
-            <img 
-              src="/young-green-happy.jpg" 
-              alt="Happy woman" 
-              className="object-cover w-full h-[400px] md:h-[600px] rounded-bl-[60px]"
-            />
-            
-            {/* Review Overlay - Desktop only */}
-            <div className="hidden md:block absolute bottom-6 left-6 right-6">
-              <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20 max-w-md">
-                <blockquote className="text-gray-800 font-medium text-base mb-3">
-                  "As a graduate student, I couldn't afford my own place. Golden HomeShare connected me with Eleanor, and now I have an affordable home and a wonderful mentor."
-                </blockquote>
-                <cite className="text-gray-600 text-sm font-semibold not-italic">
-                  Sarah M, Golden HomeShare member
-                </cite>
-              </div>
-            </div>
-          </div>
-          
-          {/* Review Below Image - Mobile only */}
-          <div className="md:hidden px-6 py-4">
-            <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
-              <blockquote className="text-gray-800 font-medium text-base mb-3">
-                "As a graduate student, I couldn't afford my own place. Golden HomeShare connected me with Eleanor, and now I have an affordable home and a wonderful mentor."
-              </blockquote>
-              <cite className="text-gray-600 text-sm font-semibold not-italic">
-                Sarah M, Golden HomeShare member
-              </cite>
-            </div>
-          </div>
-          
-          {/* Right Content */}
-          <div className="px-6 md:px-12 py-8 md:py-16 space-y-6">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-8">Our Process</h2>
-            
-            <div className="space-y-5">
-              <div className="flex items-start gap-5">
-                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                    <circle cx="8.5" cy="7" r="4"/>
-                    <line x1="20" y1="8" x2="20" y2="14"/>
-                    <line x1="23" y1="11" x2="17" y2="11"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Signup and Give Preferences</h3>
-                  <p className="text-gray-600 text-sm">Create your profile and tell us about your housing preferences</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-5">
-                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    <path d="m9 12 2 2 4-4"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Background Check</h3>
-                  <p className="text-gray-600 text-sm">Thorough verification for safety and peace of mind</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-5">
-                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Message to Find Your Match</h3>
-                  <p className="text-gray-600 text-sm">Connect and communicate with potential housemates to find your perfect match</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-5">
-                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                    <polyline points="14,2 14,8 20,8"/>
-                    <line x1="9" y1="15" x2="15" y2="15"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Make an Agreement</h3>
-                  <p className="text-gray-600 text-sm">Secure legal agreements to protect both parties in your living arrangement</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-5">
-                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                    <line x1="8" y1="21" x2="16" y2="21"/>
-                    <line x1="12" y1="17" x2="12" y2="21"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Pay Through Our Platform</h3>
-                  <p className="text-gray-600 text-sm">Secure and convenient payment processing through our trusted platform</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-5">
-                <div className="bg-primary/10 rounded-xl p-3 mt-1 flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M9 12l2 2 4-4"/>
-                    <path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/>
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 text-base mb-1">Homeshare with Peace of Mind</h3>
-                  <p className="text-gray-600 text-sm">Enjoy your new living arrangement with ongoing support and confidence</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Listings Section - Full Width with consistent padding */}
-      <section className="mb-16 px-6">
-        {/* Join Now Button - Above listings */}
-        <div className="text-center mb-8">
-          <Link 
-            href="/onboarding"
-            className="inline-flex items-center bg-primary hover:bg-primary/90 text-white px-12 py-6 rounded-2xl font-semibold text-lg transition-colors shadow-lg"
-          >
-            Join Now
-          </Link>
-        </div>
-        
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Explore Available Listings
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover comfortable and affordable homesharing opportunities in your area. Each listing is verified and background-checked for your safety.
-          </p>
-        </div>
-        
-        <AirbnbStyleRow category="newest" />
-      </section>
     </>
   );
 }

@@ -157,3 +157,41 @@
     -webkit-line-clamp: 3;
   }
 }
+
+/* Custom Keyframe Animations */
+@keyframes vibrate {
+  0% { transform: translateX(0); }
+  10% { transform: translateX(-0.75px); }
+  20% { transform: translateX(0.75px); }
+  30% { transform: translateX(-0.75px); }
+  40% { transform: translateX(0.75px); }
+  50% { transform: translateX(-0.75px); }
+  60% { transform: translateX(0.75px); }
+  70% { transform: translateX(-0.75px); }
+  80% { transform: translateX(0.75px); }
+  90% { transform: translateX(-0.75px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes brightness-flash {
+  0% { filter: brightness(1) saturate(1); }
+  25% { filter: brightness(1.8) saturate(1.5); }
+  50% { filter: brightness(2.2) saturate(1.8); }
+  75% { filter: brightness(1.8) saturate(1.5); }
+  100% { filter: brightness(1) saturate(1); }
+}
+
+/* Custom Animation Classes */
+@layer components {
+  .animate-vibrate {
+    animation: vibrate 0.6s ease-in-out 1;
+  }
+  
+  .animate-brightness-flash {
+    animation: brightness-flash 1.0s ease-in-out 1;
+  }
+
+  .hover-vibrate:hover {
+    animation: vibrate 0.6s ease-in-out 1;
+  }
+}

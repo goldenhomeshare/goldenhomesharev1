@@ -4,7 +4,6 @@ import "./globals.css";
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { MobileBottomNav } from "./components/MobileBottomNav";
-import { ConsultationBanner } from "./components/ConsultationBanner";
 // import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 // import { extractRouterConfig } from "uploadthing/server";
 // import { ourFileRouter } from "./api/uploadthing/core";
@@ -20,8 +19,8 @@ export const metadata: Metadata = {
   title: "Golden HomeShare",
   description: "Connect with trusted housemates and find affordable housing solutions",
   icons: {
-    icon: "/Logo.png",
-    apple: "/Logo.png",
+    icon: "/golden-logo.png",
+    apple: "/golden-logo.png",
   },
 };
 
@@ -77,7 +76,6 @@ export default async function RootLayout({
         />
       </head>
       <body className={inter.className}>
-        <ConsultationBanner />
         <Navbar />
         <div className="pb-24 lg:pb-0">
           {children}

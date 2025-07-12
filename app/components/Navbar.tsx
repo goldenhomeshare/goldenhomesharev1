@@ -20,32 +20,27 @@ export async function Navbar() {
         <nav className="relative max-w-7xl w-full flex items-center px-4 md:px-8 mx-auto py-7">
             <div className="flex-shrink-0">
             <Link href="/">
-            {/* Full logo with text for larger screens */}
+            {/* Full logo for larger screens */}
             <div className="hidden sm:flex items-center">
                 <Image
-                    src="/Logo.png"
+                    src="/golden-logo.png"
                     alt="Golden HomeShare"
-                    width={200}
-                    height={60}
-                    className="h-8 md:h-10 lg:h-12 w-auto"
+                    width={320}
+                    height={96}
+                    className="h-16 md:h-20 lg:h-24 w-auto"
                     priority
                 />
-                <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold whitespace-nowrap">
-                    <span className="text-yellow-600">olden </span>
-                    <span className="text-primary">HomeShare</span> 
-                </h1>
             </div>
-            {/* Logo with smaller text for mobile */}
+            {/* Logo for mobile */}
             <div className="sm:hidden flex items-center">
                 <Image
-                    src="/Logo.png"
+                    src="/golden-logo.png"
                     alt="Golden HomeShare"
-                    width={120}
-                    height={36}
-                    className="h-6 w-auto"
+                    width={240}
+                    height={72}
+                    className="h-12 w-auto"
                     priority
                 />
-                <span className="text-yellow-600 text-lg font-semibold">olden</span>
             </div>
             </Link>
         </div>         

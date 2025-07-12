@@ -41,54 +41,6 @@ export default async function Home() {
 
   return (
     <>
-      {/* Search Bar Section */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200">
-            <div className="flex-1 px-6 py-3 relative">
-              <div className="text-xs font-semibold text-gray-900 mb-1">Where</div>
-              <input 
-                type="text" 
-                placeholder="Search destinations" 
-                className="w-full text-sm text-gray-600 placeholder-gray-400 bg-transparent border-none outline-none"
-              />
-              <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-px h-8 bg-gray-300"></div>
-            </div>
-            <div className="flex-1 px-6 py-3 relative">
-              <div className="text-xs font-semibold text-gray-900 mb-1">Check in</div>
-              <input 
-                type="text" 
-                placeholder="Add dates" 
-                className="w-full text-sm text-gray-600 placeholder-gray-400 bg-transparent border-none outline-none"
-              />
-              <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-px h-8 bg-gray-300"></div>
-            </div>
-            <div className="flex-1 px-6 py-3 relative">
-              <div className="text-xs font-semibold text-gray-900 mb-1">Check out</div>
-              <input 
-                type="text" 
-                placeholder="Add dates" 
-                className="w-full text-sm text-gray-600 placeholder-gray-400 bg-transparent border-none outline-none"
-              />
-              <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-px h-8 bg-gray-300"></div>
-            </div>
-            <div className="flex-1 px-6 py-3">
-              <div className="text-xs font-semibold text-gray-900 mb-1">Who</div>
-              <input 
-                type="text" 
-                placeholder="Add guests" 
-                className="w-full text-sm text-gray-600 placeholder-gray-400 bg-transparent border-none outline-none"
-              />
-            </div>
-            <div className="pr-2">
-              <button className="bg-rose-500 hover:bg-rose-600 text-white rounded-full p-4 transition-colors duration-200">
-                <Search className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* What is homesharing Section */}
       <section className="pt-8 mb-24 px-6 md:px-12">
         <div className="max-w-7xl mx-auto">

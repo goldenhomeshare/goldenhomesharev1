@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { FileText, Search, MessageCircle, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { MobileConditionalSearchButton } from "./ConditionalSearchButton";
 
 interface MobileBottomNavProps {
   user: {
@@ -94,39 +95,13 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
             </div>
 
             {/* Browse Homes/Housemates */}
-            <div className="flex flex-col items-center min-w-0 flex-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent"
-              >
-                <Link href={user.userType === "HOMEOWNER" ? "/products/icon" : "/products/template"}>
-                  <Search className="w-6 h-6" />
-                </Link>
-              </Button>
-              <span className="text-xs font-medium text-gray-600 mt-1 truncate">
-                {user.userType === "HOMEOWNER" ? "Browse Housemates" : "Browse Homes"}
-              </span>
-            </div>
+            <MobileConditionalSearchButton />
           </>
         ) : (
           // Non-logged in user navigation
           <>
-            {/* View Housemates */}
-            <div className="flex flex-col items-center min-w-0 flex-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent"
-              >
-                <Link href="/products/icon">
-                  <Search className="w-6 h-6" />
-                </Link>
-              </Button>
-              <span className="text-xs font-medium text-gray-600 mt-1 truncate">Housemates</span>
-            </div>
+            {/* Conditional Search based on current page */}
+            <MobileConditionalSearchButton />
 
             {/* View Homes */}
             <div className="flex flex-col items-center min-w-0 flex-1">

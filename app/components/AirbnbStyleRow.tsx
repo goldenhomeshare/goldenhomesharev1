@@ -7,11 +7,64 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronRight } from "lucide-react";
 import { calculateAgeRange, extractDateOfBirth } from "@/lib/age-utils";
 
-// Special product ID for profile-based chats (should be excluded from listings)
-const PROFILE_CHAT_PRODUCT_ID = "profile-chat-placeholder";
+// Constants
+const PROFILE_CHAT_PRODUCT_ID = "cm2h3ofy000007e71twi83xsy";
+
+// Retry configuration
+const MAX_RETRIES = 3;
+const BASE_DELAY = 1000; // 1 second
+
+// Simple in-memory cache
+const cache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Cache utility functions
+function getCacheKey(category: string, limit: number): string {
+  return `${category}-${limit}`;
+}
+
+function getCachedData(key: string) {
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+  return null;
+}
+
+function setCachedData(key: string, data: any) {
+  cache.set(key, { data, timestamp: Date.now() });
+  
+  // Clean up old cache entries
+  if (cache.size > 50) {
+    const now = Date.now();
+    for (const [k, v] of cache.entries()) {
+      if (now - v.timestamp > CACHE_TTL) {
+        cache.delete(k);
+      }
+    }
+  }
+}
+
+// Utility function for retrying database operations
+async function retryDatabaseOperation<T>(
+  operation: () => Promise<T>,
+  retries = MAX_RETRIES
+): Promise<T> {
+  try {
+    return await operation();
+  } catch (error: any) {
+    if (retries > 0 && error?.code === 'P2024') { // Connection pool timeout
+      const delay = BASE_DELAY * (MAX_RETRIES - retries + 1);
+      console.warn(`Database connection timeout, retrying in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return retryDatabaseOperation(operation, retries - 1);
+    }
+    throw error;
+  }
+}
 
 interface iAppProps {
-  category: "newest" | "templates" | "uikits" | "icons" | "rooms" | "housemates";
+  category: "newest" | "templates" | "uikits" | "icons" | "rooms" | "housemates" | "cooking-helpers" | "tech-helpers" | "pet-helpers" | "errands-helpers";
   limit?: number;
 }
 
@@ -39,30 +92,43 @@ interface GetDataResult {
 }
 
 async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResult> {
+  const cacheKey = getCacheKey(category, limit);
+  const cached = getCachedData(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   switch (category) {
     case "rooms": {
       // Combine all room types (templates, uikits, icons) into one category
-      const data = await prisma.product.findMany({
-        where: {
-          category: {
-            in: ["template", "uikit", "icon"]
+      const data = await retryDatabaseOperation(() =>
+        prisma.product.findMany({
+          where: {
+            category: {
+              in: ["template", "uikit", "icon"]
+            },
+            // Exclude the profile chat placeholder
+            id: {
+              not: PROFILE_CHAT_PRODUCT_ID,
+            },
           },
-          // Exclude the profile chat placeholder
-          id: {
-            not: PROFILE_CHAT_PRODUCT_ID,
+          select: {
+            price: true,
+            name: true,
+            smallDescription: true,
+            id: true,
+            images: true,
+            amenities: true,
           },
-        },
-        select: {
-          price: true,
-          name: true,
-          smallDescription: true,
-          id: true,
-          images: true,
-          amenities: true,
-        },
-        take: limit,
-      });
+          take: limit,
+        })
+      );
 
+      setCachedData(cacheKey, {
+        data: data,
+        title: "Rooms Available",
+        link: "/products/template",
+      });
       return {
         data: data,
         title: "Rooms Available",
@@ -70,25 +136,32 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
       };
     }
     case "icons": {
-      const data = await prisma.product.findMany({
-        where: {
-          category: "icon",
-          // Exclude the profile chat placeholder
-          id: {
-            not: PROFILE_CHAT_PRODUCT_ID,
+      const data = await retryDatabaseOperation(() =>
+        prisma.product.findMany({
+          where: {
+            category: "icon",
+            // Exclude the profile chat placeholder
+            id: {
+              not: PROFILE_CHAT_PRODUCT_ID,
+            },
           },
-        },
-        select: {
-          price: true,
-          name: true,
-          smallDescription: true,
-          id: true,
-          images: true,
-          amenities: true,
-        },
-        take: limit,
-      });
+          select: {
+            price: true,
+            name: true,
+            smallDescription: true,
+            id: true,
+            images: true,
+            amenities: true,
+          },
+          take: limit,
+        })
+      );
 
+      setCachedData(cacheKey, {
+        data: data,
+        title: "ADUs",
+        link: "/products/template",
+      });
       return {
         data: data,
         title: "ADUs",
@@ -96,27 +169,34 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
       };
     }
     case "newest": {
-      const data = await prisma.product.findMany({
-        where: {
-          // Exclude the profile chat placeholder
-          id: {
-            not: PROFILE_CHAT_PRODUCT_ID,
+      const data = await retryDatabaseOperation(() =>
+        prisma.product.findMany({
+          where: {
+            // Exclude the profile chat placeholder
+            id: {
+              not: PROFILE_CHAT_PRODUCT_ID,
+            },
           },
-        },
-        select: {
-          price: true,
-          name: true,
-          smallDescription: true,
-          id: true,
-          images: true,
-          amenities: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-        take: limit,
-      });
+          select: {
+            price: true,
+            name: true,
+            smallDescription: true,
+            id: true,
+            images: true,
+            amenities: true,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: limit,
+        })
+      );
 
+      setCachedData(cacheKey, {
+        data: data,
+        title: "Newest Listings",
+        link: "/products/template",
+      });
       return {
         data: data,
         title: "Newest Listings",
@@ -124,25 +204,32 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
       };
     }
     case "templates": {
-      const data = await prisma.product.findMany({
-        where: {
-          category: "template",
-          // Exclude the profile chat placeholder
-          id: {
-            not: PROFILE_CHAT_PRODUCT_ID,
+      const data = await retryDatabaseOperation(() =>
+        prisma.product.findMany({
+          where: {
+            category: "template",
+            // Exclude the profile chat placeholder
+            id: {
+              not: PROFILE_CHAT_PRODUCT_ID,
+            },
           },
-        },
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          smallDescription: true,
-          images: true,
-          amenities: true,
-        },
-        take: limit,
-      });
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            smallDescription: true,
+            images: true,
+            amenities: true,
+          },
+          take: limit,
+        })
+      );
 
+      setCachedData(cacheKey, {
+        title: "Private Suites",
+        data: data,
+        link: "/products/template",
+      });
       return {
         title: "Private Suites",
         data: data,
@@ -150,25 +237,32 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
       };
     }
     case "uikits": {
-      const data = await prisma.product.findMany({
-        where: {
-          category: "uikit",
-          // Exclude the profile chat placeholder
-          id: {
-            not: PROFILE_CHAT_PRODUCT_ID,
+      const data = await retryDatabaseOperation(() =>
+        prisma.product.findMany({
+          where: {
+            category: "uikit",
+            // Exclude the profile chat placeholder
+            id: {
+              not: PROFILE_CHAT_PRODUCT_ID,
+            },
           },
-        },
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          smallDescription: true,
-          images: true,
-          amenities: true,
-        },
-        take: limit,
-      });
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            smallDescription: true,
+            images: true,
+            amenities: true,
+          },
+          take: limit,
+        })
+      );
 
+      setCachedData(cacheKey, {
+        title: "Private Rooms",
+        data: data,
+        link: "/products/template",
+      });
       return {
         title: "Private Rooms",
         data: data,
@@ -177,22 +271,24 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
     }
     case "housemates": {
       // Fetch real housemate profiles from the database
-      const housemateProfiles = await prisma.housemateProfile.findMany({
-        include: {
-          user: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
+      const housemateProfiles = await retryDatabaseOperation(() =>
+        prisma.housemateProfile.findMany({
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              }
             }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc'
-        },
-        take: limit,
-      });
+          },
+          orderBy: {
+            createdAt: 'desc'
+          },
+          take: limit,
+        })
+      );
 
       // Transform the data to work with AirbnbStyleCard (similar to other categories)
       const transformedProfiles = housemateProfiles.map(profile => {
@@ -240,9 +336,413 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
         };
       });
 
+      setCachedData(cacheKey, {
+        data: transformedProfiles,
+        title: "Available Helpers in Columbia, MO",
+        link: "/products/icon",
+        isHousemates: true,
+      });
       return {
         data: transformedProfiles,
-        title: "Available Housemates",
+        title: "Available Helpers in Columbia, MO",
+        link: "/products/icon",
+        isHousemates: true,
+      };
+    }
+    case "cooking-helpers": {
+      // Fetch housemate profiles who can help with cooking
+      const housemateProfiles = await retryDatabaseOperation(() =>
+        prisma.housemateProfile.findMany({
+          where: {
+            canHelpWith: {
+              path: [],
+              array_contains: "cooking"
+            }
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc'
+          },
+          take: limit,
+        })
+      );
+
+      // Transform the data to work with AirbnbStyleCard (similar to other categories)
+      const transformedProfiles = housemateProfiles.map(profile => {
+        // Calculate age range based on date of birth
+        const dateOfBirth = extractDateOfBirth(profile.lifestyle);
+        const displayAgeRange = dateOfBirth ? calculateAgeRange(dateOfBirth) : (profile.ageRange || undefined);
+
+        // Parse lifestyle data to get education information
+        let lifestyleData: any = {};
+        if (profile.lifestyle) {
+          try {
+            lifestyleData = typeof profile.lifestyle === 'string' 
+              ? JSON.parse(profile.lifestyle) 
+              : profile.lifestyle;
+          } catch {
+            lifestyleData = {};
+          }
+        }
+
+        // Check if currently attending school
+        const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
+
+        // Check if retired
+        const isRetired = lifestyleData.occupationDetails?.isRetired || false;
+
+        return {
+          id: profile.user.id, // Use userId as the id for profile links
+          name: `${profile.user.firstName} ${profile.user.lastName?.charAt(0) || ''}.`,
+          price: profile.maxBudget || 0,
+          smallDescription: profile.bio || 'No bio available',
+          images: profile.profilePicture ? [profile.profilePicture] : [],
+          // Create amenities array from preferences and lifestyle attributes (not demographics)
+          amenities: [
+            ...(profile.schedule ? [profile.schedule] : []),
+            ...(profile.socialPreference ? [profile.socialPreference] : []),
+          ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent" && amenity !== "social"), // Remove early-riser, independent, and social tags
+          // Demographics information
+          demographics: {
+            age: displayAgeRange,
+            gender: profile.gender || undefined,
+            occupation: profile.occupation || undefined,
+            isCurrentlyAttending: isCurrentlyAttending,
+            isRetired: isRetired,
+          },
+        };
+      });
+
+      setCachedData(cacheKey, {
+        data: transformedProfiles,
+        title: "Cooking Helpers in Columbia, MO",
+        link: "/products/icon",
+        isHousemates: true,
+      });
+      return {
+        data: transformedProfiles,
+        title: "Cooking Helpers in Columbia, MO",
+        link: "/products/icon",
+        isHousemates: true,
+      };
+    }
+    case "tech-helpers": {
+      // Fetch housemate profiles who can help with tech support (excluding cooking helpers)
+      const housemateProfiles = await retryDatabaseOperation(() =>
+        prisma.housemateProfile.findMany({
+          where: {
+            canHelpWith: {
+              path: [],
+              array_contains: "techSupport"
+            },
+            NOT: {
+              canHelpWith: {
+                path: [],
+                array_contains: "cooking"
+              }
+            }
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc'
+          },
+          take: limit,
+        })
+      );
+
+      // Transform the data to work with AirbnbStyleCard (similar to other categories)
+      const transformedProfiles = housemateProfiles.map(profile => {
+        // Calculate age range based on date of birth
+        const dateOfBirth = extractDateOfBirth(profile.lifestyle);
+        const displayAgeRange = dateOfBirth ? calculateAgeRange(dateOfBirth) : (profile.ageRange || undefined);
+
+        // Parse lifestyle data to get education information
+        let lifestyleData: any = {};
+        if (profile.lifestyle) {
+          try {
+            lifestyleData = typeof profile.lifestyle === 'string' 
+              ? JSON.parse(profile.lifestyle) 
+              : profile.lifestyle;
+          } catch {
+            lifestyleData = {};
+          }
+        }
+
+        // Check if currently attending school
+        const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
+
+        // Check if retired
+        const isRetired = lifestyleData.occupationDetails?.isRetired || false;
+
+        return {
+          id: profile.user.id, // Use userId as the id for profile links
+          name: `${profile.user.firstName} ${profile.user.lastName?.charAt(0) || ''}.`,
+          price: profile.maxBudget || 0,
+          smallDescription: profile.bio || 'No bio available',
+          images: profile.profilePicture ? [profile.profilePicture] : [],
+          // Create amenities array from preferences and lifestyle attributes (not demographics)
+          amenities: [
+            ...(profile.schedule ? [profile.schedule] : []),
+            ...(profile.socialPreference ? [profile.socialPreference] : []),
+          ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent" && amenity !== "social"), // Remove early-riser, independent, and social tags
+          // Demographics information
+          demographics: {
+            age: displayAgeRange,
+            gender: profile.gender || undefined,
+            occupation: profile.occupation || undefined,
+            isCurrentlyAttending: isCurrentlyAttending,
+            isRetired: isRetired,
+          },
+        };
+      });
+
+      setCachedData(cacheKey, {
+        data: transformedProfiles,
+        title: "Tech-Savvy Helpers in Columbia, MO",
+        link: "/products/icon",
+        isHousemates: true,
+      });
+      return {
+        data: transformedProfiles,
+        title: "Tech-Savvy Helpers in Columbia, MO",
+        link: "/products/icon",
+        isHousemates: true,
+      };
+    }
+    case "pet-helpers": {
+      // Fetch housemate profiles who can help with pet care (excluding cooking and tech helpers)
+      const housemateProfiles = await retryDatabaseOperation(() =>
+        prisma.housemateProfile.findMany({
+          where: {
+            canHelpWith: {
+              path: [],
+              array_contains: "petCare"
+            },
+            NOT: {
+              OR: [
+                {
+                  canHelpWith: {
+                    path: [],
+                    array_contains: "cooking"
+                  }
+                },
+                {
+                  canHelpWith: {
+                    path: [],
+                    array_contains: "techSupport"
+                  }
+                }
+              ]
+            }
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc'
+          },
+          take: limit,
+        })
+      );
+
+      // Transform the data to work with AirbnbStyleCard (similar to other categories)
+      const transformedProfiles = housemateProfiles.map(profile => {
+        // Calculate age range based on date of birth
+        const dateOfBirth = extractDateOfBirth(profile.lifestyle);
+        const displayAgeRange = dateOfBirth ? calculateAgeRange(dateOfBirth) : (profile.ageRange || undefined);
+
+        // Parse lifestyle data to get education information
+        let lifestyleData: any = {};
+        if (profile.lifestyle) {
+          try {
+            lifestyleData = typeof profile.lifestyle === 'string' 
+              ? JSON.parse(profile.lifestyle) 
+              : profile.lifestyle;
+          } catch {
+            lifestyleData = {};
+          }
+        }
+
+        // Check if currently attending school
+        const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
+
+        // Check if retired
+        const isRetired = lifestyleData.occupationDetails?.isRetired || false;
+
+        return {
+          id: profile.user.id, // Use userId as the id for profile links
+          name: `${profile.user.firstName} ${profile.user.lastName?.charAt(0) || ''}.`,
+          price: profile.maxBudget || 0,
+          smallDescription: profile.bio || 'No bio available',
+          images: profile.profilePicture ? [profile.profilePicture] : [],
+          // Create amenities array from preferences and lifestyle attributes (not demographics)
+          amenities: [
+            ...(profile.schedule ? [profile.schedule] : []),
+            ...(profile.socialPreference ? [profile.socialPreference] : []),
+          ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent" && amenity !== "social"), // Remove early-riser, independent, and social tags
+          // Demographics information
+          demographics: {
+            age: displayAgeRange,
+            gender: profile.gender || undefined,
+            occupation: profile.occupation || undefined,
+            isCurrentlyAttending: isCurrentlyAttending,
+            isRetired: isRetired,
+          },
+        };
+      });
+
+      setCachedData(cacheKey, {
+        data: transformedProfiles,
+        title: "Pet-Friendly Helpers in Columbia, MO",
+        link: "/products/icon",
+        isHousemates: true,
+      });
+      return {
+        data: transformedProfiles,
+        title: "Pet-Friendly Helpers in Columbia, MO",
+        link: "/products/icon",
+        isHousemates: true,
+      };
+    }
+    case "errands-helpers": {
+      // Fetch housemate profiles who can help with errands or transportation (excluding previous categories)
+      const housemateProfiles = await retryDatabaseOperation(() =>
+        prisma.housemateProfile.findMany({
+          where: {
+            OR: [
+              {
+                canHelpWith: {
+                  path: [],
+                  array_contains: "errands"
+                }
+              },
+              {
+                canHelpWith: {
+                  path: [],
+                  array_contains: "transportation"
+                }
+              }
+            ],
+            NOT: {
+              OR: [
+                {
+                  canHelpWith: {
+                    path: [],
+                    array_contains: "cooking"
+                  }
+                },
+                {
+                  canHelpWith: {
+                    path: [],
+                    array_contains: "techSupport"
+                  }
+                },
+                {
+                  canHelpWith: {
+                    path: [],
+                    array_contains: "petCare"
+                  }
+                }
+              ]
+            }
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+              }
+            }
+          },
+          orderBy: {
+            createdAt: 'desc'
+          },
+          take: limit,
+        })
+      );
+
+      // Transform the data to work with AirbnbStyleCard (similar to other categories)
+      const transformedProfiles = housemateProfiles.map(profile => {
+        // Calculate age range based on date of birth
+        const dateOfBirth = extractDateOfBirth(profile.lifestyle);
+        const displayAgeRange = dateOfBirth ? calculateAgeRange(dateOfBirth) : (profile.ageRange || undefined);
+
+        // Parse lifestyle data to get education information
+        let lifestyleData: any = {};
+        if (profile.lifestyle) {
+          try {
+            lifestyleData = typeof profile.lifestyle === 'string' 
+              ? JSON.parse(profile.lifestyle) 
+              : profile.lifestyle;
+          } catch {
+            lifestyleData = {};
+          }
+        }
+
+        // Check if currently attending school
+        const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
+
+        // Check if retired
+        const isRetired = lifestyleData.occupationDetails?.isRetired || false;
+
+        return {
+          id: profile.user.id, // Use userId as the id for profile links
+          name: `${profile.user.firstName} ${profile.user.lastName?.charAt(0) || ''}.`,
+          price: profile.maxBudget || 0,
+          smallDescription: profile.bio || 'No bio available',
+          images: profile.profilePicture ? [profile.profilePicture] : [],
+          // Create amenities array from preferences and lifestyle attributes (not demographics)
+          amenities: [
+            ...(profile.schedule ? [profile.schedule] : []),
+            ...(profile.socialPreference ? [profile.socialPreference] : []),
+          ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent" && amenity !== "social"), // Remove early-riser, independent, and social tags
+          // Demographics information
+          demographics: {
+            age: displayAgeRange,
+            gender: profile.gender || undefined,
+            occupation: profile.occupation || undefined,
+            isCurrentlyAttending: isCurrentlyAttending,
+            isRetired: isRetired,
+          },
+        };
+      });
+
+      setCachedData(cacheKey, {
+        data: transformedProfiles,
+        title: "Errands & Driving Helpers in Columbia, MO",
+        link: "/products/icon",
+        isHousemates: true,
+      });
+      return {
+        data: transformedProfiles,
+        title: "Errands & Driving Helpers in Columbia, MO",
         link: "/products/icon",
         isHousemates: true,
       };
@@ -264,51 +764,66 @@ export function AirbnbStyleRow({ category, limit }: iAppProps) {
 }
 
 async function LoadRows({ category, limit }: iAppProps) {
-  const data = await getData({ category, limit });
-  
-  return (
-    <>
-      <div className="mb-6">
-        <Link
-          href={data.link}
-          className="inline-flex items-center gap-2 hover:gap-3 transition-all duration-200 group cursor-pointer"
-        >
-          <h2 className="text-2xl font-bold text-gray-900 group-hover:text-gray-700 transition-colors duration-200">
-            {data.title}
-          </h2>
-          <ChevronRight 
-            size={20} 
-            className="text-gray-600 group-hover:text-gray-800 group-hover:translate-x-1 transition-all duration-200" 
-          />
-        </Link>
-      </div>
-
-      {/* Mobile: Horizontal scroll, Desktop: Grid */}
-      <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:overflow-x-visible sm:pb-0">
-        {data.data.map((product) => (
-          <div key={product.id} className={`flex-shrink-0 w-[280px] sm:w-auto ${data.isHousemates ? "h-[420px]" : "h-[450px]"}`}>
-            <AirbnbStyleCard
-              images={product.images}
-              id={product.id}
-              name={product.name}
-              price={product.price}
-              smallDescription={product.smallDescription}
-              amenities={
-                Array.isArray(product.amenities) 
-                  ? (product.amenities as string[])
-                  : []
-              }
-              linkPath={data.isHousemates ? `/profile/${product.id}` : undefined}
-              location={data.isHousemates ? "Seeking housing" : undefined}
-              availabilityText={data.isHousemates ? "Looking for housing" : undefined}
-              priceLabel={data.isHousemates ? "budget" : undefined}
-              demographics={data.isHousemates ? (product as any).demographics : undefined}
+  try {
+    const data = await getData({ category, limit });
+    
+    return (
+      <>
+        <div className="mb-8">
+          <Link
+            href={data.link}
+            className="inline-flex items-center gap-3 hover:gap-4 transition-all duration-200 group cursor-pointer"
+          >
+            <h2 className="text-5xl font-bold text-gray-900 group-hover:text-gray-700 transition-colors duration-200">
+              {data.title}
+            </h2>
+            <ChevronRight 
+              size={32} 
+              className="text-gray-600 group-hover:text-gray-800 group-hover:translate-x-1 transition-all duration-200" 
             />
-          </div>
-        ))}
+          </Link>
+        </div>
+
+        {/* Mobile: Horizontal scroll, Desktop: Grid */}
+        <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:overflow-x-visible sm:pb-0">
+          {data.data.map((product) => (
+            <div key={product.id} className={`flex-shrink-0 w-[280px] sm:w-auto ${data.isHousemates ? "h-[420px]" : "h-[450px]"}`}>
+              <AirbnbStyleCard
+                images={product.images}
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                smallDescription={product.smallDescription}
+                amenities={
+                  Array.isArray(product.amenities) 
+                    ? (product.amenities as string[])
+                    : []
+                }
+                linkPath={data.isHousemates ? `/profile/${product.id}` : undefined}
+                location={data.isHousemates ? "Seeking housing" : undefined}
+                availabilityText={data.isHousemates ? "Looking for housing" : undefined}
+                priceLabel={data.isHousemates ? "budget" : undefined}
+                demographics={data.isHousemates ? (product as any).demographics : undefined}
+              />
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  } catch (error) {
+    console.error(`Error loading data for category ${category}:`, error);
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-600">Unable to load data at this time. Please try again later.</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Retry
+        </button>
       </div>
-    </>
-  );
+    );
+  }
 }
 
 function LoadingState({ limit = 4 }: { limit?: number }) {

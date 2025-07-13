@@ -6,7 +6,7 @@ import { ListingCard } from "@/app/components/ListingCard";
 import { ProductCard } from "@/app/components/ProductCard";
 import { HousemateCard } from "@/app/components/HousemateCard";
 import { ContactHousemateModal } from "@/app/components/ContactHousemateModal";
-import { notFound, useParams, useRouter } from "next/navigation";
+import { notFound, useParams, useRouter, useSearchParams } from "next/navigation";
 import { Map, List, CheckCircle, Filter, X, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { HousemateProfileCardNew } from "@/app/components/HousemateProfileCardNew";
@@ -79,6 +79,7 @@ async function getData(category: string) {
 export default function CategoryPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const category = params.category as string;
   const [data, setData] = useState<Listing[] | HousemateProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -150,6 +151,82 @@ export default function CategoryPage() {
     housemateEmail: "",
     housemateId: ""
   });
+
+  // Load URL parameters and set initial filter state
+  useEffect(() => {
+    const locationParam = searchParams.get('location');
+    const helpStartsParam = searchParams.get('helpStarts');
+    const typeOfHelpParam = searchParams.get('typeOfHelp');
+    const whoParam = searchParams.get('who');
+    
+    if (locationParam) {
+      setLocation(locationParam);
+    }
+    
+    // Map other parameters to relevant filters
+    if (typeOfHelpParam) {
+      // Handle comma-separated values for multi-select
+      const helpTypes = typeOfHelpParam.split(',').map(type => type.trim());
+      const allMatchedHelpOptions: string[] = [];
+      
+      helpTypes.forEach(helpType => {
+        const searchTerm = helpType.toLowerCase();
+        const matchedHelpOptions = supportOptions.filter(option => {
+          const optionLabel = option.label.toLowerCase();
+          // Check if the search term contains the option label or vice versa
+          return searchTerm.includes(optionLabel) || optionLabel.includes(searchTerm) ||
+                 // Handle common variations
+                 (searchTerm.includes('clean') && optionLabel.includes('clean')) ||
+                 (searchTerm.includes('cook') && optionLabel.includes('cook')) ||
+                 (searchTerm.includes('garden') && optionLabel.includes('garden')) ||
+                 (searchTerm.includes('errand') && optionLabel.includes('errand')) ||
+                 (searchTerm.includes('companion') && optionLabel.includes('companion')) ||
+                 (searchTerm.includes('pet') && optionLabel.includes('pet')) ||
+                 (searchTerm.includes('tech') && optionLabel.includes('tech')) ||
+                 (searchTerm.includes('security') && optionLabel.includes('security')) ||
+                 // Handle additional common terms
+                 (searchTerm.includes('house') && optionLabel.includes('clean')) ||
+                 (searchTerm.includes('meal') && optionLabel.includes('cook')) ||
+                 (searchTerm.includes('shopping') && optionLabel.includes('errand')) ||
+                 (searchTerm.includes('computer') && optionLabel.includes('tech')) ||
+                 (searchTerm.includes('dog') && optionLabel.includes('pet')) ||
+                 (searchTerm.includes('cat') && optionLabel.includes('pet')) ||
+                 (searchTerm.includes('yard') && optionLabel.includes('garden'));
+        });
+        
+        // Add matched options to the array, avoiding duplicates
+        matchedHelpOptions.forEach(option => {
+          if (!allMatchedHelpOptions.includes(option.id)) {
+            allMatchedHelpOptions.push(option.id);
+          }
+        });
+      });
+      
+      if (allMatchedHelpOptions.length > 0) {
+        setSelectedHelpOptions(allMatchedHelpOptions);
+      }
+    }
+    
+    if (whoParam) {
+      // Try to match demographics - could be gender, age, occupation, etc.
+      const lowerWho = whoParam.toLowerCase();
+      if (lowerWho.includes('male') || lowerWho.includes('female')) {
+        if (lowerWho.includes('male') && !lowerWho.includes('female')) {
+          setSelectedGender('male');
+        } else if (lowerWho.includes('female') && !lowerWho.includes('male')) {
+          setSelectedGender('female');
+        }
+      }
+      
+      if (lowerWho.includes('student')) {
+        setSelectedOccupation('student');
+      } else if (lowerWho.includes('professional')) {
+        setSelectedOccupation('professional');
+      } else if (lowerWho.includes('retired')) {
+        setSelectedOccupation('retired');
+      }
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function fetchData() {

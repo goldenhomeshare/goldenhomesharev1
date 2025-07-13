@@ -7,7 +7,9 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "db:health": "npx tsx scripts/db-health-check.ts health",
+    "db:monitor": "npx tsx scripts/db-health-check.ts monitor"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.8",

@@ -104,7 +104,11 @@ export function AirbnbStyleCard({
     <Link href={href} className="group cursor-pointer">
       <div className="relative w-full h-full flex flex-col">
         {/* Main Image */}
-        <div className="relative h-[280px] w-full overflow-hidden rounded-xl flex-shrink-0">
+        <div className={`relative overflow-hidden flex-shrink-0 ${
+          demographics 
+            ? "h-[280px] w-[280px] mx-auto rounded-full" 
+            : "h-[280px] w-full rounded-xl"
+        }`}>
           <Image
             alt={name}
             src={mainImage}
@@ -114,16 +118,23 @@ export function AirbnbStyleCard({
           />
         </div>
         
-        {/* Card Content - Improved layout for housemates */}
-        <div className="mt-3 flex-1 flex flex-col">
-          {/* For housemates: Combine location and name in one line, otherwise keep separate */}
+        {/* Card Content - Clean design for housemates */}
+        <div className="mt-4 flex-1 flex flex-col items-center text-center">
           {demographics ? (
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-1.5">
-                <h3 className="font-medium text-gray-900 truncate pr-2">{name}</h3>
-                <CheckCircle size={14} className="text-blue-500 flex-shrink-0" />
+            <>
+              {/* Name */}
+              <h3 className="font-bold text-3xl text-gray-900 mb-4">{name}</h3>
+              
+              {/* Background Checked Badge */}
+              <div className="flex items-center gap-3 text-gray-700">
+                <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-gray-200">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <span className="font-bold text-lg text-gray-900">Background Checked</span>
               </div>
-            </div>
+            </>
           ) : (
             <>
               {/* Property Type/Name - Now prominent at top */}
@@ -146,68 +157,6 @@ export function AirbnbStyleCard({
               </div>
             </>
           )}
-          
-          {/* Demographics for housemates - Combined with amenities on same line */}
-          {demographics && (
-            <div className="mb-2">
-              <div className="flex items-center gap-2 text-sm text-gray-700 flex-wrap">
-                {demographics.age && (
-                  <span className="flex items-center gap-1">
-                    <User size={12} className="text-gray-600" />
-                    <span>{demographics.age}</span>
-                  </span>
-                )}
-                {demographics.gender && (
-                  <span className="flex items-center gap-1">
-                    <UserCheck size={12} className="text-gray-600" />
-                    <span>{genderLabels[demographics.gender] || demographics.gender}</span>
-                  </span>
-                )}
-                {demographics.occupation && (
-                  <span className="flex items-center gap-1">
-                    {demographics.isRetired ? (
-                      <Armchair size={12} className="text-gray-600" />
-                    ) : demographics.isCurrentlyAttending ? (
-                      <GraduationCap size={12} className="text-gray-600" />
-                    ) : (
-                      <Briefcase size={12} className="text-gray-600" />
-                    )}
-                    <span>{demographics.isRetired ? "Retired" : demographics.isCurrentlyAttending ? "Student" : (occupationLabels[demographics.occupation] || demographics.occupation)}</span>
-                  </span>
-                )}
-                {/* Add budget to the same line */}
-                <span className="flex items-center gap-1">
-                  <span>${price}</span>
-                  <span className="text-xs">{priceLabel}</span>
-                </span>
-                {/* Add amenities to the same line */}
-                {amenities.slice(0, 2).map((amenityId) => {
-                  const amenity = amenityIcons[amenityId];
-                  if (!amenity) return null;
-                  
-                  const Icon = amenity.icon;
-                  return (
-                    <div 
-                      key={amenityId} 
-                      className="flex items-center gap-1 bg-gray-100 rounded-full px-2 py-0.5 text-xs"
-                      title={amenity.label}
-                    >
-                      <Icon size={10} className="text-gray-600" />
-                      <span className="text-gray-700 font-medium">{amenity.label}</span>
-                    </div>
-                  );
-                })}
-                {amenities.length > 2 && (
-                  <div className="flex items-center bg-gray-100 rounded-full px-2 py-0.5 text-xs">
-                    <span className="text-gray-700 font-medium">+{amenities.length - 2} more</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          
-          {/* Amenities - Only show for non-housemate cards since housemates have them combined above */}
-          {/* Description removed for cleaner layout */}
         </div>
       </div>
     </Link>

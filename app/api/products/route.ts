@@ -15,8 +15,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Category parameter is required' }, { status: 400 });
     }
 
-    // Handle housemate profiles for 'icon' category
-    if (category === 'icon') {
+    // Handle housemate profiles for 'icon' category (also accept 'housemate'/'housemates' for backward compatibility)
+    if (category === 'icon' || category === 'housemate' || category === 'housemates') {
       const housemateProfiles = await prisma.housemateProfile.findMany({
         include: {
           user: {

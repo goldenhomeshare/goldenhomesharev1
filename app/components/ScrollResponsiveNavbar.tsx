@@ -32,10 +32,24 @@ export function ScrollResponsiveNavbar({
   const [selectedWho, setSelectedWho] = useState('');
   const [selectedDemographic, setSelectedDemographic] = useState<string[]>([]);
   const [isCondensedExpanded, setIsCondensedExpanded] = useState(false);
-  const [selectedPriceRange, setSelectedPriceRange] = useState<{min: number, max: number}>({min: 0, max: 5000});
-  const [showPriceDropdown, setShowPriceDropdown] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Determine if we should show condensed mode based on page and scroll state
+  const shouldShowCondensed = () => {
+    // Show full search bar only on home page and /homes page
+    const isMainPage = pathname === '/' || pathname === '/homes' || pathname.startsWith('/homes/');
+    
+    if (isMainPage) {
+      // On main pages, only show condensed when scrolled
+      return isScrolled;
+    } else {
+      // On search result pages, show condensed by default (unless at very top)
+      return true;
+    }
+  };
+
+  const isInCondensedMode = shouldShowCondensed() && !isCondensedExpanded;
 
   // Simple scroll handler - expanded ONLY at very top
   const handleScroll = useCallback(() => {
@@ -112,9 +126,8 @@ export function ScrollResponsiveNavbar({
 
   const selectedIcon = getSelectedIcon();
 
-  // Determine if we're in helper mode or homes mode
+  // Determine if we're in helper mode
   const isHelperMode = pathname === '/' || pathname.startsWith('/products/icon') || pathname.includes('helper') || pathname.includes('housemate');
-  const isHomesMode = pathname === '/homes' || pathname.startsWith('/homes/') || pathname === '/products/template';
   
   // Get search fields based on mode
   const getSearchFields = () => {
@@ -128,20 +141,20 @@ export function ScrollResponsiveNavbar({
         ]
       };
     }
+    // Check if we're on homes page or products/template (where homes are displayed)
+    const isHomesMode = pathname === '/homes' || pathname.startsWith('/homes/') || pathname === '/products/template';
     
     if (isHomesMode) {
       return {
         condensed: ['Home', 'Anytime', 'Value'],
         full: [
-          { label: 'Where', placeholder: 'Search locations' },
-          { label: 'Check in', placeholder: 'Add dates' },
-          { label: 'Check out', placeholder: 'Add dates' },
-          { label: 'Price range', placeholder: 'Any price' }
+          { label: 'Where', placeholder: 'Search destinations' },
+          { label: 'Available', placeholder: 'Add dates' },
+          { label: 'Budget', placeholder: 'Add budget' }
         ]
       };
     }
     
-    // Default mode
     return {
       condensed: ['Anywhere', 'Anytime', 'Add guests'],
       full: [
@@ -186,17 +199,9 @@ export function ScrollResponsiveNavbar({
         // Date field is read-only, controlled by calendar
         break;
       case 2: 
-        if (isHomesMode) {
-          // Date field is read-only for check-out
-          break;
-        }
         // Type of help is read-only and handled by dropdown
         break;
       case 3: 
-        if (isHomesMode) {
-          // Price range is read-only and handled by dropdown
-          break;
-        }
         // Demographics field is read-only and handled by dropdown
         break;
     }
@@ -209,32 +214,17 @@ export function ScrollResponsiveNavbar({
     setShowCalendar(false);
     setShowTypeOfHelpDropdown(false);
     setShowDemographicDropdown(false);
-    setShowPriceDropdown(false);
     
+    // Set active field
     setActiveField(index);
     
-    // Auto-open relevant dropdowns
-    switch (index) {
-      case 0: 
-        setShowWhereDropdown(true);
-        break;
-      case 1: 
-        setShowCalendar(true);
-        break;
-      case 2: 
-        if (isHomesMode) {
-          setShowCalendar(true);
-        } else {
-          setShowTypeOfHelpDropdown(true);
-        }
-        break;
-      case 3: 
-        if (isHomesMode) {
-          setShowPriceDropdown(true);
-        } else {
-          setShowDemographicDropdown(true);
-        }
-        break;
+    // Open the appropriate dropdown for the clicked field immediately
+    if (index === 0) {
+      setShowWhereDropdown(true);
+    } else if (index === 1) {
+      setShowCalendar(true);
+    } else if (index === 2) {
+      setShowTypeOfHelpDropdown(true);
     }
   };
 
@@ -405,36 +395,30 @@ export function ScrollResponsiveNavbar({
     if (selectedWhere) {
       params.set('location', selectedWhere);
     }
-    
-    if (isHomesMode) {
-      // For homes mode, use different parameter structure
-      if (selectedDateRange.start) {
-        params.set('checkIn', selectedDateRange.start.toISOString().split('T')[0]);
-      }
-      if (selectedDateRange.end) {
-        params.set('checkOut', selectedDateRange.end.toISOString().split('T')[0]);
-      }
-      if (selectedPriceRange.min > 0 || selectedPriceRange.max < 5000) {
-        params.set('priceMin', selectedPriceRange.min.toString());
-        params.set('priceMax', selectedPriceRange.max.toString());
-      }
-      
-      const queryString = params.toString();
-      const targetUrl = `/products/template${queryString ? `?${queryString}` : ''}`;
-      router.push(targetUrl);
-    } else {
-      // Helper mode - existing logic
-      if (selectedHelpStarts || selectedDateRange.start) {
-        params.set('helpStarts', selectedHelpStarts || formatDateRange());
-      }
-      if (selectedTypeOfHelp.length > 0) {
-        params.set('typeOfHelp', selectedTypeOfHelp.join(','));
-      }
-      
-      const queryString = params.toString();
-      const targetUrl = `/products/icon${queryString ? `?${queryString}` : ''}`;
-      router.push(targetUrl);
+    if (selectedHelpStarts || selectedDateRange.start) {
+      params.set('helpStarts', selectedHelpStarts || formatDateRange());
     }
+    if (selectedTypeOfHelp.length > 0) {
+      params.set('typeOfHelp', selectedTypeOfHelp.join(','));
+    }
+    
+    const queryString = params.toString();
+    
+    // Determine target URL based on current page
+    let targetUrl;
+    if (pathname === '/homes' || pathname.startsWith('/homes/')) {
+      // If on homes page, search should go to /products/template
+      targetUrl = `/products/template${queryString ? `?${queryString}` : ''}`;
+    } else {
+      // If on home page (helpers mode), search should go to /products/icon
+      targetUrl = `/products/icon${queryString ? `?${queryString}` : ''}`;
+    }
+    
+    router.push(targetUrl);
+    
+    // Auto-condense after searching
+    setIsCondensedExpanded(false);
+    setActiveField(null);
   };
 
   // Handle clearing all selections
@@ -443,7 +427,6 @@ export function ScrollResponsiveNavbar({
     setSelectedHelpStarts('');
     setSelectedTypeOfHelp([]);
     setSelectedDateRange({ start: null, end: null });
-    setSelectedPriceRange({ min: 0, max: 5000 });
   };
 
   // Handle clearing individual selection
@@ -457,16 +440,7 @@ export function ScrollResponsiveNavbar({
         setSelectedDateRange({ start: null, end: null });
         break;
       case 2:
-        if (isHomesMode) {
-          setSelectedDateRange({ start: null, end: null });
-        } else {
-          setSelectedTypeOfHelp([]);
-        }
-        break;
-      case 3:
-        if (isHomesMode) {
-          setSelectedPriceRange({ min: 0, max: 5000 });
-        }
+        setSelectedTypeOfHelp([]);
         break;
     }
   };
@@ -477,7 +451,7 @@ export function ScrollResponsiveNavbar({
         {/* Main Navbar Row */}
         <div className="flex items-center justify-between">
           {/* Logo - Positioned further left like Airbnb */}
-          <div className={`flex-shrink-0 transition-all duration-500 ease-in-out pt-7 ${isScrolled && !isCondensedExpanded ? '-mb-14' : 'pb-7'}`}>
+          <div className={`flex-shrink-0 transition-all duration-500 ease-in-out pt-7 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
             <Link href="/">
               {/* Full logo for larger screens - no size changes */}
               <div className="hidden sm:flex items-center -ml-4 md:-ml-8 lg:-ml-12">
@@ -505,10 +479,10 @@ export function ScrollResponsiveNavbar({
           </div>
 
           {/* Center Content Area - Same top padding, remove bottom when scrolled */}
-          <div className={`flex-1 flex justify-center transition-all duration-500 ease-in-out pt-7 ${isScrolled && !isCondensedExpanded ? '-mb-14' : 'pb-7'}`}>
+          <div className={`flex-1 flex justify-center transition-all duration-500 ease-in-out pt-7 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
             {/* Condensed Search Bar when scrolled (hide when expanded) */}
             <div className={`transition-all duration-500 ease-in-out ${
-              isScrolled && !isCondensedExpanded ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
+              isInCondensedMode ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
             }`}>
               <div 
                 className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 max-w-lg w-full h-18 cursor-pointer" 
@@ -531,19 +505,34 @@ export function ScrollResponsiveNavbar({
                 <div className="flex-1 flex items-center">
                   {searchFields.condensed.map((text, index) => {
                     const getCondensedValue = () => {
-                      // Always show placeholder text to avoid clutter
-                      return text;
+                      if (isHelperMode) {
+                        switch (index) {
+                          case 0: {
+                            // For /products/icon page, show "Helpers in [City]" when location is selected
+                            if (pathname === '/products/icon' && selectedWhere) {
+                              // Extract city name only (remove state)
+                              const cityOnly = selectedWhere.split(',')[0].trim();
+                              return `Helpers in ${cityOnly}`;
+                            }
+                            return selectedWhere || text;
+                          }
+                          case 1: return text; // Always show placeholder text, not actual dates
+                          case 2: return text; // Always show placeholder text, not actual tasks
+                          default: return text;
+                        }
+                      }
+                      
+                      // For homes mode and default mode, use the same logic
+                      switch (index) {
+                        case 0: return selectedWhere || text;
+                        case 1: return formatDateRange() || text;
+                        case 2: return text; // This is "Value" for homes mode, "Add guests" for default mode
+                        default: return text;
+                      }
                     };
                     
                     const displayValue = getCondensedValue();
-                    const hasValue = (() => {
-                      switch (index) {
-                        case 0: return selectedWhere !== '';
-                        case 1: return selectedHelpStarts !== '' || selectedDateRange.start !== null;
-                        case 2: return selectedTypeOfHelp.length > 0;
-                        default: return false;
-                      }
-                    })();
+                    const hasValue = displayValue !== text;
                     
                     return (
                       <div key={index} className="flex items-center">
@@ -558,18 +547,7 @@ export function ScrollResponsiveNavbar({
                           <span className={`text-xl ${hasValue ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
                             {displayValue}
                           </span>
-                          {hasValue && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation(); // Prevent opening dropdown when clearing
-                                handleClearField(index);
-                              }}
-                              className="ml-1 hover:bg-gray-200 rounded-full p-0.5 transition-colors"
-                            >
-                              <X className="w-6 h-6 text-gray-500" />
-                            </button>
-                          )}
-                                                </div>
+                        </div>
                         {index < searchFields.condensed.length - 1 && (
                           <div className="w-px h-8 bg-gray-400"></div>
                         )}
@@ -600,21 +578,21 @@ export function ScrollResponsiveNavbar({
 
             {/* Navigation Links (show when not scrolled OR when condensed is expanded) */}
             <div className={`hidden lg:flex justify-center items-center transition-all duration-500 ease-in-out ${
-              (!isScrolled || isCondensedExpanded) && showNavLinks ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
+              (!isInCondensedMode || isCondensedExpanded) && showNavLinks ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
             }`}>
               {navLinksComponent}
             </div>
           </div>
 
           {/* User Navigation - Same top padding, remove bottom when scrolled */}
-          <div className={`flex items-center gap-x-1 flex-shrink-0 transition-all duration-500 ease-in-out pt-7 ${isScrolled && !isCondensedExpanded ? '-mb-14' : 'pb-7'}`}>
+          <div className={`flex items-center gap-x-1 flex-shrink-0 transition-all duration-500 ease-in-out pt-7 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
             {userNavigation}
           </div>
         </div>
         
         {/* Full Search Bar Row (only show when not scrolled or condensed is expanded) */}
         <div className={`flex justify-center transition-all duration-500 ease-in-out ${
-          !isScrolled || isCondensedExpanded ? 'pb-4 opacity-100 transform translate-y-0' : 'pb-0 opacity-0 transform -translate-y-4 pointer-events-none'
+          !isInCondensedMode || isCondensedExpanded ? 'pb-4 opacity-100 transform translate-y-0' : 'pb-0 opacity-0 transform -translate-y-4 pointer-events-none'
         }`}>
           <div className="relative max-w-5xl w-full">
             <div className={`flex items-center border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-all duration-200 ${
@@ -622,29 +600,45 @@ export function ScrollResponsiveNavbar({
             }`}>
               {searchFields.full.map((field, index) => {
                 const getFieldValue = () => {
+                  if (isHelperMode) {
+                    switch (index) {
+                      case 0: {
+                        // For /products/icon page, show "Helpers in [City]" when location is selected
+                        if (pathname === '/products/icon' && selectedWhere) {
+                          return `Helpers in ${selectedWhere}`;
+                        }
+                        return selectedWhere;
+                      }
+                      case 1: return formatDateRange() || selectedHelpStarts;
+                      case 2: return selectedTypeOfHelp.length > 0 ? selectedTypeOfHelp.join(', ') : '';
+                      default: return '';
+                    }
+                  }
+                  
+                  // Check if we're on homes page or products/template (where homes are displayed)
+                  const isHomesMode = pathname === '/homes' || pathname.startsWith('/homes/') || pathname === '/products/template';
+                  
+                  if (isHomesMode) {
+                    switch (index) {
+                      case 0: return selectedWhere;
+                      case 1: return formatDateRange();
+                      case 2: return ''; // Budget field placeholder
+                      default: return '';
+                    }
+                  }
+                  
+                  // Default mode (non-homes pages)
                   switch (index) {
                     case 0: return selectedWhere;
-                    case 1: return formatDateRange() || selectedHelpStarts;
-                    case 2: 
-                      if (isHomesMode) {
-                        return formatDateRange();
-                      } else {
-                        return selectedTypeOfHelp.length > 0 ? selectedTypeOfHelp.join(', ') : '';
-                      }
-                    case 3:
-                      if (isHomesMode) {
-                        if (selectedPriceRange.min === 0 && selectedPriceRange.max === 5000) {
-                          return '';
-                        }
-                        return `$${selectedPriceRange.min} - $${selectedPriceRange.max}`;
-                      }
-                      return '';
+                    case 1: return formatDateRange();
+                    case 2: return ''; // Check out field
+                    case 3: return ''; // Who field placeholder
                     default: return '';
                   }
                 };
                 
                 const fieldValue = getFieldValue();
-                const isActive = activeField === index || (index === 0 && showWhereDropdown) || (index === 1 && showCalendar) || (index === 2 && (showTypeOfHelpDropdown || showCalendar)) || (index === 3 && showPriceDropdown);
+                const isActive = activeField === index || (index === 0 && showWhereDropdown) || (index === 2 && showTypeOfHelpDropdown);
                 
                 return (
                   <div key={index} className="flex-1 relative">
@@ -676,8 +670,8 @@ export function ScrollResponsiveNavbar({
                         }`}
                         onFocus={() => handleFieldFocus(index)}
                         onBlur={() => handleFieldBlur(index)}
-                        onClick={index === 0 ? () => handleFieldFocus(0) : index === 1 ? () => handleFieldFocus(1) : index === 2 ? () => handleFieldFocus(2) : index === 3 ? () => handleFieldFocus(3) : undefined}
-                        readOnly={index === 0 || index === 1 || index === 2 || index === 3}
+                        onClick={index === 0 ? () => handleFieldFocus(0) : index === 1 ? () => handleFieldFocus(1) : index === 2 ? () => handleFieldFocus(2) : undefined}
+                        readOnly={index === 0 || index === 1 || index === 2}
                       />
                     </div>
                     {/* Divider - only show when this field and next field are both inactive */}
@@ -994,134 +988,50 @@ export function ScrollResponsiveNavbar({
                       </div>
                     </div>
 
-
-                  </div>
-                </div>
-              </>
-            )}
-            
-            {/* Price Range Dropdown */}
-            {showPriceDropdown && isHomesMode && (
-              <>
-                {/* Backdrop to close dropdown */}
-                <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => {
-                    setShowPriceDropdown(false);
-                    setActiveField(null);
-                  }}
-                />
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-50 max-w-2xl mx-auto">
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Price range</h3>
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-sm text-gray-600">Min price</span>
-                        <span className="text-sm text-gray-600">Max price</span>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="flex-1">
-                          <input
-                            type="number"
-                            value={selectedPriceRange.min}
-                            onChange={(e) => setSelectedPriceRange(prev => ({ ...prev, min: Math.max(0, parseInt(e.target.value) || 0) }))}
-                            placeholder="0"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-green-800 focus:ring-0 text-center"
-                          />
-                        </div>
-                        <span className="text-gray-400">-</span>
-                        <div className="flex-1">
-                          <input
-                            type="number"
-                            value={selectedPriceRange.max}
-                            onChange={(e) => setSelectedPriceRange(prev => ({ ...prev, max: Math.min(10000, parseInt(e.target.value) || 5000) }))}
-                            placeholder="5000"
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-green-800 focus:ring-0 text-center"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Price Range Slider */}
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-lg font-bold text-green-700">${selectedPriceRange.min}</span>
-                        <span className="text-lg font-bold text-green-700">${selectedPriceRange.max}</span>
-                      </div>
-                      <div className="space-y-3">
-                        <div>
-                          <label className="block text-sm text-gray-600 mb-1">Min: ${selectedPriceRange.min}</label>
-                          <input
-                            type="range"
-                            min="0"
-                            max="5000"
-                            value={selectedPriceRange.min}
-                            onChange={(e) => setSelectedPriceRange(prev => ({ ...prev, min: Math.min(parseInt(e.target.value), prev.max - 100) }))}
-                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-600 mb-1">Max: ${selectedPriceRange.max}</label>
-                          <input
-                            type="range"
-                            min="100"
-                            max="10000"
-                            value={selectedPriceRange.max}
-                            onChange={(e) => setSelectedPriceRange(prev => ({ ...prev, max: Math.max(parseInt(e.target.value), prev.min + 100) }))}
-                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Quick Price Options */}
-                    <div className="mb-6">
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          { min: 0, max: 500, label: "Under $500" },
-                          { min: 500, max: 1000, label: "$500 - $1000" },
-                          { min: 1000, max: 2000, label: "$1000 - $2000" },
-                          { min: 2000, max: 5000, label: "$2000 - $5000" },
-                          { min: 5000, max: 10000, label: "$5000+" }
-                        ].map((option) => (
-                          <button
-                            key={option.label}
-                            onClick={() => setSelectedPriceRange({ min: option.min, max: option.max })}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                              selectedPriceRange.min === option.min && selectedPriceRange.max === option.max
-                                ? 'bg-green-800 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                            }`}
-                          >
-                            {option.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {/* Search Button */}
-                    <div className="flex items-center justify-center pt-4 border-t border-gray-200">
+                    {/* Quick Selection Buttons */}
+                    <div className="flex items-center justify-center gap-2 mt-6 pt-6 border-t border-gray-200">
                       <button
-                        onClick={() => {
-                          setShowPriceDropdown(false);
-                          setActiveField(null);
-                          handleSearch();
-                        }}
-                        className="px-6 py-3 text-sm bg-primary hover:bg-primary/90 text-white rounded-full transition-colors font-medium"
+                        onClick={() => handleFlexibleDateSelect('± 1 day')}
+                        className="px-4 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
                       >
-                        Search
+                        ± 1 day
+                      </button>
+                      <button
+                        onClick={() => handleFlexibleDateSelect('± 2 days')}
+                        className="px-4 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                      >
+                        ± 2 days
+                      </button>
+                      <button
+                        onClick={() => handleFlexibleDateSelect('± 3 days')}
+                        className="px-4 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                      >
+                        ± 3 days
+                      </button>
+                      <button
+                        onClick={() => handleFlexibleDateSelect('± 7 days')}
+                        className="px-4 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                      >
+                        ± 7 days
+                      </button>
+                      <button
+                        onClick={() => handleFlexibleDateSelect('± 14 days')}
+                        className="px-4 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
+                      >
+                        ± 14 days
                       </button>
                     </div>
                   </div>
                 </div>
               </>
             )}
+            
 
           </div>
         </div>
         
         {/* Backdrop to close expanded condensed search bar - only when no dropdowns are open */}
-        {isCondensedExpanded && isScrolled && !showWhereDropdown && !showTypeOfHelpDropdown && !showCalendar && !showPriceDropdown && activeField === null && (
+        {isCondensedExpanded && isInCondensedMode && !showWhereDropdown && !showTypeOfHelpDropdown && !showCalendar && activeField === null && (
           <div 
             className="fixed inset-0 z-30" 
             onClick={() => {
@@ -1132,7 +1042,7 @@ export function ScrollResponsiveNavbar({
         )}
         
         {/* Additional backdrop to close expanded search when clicking outside navbar area */}
-        {isCondensedExpanded && isScrolled && (
+        {isCondensedExpanded && isInCondensedMode && (
           <div 
             className="fixed inset-x-0 top-0 bottom-0 z-20"
             style={{ top: '200px' }} // Start below the navbar area
@@ -1142,7 +1052,6 @@ export function ScrollResponsiveNavbar({
               setShowWhereDropdown(false);
               setShowTypeOfHelpDropdown(false);
               setShowCalendar(false);
-              setShowPriceDropdown(false);
             }}
           />
         )}

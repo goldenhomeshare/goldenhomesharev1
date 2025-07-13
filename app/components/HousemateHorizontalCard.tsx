@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { User, MapPin, CheckCircle, Briefcase, Star } from "lucide-react";
+import { User, MapPin, Briefcase, Star, DollarSign, Handshake, Bed, Umbrella } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HousemateHorizontalCardProps {
@@ -87,162 +87,92 @@ export function HousemateHorizontalCard({
   };
 
   return (
-    <Link href={`/profile/${userId}`} className="block">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
-        <div className="flex items-center p-4">
-          {/* Profile Picture */}
-          <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-gray-100 flex-shrink-0">
-            {profileImage ? (
-              <Image
-                src={profileImage}
-                alt={`${name}'s profile`}
-                fill
-                className="object-cover"
-                sizes="64px"
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full bg-gray-100">
-                <User size={24} className="text-gray-400" />
-              </div>
-            )}
-            
-            {/* Verification Badge */}
-            {isVerified && (
-              <div className="absolute -top-1 -right-1 bg-blue-500 rounded-full p-1">
-                <CheckCircle size={10} className="text-white" />
-              </div>
-            )}
-          </div>
-
-          {/* Main Content */}
-          <div className="flex-1 ml-4">
-            <div className="flex items-start justify-between">
-              {/* Left Content */}
-              <div className="flex-1">
-                {/* Name and Title */}
-                <div className="mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    {name}
-                    {isVerified && (
-                      <CheckCircle size={16} className="text-blue-500" />
-                    )}
-                  </h3>
-                  
-                  {/* First row: Location, Age, Occupation - Always visible */}
-                  <div className="flex items-center gap-3 text-sm text-gray-600 mt-1">
-                    <span className="flex items-center gap-1">
-                      <MapPin size={12} />
-                      {location}
-                    </span>
-                    {/* Age Range */}
-                    {ageRange && (
-                      <span>{ageRange}</span>
-                    )}
-                    {/* Student/Occupation Status */}
-                    {(isCurrentlyAttending || isRetired || occupation) && (
-                      <span className="hidden sm:flex items-center gap-1">
-                        {isRetired ? (
-                          <>
-                            <Briefcase size={10} />
-                            Retired
-                          </>
-                        ) : isCurrentlyAttending ? (
-                          <>
-                            <Briefcase size={10} />
-                            Student
-                          </>
-                        ) : occupation ? (
-                          <>
-                            <Briefcase size={10} />
-                            {occupationLabels[occupation] || occupation}
-                          </>
-                        ) : null}
-                      </span>
-                    )}
+        <Link href={`/profile/${userId}`} className="block">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer p-6">
+        {/* Name at the top center of the card */}
+        <div className="flex justify-center mb-6">
+          <h3 className="text-3xl font-bold text-gray-900 text-center">{name}</h3>
+        </div>
+        
+        <div className="flex flex-col">
+          <div className="flex items-start gap-8 mb-6">
+            {/* Profile Picture Section - Large circular image */}
+            <div className="flex-shrink-0">
+              <div className="relative w-48 h-48 rounded-full overflow-hidden">
+                {profileImage ? (
+                  <Image
+                    src={profileImage}
+                    alt={`${name}'s profile`}
+                    fill
+                    className="object-cover"
+                    sizes="192px"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full bg-gray-100">
+                    <User size={64} className="text-gray-400" />
                   </div>
-                  
-                  {/* Second row: Gender, Language, Occupation (mobile) - Additional info */}
-                  <div className="flex items-center gap-3 text-sm text-gray-600 mt-1">
-                    {/* Gender */}
-                    {gender && (
-                      <span>{genderLabels[gender] || gender}</span>
-                    )}
-                    {/* Language */}
-                    {lifestyleData.language && (
-                      <span>{lifestyleData.language}</span>
-                    )}
-                    {/* Show occupation on mobile when hidden above */}
-                    {(isCurrentlyAttending || isRetired || occupation) && (
-                      <span className="sm:hidden flex items-center gap-1">
-                        {isRetired ? (
-                          <>
-                            <Briefcase size={10} />
-                            Retired
-                          </>
-                        ) : isCurrentlyAttending ? (
-                          <>
-                            <Briefcase size={10} />
-                            Student
-                          </>
-                        ) : occupation ? (
-                          <>
-                            <Briefcase size={10} />
-                            {occupationLabels[occupation] || occupation}
-                          </>
-                        ) : null}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                )}
+              </div>
+            </div>
 
-                {/* Bio/Description */}
-                {bio && (
-                  <p className="text-sm text-gray-700 line-clamp-2 leading-relaxed mb-3">
+            {/* Right Content */}
+            <div className="flex-1 flex flex-col justify-start min-w-0">
+              {/* Main pricing text */}
+              <div className="mb-4">
+                <p className="text-xl text-gray-900 leading-relaxed mb-2">
+                  Host {name.split(' ')[0]} and get up to:
+                </p>
+                <ul className="text-xl font-semibold text-gray-900 space-y-1">
+                  <li className="flex items-center gap-2">
+                    <DollarSign size={20} className="text-green-600" />
+                    ${maxBudget || 400}/mo
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Handshake size={20} className="text-blue-600" />
+                    10 hours of help/week
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Bed size={20} className="text-purple-600" />
+                    Overnight presence
+                  </li>
+                </ul>
+              </div>
+
+              {/* Bio section */}
+              <div className="mb-4">
+                {bio ? (
+                  <p className="text-lg text-gray-700 leading-relaxed line-clamp-2 overflow-hidden">
                     {bio}
                   </p>
+                ) : (
+                  <p className="text-lg text-gray-700 leading-relaxed">
+                    {name.split(' ')[0]} hasn't added a bio yet.
+                  </p>
                 )}
-
-                {/* Contact Button and Heart - Mobile Below Bio, Desktop Right Side */}
-                <div className="flex items-center justify-between sm:hidden">
-                  <div className="flex items-center gap-2">
-                    {/* Budget */}
-                    <div className="text-sm">
-                      <span className="text-xs text-gray-500">Budget up to </span>
-                      <span className="font-bold text-gray-900">${maxBudget || 500}</span>
-                      <span className="text-xs text-gray-500">/mo</span>
-                    </div>
-                  </div>
-                  
-                  <Button
-                    onClick={handleContact}
-                    className="bg-green-800 hover:bg-green-900 text-white px-6 py-2 rounded-2xl font-medium transition-colors text-sm"
-                    size="sm"
-                  >
-                    Contact
-                  </Button>
-                </div>
               </div>
+            </div>
+          </div>
 
-              {/* Right Content - Price and Contact - Desktop Only */}
-              <div className="hidden sm:block text-right ml-6 flex-shrink-0">
-                {/* Price */}
-                <div className="mb-4">
-                  <div className="text-xs text-gray-500 mb-1">Budget up to</div>
-                  <div className="text-2xl font-bold text-gray-900">
-                    ${maxBudget || 500}
-                  </div>
-                  <div className="text-xs text-gray-500">per month</div>
+          {/* Bottom badges - now full width */}
+          <div className="flex items-center justify-center gap-6">
+            {/* Background Checked */}
+            {isVerified && (
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
                 </div>
-
-                {/* Contact Button */}
-                <Button
-                  onClick={handleContact}
-                  className="bg-green-800 hover:bg-green-900 text-white px-8 py-3 rounded-2xl font-medium transition-colors"
-                  size="default"
-                >
-                  Contact
-                </Button>
+                <span className="text-lg font-medium text-gray-900 whitespace-nowrap">Background Checked</span>
               </div>
+            )}
+
+            {/* Host Cover */}
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                <Umbrella className="w-5 h-5 text-gray-600" />
+              </div>
+              <span className="text-lg font-medium text-gray-900 whitespace-nowrap">$10,000 Host Cover</span>
             </div>
           </div>
         </div>

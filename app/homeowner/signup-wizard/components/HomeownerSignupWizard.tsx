@@ -379,7 +379,7 @@ export function HomeownerSignupWizard({ userId, firstName, lastName, email }: Ho
               Profile Created Successfully!
             </h1>
             <p className="text-gray-600 mb-6">
-              Welcome to Golden HomeShare! We're setting up your dashboard...
+              Welcome to Golden! We're setting up your dashboard...
             </p>
             
             {/* Loading Animation */}

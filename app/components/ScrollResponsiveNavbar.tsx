@@ -582,7 +582,7 @@ export function ScrollResponsiveNavbar({
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-secondary border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl w-full mx-auto px-4 md:px-8">
         {/* Main Navbar Row */}
         <div className="flex items-center justify-between">
@@ -910,7 +910,7 @@ export function ScrollResponsiveNavbar({
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-50 max-h-[600px] overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Type of help needed</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Type of help wanted (multi-select)</h3>
                     <button
                       onClick={() => {
                         setShowTypeOfHelpDropdown(false);

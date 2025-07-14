@@ -15,7 +15,8 @@ import {
   Monitor, 
   Wrench, 
   Car,
-  Search
+  Search,
+  ChevronDown
 } from "lucide-react";
 
 export default async function Home() {
@@ -42,26 +43,23 @@ export default async function Home() {
   return (
     <>
       {/* What is homesharing Section */}
-      <section className="pt-8 mb-24 px-6 md:px-12">
+      <section className="pt-8 -mb-8 px-6 md:px-12">
         <div className="max-w-7xl mx-auto">
 
           {/* Papa-style Hero Section */}
           <div className="mb-24 grid md:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-8">
-                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight font-recoleta">
-                 Welcome to Golden<br />
-                 HomeShare!
-               </h1>
+                                           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-gray-900 leading-tight">
+                Home Sharing<br />
+                Made Easy.
+              </h1>
               
                              <div className="space-y-6">
-                 <p className="text-xl md:text-2xl text-gray-900 leading-relaxed">
-                   Golden HomeShare matches homeowners with trusted, background-verified helpers who exchange household support for affordable rent.
-                 </p>
+                                   <p className="text-xl md:text-3xl text-gray-900 leading-relaxed">
+                  Here, Reliable Helpers Provide Household Support in Exchange for Affordable Rooms. </p>
                  
-                 <p className="text-xl md:text-2xl text-gray-900 leading-relaxed">
-                   Whether you're looking for a way to get extra income, an extra set of hands around the house, or a way to stay in your home longer, Golden makes it easy to create mutually beneficial living arrangements.
-                 </p>
+
                </div>
               
               
@@ -92,12 +90,12 @@ export default async function Home() {
               {/* CTA Buttons - Positioned to align with second paragraph */}
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link href="/homeowner/signup-wizard">
-                  <button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-semibold py-4 px-12 rounded-lg transition-colors duration-200 text-lg whitespace-nowrap">
-                    Become a Host
+                  <button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-semibold py-6 px-16 rounded-lg transition-colors duration-200 text-xl whitespace-nowrap">
+                    Host a Helper
                   </button>
                 </Link>
                 <Link href="/housemate/signup-wizard">
-                  <button className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-12 rounded-lg transition-colors duration-200 text-lg whitespace-nowrap">
+                  <button className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-16 rounded-lg transition-colors duration-200 text-xl whitespace-nowrap">
                     Become a Helper
                   </button>
                 </Link>
@@ -125,11 +123,16 @@ export default async function Home() {
       </div>
       
       {/* Host and Helper Layout with Exchange in Middle */}
-      <section className="bg-amber-100 -mt-1 pt-12 pb-24">
+      <section className="bg-amber-100 -mt-1 pt-2 pb-24">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           {/* Main Section Title */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">How Golden Works</h2>
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
+              How Golden Works
+            </h2>
+            <div className="flex justify-center">
+              <ChevronDown className="w-8 h-8 text-gray-600" />
+            </div>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8 md:gap-12 items-start mb-16">

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from "next/link";
 import Image from "next/image";
-import { Search, X } from "lucide-react";
+import { Search, X, Sparkles, ChefHat, TreePine, ShoppingBag, Heart, PawPrint, Monitor, Car } from "lucide-react";
 
 interface ScrollResponsiveNavbarProps {
   showNavLinks: boolean;
@@ -32,8 +32,117 @@ export function ScrollResponsiveNavbar({
   const [selectedWho, setSelectedWho] = useState('');
   const [selectedDemographic, setSelectedDemographic] = useState<string[]>([]);
   const [isCondensedExpanded, setIsCondensedExpanded] = useState(false);
+  const [locationFilter, setLocationFilter] = useState('');
   const pathname = usePathname();
   const router = useRouter();
+
+  // Cities we currently operate in
+  const operatingCities = [
+    { name: 'Columbia, MO', description: 'University town with active community', color: 'bg-blue-50', iconColor: 'text-blue-700', icon: 'graduation-cap' },
+    { name: 'Jefferson City, MO', description: 'State capital with historic charm', color: 'bg-amber-50', iconColor: 'text-amber-700', icon: 'landmark' },
+    { name: 'Boonville, MO', description: 'Riverfront community', color: 'bg-emerald-50', iconColor: 'text-emerald-700', icon: 'house' },
+    { name: 'Fulton, MO', description: 'Small town with friendly neighbors', color: 'bg-green-50', iconColor: 'text-green-700', icon: 'home' },
+    { name: 'Holts Summit, MO', description: 'Suburban area near Jefferson City', color: 'bg-slate-50', iconColor: 'text-slate-700', icon: 'building' }
+  ];
+
+  // Filter cities based on user input
+  const filteredCities = operatingCities.filter(city =>
+    city.name.toLowerCase().includes(locationFilter.toLowerCase())
+  );
+
+  // Function to render city icons
+  const renderCityIcon = (iconName: string) => {
+    const iconProps = "w-5 h-5";
+    switch (iconName) {
+      case 'graduation-cap':
+        return (
+          <svg className={iconProps} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+          </svg>
+        );
+      case 'landmark':
+        return (
+          <svg className={iconProps} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        );
+      case 'waves':
+        return (
+          <svg className={iconProps} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1" />
+          </svg>
+        );
+      case 'home':
+        return (
+          <svg className={iconProps} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        );
+      case 'star':
+        return (
+          <svg className={iconProps} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+          </svg>
+        );
+      case 'house':
+        return (
+          <svg className={iconProps} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        );
+      case 'wheat':
+        return (
+          <svg className={iconProps} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 2l3 6 3-6-3 6c0 3 6 3 6 3s-6 0-6 3c0-3-6-3-6-3s6 0 6-3z" />
+          </svg>
+        );
+      case 'building':
+        return (
+          <svg className={iconProps} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        );
+      case 'mountain':
+        return (
+          <svg className={iconProps} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l6 6 6-6M3 18h18l-6-6-6 6z" />
+          </svg>
+        );
+      default:
+        return (
+          <svg className={iconProps} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+            <circle cx="12" cy="9" r="2.5" />
+          </svg>
+        );
+    }
+  };
+
+  // Function to render help type icons
+  const renderHelpTypeIcon = (iconName: string) => {
+    const iconProps = "w-5 h-5";
+    switch (iconName) {
+      case 'sparkles':
+        return <Sparkles className={iconProps} />;
+      case 'chef-hat':
+        return <ChefHat className={iconProps} />;
+      case 'leaf':
+        return <TreePine className={iconProps} />;
+      case 'shopping-bag':
+        return <ShoppingBag className={iconProps} />;
+      case 'heart':
+        return <Heart className={iconProps} />;
+      case 'paw':
+        return <PawPrint className={iconProps} />;
+      case 'monitor':
+        return <Monitor className={iconProps} />;
+      case 'car':
+        return <Car className={iconProps} />;
+      default:
+        return <Search className={iconProps} />;
+    }
+  };
 
   // Determine if we should show condensed mode based on page and scroll state
   const shouldShowCondensed = () => {
@@ -168,9 +277,10 @@ export function ScrollResponsiveNavbar({
 
   const searchFields = getSearchFields();
 
-  // Handle location selection
+  // Handle location selection from autocomplete
   const handleLocationSelect = (location: string) => {
     setSelectedWhere(location);
+    setLocationFilter(location);
     setShowWhereDropdown(false);
     // Move to next field (Help starts) and auto-open calendar
     setTimeout(() => {
@@ -194,7 +304,14 @@ export function ScrollResponsiveNavbar({
   // Handle input changes with auto-advance
   const handleInputChange = (index: number, value: string) => {
     switch (index) {
-      case 0: setSelectedWhere(value); break;
+      case 0: 
+        setSelectedWhere(value);
+        setLocationFilter(value);
+        // Auto-open dropdown when typing
+        if (!showWhereDropdown && value.length > 0) {
+          setShowWhereDropdown(true);
+        }
+        break;
       case 1: 
         // Date field is read-only, controlled by calendar
         break;
@@ -215,6 +332,12 @@ export function ScrollResponsiveNavbar({
     setShowTypeOfHelpDropdown(false);
     setShowDemographicDropdown(false);
     
+    // Auto-clear location field if clicking on it again with existing content (desktop mode only)
+    if (index === 0 && selectedWhere && !shouldShowCondensed()) {
+      setSelectedWhere('');
+      setLocationFilter('');
+    }
+    
     // Set active field
     setActiveField(index);
     
@@ -230,19 +353,17 @@ export function ScrollResponsiveNavbar({
 
   // Handle field blur
   const handleFieldBlur = (index: number) => {
-    setTimeout(() => setActiveField(null), 100);
-    // Auto-close dropdowns with delays to allow for interactions
-    if (index === 0) {
-      setTimeout(() => setShowWhereDropdown(false), 200);
-    }
-    // Don't auto-close calendar, type of help, or demographic dropdowns - they have their own backdrop handlers
+    // Small delay to allow for dropdown interaction
+    setTimeout(() => {
+      if (index === 0 && !showWhereDropdown) {
+        // Location field lost focus and dropdown is closed
+      }
+    }, 200);
   };
 
-  // Handle condensed search bar click to expand
+  // Handle condensed search bar click
   const handleCondensedClick = () => {
     setIsCondensedExpanded(true);
-    setActiveField(0);
-    setShowWhereDropdown(true);
   };
 
   // Calendar helper functions
@@ -317,17 +438,30 @@ export function ScrollResponsiveNavbar({
     return selectedDateRange.start && date.getTime() === selectedDateRange.start.getTime();
   };
 
+  // Check if a date is in the past
+  const isDateInPast = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dateToCheck = new Date(date);
+    dateToCheck.setHours(0, 0, 0, 0);
+    return dateToCheck < today;
+  };
+
   // Available help options
   const helpOptions = [
-    { id: "cleaning", label: "Cleaning" },
-    { id: "cooking", label: "Cooking" },
-    { id: "gardening", label: "Gardening" },
-    { id: "errands", label: "Errands" },
-    { id: "companionship", label: "Companionship" },
-    { id: "petCare", label: "Pet Care" },
-    { id: "techSupport", label: "Tech Support" },
-    { id: "homeSecurity", label: "Home Security" },
+    { id: "cleaning", label: "Cleaning", color: 'bg-blue-50', iconColor: 'text-blue-700', icon: 'sparkles' },
+    { id: "cooking", label: "Cooking", color: 'bg-orange-50', iconColor: 'text-orange-700', icon: 'chef-hat' },
+    { id: "yardWork", label: "Yard Work", color: 'bg-green-50', iconColor: 'text-green-700', icon: 'leaf' },
+    { id: "shoppingErrands", label: "Shopping & Errands", color: 'bg-purple-50', iconColor: 'text-purple-700', icon: 'shopping-bag' },
+    { id: "companionship", label: "Companionship", color: 'bg-pink-50', iconColor: 'text-pink-700', icon: 'heart' },
+    { id: "petCare", label: "Pet Care", color: 'bg-amber-50', iconColor: 'text-amber-700', icon: 'paw' },
+    { id: "techSupport", label: "Tech Support", color: 'bg-indigo-50', iconColor: 'text-indigo-700', icon: 'monitor' },
+    { id: "transportation", label: "Transportation", color: 'bg-slate-50', iconColor: 'text-slate-700', icon: 'car' },
   ];
+
+  // Note: The helpOptions array is consistent with the products page
+  // If there's a mismatch between database values and UI options, 
+  // the filtering logic in the products page handles the mapping
 
   // Available demographic options
   const demographicOptions = [
@@ -424,6 +558,7 @@ export function ScrollResponsiveNavbar({
   // Handle clearing all selections
   const handleClearAll = () => {
     setSelectedWhere('');
+    setLocationFilter('');
     setSelectedHelpStarts('');
     setSelectedTypeOfHelp([]);
     setSelectedDateRange({ start: null, end: null });
@@ -434,6 +569,7 @@ export function ScrollResponsiveNavbar({
     switch (fieldIndex) {
       case 0:
         setSelectedWhere('');
+        setLocationFilter('');
         break;
       case 1:
         setSelectedHelpStarts('');
@@ -485,7 +621,7 @@ export function ScrollResponsiveNavbar({
               isInCondensedMode ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
             }`}>
               <div 
-                className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 max-w-lg w-full h-18 cursor-pointer" 
+                className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 max-w-2xl w-full h-18 cursor-pointer" 
                 onClick={handleCondensedClick}
               >
                 {/* Selected Icon */}
@@ -513,6 +649,10 @@ export function ScrollResponsiveNavbar({
                               // Extract city name only (remove state)
                               const cityOnly = selectedWhere.split(',')[0].trim();
                               return `Helpers in ${cityOnly}`;
+                            }
+                            // For /products/icon page without location, show "Helpers nearby"
+                            if (pathname === '/products/icon' && !selectedWhere) {
+                              return 'Helpers nearby';
                             }
                             return selectedWhere || text;
                           }
@@ -651,14 +791,6 @@ export function ScrollResponsiveNavbar({
                     >
                       <div className="flex items-center justify-between">
                         <div className="text-lg font-semibold text-gray-900 mb-1">{field.label}</div>
-                        {fieldValue && (
-                          <button
-                            onClick={() => handleClearField(index)}
-                            className="text-gray-400 hover:text-gray-600 transition-colors"
-                          >
-                            <X className="w-6 h-6" />
-                          </button>
-                        )}
                       </div>
                       <input 
                         type="text" 
@@ -671,7 +803,7 @@ export function ScrollResponsiveNavbar({
                         onFocus={() => handleFieldFocus(index)}
                         onBlur={() => handleFieldBlur(index)}
                         onClick={index === 0 ? () => handleFieldFocus(0) : index === 1 ? () => handleFieldFocus(1) : index === 2 ? () => handleFieldFocus(2) : undefined}
-                        readOnly={index === 0 || index === 1 || index === 2}
+                        readOnly={index === 1 || index === 2} // Only make location field (index 0) editable
                       />
                     </div>
                     {/* Divider - only show when this field and next field are both inactive */}
@@ -708,92 +840,58 @@ export function ScrollResponsiveNavbar({
                     // Don't close expanded search - let user navigate between sections
                   }}
                 />
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Suggested destinations</h3>
-                  <div className="space-y-3 max-h-80 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                    {/* Columbia, MO */}
-                    <div 
-                      className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                      onClick={() => handleLocationSelect('Columbia, MO')}
-                    >
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                      </div>
+                <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden w-96">
+                  <div className="p-5 space-y-5 max-h-80 overflow-y-auto">
+                    {/* Recent searches section - could be implemented later */}
+                    {selectedWhere && (
                       <div>
-                        <div className="font-medium text-gray-900 text-lg">Columbia, MO</div>
-                        <div className="text-base text-gray-500">University town with great community</div>
+                        <h3 className="text-xs font-medium text-gray-400 mb-3 uppercase tracking-wider">Recent searches</h3>
+                        <div 
+                          className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                          onClick={() => handleLocationSelect(selectedWhere)}
+                        >
+                          <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                              <circle cx="12" cy="9" r="2.5" />
+                            </svg>
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900 text-sm">{selectedWhere}</div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     
-                    {/* Kansas City, MO */}
-                    <div 
-                      className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                      onClick={() => handleLocationSelect('Kansas City, MO')}
-                    >
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="font-medium text-gray-900 text-lg">Kansas City, MO</div>
-                        <div className="text-base text-gray-500">Urban area with diverse neighborhoods</div>
-                      </div>
-                    </div>
-                    
-                    {/* St. Louis, MO */}
-                    <div 
-                      className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                      onClick={() => handleLocationSelect('St. Louis, MO')}
-                    >
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="font-medium text-gray-900 text-lg">St. Louis, MO</div>
-                        <div className="text-base text-gray-500">Historic city with cultural attractions</div>
-                      </div>
-                    </div>
-                    
-                    {/* Springfield, MO */}
-                    <div 
-                      className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                      onClick={() => handleLocationSelect('Springfield, MO')}
-                    >
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="font-medium text-gray-900 text-lg">Springfield, MO</div>
-                        <div className="text-base text-gray-500">Popular with travelers near you</div>
-                      </div>
-                    </div>
-                    
-                    {/* Jefferson City, MO */}
-                    <div 
-                      className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                      onClick={() => handleLocationSelect('Jefferson City, MO')}
-                    >
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="font-medium text-gray-900 text-lg">Jefferson City, MO</div>
-                        <div className="text-base text-gray-500">State capital with community feel</div>
+                    {/* Currently operating destinations */}
+                    <div>
+                      <h3 className="text-xs font-medium text-gray-400 mb-3 uppercase tracking-wider">Currently Operating In</h3>
+                      <div className="space-y-1">
+                        {filteredCities.map((city, index) => (
+                          <div 
+                            key={city.name}
+                            className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors group"
+                            onClick={() => handleLocationSelect(city.name)}
+                          >
+                            <div className={`w-10 h-10 ${city.color} rounded-lg flex items-center justify-center ${city.iconColor} group-hover:scale-105 transition-transform`}>
+                              {renderCityIcon(city.icon)}
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-medium text-gray-900 text-sm">{city.name}</div>
+                              <div className="text-xs text-gray-500">{city.description}</div>
+                            </div>
+                          </div>
+                        ))}
+                        {filteredCities.length === 0 && locationFilter && (
+                          <div className="p-3 text-center text-gray-500">
+                            <div className="text-sm">No cities found matching "{locationFilter}"</div>
+                            <div className="text-xs mt-1">We currently operate in Columbia, Jefferson City, Boonville, and other central Missouri cities.</div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
               </>
             )}
             
@@ -835,16 +933,14 @@ export function ScrollResponsiveNavbar({
                           onClick={() => handleTypeOfHelpSelect(option.label)}
                         >
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                            isSelected ? 'bg-blue-600 text-white' : 'bg-gray-100'
+                            isSelected ? 'bg-blue-600 text-white' : `${option.color} ${option.iconColor}`
                           }`}>
                             {isSelected ? (
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                               </svg>
                             ) : (
-                              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                              </svg>
+                              renderHelpTypeIcon(option.icon)
                             )}
                           </div>
                           <div>
@@ -929,9 +1025,12 @@ export function ScrollResponsiveNavbar({
                             <div key={index} className="aspect-square">
                               {date && (
                                 <button
-                                  onClick={() => handleDateSelect(date)}
+                                  onClick={() => !isDateInPast(date) && handleDateSelect(date)}
+                                  disabled={isDateInPast(date)}
                                   className={`w-full h-full flex items-center justify-center text-base rounded-full transition-colors ${
-                                    isDateInRange(date)
+                                    isDateInPast(date)
+                                      ? 'text-gray-300 cursor-not-allowed'
+                                      : isDateInRange(date)
                                       ? 'bg-black text-white'
                                       : 'hover:bg-gray-100 text-gray-900'
                                   }`}
@@ -972,9 +1071,12 @@ export function ScrollResponsiveNavbar({
                             <div key={index} className="aspect-square">
                               {date && (
                                 <button
-                                  onClick={() => handleDateSelect(date)}
+                                  onClick={() => !isDateInPast(date) && handleDateSelect(date)}
+                                  disabled={isDateInPast(date)}
                                   className={`w-full h-full flex items-center justify-center text-base rounded-full transition-colors ${
-                                    isDateInRange(date)
+                                    isDateInPast(date)
+                                      ? 'text-gray-300 cursor-not-allowed'
+                                      : isDateInRange(date)
                                       ? 'bg-black text-white'
                                       : 'hover:bg-gray-100 text-gray-900'
                                   }`}

@@ -7,7 +7,7 @@ import { ProductCard } from "@/app/components/ProductCard";
 import { HousemateCard } from "@/app/components/HousemateCard";
 import { ContactHousemateModal } from "@/app/components/ContactHousemateModal";
 import { notFound, useParams, useRouter, useSearchParams } from "next/navigation";
-import { Map, List, CheckCircle, Filter, X } from "lucide-react";
+import { Map, List, CheckCircle, Filter, X, Sparkles, ChefHat, TreePine, ShoppingBag, Heart, PawPrint, Monitor, Car } from "lucide-react";
 import { toast } from "sonner";
 import { HousemateProfileCardNew } from "@/app/components/HousemateProfileCardNew";
 import { HousemateHorizontalCard } from "@/app/components/HousemateHorizontalCard";
@@ -118,15 +118,64 @@ export default function CategoryPage() {
   
   // Support options available for selection
   const supportOptions = [
-    { id: "cleaning", label: "Cleaning" },
-    { id: "cooking", label: "Cooking" },
-    { id: "gardening", label: "Gardening" },
-    { id: "errands", label: "Errands" },
-    { id: "companionship", label: "Companionship" },
-    { id: "petCare", label: "Pet Care" },
-    { id: "techSupport", label: "Tech Support" },
-    { id: "homeSecurity", label: "Home Security" },
+    { id: "cleaning", label: "Cleaning", color: 'bg-blue-50', iconColor: 'text-blue-700', icon: 'sparkles' },
+    { id: "cooking", label: "Cooking", color: 'bg-orange-50', iconColor: 'text-orange-700', icon: 'chef-hat' },
+    { id: "yardWork", label: "Yard Work", color: 'bg-green-50', iconColor: 'text-green-700', icon: 'leaf' },
+    { id: "shoppingErrands", label: "Shopping & Errands", color: 'bg-purple-50', iconColor: 'text-purple-700', icon: 'shopping-bag' },
+    { id: "companionship", label: "Companionship", color: 'bg-pink-50', iconColor: 'text-pink-700', icon: 'heart' },
+    { id: "petCare", label: "Pet Care", color: 'bg-amber-50', iconColor: 'text-amber-700', icon: 'paw' },
+    { id: "techSupport", label: "Tech Support", color: 'bg-indigo-50', iconColor: 'text-indigo-700', icon: 'monitor' },
+    { id: "transportation", label: "Transportation", color: 'bg-slate-50', iconColor: 'text-slate-700', icon: 'car' },
   ];
+
+  // Helper function to map database values to UI option IDs
+  const mapDatabaseToUIOption = (databaseValue: string): string => {
+    // Handle the gardening -> yardWork mapping
+    if (databaseValue === "gardening") {
+      return "yardWork";
+    }
+    return databaseValue;
+  };
+
+  // Helper function to check if an option matches (handles backward compatibility)
+  const doesOptionMatch = (selectedOption: string, databaseArray: string[]): boolean => {
+    // Direct match
+    if (databaseArray.includes(selectedOption)) {
+      return true;
+    }
+    
+    // Handle yardWork -> gardening mapping for backward compatibility
+    if (selectedOption === "yardWork" && databaseArray.includes("gardening")) {
+      return true;
+    }
+    
+    return false;
+  };
+
+  // Function to render help type icons
+  const renderHelpTypeIcon = (iconName: string) => {
+    const iconProps = "w-4 h-4";
+    switch (iconName) {
+      case 'sparkles':
+        return <Sparkles className={iconProps} />;
+      case 'chef-hat':
+        return <ChefHat className={iconProps} />;
+      case 'leaf':
+        return <TreePine className={iconProps} />;
+      case 'shopping-bag':
+        return <ShoppingBag className={iconProps} />;
+      case 'heart':
+        return <Heart className={iconProps} />;
+      case 'paw':
+        return <PawPrint className={iconProps} />;
+      case 'monitor':
+        return <Monitor className={iconProps} />;
+      case 'car':
+        return <Car className={iconProps} />;
+      default:
+        return <Filter className={iconProps} />;
+    }
+  };
   
   // Schedule options
   const scheduleOptions = [
@@ -214,7 +263,7 @@ export default function CategoryPage() {
       // Help options filter
       if (selectedHelpOptions.length > 0) {
         const hasAllMatchingOptions = selectedHelpOptions.every(option => 
-          canHelpWithArray.includes(option)
+          doesOptionMatch(option, canHelpWithArray)
         );
         if (!hasAllMatchingOptions) {
           return false;
@@ -356,7 +405,7 @@ export default function CategoryPage() {
                  // Handle common variations
                  (searchTerm.includes('clean') && optionLabel.includes('clean')) ||
                  (searchTerm.includes('cook') && optionLabel.includes('cook')) ||
-                 (searchTerm.includes('garden') && optionLabel.includes('garden')) ||
+                 (searchTerm.includes('garden') && optionLabel.includes('yard')) ||
                  (searchTerm.includes('errand') && optionLabel.includes('errand')) ||
                  (searchTerm.includes('companion') && optionLabel.includes('companion')) ||
                  (searchTerm.includes('pet') && optionLabel.includes('pet')) ||
@@ -369,7 +418,7 @@ export default function CategoryPage() {
                  (searchTerm.includes('computer') && optionLabel.includes('tech')) ||
                  (searchTerm.includes('dog') && optionLabel.includes('pet')) ||
                  (searchTerm.includes('cat') && optionLabel.includes('pet')) ||
-                 (searchTerm.includes('yard') && optionLabel.includes('garden'));
+                 (searchTerm.includes('yard') && optionLabel.includes('yard'));
         });
         
         // Add matched options to the array, avoiding duplicates
@@ -595,7 +644,7 @@ export default function CategoryPage() {
       // Can help with filters
       if (appliedHelpOptions.length > 0) {
         const hasAllMatchingOptions = appliedHelpOptions.every(option => 
-          canHelpWithArray.includes(option)
+          doesOptionMatch(option, canHelpWithArray)
         );
         if (!hasAllMatchingOptions) {
           return false;
@@ -1244,10 +1293,9 @@ export default function CategoryPage() {
                     </div>
                   </div>
 
-                  {/* Can Help With Filter */}
+                  {/* Type of Help Wanted Filter */}
                   <div className="mb-6">
-                    <h4 className="font-medium text-gray-900 mb-3">Can help with</h4>
-                    <p className="text-xs text-gray-500 mb-3">Select services you're looking for</p>
+                    <h4 className="font-medium text-gray-900 mb-3">Type of help wanted (select all that apply)</h4>
                     <div className="flex flex-wrap gap-2">
                       {supportOptions.map((option) => {
                         const isSelected = selectedHelpOptions.includes(option.id);
@@ -1263,12 +1311,17 @@ export default function CategoryPage() {
                                 setSelectedHelpOptions(prev => [...prev, option.id]);
                               }
                             }}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                               isSelected
                                 ? 'bg-green-800 text-white hover:bg-green-900'
                                 : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                             }`}
                           >
+                            <div className={`flex items-center justify-center ${
+                              isSelected ? 'text-white' : 'text-gray-600'
+                            }`}>
+                              {renderHelpTypeIcon(option.icon)}
+                            </div>
                             {option.label}
                           </button>
                         );
@@ -1287,8 +1340,11 @@ export default function CategoryPage() {
                             return option ? (
                               <span
                                 key={optionId}
-                                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-200 text-blue-800"
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-200 text-blue-800"
                               >
+                                <div className="flex items-center justify-center text-blue-800">
+                                  {renderHelpTypeIcon(option.icon)}
+                                </div>
                                 {option.label}
                               </span>
                             ) : null;

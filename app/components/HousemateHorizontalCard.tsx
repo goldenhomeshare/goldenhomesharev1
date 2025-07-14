@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { User, MapPin, Briefcase, Star, DollarSign, Handshake, Bed, Umbrella } from "lucide-react";
+import { User, MapPin, Briefcase, GraduationCap, Star, DollarSign, Handshake, Bed, Umbrella } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HousemateHorizontalCardProps {
@@ -79,6 +79,37 @@ export function HousemateHorizontalCard({
   const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
   const isRetired = lifestyleData.occupationDetails?.isRetired || false;
 
+  // Function to get detailed occupation display
+  const getOccupationDisplay = () => {
+    // Check if retired
+    if (isRetired) {
+      return "retired";
+    }
+    
+    // Check if currently a student
+    if (isCurrentlyAttending) {
+      const program = lifestyleData.education?.degreeProgram;
+      if (program) {
+        return `Studying ${program}`;
+      }
+      return "a student";
+    }
+    
+    // Check for detailed occupation description
+    if (lifestyleData.occupationDetails?.description) {
+      return lifestyleData.occupationDetails.description;
+    }
+    
+    // Fall back to basic occupation
+    if (occupation) {
+      return occupation;
+    }
+    
+    return null;
+  };
+
+  const occupationDisplay = getOccupationDisplay();
+
   // Gender labels
   const genderLabels: Record<string, string> = {
     male: "Male",
@@ -90,9 +121,23 @@ export function HousemateHorizontalCard({
         <Link href={`/profile/${userId}`} className="block">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer p-6">
         {/* Name at the top center of the card */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-3">
           <h3 className="text-3xl font-bold text-gray-900 text-center">{name}</h3>
         </div>
+        
+        {/* Occupation with icon */}
+        {occupationDisplay && (
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center gap-2 text-gray-600 max-w-md">
+              {isCurrentlyAttending ? (
+                <GraduationCap size={18} className="text-gray-500 flex-shrink-0" />
+              ) : (
+                <Briefcase size={18} className="text-gray-500 flex-shrink-0" />
+              )}
+              <span className="text-lg truncate">{occupationDisplay}</span>
+            </div>
+          </div>
+        )}
         
         <div className="flex flex-col">
           <div className="flex items-start gap-8 mb-6">
@@ -124,15 +169,15 @@ export function HousemateHorizontalCard({
                 </p>
                 <ul className="text-xl font-semibold text-gray-900 space-y-1">
                   <li className="flex items-center gap-2">
-                    <DollarSign size={20} className="text-green-600" />
+                    <DollarSign size={24} className="text-green-600" />
                     ${maxBudget || 400}/mo
                   </li>
                   <li className="flex items-center gap-2">
-                    <Handshake size={20} className="text-blue-600" />
+                    <Handshake size={24} className="text-green-600" />
                     10 hours of help/week
                   </li>
                   <li className="flex items-center gap-2">
-                    <Bed size={20} className="text-purple-600" />
+                    <Bed size={24} className="text-green-600" />
                     Overnight presence
                   </li>
                 </ul>
@@ -174,6 +219,16 @@ export function HousemateHorizontalCard({
               </div>
               <span className="text-lg font-medium text-gray-900 whitespace-nowrap">$10,000 Host Cover</span>
             </div>
+          </div>
+
+          {/* Contact Button */}
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={handleContact}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
+            >
+              Contact {name.split(' ')[0]}
+            </button>
           </div>
         </div>
       </div>

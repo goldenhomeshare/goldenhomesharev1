@@ -768,10 +768,10 @@ export default function CategoryPage() {
     
     return (
       <>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 overflow-x-hidden">
           {/* Helper Counter and Filters - Under Navbar */}
           <div className="py-3">
-            <div className="max-w-7xl mx-auto px-2 flex items-center gap-4">
+            <div className="max-w-7xl mx-auto px-4 flex items-center gap-4">
               <span className="text-lg font-semibold text-gray-900">
                 {filteredHousemates.length} helpers
               </span>
@@ -791,19 +791,11 @@ export default function CategoryPage() {
           </div>
           
           {/* Mobile Layout */}
-          <div className="lg:hidden flex flex-col">
-
-
-
+          <div className="lg:hidden flex flex-col overflow-x-hidden">
             {/* Housemates List - Stacked */}
-            <div className="p-6">
-              <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {filteredHousemates.length} housemate{filteredHousemates.length !== 1 ? 's' : ''} found
-                </h2>
-              </div>
+            <div className="px-4 py-6">
               {/* Housemates List - Stacked */}
-              <div className="space-y-6 pb-40 lg:pb-20">
+              <div className="space-y-4 pb-40 lg:pb-20">
                 {currentPageHousemates.map((housemate) => {
                   // Parse lifestyle data to get location
                   let lifestyleData: any = {};

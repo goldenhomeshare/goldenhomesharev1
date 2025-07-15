@@ -42,10 +42,10 @@ export function VideoPlayButton({ playbackId }: VideoPlayButtonProps) {
   return (
     <>
       <button 
-        className="bg-cyan-300 hover:bg-cyan-400 rounded-full p-8 md:p-12 shadow-2xl transition-all duration-300 hover:scale-105"
+        className="bg-green-600 hover:bg-green-700 rounded-full p-8 md:p-12 shadow-2xl transition-all duration-300 hover:scale-105"
         onClick={handlePlay}
       >
-        <svg className="w-12 h-12 md:w-16 md:h-16 text-blue-700 ml-1" fill="currentColor" viewBox="0 0 24 24">
+        <svg className="w-12 h-12 md:w-16 md:h-16 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
           <path d="M8 5v14l11-7z"/>
         </svg>
       </button>

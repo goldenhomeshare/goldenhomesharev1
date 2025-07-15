@@ -19,10 +19,10 @@ export function ScrollResponsiveNavbar({
 }: ScrollResponsiveNavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [ignoreScrollEvents, setIgnoreScrollEvents] = useState(false);
-  const [showWhereDropdown, setShowWhereDropdown] = useState(false);
-  const [showTypeOfHelpDropdown, setShowTypeOfHelpDropdown] = useState(false);
-  const [showCalendar, setShowCalendar] = useState(false);
-  const [showDemographicDropdown, setShowDemographicDropdown] = useState(false);
+  
+  // Single state to track which dropdown is open
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  
   const [selectedDateRange, setSelectedDateRange] = useState<{start: Date | null, end: Date | null}>({start: null, end: null});
   const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date());
   const [activeField, setActiveField] = useState<number | null>(null);
@@ -35,6 +35,25 @@ export function ScrollResponsiveNavbar({
   const [locationFilter, setLocationFilter] = useState('');
   const pathname = usePathname();
   const router = useRouter();
+
+  // Simple dropdown management
+  const handleDropdownClick = (dropdownName: string, fieldIndex: number) => {
+    if (openDropdown === dropdownName) {
+      // If clicking the same dropdown, close it
+      setOpenDropdown(null);
+      setActiveField(null);
+    } else {
+      // If clicking a different dropdown, close current and open new one
+      setOpenDropdown(dropdownName);
+      setActiveField(fieldIndex);
+    }
+  };
+
+  // Helper booleans for rendering
+  const showWhereDropdown = openDropdown === 'location';
+  const showCalendar = openDropdown === 'date';
+  const showTypeOfHelpDropdown = openDropdown === 'typeOfHelp';
+  const showDemographicDropdown = openDropdown === 'demographic';
 
   // Cities we currently operate in
   const operatingCities = [
@@ -281,11 +300,10 @@ export function ScrollResponsiveNavbar({
   const handleLocationSelect = (location: string) => {
     setSelectedWhere(location);
     setLocationFilter(location);
-    setShowWhereDropdown(false);
     // Move to next field (Help starts) and auto-open calendar
     setTimeout(() => {
+      setOpenDropdown('date');
       setActiveField(1);
-      setShowCalendar(true);
     }, 100);
   };
 
@@ -309,7 +327,8 @@ export function ScrollResponsiveNavbar({
         setLocationFilter(value);
         // Auto-open dropdown when typing
         if (!showWhereDropdown && value.length > 0) {
-          setShowWhereDropdown(true);
+          setOpenDropdown('location');
+          setActiveField(0);
         }
         break;
       case 1: 
@@ -326,29 +345,14 @@ export function ScrollResponsiveNavbar({
 
   // Handle field focus with auto-advance logic
   const handleFieldFocus = (index: number) => {
-    // Close all dropdowns first
-    setShowWhereDropdown(false);
-    setShowCalendar(false);
-    setShowTypeOfHelpDropdown(false);
-    setShowDemographicDropdown(false);
-    
     // Auto-clear location field if clicking on it again with existing content (desktop mode only)
     if (index === 0 && selectedWhere && !shouldShowCondensed()) {
       setSelectedWhere('');
       setLocationFilter('');
     }
     
-    // Set active field
+    // Just set active field - dropdown opening is handled by handleDropdownClick
     setActiveField(index);
-    
-    // Open the appropriate dropdown for the clicked field immediately
-    if (index === 0) {
-      setShowWhereDropdown(true);
-    } else if (index === 1) {
-      setShowCalendar(true);
-    } else if (index === 2) {
-      setShowTypeOfHelpDropdown(true);
-    }
   };
 
   // Handle field blur
@@ -378,9 +382,8 @@ export function ScrollResponsiveNavbar({
     setSelectedDateRange({ start: date, end: date });
     // Auto-advance to next field and open dropdown
     setTimeout(() => {
-      setShowCalendar(false);
+      setOpenDropdown('typeOfHelp');
       setActiveField(2);
-      setShowTypeOfHelpDropdown(true);
     }, 300);
   };
 
@@ -389,9 +392,8 @@ export function ScrollResponsiveNavbar({
     setSelectedDateRange({ start: today, end: today });
     setSelectedHelpStarts(flexibility);
     setTimeout(() => {
-      setShowCalendar(false);
+      setOpenDropdown('typeOfHelp');
       setActiveField(2);
-      setShowTypeOfHelpDropdown(true);
     }, 300);
   };
 
@@ -621,7 +623,7 @@ export function ScrollResponsiveNavbar({
               isInCondensedMode ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
             }`}>
               <div 
-                className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 max-w-2xl w-full h-18 cursor-pointer" 
+                className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 max-w-2xl w-full h-18 cursor-pointer z-50" 
                 onClick={handleCondensedClick}
               >
                 {/* Selected Icon */}
@@ -681,7 +683,14 @@ export function ScrollResponsiveNavbar({
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent condensed bar expansion
                             setIsCondensedExpanded(true); // Expand to full search bar
-                            handleFieldFocus(index);
+                            // Open the appropriate dropdown based on index
+                            if (index === 0) {
+                              handleDropdownClick('location', 0);
+                            } else if (index === 1) {
+                              handleDropdownClick('date', 1);
+                            } else if (index === 2) {
+                              handleDropdownClick('typeOfHelp', 2);
+                            }
                           }}
                         >
                           <span className={`text-xl ${hasValue ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
@@ -734,7 +743,7 @@ export function ScrollResponsiveNavbar({
         <div className={`flex justify-center transition-all duration-500 ease-in-out ${
           !isInCondensedMode || isCondensedExpanded ? 'pb-4 opacity-100 transform translate-y-0' : 'pb-0 opacity-0 transform -translate-y-4 pointer-events-none'
         }`}>
-          <div className="relative max-w-5xl w-full">
+          <div className="relative max-w-5xl w-full z-50">
             <div className={`flex items-center border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-all duration-200 ${
               activeField !== null ? 'bg-gray-100' : 'bg-white'
             }`}>
@@ -783,11 +792,21 @@ export function ScrollResponsiveNavbar({
                 return (
                   <div key={index} className="flex-1 relative">
                     <div 
-                      className={`px-6 py-6 relative ${
+                      className={`px-6 py-6 relative cursor-pointer z-50 ${
                         isActive 
-                          ? 'bg-white shadow-lg z-10 rounded-full' : 
+                          ? 'bg-white shadow-lg rounded-full' : 
                           activeField !== null ? 'opacity-60' : ''
                       } transition-all duration-200`}
+                      onClick={(e) => {
+                        // Handle dropdown switching for ALL fields
+                        if (index === 0) {
+                          handleDropdownClick('location', 0);
+                        } else if (index === 1) {
+                          handleDropdownClick('date', 1);
+                        } else if (index === 2) {
+                          handleDropdownClick('typeOfHelp', 2);
+                        }
+                      }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="text-lg font-semibold text-gray-900 mb-1">{field.label}</div>
@@ -795,15 +814,31 @@ export function ScrollResponsiveNavbar({
                       <input 
                         type="text" 
                         value={fieldValue}
-                        onChange={(e) => handleInputChange(index, e.target.value)}
+                        onChange={(e) => {
+                          // Only allow changes for location field
+                          if (index === 0) {
+                            handleInputChange(index, e.target.value);
+                          }
+                        }}
                         placeholder={field.placeholder} 
                         className={`w-full text-xl bg-transparent border-none outline-none ${
                           fieldValue ? 'text-gray-900 font-medium' : 'text-gray-600 placeholder-gray-400'
                         }`}
-                        onFocus={() => handleFieldFocus(index)}
-                        onBlur={() => handleFieldBlur(index)}
-                        onClick={index === 0 ? () => handleFieldFocus(0) : index === 1 ? () => handleFieldFocus(1) : index === 2 ? () => handleFieldFocus(2) : undefined}
-                        readOnly={index === 1 || index === 2} // Only make location field (index 0) editable
+                        readOnly={index !== 0} // Only location field is editable
+                        onFocus={index === 0 ? () => {
+                          // Auto-clear location field if clicking on it again with existing content
+                          if (selectedWhere && !shouldShowCondensed()) {
+                            setSelectedWhere('');
+                            setLocationFilter('');
+                          }
+                        } : undefined}
+                        onClick={(e) => {
+                          // For location field, prevent container click event when clicking input
+                          if (index === 0) {
+                            e.stopPropagation();
+                            handleDropdownClick('location', 0);
+                          }
+                        }}
                       />
                     </div>
                     {/* Divider - only show when this field and next field are both inactive */}
@@ -835,7 +870,7 @@ export function ScrollResponsiveNavbar({
                 <div 
                   className="fixed inset-0 z-40" 
                   onClick={() => {
-                    setShowWhereDropdown(false);
+                    setOpenDropdown(null);
                     setActiveField(null);
                     // Don't close expanded search - let user navigate between sections
                   }}
@@ -902,7 +937,7 @@ export function ScrollResponsiveNavbar({
                 <div 
                   className="fixed inset-0 z-40" 
                   onClick={() => {
-                    setShowTypeOfHelpDropdown(false);
+                    setOpenDropdown(null);
                     setActiveField(null);
                     // Don't close expanded search - let user navigate between sections
                   }}
@@ -913,7 +948,7 @@ export function ScrollResponsiveNavbar({
                     <h3 className="text-lg font-semibold text-gray-900">Type of help wanted (multi-select)</h3>
                     <button
                       onClick={() => {
-                        setShowTypeOfHelpDropdown(false);
+                        setOpenDropdown(null);
                         setActiveField(null);
                       }}
                       className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -955,13 +990,13 @@ export function ScrollResponsiveNavbar({
                   </div>
                   {/* Search Button */}
                   <div className="flex items-center justify-center mt-6 pt-6 border-t border-gray-200">
-                    <button
+                                        <button
                       onClick={() => {
-                        setShowTypeOfHelpDropdown(false);
+                        setOpenDropdown(null);
                         setActiveField(null);
                         handleSearch();
                       }}
-                                              className="px-6 py-3 text-sm bg-primary hover:bg-primary/90 text-white rounded-full transition-colors font-medium"
+                      className="px-6 py-3 text-sm bg-primary hover:bg-primary/90 text-white rounded-full transition-colors font-medium"
                     >
                       Search
                     </button>
@@ -978,7 +1013,7 @@ export function ScrollResponsiveNavbar({
                 <div 
                   className="fixed inset-0 z-40" 
                   onClick={() => {
-                    setShowCalendar(false);
+                    setOpenDropdown(null);
                     setActiveField(null);
                     // Don't close expanded search - let user navigate between sections
                   }}
@@ -1089,40 +1124,6 @@ export function ScrollResponsiveNavbar({
                         </div>
                       </div>
                     </div>
-
-                    {/* Quick Selection Buttons */}
-                    <div className="flex items-center justify-center gap-2 mt-6 pt-6 border-t border-gray-200">
-                      <button
-                        onClick={() => handleFlexibleDateSelect('± 1 day')}
-                        className="px-4 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
-                      >
-                        ± 1 day
-                      </button>
-                      <button
-                        onClick={() => handleFlexibleDateSelect('± 2 days')}
-                        className="px-4 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
-                      >
-                        ± 2 days
-                      </button>
-                      <button
-                        onClick={() => handleFlexibleDateSelect('± 3 days')}
-                        className="px-4 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
-                      >
-                        ± 3 days
-                      </button>
-                      <button
-                        onClick={() => handleFlexibleDateSelect('± 7 days')}
-                        className="px-4 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
-                      >
-                        ± 7 days
-                      </button>
-                      <button
-                        onClick={() => handleFlexibleDateSelect('± 14 days')}
-                        className="px-4 py-2 text-base border border-gray-300 rounded-full hover:bg-gray-50 transition-colors"
-                      >
-                        ± 14 days
-                      </button>
-                    </div>
                   </div>
                 </div>
               </>
@@ -1151,9 +1152,7 @@ export function ScrollResponsiveNavbar({
             onClick={() => {
               setIsCondensedExpanded(false);
               setActiveField(null);
-              setShowWhereDropdown(false);
-              setShowTypeOfHelpDropdown(false);
-              setShowCalendar(false);
+              setOpenDropdown(null);
             }}
           />
         )}

@@ -332,7 +332,7 @@ export default async function Home() {
               
               {/* Left Content - Meet Golden Text */}
               <div className="space-y-6">
-                <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold text-cyan-300 leading-tight">
+                <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold text-green-600 leading-tight">
                   Meet<br />
                   Golden
                 </h2>

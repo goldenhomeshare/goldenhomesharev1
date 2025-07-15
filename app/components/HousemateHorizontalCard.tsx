@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { User, MapPin, Briefcase, GraduationCap, Star, DollarSign, Handshake, Bed, Umbrella } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
+import { User, MapPin, Briefcase, GraduationCap, Star, ShieldCheck } from "lucide-react";
+
 
 interface HousemateHorizontalCardProps {
   id: string;
@@ -119,6 +119,11 @@ export function HousemateHorizontalCard({
   };
 
   const occupationDisplay = getOccupationDisplay();
+  
+  // Truncate occupation display to ensure consistent card height
+  const truncatedOccupation = occupationDisplay && occupationDisplay.length > 25 
+    ? occupationDisplay.substring(0, 25) + "..." 
+    : occupationDisplay;
 
   // Gender labels
   const genderLabels: Record<string, string> = {
@@ -129,220 +134,102 @@ export function HousemateHorizontalCard({
 
   return (
     <Link href={`/profile/${userId}`} className="block w-full">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-full max-w-full">
-        {/* Mobile Layout - Stack vertically */}
-        <div className="block lg:hidden w-full">
-          <div className="p-4 space-y-3 w-full overflow-hidden">
-            {/* Header with name and profile image */}
-            <div className="flex items-center gap-3 w-full">
-              {/* Profile Picture - Optimized for mobile */}
-              <div className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-                {profileImage ? (
-                  <Image
-                    src={profileImage}
-                    alt={`${name}'s profile`}
-                    fill
-                    className="object-cover"
-                    sizes="64px"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full bg-gray-100">
-                    <User size={24} className="text-gray-400" />
-                  </div>
-                )}
-              </div>
-             
-              {/* Name and occupation */}
-              <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-bold text-gray-900 truncate">{displayName}</h3>
-                {occupationDisplay && (
-                  <div className="flex items-center gap-1 text-gray-600 mt-1">
-                    {isCurrentlyAttending ? (
-                      <GraduationCap size={12} className="text-gray-500 flex-shrink-0" />
-                    ) : (
-                      <Briefcase size={12} className="text-gray-500 flex-shrink-0" />
-                    )}
-                    <span className="text-xs truncate">{occupationDisplay}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Key benefits */}
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <p className="text-sm text-gray-700 mb-2">
-                Host {firstName} and get up to:
-              </p>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-sm">
-                  <DollarSign size={14} className="text-green-600 flex-shrink-0" />
-                  <span className="font-bold">${maxBudget || 400}/mo</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Handshake size={14} className="text-green-600 flex-shrink-0" />
-                  <span className="font-bold">10 hours of help/week</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Bed size={14} className="text-green-600 flex-shrink-0" />
-                  <span className="font-bold">Overnight presence</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Bio */}
-            {bio && (
-              <div className="w-full">
-                <p className="text-sm text-gray-700 line-clamp-2 break-words">
-                  {bio}
-                </p>
-              </div>
-            )}
-
-            {/* Verification badges */}
-            <div className="flex flex-wrap items-center justify-center gap-3 text-center">
-              {isVerified && (
-                <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-2.5 h-2.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                  </div>
-                  <span className="text-xs font-medium text-gray-900">Background Checked</span>
-                </div>
-              )}
-              
-              <div className="flex items-center gap-1">
-                <div className="w-4 h-4 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Umbrella className="w-2.5 h-2.5 text-gray-600" />
-                </div>
-                <span className="text-xs font-medium text-gray-900">$10,000 Host Cover</span>
-              </div>
-            </div>
-
-            {/* Contact button */}
-            <div className="w-full">
-              <button
-                onClick={handleContact}
-                className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium text-sm"
-              >
-                Contact {firstName}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Desktop Layout - Original horizontal layout */}
-        <div className="hidden lg:block p-6">
-                     {/* Name at the top center of the card */}
-           <div className="flex justify-center mb-3">
-             <h3 className="text-3xl font-bold text-gray-900 text-center">{displayName}</h3>
-           </div>
-          
-          {/* Occupation with icon */}
-          {occupationDisplay && (
-            <div className="flex justify-center mb-8">
-              <div className="flex items-center gap-2 text-gray-600 max-w-md">
-                {isCurrentlyAttending ? (
-                  <GraduationCap size={18} className="text-gray-500 flex-shrink-0" />
-                ) : (
-                  <Briefcase size={18} className="text-gray-500 flex-shrink-0" />
-                )}
-                <span className="text-lg truncate">{occupationDisplay}</span>
-              </div>
-            </div>
-          )}
-          
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-full max-w-full min-h-[300px] lg:min-h-[420px]">
+        
+        {/* Unified Layout - Responsive horizontal design */}
+        <div className="p-3 pb-0 sm:p-4 lg:p-6">
           <div className="flex flex-col">
-            <div className="flex items-start gap-8 mb-6">
-              {/* Profile Picture Section - Large circular image */}
-              <div className="flex-shrink-0">
-                <div className="relative w-48 h-48 rounded-full overflow-hidden">
+            <div className="flex items-center sm:items-start gap-4 lg:gap-8 mb-3 sm:mb-4 lg:mb-6 relative">
+              {/* Profile Picture Section - Responsive sizing */}
+              <div className="w-32 sm:w-48 lg:w-64 flex-shrink-0 flex flex-col items-center mt-4 sm:mt-0">
+                <div className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-48 lg:h-48 rounded-full overflow-hidden">
                   {profileImage ? (
                     <Image
                       src={profileImage}
                       alt={`${name}'s profile`}
                       fill
                       className="object-cover"
-                      sizes="192px"
+                      sizes="(max-width: 640px) 96px, (max-width: 1024px) 128px, 192px"
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full bg-gray-100">
-                      <User size={64} className="text-gray-400" />
+                      <User size={32} className="text-gray-400 sm:w-12 sm:h-12 lg:w-16 lg:h-16" />
                     </div>
                   )}
                 </div>
-              </div>
-
-              {/* Right Content */}
-              <div className="flex-1 flex flex-col justify-start min-w-0">
-                {/* Main pricing text */}
-                <div className="mb-4">
-                                     <p className="text-xl text-gray-900 leading-relaxed mb-2">
-                     Host {firstName} and get up to:
-                   </p>
-                  <ul className="text-xl font-semibold text-gray-900 space-y-1">
-                    <li className="flex items-center gap-2">
-                      <DollarSign size={24} className="text-green-600" />
-                      ${maxBudget || 400}/mo
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Handshake size={24} className="text-green-600" />
-                      10 hours of help/week
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Bed size={24} className="text-green-600" />
-                      Overnight presence
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Bio section */}
-                <div className="mb-4">
-                  {bio ? (
-                    <p className="text-lg text-gray-700 leading-relaxed line-clamp-2 overflow-hidden">
-                      {bio}
-                    </p>
-                                     ) : (
-                     <p className="text-lg text-gray-700 leading-relaxed">
-                       {firstName} hasn't added a bio yet.
-                     </p>
-                   )}
-                </div>
-              </div>
-            </div>
-
-            {/* Bottom badges - now full width */}
-            <div className="flex items-center justify-center gap-6">
-              {/* Background Checked */}
-              {isVerified && (
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
+                {/* Name below profile image */}
+                <div className="mt-2 lg:mt-4 text-center w-full">
+                  <h3 className="text-lg sm:text-2xl lg:text-4xl font-bold text-gray-900">{firstName}</h3>
+                  {/* Occupation with icon - responsive spacing */}
+                  <div className="h-10 sm:h-8 lg:h-12 flex items-center justify-center gap-1 lg:gap-2 text-gray-600 mt-1 lg:mt-2 px-1 lg:px-2">
+                    {occupationDisplay ? (
+                      <div className="flex items-center gap-1 lg:gap-2">
+                        {isCurrentlyAttending ? (
+                          <GraduationCap size={14} className="text-gray-500 flex-shrink-0 sm:w-4 sm:h-4 lg:w-[18px] lg:h-[18px]" />
+                        ) : (
+                          <Briefcase size={14} className="text-gray-500 flex-shrink-0 sm:w-4 sm:h-4 lg:w-[18px] lg:h-[18px]" />
+                        )}
+                        {/* Single responsive span - mobile: 2-line left-aligned, desktop: truncated center-aligned */}
+                        <span 
+                          className="text-sm sm:text-sm lg:text-lg text-left sm:text-center line-clamp-2 sm:truncate max-w-[120px] sm:max-w-[140px] lg:max-w-[180px]" 
+                          title={occupationDisplay || undefined}
+                        >
+                          {occupationDisplay}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-sm sm:text-sm lg:text-lg text-gray-400">No occupation listed</span>
+                    )}
                   </div>
-                  <span className="text-lg font-medium text-gray-900 whitespace-nowrap">Background Checked</span>
+                </div>
+              </div>
+              {/* Verification Badge - Responsive positioning */}
+              {isVerified && (
+                <div 
+                  className="absolute top-21 left-20 sm:top-24 sm:left-32 lg:top-34 lg:left-39 w-8 h-8 sm:w-10 sm:h-10 lg:w-14 lg:h-14 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg cursor-help z-10" 
+                  title="This person has been background checked"
+                >
+                  <ShieldCheck size={20} className="text-white sm:w-6 sm:h-6 lg:w-9 lg:h-9" />
                 </div>
               )}
 
-              {/* Host Cover */}
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                  <Umbrella className="w-5 h-5 text-gray-600" />
+              {/* Right Content - Responsive sizing */}
+              <div className="flex-1 flex flex-col justify-start min-w-0 mt-0 lg:mt-8">
+                {/* Main pricing text */}
+                <div className="mb-2 sm:mb-4">
+                  <div className="space-y-2 lg:space-y-4">
+                    <div className="text-left">
+                      <div className="font-bold text-lg sm:text-xl lg:text-2xl text-gray-900">${maxBudget || 400}/month</div>
+                      <div className="text-sm lg:text-base text-gray-600">Housing budget</div>
+                    </div>
+                    <div className="border-t border-gray-300"></div>
+                    <div className="text-left">
+                      <div className="font-bold text-lg sm:text-xl lg:text-2xl text-gray-900">10 hrs/week</div>
+                      <div className="text-sm lg:text-base text-gray-600">Available to help</div>
+                    </div>
+                    <div className="border-t border-gray-300"></div>
+                     <div className="text-left">
+                      <div className="font-bold text-lg sm:text-xl lg:text-2xl text-gray-900">5-6 nights/week</div>
+                      <div className="text-sm lg:text-base text-gray-600">Overnight presence</div>
+                    </div>
+                  </div>
                 </div>
-                <span className="text-lg font-medium text-gray-900 whitespace-nowrap">$10,000 Host Cover</span>
               </div>
             </div>
 
-            {/* Contact Button */}
-            <div className="flex justify-center mt-4">
-                             <button
-                 onClick={handleContact}
-                 className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium"
-               >
-                 Contact {firstName}
-               </button>
+            {/* Bio section - spans full width, responsive text */}
+            <div className="mt-4 sm:mt-6 lg:mt-8 mb-0 sm:mb-0 lg:mb-0">
+              {bio ? (
+                <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-tight sm:leading-relaxed line-clamp-2 overflow-hidden">
+                  <span className="font-bold text-gray-900">About: </span>{bio}
+                </p>
+              ) : (
+                <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-tight sm:leading-relaxed">
+                  <span className="font-bold text-gray-900">About: </span>{firstName} hasn't added a bio yet.
+                </p>
+              )}
             </div>
+
           </div>
         </div>
       </div>

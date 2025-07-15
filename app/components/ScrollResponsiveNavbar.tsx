@@ -623,7 +623,7 @@ export function ScrollResponsiveNavbar({
               isInCondensedMode ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
             }`}>
               <div 
-                className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 max-w-2xl w-full h-18 cursor-pointer z-50" 
+                className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 max-w-2xl w-full h-18 cursor-pointer z-[9998]" 
                 onClick={handleCondensedClick}
               >
                 {/* Selected Icon */}
@@ -743,7 +743,7 @@ export function ScrollResponsiveNavbar({
         <div className={`flex justify-center transition-all duration-500 ease-in-out ${
           !isInCondensedMode || isCondensedExpanded ? 'pb-4 opacity-100 transform translate-y-0' : 'pb-0 opacity-0 transform -translate-y-4 pointer-events-none'
         }`}>
-          <div className="relative max-w-5xl w-full z-50">
+          <div className="relative max-w-5xl w-full z-[9998]">
             <div className={`flex items-center border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-all duration-200 ${
               activeField !== null ? 'bg-gray-100' : 'bg-white'
             }`}>
@@ -792,7 +792,7 @@ export function ScrollResponsiveNavbar({
                 return (
                   <div key={index} className="flex-1 relative">
                     <div 
-                      className={`px-6 py-6 relative cursor-pointer z-50 ${
+                      className={`px-6 py-6 relative cursor-pointer z-[9998] ${
                         isActive 
                           ? 'bg-white shadow-lg rounded-full' : 
                           activeField !== null ? 'opacity-60' : ''
@@ -868,14 +868,24 @@ export function ScrollResponsiveNavbar({
               <>
                 {/* Backdrop to close dropdown */}
                 <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => {
+                  className="fixed inset-0 z-[9999] bg-transparent" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Backdrop clicked - closing dropdown');
                     setOpenDropdown(null);
                     setActiveField(null);
-                    // Don't close expanded search - let user navigate between sections
+                  }}
+                  style={{ 
+                    top: 0, 
+                    left: 0, 
+                    right: 0, 
+                    bottom: 0, 
+                    position: 'fixed',
+                    zIndex: 9999
                   }}
                 />
-                <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden w-96">
+                <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-[10000] max-h-96 overflow-hidden w-96">
                   <div className="p-5 space-y-5 max-h-80 overflow-y-auto">
                     {/* Recent searches section - could be implemented later */}
                     {selectedWhere && (
@@ -935,14 +945,24 @@ export function ScrollResponsiveNavbar({
               <>
                 {/* Backdrop to close dropdown */}
                 <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => {
+                  className="fixed inset-0 z-[9999] bg-transparent" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Type of help backdrop clicked - closing dropdown');
                     setOpenDropdown(null);
                     setActiveField(null);
-                    // Don't close expanded search - let user navigate between sections
+                  }}
+                  style={{ 
+                    top: 0, 
+                    left: 0, 
+                    right: 0, 
+                    bottom: 0, 
+                    position: 'fixed',
+                    zIndex: 9999
                   }}
                 />
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-50 max-h-[600px] overflow-hidden">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-[10000] max-h-[600px] overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">Type of help wanted (multi-select)</h3>
@@ -1011,14 +1031,24 @@ export function ScrollResponsiveNavbar({
               <>
                 {/* Backdrop to close calendar */}
                 <div 
-                  className="fixed inset-0 z-40" 
-                  onClick={() => {
+                  className="fixed inset-0 z-[9999] bg-transparent" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Calendar backdrop clicked - closing dropdown');
                     setOpenDropdown(null);
                     setActiveField(null);
-                    // Don't close expanded search - let user navigate between sections
+                  }}
+                  style={{ 
+                    top: 0, 
+                    left: 0, 
+                    right: 0, 
+                    bottom: 0, 
+                    position: 'fixed',
+                    zIndex: 9999
                   }}
                 />
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-50 max-w-4xl mx-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-[10000] max-w-4xl mx-auto">
                   <div className="p-6">
                     {/* As Soon As Possible Button */}
                     <div className="flex items-center justify-center mb-6">

@@ -4,18 +4,9 @@ import { cn } from '@/lib/utils';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { useState, useEffect } from "react";
 
 export function NavbarLinks () {
     const location = usePathname(); 
-    const [brightFlash, setBrightFlash] = useState<string | null>(null);
-
-    const handleNavClick = (path: string) => {
-      setBrightFlash(path);
-      setTimeout(() => {
-        setBrightFlash(null);
-      }, 1000); // Reset after animation
-    };
 
     return (
     <div className="flex justify-center items-center gap-x-6">
@@ -27,13 +18,11 @@ export function NavbarLinks () {
             className={cn(
                 "group flex flex-col items-center transition-all duration-200 hover:text-gray-900"
             )}
-            onClick={() => handleNavClick("/")}
           >
             <div className="flex items-center gap-6 pb-2">
               <div className={cn(
                 "relative w-16 h-16 hover-vibrate",
-                location === "/" && "animate-vibrate",
-                brightFlash === "/" && "animate-brightness-flash"
+                location === "/" && "animate-vibrate"
               )} 
               style={{
                 animation: location === "/" ? "vibrate 0.6s ease-in-out 1" : undefined
@@ -63,13 +52,11 @@ export function NavbarLinks () {
             className={cn(
                 "group flex flex-col items-center transition-all duration-200 hover:text-gray-900"
             )}
-            onClick={() => handleNavClick("/homes")}
           >
             <div className="flex items-center gap-6 pb-2">
               <div className={cn(
                 "relative w-16 h-16 hover-vibrate",
-                location === "/homes" && "animate-vibrate",
-                brightFlash === "/homes" && "animate-brightness-flash"
+                location === "/homes" && "animate-vibrate"
               )}
               style={{
                 animation: location === "/homes" ? "vibrate 0.6s ease-in-out 1" : undefined

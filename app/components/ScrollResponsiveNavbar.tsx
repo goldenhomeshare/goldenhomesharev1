@@ -589,7 +589,7 @@ export function ScrollResponsiveNavbar({
         {/* Main Navbar Row */}
         <div className="flex items-center justify-between">
           {/* Logo - Positioned further left like Airbnb */}
-          <div className={`flex-shrink-0 transition-all duration-500 ease-in-out pt-7 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
+          <div className={`flex-shrink-0 transition-all duration-500 ease-in-out pt-3 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
             <Link href="/">
               {/* Full logo for larger screens - no size changes */}
               <div className="hidden sm:flex items-center -ml-4 md:-ml-8 lg:-ml-12">
@@ -617,7 +617,7 @@ export function ScrollResponsiveNavbar({
           </div>
 
           {/* Center Content Area - Same top padding, remove bottom when scrolled */}
-          <div className={`flex-1 flex justify-center transition-all duration-500 ease-in-out pt-7 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
+          <div className={`flex-1 flex justify-center transition-all duration-500 ease-in-out pt-3 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
             {/* Condensed Search Bar when scrolled (hide when expanded) */}
             <div className={`transition-all duration-500 ease-in-out ${
               isInCondensedMode ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
@@ -734,7 +734,7 @@ export function ScrollResponsiveNavbar({
           </div>
 
           {/* User Navigation - Same top padding, remove bottom when scrolled */}
-          <div className={`flex items-center gap-x-1 flex-shrink-0 transition-all duration-500 ease-in-out pt-7 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
+          <div className={`flex items-center gap-x-1 flex-shrink-0 transition-all duration-500 ease-in-out pt-3 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
             {userNavigation}
           </div>
         </div>

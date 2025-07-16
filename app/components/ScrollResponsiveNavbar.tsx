@@ -36,17 +36,10 @@ export function ScrollResponsiveNavbar({
   const pathname = usePathname();
   const router = useRouter();
 
-  // Simple dropdown management
-  const handleDropdownClick = (dropdownName: string, fieldIndex: number) => {
-    if (openDropdown === dropdownName) {
-      // If clicking the same dropdown, close it
-      setOpenDropdown(null);
-      setActiveField(null);
-    } else {
-      // If clicking a different dropdown, close current and open new one
-      setOpenDropdown(dropdownName);
-      setActiveField(fieldIndex);
-    }
+  // Clean dropdown management - direct state setting
+  const closeDropdown = () => {
+    setOpenDropdown(null);
+    setActiveField(null);
   };
 
   // Helper booleans for rendering
@@ -680,16 +673,20 @@ export function ScrollResponsiveNavbar({
                       <div key={index} className="flex items-center">
                         <div 
                           className="px-5 py-4 cursor-pointer hover:bg-gray-50 rounded-md transition-colors flex items-center"
-                          onClick={(e) => {
+                          onMouseDown={(e) => {
+                            e.preventDefault();
                             e.stopPropagation(); // Prevent condensed bar expansion
                             setIsCondensedExpanded(true); // Expand to full search bar
-                            // Open the appropriate dropdown based on index
+                            // Immediately open the appropriate dropdown
                             if (index === 0) {
-                              handleDropdownClick('location', 0);
+                              setOpenDropdown('location');
+                              setActiveField(0);
                             } else if (index === 1) {
-                              handleDropdownClick('date', 1);
+                              setOpenDropdown('date');
+                              setActiveField(1);
                             } else if (index === 2) {
-                              handleDropdownClick('typeOfHelp', 2);
+                              setOpenDropdown('typeOfHelp');
+                              setActiveField(2);
                             }
                           }}
                         >
@@ -743,7 +740,7 @@ export function ScrollResponsiveNavbar({
         <div className={`flex justify-center transition-all duration-500 ease-in-out ${
           !isInCondensedMode || isCondensedExpanded ? 'pb-4 opacity-100 transform translate-y-0' : 'pb-0 opacity-0 transform -translate-y-4 pointer-events-none'
         }`}>
-          <div className="relative max-w-5xl w-full z-[9998]">
+          <div className="relative max-w-5xl w-full z-[60]">
             <div className={`flex items-center border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-all duration-200 ${
               activeField !== null ? 'bg-gray-100' : 'bg-white'
             }`}>
@@ -792,19 +789,24 @@ export function ScrollResponsiveNavbar({
                 return (
                   <div key={index} className="flex-1 relative">
                     <div 
-                      className={`px-6 py-6 relative cursor-pointer z-[9998] ${
+                      className={`px-6 py-6 relative cursor-pointer z-[75] ${
                         isActive 
                           ? 'bg-white shadow-lg rounded-full' : 
                           activeField !== null ? 'opacity-60' : ''
                       } transition-all duration-200`}
-                      onClick={(e) => {
-                        // Handle dropdown switching for ALL fields
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        // Immediate dropdown switching - no conflicts
                         if (index === 0) {
-                          handleDropdownClick('location', 0);
+                          setOpenDropdown('location');
+                          setActiveField(0);
                         } else if (index === 1) {
-                          handleDropdownClick('date', 1);
+                          setOpenDropdown('date');
+                          setActiveField(1);
                         } else if (index === 2) {
-                          handleDropdownClick('typeOfHelp', 2);
+                          setOpenDropdown('typeOfHelp');
+                          setActiveField(2);
                         }
                       }}
                     >
@@ -821,24 +823,17 @@ export function ScrollResponsiveNavbar({
                           }
                         }}
                         placeholder={field.placeholder} 
-                        className={`w-full text-xl bg-transparent border-none outline-none ${
+                        className={`w-full text-xl bg-transparent border-none outline-none pointer-events-none ${
                           fieldValue ? 'text-gray-900 font-medium' : 'text-gray-600 placeholder-gray-400'
-                        }`}
+                        } ${index === 0 ? 'pointer-events-auto' : ''}`}
                         readOnly={index !== 0} // Only location field is editable
                         onFocus={index === 0 ? () => {
-                          // Auto-clear location field if clicking on it again with existing content
+                          // Only handle auto-clear for location field
                           if (selectedWhere && !shouldShowCondensed()) {
                             setSelectedWhere('');
                             setLocationFilter('');
                           }
                         } : undefined}
-                        onClick={(e) => {
-                          // For location field, prevent container click event when clicking input
-                          if (index === 0) {
-                            e.stopPropagation();
-                            handleDropdownClick('location', 0);
-                          }
-                        }}
                       />
                     </div>
                     {/* Divider - only show when this field and next field are both inactive */}
@@ -848,7 +843,7 @@ export function ScrollResponsiveNavbar({
                   </div>
                 );
               })}
-              <div className={`pr-2 ${activeField !== null ? 'opacity-100' : ''} transition-opacity duration-200`}>
+              <div className={`pr-2 z-[75] relative ${activeField !== null ? 'opacity-100' : ''} transition-opacity duration-200`}>
                 <button 
                   onClick={handleSearch}
                   className={`bg-primary hover:bg-primary/90 text-white rounded-full transition-all duration-200 flex items-center gap-3 ${
@@ -866,26 +861,24 @@ export function ScrollResponsiveNavbar({
             {/* Where Dropdown */}
             {showWhereDropdown && (
               <>
-                {/* Backdrop to close dropdown */}
+                {/* Backdrop to close dropdown - proper z-index hierarchy */}
                 <div 
-                  className="fixed inset-0 z-[9999] bg-transparent" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Backdrop clicked - closing dropdown');
-                    setOpenDropdown(null);
-                    setActiveField(null);
-                  }}
+                  className="fixed inset-0 bg-transparent"
                   style={{ 
+                    position: 'fixed',
                     top: 0, 
                     left: 0, 
                     right: 0, 
                     bottom: 0, 
-                    position: 'fixed',
-                    zIndex: 9999
+                    zIndex: 70
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeDropdown();
                   }}
                 />
-                <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-[10000] max-h-96 overflow-hidden w-96">
+                <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 max-h-96 overflow-hidden w-96" style={{ zIndex: 80 }}>
                   <div className="p-5 space-y-5 max-h-80 overflow-y-auto">
                     {/* Recent searches section - could be implemented later */}
                     {selectedWhere && (
@@ -943,34 +936,29 @@ export function ScrollResponsiveNavbar({
             {/* Type of Help Dropdown */}
             {showTypeOfHelpDropdown && (
               <>
-                {/* Backdrop to close dropdown */}
+                {/* Backdrop to close dropdown - proper z-index hierarchy */}
                 <div 
-                  className="fixed inset-0 z-[9999] bg-transparent" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Type of help backdrop clicked - closing dropdown');
-                    setOpenDropdown(null);
-                    setActiveField(null);
-                  }}
+                  className="fixed inset-0 bg-transparent"
                   style={{ 
+                    position: 'fixed',
                     top: 0, 
                     left: 0, 
                     right: 0, 
                     bottom: 0, 
-                    position: 'fixed',
-                    zIndex: 9999
+                    zIndex: 70
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeDropdown();
                   }}
                 />
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-[10000] max-h-[600px] overflow-hidden">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 max-h-[600px] overflow-hidden" style={{ zIndex: 80 }}>
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">Type of help wanted (multi-select)</h3>
                     <button
-                      onClick={() => {
-                        setOpenDropdown(null);
-                        setActiveField(null);
-                      }}
+                      onClick={closeDropdown}
                       className="text-gray-400 hover:text-gray-600 transition-colors"
                     >
                       <X className="w-4 h-4" />
@@ -1012,8 +1000,7 @@ export function ScrollResponsiveNavbar({
                   <div className="flex items-center justify-center mt-6 pt-6 border-t border-gray-200">
                                         <button
                       onClick={() => {
-                        setOpenDropdown(null);
-                        setActiveField(null);
+                        closeDropdown();
                         handleSearch();
                       }}
                       className="px-6 py-3 text-sm bg-primary hover:bg-primary/90 text-white rounded-full transition-colors font-medium"
@@ -1029,26 +1016,24 @@ export function ScrollResponsiveNavbar({
             {/* Calendar Popup */}
             {showCalendar && (
               <>
-                {/* Backdrop to close calendar */}
+                {/* Backdrop to close calendar - proper z-index hierarchy */}
                 <div 
-                  className="fixed inset-0 z-[9999] bg-transparent" 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Calendar backdrop clicked - closing dropdown');
-                    setOpenDropdown(null);
-                    setActiveField(null);
-                  }}
+                  className="fixed inset-0 bg-transparent"
                   style={{ 
+                    position: 'fixed',
                     top: 0, 
                     left: 0, 
                     right: 0, 
                     bottom: 0, 
-                    position: 'fixed',
-                    zIndex: 9999
+                    zIndex: 70
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    closeDropdown();
                   }}
                 />
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 z-[10000] max-w-4xl mx-auto">
+                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 max-w-4xl mx-auto" style={{ zIndex: 80 }}>
                   <div className="p-6">
                     {/* As Soon As Possible Button */}
                     <div className="flex items-center justify-center mb-6">
@@ -1169,7 +1154,7 @@ export function ScrollResponsiveNavbar({
             className="fixed inset-0 z-30" 
             onClick={() => {
               setIsCondensedExpanded(false);
-              setActiveField(null);
+              closeDropdown();
             }}
           />
         )}

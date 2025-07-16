@@ -2,6 +2,7 @@ import { AirbnbStyleRow } from "../app/components/AirbnbStyleRow";
 import Image from "next/image";
 import Link from "next/link";
 import { VideoPlayButton } from "../components/VideoPlayButton";
+import { VideoModal } from "./components/VideoModal";
 
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -16,7 +17,9 @@ import {
   Wrench, 
   Car,
   Search,
-  ChevronDown
+  ChevronDown,
+  Play,
+  X
 } from "lucide-react";
 
 export default async function Home() {
@@ -315,36 +318,38 @@ export default async function Home() {
         {/* Main Video Section with Curved Background */}
         <div className="relative min-h-[600px] md:min-h-[700px] lg:min-h-[800px] overflow-hidden">
           
-          {/* Curved Background Image Layer */}
+          {/* Background Image Layer */}
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat bg-amber-100"
+            className="absolute inset-0 bg-cover bg-no-repeat"
             style={{ 
-              backgroundImage: "url('/old-young-hero.jpg')",
-              clipPath: "polygon(0 6%, 1% 6.2%, 2% 6.5%, 3% 6.8%, 4% 7.2%, 5% 7.6%, 6% 8%, 7% 8.5%, 8% 9%, 9% 9.5%, 10% 10%, 11% 10.5%, 12% 11%, 13% 11.4%, 14% 11.8%, 15% 12.2%, 16% 12.5%, 17% 12.8%, 18% 13.1%, 19% 13.3%, 20% 13.5%, 21% 13.7%, 22% 13.8%, 23% 13.9%, 24% 14%, 25% 14.1%, 26% 14.2%, 27% 14.3%, 28% 14.4%, 29% 14.5%, 30% 14.6%, 31% 14.7%, 32% 14.8%, 33% 14.9%, 34% 15%, 35% 15.1%, 36% 15.2%, 37% 15.3%, 38% 15.4%, 39% 15.5%, 40% 15.6%, 41% 15.7%, 42% 15.8%, 43% 15.9%, 44% 16%, 45% 16.1%, 46% 16.2%, 47% 16.3%, 48% 16.4%, 49% 16.5%, 50% 16.6%, 51% 16.5%, 52% 16.4%, 53% 16.3%, 54% 16.2%, 55% 16.1%, 56% 16%, 57% 15.9%, 58% 15.8%, 59% 15.7%, 60% 15.6%, 61% 15.5%, 62% 15.4%, 63% 15.3%, 64% 15.2%, 65% 15.1%, 66% 15%, 67% 14.9%, 68% 14.8%, 69% 14.7%, 70% 14.6%, 71% 14.5%, 72% 14.4%, 73% 14.3%, 74% 14.2%, 75% 14.1%, 76% 14%, 77% 13.9%, 78% 13.9%, 79% 13.7%, 80% 13.5%, 81% 13.3%, 82% 13.1%, 83% 12.8%, 84% 12.5%, 85% 12.2%, 86% 11.8%, 87% 11.4%, 88% 11%, 89% 10.5%, 90% 10%, 91% 9.5%, 92% 9%, 93% 8.5%, 94% 8%, 95% 7.6%, 96% 7.2%, 97% 6.8%, 98% 6.5%, 99% 6.2%, 100% 6%, 100% 82%, 99% 82.2%, 98% 82.5%, 97% 82.8%, 96% 83.2%, 95% 83.6%, 94% 84%, 93% 84.5%, 92% 85%, 91% 85.5%, 90% 86%, 89% 86.5%, 88% 87%, 87% 87.4%, 86% 87.8%, 85% 88.2%, 84% 88.5%, 83% 88.8%, 82% 89.1%, 81% 89.3%, 80% 89.5%, 79% 89.7%, 78% 89.8%, 77% 89.9%, 76% 90%, 75% 90.1%, 74% 90.2%, 73% 90.3%, 72% 90.4%, 71% 90.5%, 70% 90.6%, 69% 90.7%, 68% 90.8%, 67% 90.9%, 66% 91%, 65% 91.1%, 64% 91.2%, 63% 91.3%, 62% 91.4%, 61% 91.5%, 60% 91.6%, 59% 91.7%, 58% 91.8%, 57% 91.9%, 56% 92%, 55% 92.1%, 54% 92.2%, 53% 92.3%, 52% 92.4%, 51% 92.5%, 50% 92.6%, 49% 92.5%, 48% 92.4%, 47% 92.3%, 46% 92.2%, 45% 92.1%, 44% 92%, 43% 91.9%, 42% 91.8%, 41% 91.7%, 40% 91.6%, 39% 91.5%, 38% 91.4%, 37% 91.3%, 36% 91.2%, 35% 91.1%, 34% 91%, 33% 90.9%, 32% 90.8%, 31% 90.7%, 30% 90.6%, 29% 90.5%, 28% 90.4%, 27% 90.3%, 26% 90.2%, 25% 90.1%, 24% 90%, 23% 89.9%, 22% 89.8%, 21% 89.7%, 20% 89.5%, 19% 89.3%, 18% 89.1%, 17% 88.8%, 16% 88.5%, 15% 88.2%, 14% 87.8%, 13% 87.4%, 12% 87%, 11% 86.5%, 10% 86%, 9% 85.5%, 8% 85%, 7% 84.5%, 6% 84%, 5% 83.6%, 4% 83.2%, 3% 82.8%, 2% 82.5%, 1% 82.2%, 0 82%)"
+              backgroundImage: "url('/mux-video-thumbnail.png')",
+              backgroundPosition: "center 20%"
+            }}
+          ></div>
+          
+          {/* Curved top overlay to create smooth transition from amber section */}
+          <div 
+            className="absolute top-0 left-0 right-0 h-16 md:h-20 lg:h-24 bg-amber-100 z-5"
+            style={{ 
+              borderBottomLeftRadius: "80% 60%",
+              borderBottomRightRadius: "80% 60%"
             }}
           ></div>
           
 
           
           {/* Content Container */}
-          <div className="relative z-10 flex items-center min-h-[600px] md:min-h-[700px] lg:min-h-[800px] px-6 md:px-12">
-            <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
-              
-              {/* Left Content - Meet Golden Text */}
-              <div className="space-y-6">
-                <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold text-green-600 leading-tight">
-                  Meet<br />
-                  Golden
-                </h2>
+          <div className="relative z-20 flex items-center justify-center min-h-[600px] md:min-h-[700px] lg:min-h-[800px] px-6 md:px-12">
+            <div className="text-center">
+              {/* Center - Play Button */}
+              <div className="flex justify-center items-center relative z-30 mb-8">
+                <VideoModal />
               </div>
               
-                             {/* Center - Play Button */}
-               <div className="flex justify-center items-center">
-                 <VideoPlayButton playbackId="AY02ObBaJzq01dJCjKL4hVjxVmV6cqgFdVnT15Rn1xOds" />
-               </div>
-              
-              {/* Right side - empty to balance layout */}
-              <div className="w-0 md:w-1/3"></div>
+              {/* Meet Golden Text - Below Play Button */}
+              <h2 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-tight">
+                Meet Golden
+              </h2>
             </div>
           </div>
         </div>

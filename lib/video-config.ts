@@ -1,9 +1,9 @@
 // Video configuration for Mux integration
 export const videoConfig = {
-  // Replace this with your actual Mux Playback ID once you have it
+  // Updated with the new Golden HomeShare video
   homePageVideo: {
-    playbackId: "AY02ObBaJzq01dJCjKL4hVjxVmV6cqgFdVnT15Rn1xOds", // Your Mux Playback ID
-    title: "",
+    playbackId: "02jjNf02t5q4b15cQRe02PVcJVYAJf33vU6zQLEf02Xy8Cs", // Golden HomeShare Website video updated
+    title: "Golden HomeShare Website video updated",
     description: "",
     thumbnailUrl: "/video-thumbnail.jpg", // Custom thumbnail image
     autoplay: false,

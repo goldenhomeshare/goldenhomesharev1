@@ -2,412 +2,147 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { User, MapPin, MessageCircle, CheckCircle, Armchair } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Briefcase, Clock, Users, Instagram, Facebook, Linkedin, PawPrint, Cigarette, CigaretteOff, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, GraduationCap } from "lucide-react";
-
-interface HousemateProfile {
-  profilePicture?: string | null;
-  bio?: string | null;
-  occupation?: string | null;
-  gender?: string | null;
-  ageRange?: string | null;
-  schedule?: string | null;
-  socialPreference?: string | null;
-  hobbies?: string[] | any | null;
-  preferredGender?: string | null;
-  maxBudget?: number | null;
-  canHelpWith?: string[] | any | null;
-  socialMedia?: {
-    instagram?: string | null;
-    facebook?: string | null;
-    linkedin?: string | null;
-  } | any | null;
-  lifestyle?: {
-    hasPets?: boolean;
-    petDescription?: string;
-    numberOfPeople?: string;
-    smokingStatus?: string;
-  } | any | null;
-}
+import { User, ShieldCheck } from "lucide-react";
 
 interface HousemateProfileCardProps {
-  housemate: {
-    firstName: string;
-    lastName: string;
-    profileImage?: string | null;
-    housemateProfile?: HousemateProfile | null;
-  };
+  id: string;
+  name: string;
+  profileImage?: string;
+  bio?: string;
+  maxBudget?: number;
+  ageRange?: string;
+  gender?: string;
+  occupation?: string;
+  location?: string;
+  canHelpWith?: string[];
 }
 
-const genderLabels: Record<string, string> = {
-  male: "Male",
-  female: "Female",
-  other: "Other",
-  "no-preference": "No Preference"
-};
-
-const occupationLabels: Record<string, string> = {
-  student: "Student",
-  professional: "Professional",
-  remote: "Remote Worker",
-  healthcare: "Healthcare",
-  education: "Education",
-  creative: "Creative",
-  service: "Service Industry",
-  retired: "Retired",
-  unemployed: "Between Jobs",
-  other: "Other"
-};
-
-const scheduleLabels: Record<string, string> = {
-  earlyRiser: "Early Riser",
-  nightOwl: "Night Owl",
-  flexible: "Flexible",
-  regular: "Regular 9-5"
-};
-
-const socialLabels: Record<string, string> = {
-  social: "Social",
-  independent: "Independent",
-  balanced: "Balanced"
-};
-
-const scheduleIcons: Record<string, any> = {
-  earlyRiser: { icon: Clock, label: "Early Riser" },
-  nightOwl: { icon: Clock, label: "Night Owl" },
-  flexible: { icon: Clock, label: "Flexible" },
-  regular: { icon: Clock, label: "Regular 9-5" }
-};
-
-const socialIcons: Record<string, any> = {
-  social: { icon: Users, label: "Social" },
-  independent: { icon: User, label: "Independent" },
-  balanced: { icon: Users, label: "Balanced" }
-};
-
-const supportIcons: Record<string, any> = {
-  cleaning: { icon: Sparkles, label: "Cleaning" },
-  cooking: { icon: Salad, label: "Cooking" },
-  gardening: { icon: Flower, label: "Gardening" },
-  errands: { icon: ShoppingBag, label: "Errands" },
-  companionship: { icon: HeartHandshake, label: "Companionship" },
-  petCare: { icon: Cat, label: "Pet Care" },
-  techSupport: { icon: Wrench, label: "Tech Support" },
-  homeSecurity: { icon: Shield, label: "Home Security" },
-};
-
-export function HousemateProfileCard({ housemate }: HousemateProfileCardProps) {
-  const profile = housemate.housemateProfile;
-
-  // Parse lifestyle data to check if currently attending school
-  let lifestyleData: any = {};
-  if (profile?.lifestyle) {
-    try {
-      lifestyleData = typeof profile.lifestyle === 'string' 
-        ? JSON.parse(profile.lifestyle) 
-        : profile.lifestyle;
-    } catch {
-      lifestyleData = {};
-    }
-  }
-
-  const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
+export function HousemateProfileCard({
+  id,
+  name,
+  profileImage,
+  bio,
+  maxBudget,
+  ageRange,
+  gender,
+  occupation,
+  location,
+  canHelpWith = []
+}: HousemateProfileCardProps) {
+  const firstName = name.split(' ')[0];
 
   return (
-    <Card className="mt-8">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-3">
-          <div className="relative w-16 h-16 rounded-full overflow-hidden">
-            {profile?.profilePicture ? (
-              <Image
-                src={profile.profilePicture}
-                alt={`${housemate.firstName}'s profile`}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                <User className="w-8 h-8 text-gray-400" />
+    <Link href={`/profile/${id}`} className="group cursor-pointer">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-300">
+        {/* Profile Header */}
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-start gap-4">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full overflow-hidden bg-gray-100">
+                {profileImage ? (
+                  <Image
+                    src={profileImage}
+                    alt={`${name}'s profile`}
+                    width={80}
+                    height={80}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <User size={32} className="text-gray-400" />
+                  </div>
+                )}
               </div>
-            )}
+              {/* Verification Badge */}
+              <div 
+                className="absolute -bottom-1 -right-1 w-7 h-7 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg cursor-help" 
+                title="This person has been background checked"
+              >
+                <ShieldCheck size={16} className="text-white" />
+              </div>
+            </div>
+            
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-xl text-gray-900 mb-2">{firstName}</h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                {gender && (
+                  <div>
+                    <span className="text-gray-500">Gender:</span>
+                    <span className="ml-1 text-gray-900">{gender}</span>
+                  </div>
+                )}
+                {ageRange && (
+                  <div>
+                    <span className="text-gray-500">Age:</span>
+                    <span className="ml-1 text-gray-900">{ageRange}</span>
+                  </div>
+                )}
+                {occupation && (
+                  <div>
+                    <span className="text-gray-500">Work:</span>
+                    <span className="ml-1 text-gray-900">{occupation}</span>
+                  </div>
+                )}
+                {location && (
+                  <div>
+                    <span className="text-gray-500">Location:</span>
+                    <span className="ml-1 text-gray-900">{location}</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xl font-semibold">Housemate Profile</h3>
-            <p className="text-lg text-muted-foreground">{housemate.firstName} {housemate.lastName?.charAt(0) || ''}.</p>
-          </div>
-        </CardTitle>
-      </CardHeader>
+        </div>
 
-      <CardContent className="space-y-6">
-        {/* Bio */}
-        {profile?.bio && (
-          <div>
-            <h4 className="font-medium mb-2">About</h4>
-            <p className="text-sm text-muted-foreground leading-relaxed">{profile.bio}</p>
+        {/* Budget Section */}
+        {maxBudget && (
+          <div className="px-6 py-4 bg-primary/5">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900">${maxBudget}/month</p>
+              <p className="text-sm text-gray-600">Housing budget</p>
+            </div>
           </div>
         )}
 
-        {/* Basic Information */}
-        {(profile?.occupation || profile?.maxBudget) && (
-          <div>
-            <h4 className="font-medium mb-3">Basic Information</h4>
-            <div className="space-y-3">
-              {profile.occupation && (
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                    {lifestyleData.occupationDetails?.isRetired ? (
-                      <Armchair size={16} className="text-slate-600" />
-                    ) : isCurrentlyAttending ? (
-                      <GraduationCap size={16} className="text-slate-600" />
-                    ) : (
-                      <Briefcase size={16} className="text-slate-600" />
-                    )}
-                  </div>
-                  <span className="text-sm">
-                    {lifestyleData.occupationDetails?.isRetired ? "Retired" : isCurrentlyAttending ? "Student" : (occupationLabels[profile.occupation] || profile.occupation)}
-                  </span>
-                </div>
-              )}
-              
-              {profile.maxBudget && (
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                    <DollarSign size={16} className="text-slate-600" />
-                  </div>
-                  <span className="text-sm">Budget: Up to ${profile.maxBudget}/month</span>
-                </div>
+        {/* Bio Section */}
+        {bio && (
+          <div className="p-6">
+            <h4 className="font-semibold text-gray-900 mb-2">About {firstName}</h4>
+            <p className="text-sm text-gray-600 line-clamp-4 leading-relaxed">
+              {bio}
+            </p>
+          </div>
+        )}
+
+        {/* Can Help With Section */}
+        {canHelpWith.length > 0 && (
+          <div className="px-6 pb-6">
+            <h4 className="font-semibold text-gray-900 mb-3">Can help with</h4>
+            <div className="flex flex-wrap gap-2">
+              {canHelpWith.slice(0, 4).map((skill, index) => (
+                <span 
+                  key={index}
+                  className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20"
+                >
+                  {skill}
+                </span>
+              ))}
+              {canHelpWith.length > 4 && (
+                <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+                  +{canHelpWith.length - 4} more
+                </span>
               )}
             </div>
           </div>
         )}
 
-        {/* Personal Details */}
-        {(profile?.gender || profile?.ageRange) && (
-          <div>
-            <h4 className="font-medium mb-3">Personal Details</h4>
-            <div className="space-y-3">
-              {profile.gender && (
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                    <User size={16} className="text-slate-600" />
-                  </div>
-                  <span className="text-sm">{genderLabels[profile.gender] || profile.gender}</span>
-                </div>
-              )}
-              
-              {profile.ageRange && (
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                    <Users size={16} className="text-slate-600" />
-                  </div>
-                  <span className="text-sm">Age: {profile.ageRange}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Lifestyle */}
-        {(profile?.schedule || profile?.socialPreference) && (
-          <div>
-            <h4 className="font-medium mb-3">Lifestyle</h4>
-            <div className="space-y-3">
-              {profile.schedule && scheduleIcons[profile.schedule as keyof typeof scheduleIcons] && (
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                    {(() => {
-                      const Icon = scheduleIcons[profile.schedule as keyof typeof scheduleIcons].icon;
-                      return <Icon size={16} className="text-slate-600" />;
-                    })()}
-                  </div>
-                  <span className="text-sm">{scheduleIcons[profile.schedule as keyof typeof scheduleIcons].label}</span>
-                </div>
-              )}
-              
-              {profile.socialPreference && socialIcons[profile.socialPreference as keyof typeof socialIcons] && (
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                    {(() => {
-                      const Icon = socialIcons[profile.socialPreference as keyof typeof socialIcons].icon;
-                      return <Icon size={16} className="text-slate-600" />;
-                    })()}
-                  </div>
-                  <span className="text-sm">{socialIcons[profile.socialPreference as keyof typeof socialIcons].label}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Living Preferences */}
-        {(profile?.preferredGender) && (
-          <div>
-            <h4 className="font-medium mb-3">Living Preferences</h4>
-            <div className="space-y-3">
-              {profile.preferredGender && (
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                    <User size={16} className="text-slate-600" />
-                  </div>
-                  <span className="text-sm">Prefers {genderLabels[profile.preferredGender] || profile.preferredGender} housemates</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Additional Lifestyle Info */}
-        {profile?.lifestyle && (() => {
-          let lifestyleObj: any = {};
-          if (typeof profile.lifestyle === 'string') {
-            try {
-              lifestyleObj = JSON.parse(profile.lifestyle);
-            } catch {
-              lifestyleObj = {};
-            }
-          } else if (typeof profile.lifestyle === 'object') {
-            lifestyleObj = profile.lifestyle;
-          }
-          
-          const hasLifestyleInfo = lifestyleObj.hasPets || lifestyleObj.smokingStatus || 
-                                  (lifestyleObj.numberOfPeople && lifestyleObj.numberOfPeople !== "1");
-          
-          if (hasLifestyleInfo) {
-            return (
-              <div>
-                <h4 className="font-medium mb-3">Additional Information</h4>
-                <div className="space-y-3">
-                  {lifestyleObj.numberOfPeople && lifestyleObj.numberOfPeople !== "1" && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                        <Users size={16} className="text-slate-600" />
-                      </div>
-                      <span className="text-sm">{lifestyleObj.numberOfPeople} people looking for housing</span>
-                    </div>
-                  )}
-                  
-                  {lifestyleObj.hasPets && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                        <PawPrint size={16} className="text-slate-600" />
-                      </div>
-                      <div>
-                        <span className="text-sm">Has pets</span>
-                        {lifestyleObj.petDescription && (
-                          <span className="block text-xs text-muted-foreground">{lifestyleObj.petDescription}</span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {lifestyleObj.smokingStatus && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                        {lifestyleObj.smokingStatus === "yes" ? (
-                          <Cigarette size={16} className="text-slate-600" />
-                        ) : (
-                          <CigaretteOff size={16} className="text-slate-600" />
-                        )}
-                      </div>
-                      <span className="text-sm">
-                        {lifestyleObj.smokingStatus === "yes" ? "Smoker" : "Non-smoker"}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          }
-          return null;
-        })()}
-
-        {/* Can Help With */}
-        {profile?.canHelpWith && (() => {
-          let canHelpWithArray: string[] = [];
-          if (typeof profile.canHelpWith === 'string') {
-            try {
-              canHelpWithArray = JSON.parse(profile.canHelpWith);
-            } catch {
-              canHelpWithArray = [];
-            }
-          } else if (Array.isArray(profile.canHelpWith)) {
-            canHelpWithArray = profile.canHelpWith;
-          }
-          
-          if (canHelpWithArray.length > 0) {
-            return (
-              <div>
-                <h4 className="font-medium mb-3">Can Help With</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  {canHelpWithArray.map((supportId) => {
-                    const support = supportIcons[supportId];
-                    if (!support) return null;
-                    
-                    const Icon = support.icon;
-                    return (
-                      <div key={supportId} className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
-                          <Icon size={12} className="text-slate-600" />
-                        </div>
-                        <span className="text-sm">{support.label}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          }
-          return null;
-        })()}
-
-        {/* Social Media */}
-        {profile?.socialMedia && (() => {
-          let socialMediaObj: any = {};
-          if (typeof profile.socialMedia === 'string') {
-            try {
-              socialMediaObj = JSON.parse(profile.socialMedia);
-            } catch {
-              socialMediaObj = {};
-            }
-          } else if (typeof profile.socialMedia === 'object') {
-            socialMediaObj = profile.socialMedia;
-          }
-          
-          const hasSocialMedia = socialMediaObj.instagram || socialMediaObj.facebook || socialMediaObj.linkedin;
-          
-          if (hasSocialMedia) {
-            return (
-              <div>
-                <h4 className="font-medium mb-3">Connect</h4>
-                <div className="flex gap-3">
-                  {socialMediaObj.instagram && (
-                    <a href={socialMediaObj.instagram} target="_blank" rel="noopener noreferrer"
-                       className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors">
-                      <Instagram size={16} className="text-slate-600" />
-                    </a>
-                  )}
-                  {socialMediaObj.facebook && (
-                    <a href={socialMediaObj.facebook} target="_blank" rel="noopener noreferrer"
-                       className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors">
-                      <Facebook size={16} className="text-slate-600" />
-                    </a>
-                  )}
-                  {socialMediaObj.linkedin && (
-                    <a href={socialMediaObj.linkedin} target="_blank" rel="noopener noreferrer"
-                       className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors">
-                      <Linkedin size={16} className="text-slate-600" />
-                    </a>
-                  )}
-                </div>
-              </div>
-            );
-          }
-          return null;
-        })()}
-      </CardContent>
-    </Card>
+        {/* Call to Action */}
+        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
+          <p className="text-sm text-gray-600 text-center">
+            View full profile & contact {firstName} →
+          </p>
+        </div>
+      </div>
+    </Link>
   );
 } 

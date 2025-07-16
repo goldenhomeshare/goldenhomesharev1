@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { User, ShieldCheck, Briefcase, GraduationCap } from "lucide-react";
+import { User, MapPin, Briefcase, Clock, GraduationCap, Star, ShieldCheck } from "lucide-react";
 
-interface HousemateHorizontalCardProps {
+interface ProfileHousemateCardProps {
   id: string;
   name: string;
   location: string;
@@ -13,16 +13,12 @@ interface HousemateHorizontalCardProps {
   ageRange: string;
   maxBudget: number;
   profileImage?: string;
-  bio?: string;
-  isVerified?: boolean;
   userId: string;
   email: string;
   lifestyle?: any;
-  experience?: string;
-  onContact: (housemateId: string, email: string) => void;
 }
 
-export function HousemateHorizontalCard({
+export function ProfileHousemateCard({
   id,
   name,
   location,
@@ -31,14 +27,10 @@ export function HousemateHorizontalCard({
   ageRange,
   maxBudget,
   profileImage,
-  bio,
-  isVerified = false,
   userId,
   email,
-  lifestyle,
-  experience,
-  onContact
-}: HousemateHorizontalCardProps) {
+  lifestyle
+}: ProfileHousemateCardProps) {
 
   // Helper function to convert names to title case
   const toTitleCase = (str: string) => {
@@ -49,14 +41,6 @@ export function HousemateHorizontalCard({
 
   const displayName = toTitleCase(name);
   const firstName = displayName.split(' ')[0];
-
-  const handleContact = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onContact && userId && email) {
-      onContact(userId, email);
-    }
-  };
 
   // Parse lifestyle data to check if currently attending school
   let lifestyleData: any = {};
@@ -77,7 +61,7 @@ export function HousemateHorizontalCard({
   const getOccupationDisplay = () => {
     // Check if retired
     if (isRetired) {
-      return "Retired";
+      return "retired";
     }
     
     // Check if currently a student
@@ -86,7 +70,7 @@ export function HousemateHorizontalCard({
       if (program) {
         return `Studying ${program}`;
       }
-      return "Student";
+      return "a student";
     }
     
     // Check for detailed occupation description
@@ -99,14 +83,14 @@ export function HousemateHorizontalCard({
       return occupation;
     }
     
-    return "Not specified";
+    return null;
   };
 
   const occupationDisplay = getOccupationDisplay();
 
   return (
     <Link href={`/profile/${userId}`} className="block w-full">
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-full max-w-full min-h-[280px] lg:min-h-[350px]">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-full max-w-full min-h-[250px] lg:min-h-[320px]">
         
         {/* Unified Layout - Responsive horizontal design */}
         <div className="p-3 pb-2 sm:p-4 sm:pb-3 lg:p-6 lg:pb-4">
@@ -132,25 +116,6 @@ export function HousemateHorizontalCard({
                 {/* Name below profile image */}
                 <div className="mt-2 lg:mt-4 text-center w-full">
                   <h3 className="text-lg sm:text-2xl lg:text-4xl font-bold text-gray-900">{firstName}</h3>
-                  {/* Occupation with icon - responsive spacing */}
-                  <div className="h-10 sm:h-8 lg:h-12 flex items-center justify-center gap-1 lg:gap-2 text-gray-600 mt-1 lg:mt-2 px-1 lg:px-2">
-                    {occupationDisplay && (
-                      <div className="flex items-center gap-1 lg:gap-2">
-                        {isCurrentlyAttending ? (
-                          <GraduationCap size={14} className="text-gray-500 flex-shrink-0 sm:w-4 sm:h-4 lg:w-[18px] lg:h-[18px]" />
-                        ) : (
-                          <Briefcase size={14} className="text-gray-500 flex-shrink-0 sm:w-4 sm:h-4 lg:w-[18px] lg:h-[18px]" />
-                        )}
-                        {/* Single responsive span - mobile: 2-line left-aligned, desktop: truncated center-aligned */}
-                        <span 
-                          className="text-sm sm:text-sm lg:text-lg text-left sm:text-center line-clamp-2 sm:truncate max-w-[120px] sm:max-w-[140px] lg:max-w-[180px]" 
-                          title={occupationDisplay || undefined}
-                        >
-                          {occupationDisplay}
-                        </span>
-                      </div>
-                    )}
-                  </div>
                 </div>
               </div>
               {/* Verification Badge - Responsive positioning */}
@@ -176,7 +141,7 @@ export function HousemateHorizontalCard({
                       <div className="text-sm lg:text-base text-gray-600">Available to help</div>
                     </div>
                     <div className="border-t border-gray-300"></div>
-                    <div className="text-left">
+                     <div className="text-left">
                       <div className="font-bold text-lg sm:text-xl lg:text-2xl text-gray-900">5-6 nights/week</div>
                       <div className="text-sm lg:text-base text-gray-600">Overnight presence</div>
                     </div>
@@ -184,20 +149,6 @@ export function HousemateHorizontalCard({
                 </div>
               </div>
             </div>
-
-            {/* Bio section - spans full width, responsive text */}
-            <div className="mt-4 sm:mt-6 lg:mt-8 mb-0 sm:mb-0 lg:mb-0">
-              {bio ? (
-                <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-tight sm:leading-relaxed line-clamp-2 overflow-hidden">
-                  <span className="font-bold text-gray-900">About: </span>{bio}
-                </p>
-              ) : (
-                <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-tight sm:leading-relaxed">
-                  <span className="font-bold text-gray-900">About: </span>{firstName} hasn't added a bio yet.
-                </p>
-              )}
-            </div>
-
           </div>
         </div>
       </div>

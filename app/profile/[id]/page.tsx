@@ -2,20 +2,32 @@ import { notFound } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import prisma from "@/app/lib/db";
 import Image from "next/image";
-import { User, MapPin, CheckCircle, Briefcase, Clock, Users, PawPrint, CigaretteOff, Cigarette, Instagram, Facebook, Linkedin, DollarSign, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, BookOpen, Film, Dumbbell, Music, Gamepad2, Palette, Church, GraduationCap, Armchair, MessageCircle } from "lucide-react";
+import Link from "next/link";
+import { User, MapPin, Briefcase, Clock, Users, PawPrint, CigaretteOff, Cigarette, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, BookOpen, Film, Dumbbell, Music, Gamepad2, Palette, Church, GraduationCap, MessageCircle, ShieldCheck, Umbrella, Monitor, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProfileNavigation } from "./components/ProfileNavigation";
 import { calculateAgeRange, extractDateOfBirth } from "@/lib/age-utils";
 import { MessageHousemateButton } from "@/app/components/chat/MessageHousemateButton";
+import { ProfileHousemateCard } from "./components/ProfileHousemateCard";
+import { SimpleMessageButton } from "./components/SimpleMessageButton";
+import { StickyMessagingCard } from "./components/StickyMessagingCard";
+import { ProfileAboutSection } from "./components/ProfileAboutSection";
+
+// Helper function to convert names to title case
+const toTitleCase = (str: string) => {
+  return str.toLowerCase().split(' ').map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1)
+  ).join(' ');
+};
 
 const supportIcons: Record<string, any> = {
   cleaning: { icon: Sparkles, label: "Cleaning" },
   cooking: { icon: Salad, label: "Cooking" },
-  gardening: { icon: Flower, label: "Gardening" },
+  gardening: { icon: Flower, label: "Yard work" },
   errands: { icon: ShoppingBag, label: "Errands" },
   companionship: { icon: HeartHandshake, label: "Companionship" },
   petCare: { icon: Cat, label: "Pet Care" },
-  techSupport: { icon: Wrench, label: "Tech Support" },
+  techSupport: { icon: Monitor, label: "Tech Support" },
   homeSecurity: { icon: Shield, label: "Home Security" },
 };
 
@@ -123,6 +135,24 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   const dateOfBirth = extractDateOfBirth(profile?.lifestyle);
   const displayAgeRange = dateOfBirth ? calculateAgeRange(dateOfBirth) : (profile?.ageRange || 'Age not specified');
 
+  // Calculate birth decade
+  const getBirthDecade = (dateOfBirthString: string | null) => {
+    if (!dateOfBirthString) return null;
+    const dateObj = new Date(dateOfBirthString);
+    if (isNaN(dateObj.getTime())) return null;
+    const year = dateObj.getFullYear();
+    const decade = Math.floor(year / 10) * 10;
+    const decadeString = decade.toString().slice(-2);
+    return `${decadeString}s`;
+  };
+
+  const birthDecade = getBirthDecade(dateOfBirth);
+
+  // Determine display location for the card
+  const displayLocation = lifestyleData.location?.city && lifestyleData.location?.state
+    ? `${lifestyleData.location.city}, ${lifestyleData.location.state}`
+    : "Location not specified";
+
   const occupationLabels: Record<string, string> = {
     student: "Student",
     professional: "Professional",
@@ -166,399 +196,236 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden sticky top-8">
-              {/* Profile Image */}
-              <div className="relative aspect-square w-full bg-gray-50">
-                {profile?.profilePicture ? (
-                  <Image
-                    src={profile.profilePicture}
-                    alt={`${profileUser.firstName}'s profile`}
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <User size={64} className="text-gray-300" />
-                  </div>
-                )}
-              </div>
+        {/* Housemate Card at the top */}
+        {profile && (
+          <div className="mb-8">
+            <ProfileHousemateCard
+              id={profileUser.id}
+              name={`${profileUser.firstName} ${profileUser.lastName || ''}`}
+              location={displayLocation}
+              occupation={profile.occupation || "Not specified"}
+              gender={profile.gender || "Not specified"}
+              ageRange={displayAgeRange}
+              maxBudget={profile.maxBudget || 400}
+              profileImage={profile.profilePicture || undefined}
+              userId={profileUser.id}
+              email={profileUser.email || ""}
+              lifestyle={profile.lifestyle}
+            />
+          </div>
+        )}
 
-              {/* Profile Info */}
-              <div className="p-6">
-                <div className="text-center mb-6">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <h1 className="text-2xl font-bold text-gray-900">
-                      {profileUser.firstName} {profileUser.lastName?.charAt(0)}.
-                    </h1>
-                    <CheckCircle size={20} className="text-blue-500" />
+        {/* Main Content Layout - Left content and Right sticky messaging card */}
+        {profile && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Content - Takes up 2 columns */}
+            <div className="lg:col-span-2 space-y-8">
+              {/* About Section - now aligned with other content */}
+              {profile.bio && (
+                <ProfileAboutSection 
+                  bio={profile.bio}
+                  firstName={profileUser.firstName}
+                />
+              )}
+
+              {/* Safety Features Section */}
+              <div className="space-y-6">
+                {/* Background Check Verification Section */}
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-14 lg:h-14 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+                    <ShieldCheck size={20} className="text-white sm:w-6 sm:h-6 lg:w-9 lg:h-9" />
                   </div>
-                  <p className="text-gray-600 flex items-center justify-center gap-1">
-                    <MapPin size={16} />
-                    {lifestyleData.location?.city && lifestyleData.location?.state ? (
-                      `${lifestyleData.location.city}, ${lifestyleData.location.state}`
-                    ) : (
-                      'Location not specified'
-                    )}
-                  </p>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      Background Checked
+                    </h3>
+                    <p className="text-gray-600 mb-3">
+                      Screened by Checkr with no reported criminal history. Minor traffic violations excluded.
+                    </p>
+                    <Link href="/about/safety/background-checks" target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" size="sm" className="text-sm">
+                        Learn more
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
 
-                {/* Message Housemate Button */}
-                {!isOwnProfile && (
-                  <div className="mb-6">
-                    <MessageHousemateButton 
-                      housemateId={profileUser.id} 
-                      housemateName={`${profileUser.firstName} ${profileUser.lastName || ''}`}
-                    />
+                {/* Golden Cover Section */}
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 lg:w-14 lg:h-14 bg-green-700 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+                    <Umbrella size={20} className="text-white sm:w-6 sm:h-6 lg:w-9 lg:h-9" />
                   </div>
-                )}
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                      Golden Cover $10,000
+                    </h3>
+                    <p className="text-gray-600 mb-3">
+                      Damage protection covers you if a helper damages your place or belongings during an Golden stay.
+                    </p>
+                    <Link href="/safety" target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" size="sm" className="text-sm">
+                        Learn more
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
 
-                {/* Basic Information */}
-                {(profile?.occupation || profile?.gender || profile?.ageRange || profile?.maxBudget || socialMediaData.instagram || socialMediaData.facebook || socialMediaData.linkedin) && (
-                  <div className="mb-6">
-                    <h4 className="font-medium mb-3">Basic Information</h4>
-                    <div className="space-y-3">
-                      {profile?.occupation && (
-                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            {lifestyleData.occupationDetails?.isRetired ? (
-                              <Armchair size={16} className="text-primary" />
-                            ) : lifestyleData.education?.stillAttending ? (
-                              <GraduationCap size={16} className="text-primary" />
-                            ) : (
-                              <Briefcase size={16} className="text-primary" />
-                            )}
+              {/* Can Help With Section */}
+              {canHelpWithArray.length > 0 && (
+                <div>
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+                    {toTitleCase(profileUser.firstName)} can help with
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {canHelpWithArray.map((supportId, index) => {
+                      const support = supportIcons[supportId];
+                      if (!support) return null;
+                      
+                      const Icon = support.icon;
+                      return (
+                        <div key={index} className="flex flex-col items-center text-center p-4">
+                          <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                            <Icon size={24} className="text-gray-700" />
                           </div>
-                          <span className="text-sm font-medium text-gray-700">
-                            {lifestyleData.occupationDetails?.isRetired ? "Retired" : lifestyleData.education?.stillAttending ? "Student" : (occupationLabels[profile.occupation] || profile.occupation)}
+                          <span className="text-base font-medium text-gray-900">
+                            {support.label}
                           </span>
                         </div>
-                      )}
-
-                      {profile?.gender && (
-                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <User size={16} className="text-primary" />
-                          </div>
-                          <span className="text-sm font-medium text-gray-700">{genderLabels[profile.gender] || profile.gender}</span>
-                        </div>
-                      )}
-                      
-                      {profile?.ageRange && (
-                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Users size={16} className="text-primary" />
-                          </div>
-                          <span className="text-sm font-medium text-gray-700">Age: {displayAgeRange}</span>
-                        </div>
-                      )}
-                      
-                      {profile?.maxBudget && (
-                        <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <DollarSign size={16} className="text-primary" />
-                          </div>
-                          <span className="text-sm font-medium text-gray-700">Budget: Up to ${profile.maxBudget}/month</span>
-                        </div>
-                      )}
-
-                      {/* Social Media Links */}
-                      {socialMediaData.instagram && (
-                        <a 
-                          href={socialMediaData.instagram} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-primary/5 transition-colors group"
-                        >
-                          <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center group-hover:bg-pink-200 transition-colors">
-                            <Instagram size={16} className="text-pink-600" />
-                          </div>
-                          <span className="text-sm font-medium text-gray-700 group-hover:text-pink-600 transition-colors">Instagram</span>
-                        </a>
-                      )}
-                      {socialMediaData.facebook && (
-                        <a 
-                          href={socialMediaData.facebook} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-primary/5 transition-colors group"
-                        >
-                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                            <Facebook size={16} className="text-blue-600" />
-                          </div>
-                          <span className="text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">Facebook</span>
-                        </a>
-                      )}
-                      {socialMediaData.linkedin && (
-                        <a 
-                          href={socialMediaData.linkedin} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-primary/5 transition-colors group"
-                        >
-                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                            <Linkedin size={16} className="text-blue-700" />
-                          </div>
-                          <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700 transition-colors">LinkedIn</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-              {/* About Section */}
-              <div id="about-section" className="p-6">
-                <h2 className="text-xl font-semibold text-primary mb-4">
-                  About {profileUser.firstName}
-                </h2>
-                
-                {profile?.bio ? (
-                  <p className="text-gray-700 leading-relaxed mb-6">
-                    {profile.bio}
-                  </p>
-                ) : (
-                  <p className="text-gray-500 italic mb-6">
-                    No bio provided yet.
-                  </p>
-                )}
-
-                {/* Education & Work */}
-                {(lifestyleData.education || lifestyleData.occupationDetails || profile?.occupation) && (
-                  <div className="mb-6">
-                    <h3 className="font-semibold text-primary mb-3">Education & Work</h3>
-                    <div className="space-y-4">
-                      {lifestyleData.education && (
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <h4 className="font-medium text-gray-900 mb-2">Education</h4>
-                          <div className="text-gray-700 space-y-1">
-                            {lifestyleData.education.level && (
-                              <p><span className="font-medium">Level:</span> {lifestyleData.education.level}</p>
-                            )}
-                            {lifestyleData.education.degreeProgram && (
-                              <p><span className="font-medium">Program:</span> {lifestyleData.education.degreeProgram}</p>
-                            )}
-                            {lifestyleData.education.stillAttending && (
-                              <p className="text-sm text-primary font-medium">Currently attending</p>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {(lifestyleData.occupationDetails || profile?.occupation) && (
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <h4 className="font-medium text-gray-900 mb-2">Work</h4>
-                          <div className="text-gray-700">
-                            {lifestyleData.occupationDetails?.isRetired ? (
-                              <p className="font-medium">Retired</p>
-                            ) : lifestyleData.occupationDetails?.description ? (
-                              <p className="font-medium">{lifestyleData.occupationDetails.description}</p>
-                            ) : profile?.occupation ? (
-                              <p className="font-medium">{occupationLabels[profile.occupation] || profile.occupation}</p>
-                            ) : (
-                              <p className="text-gray-500 italic">No work information provided</p>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Personal Preferences */}
-                {(profile?.schedule || profile?.socialPreference) && (
-                  <div id="preferences-section" className="mb-6">
-                    <h3 className="font-semibold text-primary mb-3">Personal Preferences</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {profile?.schedule && (
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Clock size={20} className="text-primary" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-sm">Schedule</div>
-                            <div className="text-sm text-gray-600">
-                              {scheduleLabels[profile.schedule] || profile.schedule}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      {profile?.socialPreference && (
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Users size={20} className="text-primary" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-sm">Social Style</div>
-                            <div className="text-sm text-gray-600">
-                              {socialLabels[profile.socialPreference] || profile.socialPreference}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Hobbies & Interests */}
-                {hobbiesArray.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="font-semibold text-primary mb-3">Hobbies & Interests</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {hobbiesArray.map((hobby, index) => {
-                        const hobbyData = hobbyIcons[hobby];
-                        const Icon = hobbyData?.icon;
-                        
-                        return (
-                          <div
-                            key={index}
-                            className="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium border border-primary/20 hover:bg-primary/20 transition-colors"
-                          >
-                            {Icon && <Icon size={16} className="text-primary" />}
-                            <span>{hobbyData?.label || hobbiesLabels[hobby] || hobby}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Housing Preferences */}
-                <div id="housing-section" className="mb-6">
-                  <h3 className="font-semibold text-primary mb-3">Housing Preferences</h3>
-                  <div className="space-y-4">
-                    {/* Budget */}
-                    <div className="bg-primary/5 rounded-lg p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <DollarSign size={16} className="text-primary" />
-                          <span className="text-gray-700">Monthly budget</span>
-                        </div>
-                        <span className="font-semibold">
-                          {profile?.maxBudget ? `$${profile.maxBudget}` : 'Not specified'} /month
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Preferred Age Ranges */}
-
-                    {/* Preferred Gender */}
-                    {profile?.preferredGender && (
-                      <div>
-                        <div className="text-sm font-medium text-gray-700 mb-1">Preferred gender for housemates:</div>
-                        <span className="text-sm text-gray-600">
-                          {profile.preferredGender === "no-preference" ? "No Preference" : genderLabels[profile.preferredGender] || profile.preferredGender}
-                        </span>
-                      </div>
-                    )}
+                      );
+                    })}
                   </div>
                 </div>
+              )}
 
-                {/* Lifestyle Information */}
-                {(lifestyleData.hasPets !== undefined || lifestyleData.numberOfPeople || lifestyleData.smokingStatus || lifestyleData.language) && (
-                  <div className="mb-6">
-                    <h3 className="font-semibold text-gray-900 mb-3">Lifestyle</h3>
-                    <div className="space-y-3">
-                      {lifestyleData.language && (
-                        <div className="flex items-center gap-3">
-                          <MessageCircle size={20} className="text-gray-400" />
-                          <div>
-                            <div className="font-medium text-sm">Primary Language</div>
-                            <div className="text-sm text-gray-600">
-                              {lifestyleData.language}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {lifestyleData.hasPets !== undefined && (
-                        <div className="flex items-start gap-3">
-                          <PawPrint size={20} className="text-gray-400 mt-0.5" />
-                          <div>
-                            <div className="font-medium text-sm">
-                              {lifestyleData.hasPets ? "Has pets" : "No pets"}
-                            </div>
-                            {lifestyleData.hasPets && lifestyleData.petDescription && (
-                              <div className="text-sm text-gray-600 mt-1">
-                                {lifestyleData.petDescription}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {lifestyleData.numberOfPeople && (
-                        <div className="flex items-center gap-3">
-                          <Users size={20} className="text-gray-400" />
-                          <div>
-                            <div className="font-medium text-sm">Number of people</div>
-                            <div className="text-sm text-gray-600">
-                              {lifestyleData.numberOfPeople === "1" ? "Just myself (1 person)" :
-                               lifestyleData.numberOfPeople === "2" ? "2 people" :
-                               lifestyleData.numberOfPeople === "3+" ? "3 or more people" :
-                               lifestyleData.numberOfPeople}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {lifestyleData.smokingStatus && (
-                        <div className="flex items-center gap-3">
-                          {lifestyleData.smokingStatus === "non-smoker" ? (
-                            <CigaretteOff size={20} className="text-gray-400" />
-                          ) : (
-                            <Cigarette size={20} className="text-gray-400" />
-                          )}
-                          <div>
-                            <div className="font-medium text-sm">Smoking</div>
-                            <div className="text-sm text-gray-600">
-                              {lifestyleData.smokingStatus === "non-smoker" ? "Non-smoker" :
-                               lifestyleData.smokingStatus === "smoker" ? "Smoker" :
-                               lifestyleData.smokingStatus === "occasional" ? "Occasional smoker" :
-                               lifestyleData.smokingStatus}
-                            </div>
-                          </div>
-                        </div>
-                      )}
+              {/* Profile Information Section */}
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+                  About {toTitleCase(profileUser.firstName)}
+                </h2>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Work */}
+                  {(lifestyleData.occupationDetails?.description || profile?.occupation) && (
+                    <div className="flex items-center gap-3">
+                      <Briefcase size={24} className="text-gray-900 flex-shrink-0" />
+                      <span className="text-gray-900 text-base">
+                        My work: {lifestyleData.occupationDetails?.isRetired ? "Retired" : 
+                         lifestyleData.occupationDetails?.description || 
+                         (profile?.occupation && (occupationLabels[profile.occupation] || profile.occupation))}
+                      </span>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Can Help With */}
-                {canHelpWithArray.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="font-semibold text-primary mb-3">Can Help With</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {canHelpWithArray.map((supportId, index) => {
-                        const support = supportIcons[supportId];
-                        if (!support) return null;
-                        
-                        const Icon = support.icon;
-                        return (
-                          <div key={index} className="flex items-center gap-3 p-3 bg-primary/5 rounded-lg border border-primary/10">
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                              <Icon size={16} className="text-primary" />
-                            </div>
-                            <span className="text-sm font-medium text-primary">
-                              {support.label}
-                            </span>
-                          </div>
-                        );
-                      })}
+                  {/* Schedule Preference */}
+                  {profile?.schedule && (
+                    <div className="flex items-center gap-3">
+                      <Clock size={24} className="text-gray-900 flex-shrink-0" />
+                      <span className="text-gray-900 text-base">
+                        Schedule: {scheduleLabels[profile.schedule] || profile.schedule}
+                      </span>
                     </div>
-                  </div>
-                )}
+                  )}
+
+                  {/* Social Style */}
+                  {profile?.socialPreference && (
+                    <div className="flex items-center gap-3">
+                      <Users size={24} className="text-gray-900 flex-shrink-0" />
+                      <span className="text-gray-900 text-base">
+                        Social style: {socialLabels[profile.socialPreference] || profile.socialPreference}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Gender */}
+                  {profile?.gender && (
+                    <div className="flex items-center gap-3">
+                      <User size={24} className="text-gray-900 flex-shrink-0" />
+                      <span className="text-gray-900 text-base">
+                        Gender: {genderLabels[profile.gender] || profile.gender}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Birth Decade */}
+                  {birthDecade && (
+                    <div className="flex items-center gap-3">
+                      <PartyPopper size={24} className="text-gray-900 flex-shrink-0" />
+                      <span className="text-gray-900 text-base">Born in the {birthDecade}</span>
+                    </div>
+                  )}
+
+                  {/* Education */}
+                  {lifestyleData.education?.level && (
+                    <div className="flex items-center gap-3">
+                      <GraduationCap size={24} className="text-gray-900 flex-shrink-0" />
+                      <span className="text-gray-900 text-base">
+                        Education: {lifestyleData.education.level}
+                        {lifestyleData.education.degreeProgram && ` in ${lifestyleData.education.degreeProgram}`}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Language */}
+                  {lifestyleData.language && (
+                    <div className="flex items-center gap-3">
+                      <MessageCircle size={24} className="text-gray-900 flex-shrink-0" />
+                      <span className="text-gray-900 text-base">Primary language: {lifestyleData.language}</span>
+                    </div>
+                  )}
+
+                  {/* Pets */}
+                  {lifestyleData.hasPets !== undefined && (
+                    <div className="flex items-center gap-3">
+                      <PawPrint size={24} className="text-gray-900 flex-shrink-0" />
+                      <span className="text-gray-900 text-base">
+                        {lifestyleData.hasPets ? 
+                          (lifestyleData.petDescription || "Has pets") : 
+                          "No pets"}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Number of People */}
+                  {lifestyleData.numberOfPeople && (
+                    <div className="flex items-center gap-3">
+                      <Users size={24} className="text-gray-900 flex-shrink-0" />
+                      <span className="text-gray-900 text-base">
+                        Lives with: {lifestyleData.numberOfPeople === "1" ? "Just myself (1 person)" :
+                         lifestyleData.numberOfPeople === "2" ? "2 people" :
+                         lifestyleData.numberOfPeople === "3+" ? "3 or more people" :
+                         lifestyleData.numberOfPeople}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Smoking */}
+                  {lifestyleData.smokingStatus && (
+                    <div className="flex items-center gap-3">
+                      {lifestyleData.smokingStatus === "non-smoker" ? (
+                        <CigaretteOff size={24} className="text-gray-900 flex-shrink-0" />
+                      ) : (
+                        <Cigarette size={24} className="text-gray-900 flex-shrink-0" />
+                      )}
+                      <span className="text-gray-900 text-base">
+                        {lifestyleData.smokingStatus === "non-smoker" ? "Non-smoker" :
+                         lifestyleData.smokingStatus === "smoker" ? "Smoker" :
+                         lifestyleData.smokingStatus === "occasional" ? "Occasional smoker" :
+                         lifestyleData.smokingStatus}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
+
+            {/* Right Sticky Messaging Card - Takes up 1 column */}
+            <StickyMessagingCard 
+              housemateId={profileUser.id} 
+              isOwnProfile={isOwnProfile} 
+            />
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

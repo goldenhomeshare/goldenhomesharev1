@@ -1,16 +1,15 @@
 'use client';
 
-import { Heart, Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, User, GraduationCap, UserCheck, DollarSign, CheckCircle, MapPin, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { ShieldCheck, User } from "lucide-react";
 
 interface AirbnbStyleCardProps {
   images: string[];
-  name: string;
+  id: string;
   price: number;
   smallDescription: string;
-  id: string;
+  name: string;
   showEditButton?: boolean;
   location?: string;
   amenities?: string[];
@@ -18,64 +17,12 @@ interface AirbnbStyleCardProps {
   availabilityText?: string;
   priceLabel?: string;
   isVerified?: boolean;
-  // Demographic information for housemates
   demographics?: {
-    age?: string;
     gender?: string;
+    ageRange?: string;
     occupation?: string;
-    isCurrentlyAttending?: boolean;
-    isRetired?: boolean;
   };
 }
-
-// Amenity icons mapping (same as ListingCard)
-const amenityIcons: Record<string, any> = {
-  parking: { icon: Car, label: "Parking" },
-  wifi: { icon: Wifi, label: "WiFi" },
-  kitchen: { icon: Utensils, label: "Kitchen Access" },
-  tv: { icon: Tv, label: "TV" },
-  ac: { icon: Snowflake, label: "Air Conditioning" },
-  heating: { icon: Sun, label: "Heating" },
-  privateBathroom: { icon: Bath, label: "Private Bathroom" },
-  privateEntrance: { icon: DoorOpen, label: "Private Entrance" },
-  laundry: { icon: WashingMachine, label: "Laundry Access" },
-  patio: { icon: Home, label: "Patio/Balcony" },
-  furnished: { icon: Armchair, label: "Furnished Room" },
-  workspace: { icon: Briefcase, label: "Desk/Workspace" },
-  // Housemate lifestyle preferences
-  "early-riser": { icon: Sun, label: "Early Riser" },
-  "night-owl": { icon: Snowflake, label: "Night Owl" },
-  "flexible": { icon: Car, label: "Flexible Schedule" },
-  "social": { icon: User, label: "Social" },
-  "independent": { icon: Home, label: "Independent" },
-  "balanced": { icon: User, label: "Balanced" },
-  // Common hobbies
-  "gardening": { icon: Home, label: "Gardening" },
-  "cooking": { icon: Utensils, label: "Cooking" },
-  "reading": { icon: Briefcase, label: "Reading" },
-  "movies": { icon: Tv, label: "Movies/TV" },
-  "volunteering": { icon: User, label: "Volunteering" },
-  "fitness": { icon: User, label: "Fitness" },
-  "church": { icon: Home, label: "Church" },
-  "crafting": { icon: Armchair, label: "Arts & Crafts" },
-  "music": { icon: User, label: "Music" },
-  "tech": { icon: Briefcase, label: "Technology" },
-  "pets": { icon: User, label: "Pet Lover" },
-  "games": { icon: Armchair, label: "Board Games" },
-};
-
-// Gender and occupation labels for display
-const genderLabels: Record<string, string> = {
-  "male": "Male",
-  "female": "Female",
-  "other": "Other",
-};
-
-const occupationLabels: Record<string, string> = {
-  "student": "Student",
-  "professional": "Professional",
-  "retired": "Retired",
-};
 
 export function AirbnbStyleCard({
   images,
@@ -118,47 +65,94 @@ export function AirbnbStyleCard({
             className="object-cover transition-transform duration-300 group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-        </div>
-        {/* Verification Badge - Only show for verified users with demographics (housemates) */}
-        {isVerified && demographics && (
-          <div 
-            className="absolute bottom-[15px] right-[-5px] w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg cursor-help z-10" 
-            title="This person has been background checked"
-          >
-            <ShieldCheck size={28} className="text-white" />
-          </div>
-        )}
-        
-        {/* Card Content - Clean design for housemates */}
-        <div className="mt-4 flex-1 flex flex-col items-center text-center">
-          {demographics ? (
-            <>
-              {/* Name - First name only */}
-              <h3 className="font-bold text-3xl text-gray-900 mb-4">{name.split(' ')[0]}</h3>
-            </>
-          ) : (
-            <>
-              {/* Property Type/Name - Now prominent at top */}
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium text-gray-900 truncate pr-2">{name}</h3>
-              </div>
-              
-              {/* Location with price on same line - Now below title */}
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <div className="flex items-baseline gap-1">
-                    <span className="font-semibold text-gray-900">${price}</span>
-                    <span className="text-gray-600 text-sm">per {priceLabel}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <MapPin size={12} className="text-gray-600" />
-                    <p className="text-gray-600 text-sm truncate">{location}</p>
-                  </div>
-                </div>
-              </div>
-            </>
+          
+          {/* Verification Badge - Only show for verified users with demographics (housemates) */}
+          {isVerified && demographics && (
+            <div 
+              className="absolute bottom-[15px] right-[-5px] w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg cursor-help z-10" 
+              title="This person has been background checked"
+            >
+              <ShieldCheck size={28} className="text-white" />
+            </div>
           )}
         </div>
+        
+        {/* Card Content - Enhanced design for housemates */}
+        {demographics ? (
+          <div className="flex-1 pt-4 text-center">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <User size={16} className="text-gray-400" />
+              <h3 className="font-semibold text-lg text-gray-900 truncate">{name}</h3>
+            </div>
+            
+            <div className="flex flex-col items-center gap-1 mb-3">
+              {demographics.gender && (
+                <p className="text-sm text-gray-600">{demographics.gender}</p>
+              )}
+              {demographics.ageRange && (
+                <p className="text-sm text-gray-600">{demographics.ageRange}</p>
+              )}
+              {demographics.occupation && (
+                <p className="text-sm text-gray-700 font-medium bg-gray-100 px-2 py-1 rounded-md">
+                  {demographics.occupation}
+                </p>
+              )}
+            </div>
+
+            {/* About Section Preview */}
+            {smallDescription && (
+              <div className="mb-4 px-2">
+                <p className="text-xs text-gray-600 line-clamp-3 leading-relaxed">
+                  {smallDescription}
+                </p>
+              </div>
+            )}
+            
+            <div className="mt-auto">
+              <p className="text-lg font-semibold text-gray-900">
+                ${price}
+                <span className="text-sm font-normal text-gray-600">/{priceLabel}</span>
+              </p>
+            </div>
+          </div>
+        ) : (
+          // Standard listing card content
+          <div className="flex-1 pt-3">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className="font-semibold text-lg text-gray-900 line-clamp-1">{name}</h3>
+            </div>
+            
+            <p className="text-sm text-gray-600 mb-1">{location}</p>
+            <p className="text-sm text-gray-600 mb-2">{availabilityText}</p>
+            
+            {/* Amenities */}
+            {displayAmenities.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-3">
+                {displayAmenities.map((amenity, index) => (
+                  <span 
+                    key={index}
+                    className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-md"
+                  >
+                    {amenity}
+                  </span>
+                ))}
+                {remainingCount > 0 && (
+                  <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-md">
+                    +{remainingCount} more
+                  </span>
+                )}
+              </div>
+            )}
+            
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-gray-600 line-clamp-2">{smallDescription}</p>
+              <p className="text-lg font-semibold text-gray-900 ml-2">
+                ${price}
+                <span className="text-sm font-normal">/{priceLabel}</span>
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </Link>
   );

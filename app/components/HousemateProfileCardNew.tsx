@@ -2,196 +2,153 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { User, MapPin, CheckCircle, Briefcase, Users, DollarSign, GraduationCap, Armchair } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { User, ShieldCheck } from "lucide-react";
 
 interface HousemateProfileCardNewProps {
   id: string;
   name: string;
-  location: string;
-  occupation?: string;
-  gender?: string;
-  ageRange?: string;
-  maxBudget?: number;
   profileImage?: string;
   bio?: string;
-  isVerified?: boolean;
-  userId?: string;
-  email?: string;
-  lifestyle?: any;
-  onContact?: (housemateId: string, email: string) => void;
+  maxBudget?: number;
+  ageRange?: string;
+  gender?: string;
+  occupation?: string;
+  location?: string;
+  schedule?: string;
+  socialPreference?: string;
+  canHelpWith?: string[];
 }
-
-// Occupation labels
-const occupationLabels: Record<string, string> = {
-  student: "Student",
-  professional: "Professional",
-  remote: "Remote Worker",
-  healthcare: "Healthcare",
-  education: "Education",
-  creative: "Creative",
-  service: "Service Industry",
-  retired: "Retired",
-  unemployed: "Between Jobs",
-  other: "Other"
-};
-
-// Gender labels
-const genderLabels: Record<string, string> = {
-  male: "Male",
-  female: "Female",
-  other: "Other",
-};
 
 export function HousemateProfileCardNew({
   id,
   name,
-  location,
-  occupation,
-  gender,
-  ageRange,
-  maxBudget,
   profileImage,
   bio,
-  isVerified = false,
-  userId,
-  email,
-  lifestyle,
-  onContact
+  maxBudget,
+  ageRange,
+  gender,
+  occupation,
+  location,
+  schedule,
+  socialPreference,
+  canHelpWith = []
 }: HousemateProfileCardNewProps) {
-
-  const handleContact = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (onContact && userId && email) {
-      onContact(userId, email);
-    }
-  };
-
-  // Parse lifestyle data to check if currently attending school
-  let lifestyleData: any = {};
-  if (lifestyle) {
-    try {
-      lifestyleData = typeof lifestyle === 'string' 
-        ? JSON.parse(lifestyle) 
-        : lifestyle;
-    } catch {
-      lifestyleData = {};
-    }
-  }
-
-  const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
-
-  // Check if retired
-  const isRetired = lifestyleData.occupationDetails?.isRetired || false;
+  const firstName = name.split(' ')[0];
 
   return (
-    <Link href={`/profile/${userId}`} className="block">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
-        {/* Profile Image */}
-        <div className="relative aspect-square w-full bg-gray-50">
-          {profileImage ? (
-            <Image
-              src={profileImage}
-              alt={`${name}'s profile`}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <User size={48} className="text-gray-300" />
+    <Link href={`/profile/${id}`} className="group cursor-pointer">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300">
+        {/* Header Section */}
+        <div className="relative p-6 bg-gradient-to-br from-primary/5 to-primary/10">
+          <div className="flex items-start gap-4">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-full overflow-hidden bg-white shadow-md">
+                {profileImage ? (
+                  <Image
+                    src={profileImage}
+                    alt={`${name}'s profile`}
+                    width={96}
+                    height={96}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <User size={40} className="text-gray-400" />
+                  </div>
+                )}
+              </div>
+              {/* Verification Badge */}
+              <div 
+                className="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg cursor-help" 
+                title="This person has been background checked"
+              >
+                <ShieldCheck size={18} className="text-white" />
+              </div>
             </div>
-          )}
+            
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-xl text-gray-900 mb-2">{firstName}</h3>
+              <div className="space-y-1">
+                {gender && ageRange && (
+                  <p className="text-sm text-gray-600">{gender} • {ageRange}</p>
+                )}
+                {occupation && (
+                  <p className="text-sm text-gray-600 font-medium">{occupation}</p>
+                )}
+                {location && (
+                  <p className="text-sm text-gray-500">{location}</p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="p-4">
-          {/* Header with name and verification */}
-          <div className="mb-3">
-            <div className="flex items-center gap-1.5 mb-1">
-              <h3 className="font-semibold text-base text-gray-900 leading-tight">{name}</h3>
-              {isVerified && (
-                <CheckCircle size={14} className="text-blue-500 flex-shrink-0" />
-              )}
-            </div>
-            
-            {/* Location */}
-            <div className="flex items-center gap-1 text-gray-500 mb-2">
-              <MapPin size={12} className="flex-shrink-0" />
-              <span className="text-sm">{location}</span>
-            </div>
-
-            {/* Profile Details */}
-            <div className="space-y-1.5">
-              {/* Age and Gender */}
-              {(ageRange || gender) && (
-                <div className="flex items-center gap-1 text-gray-600">
-                  <Users size={12} className="flex-shrink-0" />
-                  <span className="text-xs">
-                    {[
-                      ageRange,
-                      gender ? genderLabels[gender] || gender : null
-                    ].filter(Boolean).join(' • ')}
-                  </span>
-                </div>
-              )}
-
-              {/* Occupation */}
-              {occupation && (
-                <div className="flex items-center gap-1 text-gray-600">
-                  {isRetired ? (
-                    <Armchair size={12} className="flex-shrink-0" />
-                  ) : isCurrentlyAttending ? (
-                    <GraduationCap size={12} className="flex-shrink-0" />
-                  ) : (
-                    <Briefcase size={12} className="flex-shrink-0" />
-                  )}
-                  <span className="text-xs">
-                    {isRetired ? "Retired" : isCurrentlyAttending ? "Student" : (occupationLabels[occupation] || occupation)}
-                  </span>
-                </div>
-              )}
+        {/* Budget Section */}
+        {maxBudget && (
+          <div className="px-6 py-4 border-b border-gray-100">
+            <div className="text-center">
+              <p className="text-3xl font-bold text-primary">${maxBudget}</p>
+              <p className="text-sm text-gray-600">monthly housing budget</p>
             </div>
           </div>
+        )}
 
-          {/* Bio Preview */}
-          {bio && (
-            <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed mb-4">
+        {/* Bio Section */}
+        {bio && (
+          <div className="p-6 border-b border-gray-100">
+            <h4 className="font-semibold text-gray-900 mb-3">About {firstName}</h4>
+            <p className="text-sm text-gray-600 line-clamp-3 leading-relaxed">
               {bio}
             </p>
-          )}
+          </div>
+        )}
 
-          {/* Budget and Contact */}
-          <div className="flex items-center justify-between">
-            <div>
-              {maxBudget && maxBudget > 0 ? (
-                <>
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <DollarSign size={12} />
-                    <span className="text-xs">Budget</span>
-                  </div>
-                  <div className="font-semibold text-base text-gray-900">
-                    Up to ${maxBudget}
-                  </div>
-                  <div className="text-xs text-gray-500">per month</div>
-                </>
-              ) : (
-                <div className="text-sm text-gray-500">
-                  Budget negotiable
-                </div>
+        {/* Preferences Section */}
+        {(schedule || socialPreference) && (
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h4 className="font-semibold text-gray-900 mb-3">Preferences</h4>
+            <div className="flex flex-wrap gap-2">
+              {schedule && (
+                <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+                  {schedule}
+                </span>
+              )}
+              {socialPreference && (
+                <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+                  {socialPreference}
+                </span>
               )}
             </div>
-            
-            <Button
-              onClick={handleContact}
-              className="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-              size="sm"
-            >
-              Contact
-            </Button>
           </div>
+        )}
+
+        {/* Can Help With Section */}
+        {canHelpWith.length > 0 && (
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h4 className="font-semibold text-gray-900 mb-3">Can help with</h4>
+            <div className="flex flex-wrap gap-2">
+              {canHelpWith.slice(0, 3).map((skill, index) => (
+                <span 
+                  key={index}
+                  className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/20"
+                >
+                  {skill}
+                </span>
+              ))}
+              {canHelpWith.length > 3 && (
+                <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+                  +{canHelpWith.length - 3} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Call to Action */}
+        <div className="px-6 py-4 bg-gray-50">
+          <p className="text-sm text-primary font-medium text-center">
+            View full profile & contact {firstName} →
+          </p>
         </div>
       </div>
     </Link>

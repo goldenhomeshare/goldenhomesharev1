@@ -18,6 +18,7 @@ export function NavbarLinks () {
             className={cn(
                 "group flex flex-col items-center transition-all duration-200 hover:text-gray-900"
             )}
+            data-search-tab
           >
             <div className="flex items-center gap-6 pb-2">
               <div className="relative w-20 h-20">
@@ -46,6 +47,7 @@ export function NavbarLinks () {
             className={cn(
                 "group flex flex-col items-center transition-all duration-200 hover:text-gray-900"
             )}
+            data-search-tab
           >
             <div className="flex items-center gap-6 pb-2">
               <div className="relative w-20 h-20">

@@ -44,6 +44,51 @@ export function ScrollResponsiveNavbar({
     setActiveField(null);
   };
 
+  // Add a unified click outside handler
+  const handleClickOutside = useCallback((e: Event) => {
+    const target = e.target as HTMLElement;
+    
+    // Ignore if clicking the clear button
+    if (target.closest('[data-clear-btn]')) return;
+    
+    // Check if click is inside search container
+    const searchContainer = document.querySelector('[data-search-container]');
+    if (searchContainer && searchContainer.contains(target)) {
+      return; // Don't close if clicking inside search container
+    }
+    
+    // Check if click is inside any dropdown
+    const whereDropdown = document.querySelector('[data-where-dropdown]');
+    const calendarDropdown = document.querySelector('[data-calendar-dropdown]');
+    const helpDropdown = document.querySelector('[data-help-dropdown]');
+    
+    if (
+      (whereDropdown && whereDropdown.contains(target)) ||
+      (calendarDropdown && calendarDropdown.contains(target)) ||
+      (helpDropdown && helpDropdown.contains(target))
+    ) {
+      return; // Don't close if clicking inside any dropdown
+    }
+
+    // Ignore clicks on elements with data-search-tab
+    if (target.closest('[data-search-tab]')) return;
+    if (target.closest('[data-condensed-nav]')) return;
+    
+    // Only close if click is outside both search container and dropdowns
+    closeDropdown();
+    setIsCondensedExpanded(false);
+  }, []);
+
+  // Add click outside listener when any dropdown is open
+  useEffect(() => {
+    if (openDropdown !== null || isCondensedExpanded) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [openDropdown, isCondensedExpanded, handleClickOutside]);
+
   // Helper booleans for rendering
   const showWhereDropdown = openDropdown === 'location';
   const showCalendar = openDropdown === 'date';
@@ -157,6 +202,8 @@ export function ScrollResponsiveNavbar({
         return <Search className={iconProps} />;
     }
   };
+
+
 
   // Determine if we should show condensed mode based on page and scroll state
   const shouldShowCondensed = () => {
@@ -579,7 +626,7 @@ export function ScrollResponsiveNavbar({
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-secondary border-b border-gray-100 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-gray-100 border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl w-full mx-auto px-4 md:px-8">
         {/* Main Navbar Row */}
         <div className="flex items-center justify-between">
@@ -625,6 +672,7 @@ export function ScrollResponsiveNavbar({
                 <Link 
                   href="/" 
                   className="flex flex-col items-center"
+                  data-search-tab
                 >
                   <div className={`flex flex-col items-center transition-all duration-500 ease-in-out ${
                     isInCondensedMode ? 'gap-0' : 'gap-2'
@@ -655,6 +703,7 @@ export function ScrollResponsiveNavbar({
                 <Link 
                   href="/homes" 
                   className="flex flex-col items-center"
+                  data-search-tab
                 >
                   <div className={`flex flex-col items-center transition-all duration-500 ease-in-out ${
                     isInCondensedMode ? 'gap-0' : 'gap-2'
@@ -690,6 +739,8 @@ export function ScrollResponsiveNavbar({
               <div 
                 className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 max-w-2xl w-full h-18 cursor-pointer z-[9998]" 
                 onClick={handleCondensedClick}
+                data-search-container
+                data-condensed-nav
               >
                 {/* Selected Icon */}
                                   <div className="flex items-center pl-4">
@@ -818,7 +869,7 @@ export function ScrollResponsiveNavbar({
         <div className={`hidden lg:flex justify-center transition-all duration-500 ease-in-out ${
           !isInCondensedMode || isCondensedExpanded ? 'pb-4 opacity-100 transform translate-y-0' : 'pb-0 opacity-0 transform -translate-y-4 pointer-events-none'
         }`}>
-          <div className="relative max-w-5xl w-full z-[60]">
+          <div className="relative max-w-5xl w-full z-[60]" data-search-container>
             <div className={`flex items-center border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-all duration-200 ${
               activeField !== null ? 'bg-gray-100' : 'bg-white'
             } relative overflow-hidden`}>
@@ -834,7 +885,7 @@ export function ScrollResponsiveNavbar({
                         return selectedWhere;
                       }
                       case 1: return formatDateRange() || selectedHelpStarts;
-                      case 2: return selectedTypeOfHelp.length > 0 ? selectedTypeOfHelp.join(', ') : '';
+                      case 2: return ''; // We'll show icons instead of text for help types
                       default: return '';
                     }
                   }
@@ -910,21 +961,49 @@ export function ScrollResponsiveNavbar({
                           }}
                           placeholder={field.placeholder} 
                           className={`w-full text-xl bg-transparent border-none outline-none pointer-events-none pr-10 ${
-                            fieldValue ? 'text-gray-900 font-medium' : 'text-gray-600 placeholder-gray-400'
-                          } ${index === 0 ? 'pointer-events-auto' : ''}`}
+                            fieldValue || (index === 2 && selectedTypeOfHelp.length > 0) ? 'text-gray-900 font-medium' : 'text-gray-600 placeholder-gray-400'
+                          } ${index === 0 ? 'pointer-events-auto' : ''} ${
+                            index === 2 && selectedTypeOfHelp.length > 0 ? 'placeholder-transparent' : ''
+                          }`}
                           readOnly={index !== 0} // Only location field is editable
                           onFocus={index === 0 ? () => {
                             // Location field - auto-clear is now handled in onMouseDown
                           } : undefined}
                         />
+                        
+                        {/* Show icons for help types field when items are selected */}
+                        {index === 2 && isHelperMode && selectedTypeOfHelp.length > 0 && (
+                          <div className="absolute left-0 top-0 flex items-center h-full pointer-events-none">
+                            <div className="flex items-center gap-1 flex-wrap">
+                              {selectedTypeOfHelp.slice(0, 4).map((label, iconIndex) => {
+                                // Find the help option that matches this label
+                                const helpOption = helpOptions.find(option => option.label === label);
+                                if (!helpOption) return null;
+                                
+                                return (
+                                  <div 
+                                    key={iconIndex}
+                                    className={`w-6 h-6 rounded-md flex items-center justify-center ${helpOption.color} ${helpOption.iconColor}`}
+                                  >
+                                    {renderHelpTypeIcon(helpOption.icon)}
+                                  </div>
+                                );
+                              })}
+                              {selectedTypeOfHelp.length > 4 && (
+                                <div className="w-6 h-6 rounded-md flex items-center justify-center bg-gray-100 text-gray-600 text-xs font-medium">
+                                  +{selectedTypeOfHelp.length - 4}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
                       {/* Clear button - positioned relative to entire field bubble */}
-                      {isActive && fieldValue && index !== 0 && (
+                      {isActive && ((fieldValue && index !== 0) || (index === 2 && selectedTypeOfHelp.length > 0)) && (
                         <button
-                          onClick={(e) => {
+                          onMouseDown={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            // Clear the respective field
                             if (index === 1) {
                               setSelectedDateRange({ start: null, end: null });
                               setSelectedHelpStarts('');
@@ -932,7 +1011,8 @@ export function ScrollResponsiveNavbar({
                               setSelectedTypeOfHelp([]);
                             }
                           }}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors z-[80]"
+                          data-clear-btn
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors z-[80] pointer-events-auto"
                         >
                           <X className="w-4 h-4 text-gray-600 hover:text-gray-800" />
                         </button>
@@ -973,25 +1053,7 @@ export function ScrollResponsiveNavbar({
             
             {/* Where Dropdown */}
             {showWhereDropdown && (
-              <>
-                {/* Backdrop to close dropdown - proper z-index hierarchy */}
-                <div 
-                  className="fixed inset-0 bg-transparent"
-                  style={{ 
-                    position: 'fixed',
-                    top: 0, 
-                    left: 0, 
-                    right: 0, 
-                    bottom: 0, 
-                    zIndex: 70
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    closeDropdown();
-                  }}
-                />
-                <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 max-h-96 overflow-hidden w-96" style={{ zIndex: 80 }}>
+              <div className="absolute top-full left-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 max-h-96 overflow-hidden w-96" style={{ zIndex: 80 }} data-where-dropdown>
                   <div className="p-5 space-y-5 max-h-80 overflow-y-auto">
                     {/* Recent searches section - could be implemented later */}
                     {selectedWhere && (
@@ -1044,30 +1106,11 @@ export function ScrollResponsiveNavbar({
                     </div>
                   </div>
                 </div>
-              </>
             )}
             
             {/* Type of Help Dropdown */}
             {showTypeOfHelpDropdown && (
-              <>
-                {/* Backdrop to close dropdown - proper z-index hierarchy */}
-                <div 
-                  className="fixed inset-0 bg-transparent"
-                  style={{ 
-                    position: 'fixed',
-                    top: 0, 
-                    left: 0, 
-                    right: 0, 
-                    bottom: 0, 
-                    zIndex: 70
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    closeDropdown();
-                  }}
-                />
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 max-h-[600px] overflow-hidden" style={{ zIndex: 80 }}>
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 max-h-[600px] overflow-hidden" style={{ zIndex: 80 }} data-help-dropdown>
                 <div className="p-6">
                   <div className="mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">Type of help wanted (multi-select)</h3>
@@ -1079,12 +1122,12 @@ export function ScrollResponsiveNavbar({
                         <div 
                           key={option.id}
                           className={`flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors ${
-                            isSelected ? 'bg-blue-50 border border-blue-200' : ''
+                            isSelected ? 'bg-gray-100' : ''
                           }`}
                           onClick={() => handleTypeOfHelpSelect(option.label)}
                         >
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                            isSelected ? 'bg-blue-600 text-white' : `${option.color} ${option.iconColor}`
+                            isSelected ? 'bg-gray-800 text-white' : `${option.color} ${option.iconColor}`
                           }`}>
                             {isSelected ? (
                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1095,7 +1138,7 @@ export function ScrollResponsiveNavbar({
                             )}
                           </div>
                           <div>
-                            <div className={`font-medium text-lg ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>
+                            <div className={`font-medium text-lg ${isSelected ? 'text-gray-900' : 'text-gray-900'}`}>
                               {option.label}
                             </div>
                             <div className="text-base text-gray-500">Find helpers for {option.label.toLowerCase()}</div>
@@ -1121,30 +1164,11 @@ export function ScrollResponsiveNavbar({
                   </div>
                 </div>
               </div>
-              </>
             )}
             
             {/* Calendar Popup */}
             {showCalendar && (
-              <>
-                {/* Backdrop to close calendar - proper z-index hierarchy */}
-                <div 
-                  className="fixed inset-0 bg-transparent"
-                  style={{ 
-                    position: 'fixed',
-                    top: 0, 
-                    left: 0, 
-                    right: 0, 
-                    bottom: 0, 
-                    zIndex: 70
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    closeDropdown();
-                  }}
-                />
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 max-w-4xl mx-auto" style={{ zIndex: 80 }}>
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 max-w-4xl mx-auto" style={{ zIndex: 80 }} data-calendar-dropdown>
                   <div className="p-6">
                     {/* As Soon As Possible Button */}
                     <div className="flex items-center justify-center mb-6">
@@ -1252,36 +1276,11 @@ export function ScrollResponsiveNavbar({
                     </div>
                   </div>
                 </div>
-              </>
             )}
             
 
           </div>
         </div>
-        
-        {/* Backdrop to close expanded condensed search bar - only when no dropdowns are open */}
-        {isCondensedExpanded && isInCondensedMode && !showWhereDropdown && !showTypeOfHelpDropdown && !showCalendar && activeField === null && (
-          <div 
-            className="fixed inset-0 z-30" 
-            onClick={() => {
-              setIsCondensedExpanded(false);
-              closeDropdown();
-            }}
-          />
-        )}
-        
-        {/* Additional backdrop to close expanded search when clicking outside navbar area */}
-        {isCondensedExpanded && isInCondensedMode && (
-          <div 
-            className="fixed inset-x-0 top-0 bottom-0 z-20"
-            style={{ top: '200px' }} // Start below the navbar area
-            onClick={() => {
-              setIsCondensedExpanded(false);
-              setActiveField(null);
-              setOpenDropdown(null);
-            }}
-          />
-        )}
       </div>
 
 

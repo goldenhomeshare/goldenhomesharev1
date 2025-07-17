@@ -314,37 +314,35 @@ export function MobileSearchModal({ isOpen, onClose, initialSearchType }: Mobile
   // Fullscreen Where Interface
   if (fullscreenSection === 'where') {
     return (
-      <div className="fixed inset-0 z-50 bg-white flex flex-col">
-        {/* Header with back button */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <button 
-            onClick={() => setFullscreenSection(null)}
-            className="flex items-center gap-2 text-gray-900 hover:text-gray-700 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900">Where to?</h1>
-          <div className="w-6" /> {/* Spacer */}
-        </div>
-
-        {/* Search input */}
-        <div className="p-4">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              placeholder="Search locations"
-              value={locationFilter}
-              onChange={(e) => setLocationFilter(e.target.value)}
-              className="pl-12 h-14 text-base border-gray-300 focus:border-black focus:ring-1 focus:ring-black rounded-xl bg-gray-50 transition-all duration-200"
-              autoFocus
-            />
+      <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
+        {/* Top spacing */}
+        <div className="h-5 flex-shrink-0"></div>
+        
+        {/* Header with integrated search bar */}
+        <div className="bg-white rounded-t-[3rem] shadow-lg">
+          <div className="p-4">
+            <div className="relative">
+              <button 
+                onClick={() => setFullscreenSection(null)}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <Input
+                placeholder="Search destinations"
+                value={locationFilter}
+                onChange={(e) => setLocationFilter(e.target.value)}
+                className="pl-12 pr-4 h-14 text-base border border-black focus:border-black focus:ring-0 rounded-xl bg-white transition-all duration-200"
+                autoFocus
+              />
+            </div>
           </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto touch-pan-y p-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="flex-1 overflow-y-auto touch-pan-y p-4 bg-white rounded-b-3xl" style={{ WebkitOverflowScrolling: 'touch' }}>
           {/* Recent searches */}
           {searchState.location && (
             <div className="mb-8">
@@ -400,82 +398,130 @@ export function MobileSearchModal({ isOpen, onClose, initialSearchType }: Mobile
   // Fullscreen What Interface
   if (fullscreenSection === 'what') {
     return (
-      <div className="fixed inset-0 z-50 bg-white flex flex-col">
-        {/* Header with back button */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200">
-          <button 
-            onClick={() => setFullscreenSection(null)}
-            className="flex items-center gap-2 text-gray-900 hover:text-gray-700 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900">
-            {searchState.searchType === 'housemates' ? 'What help do you need?' : 'How many guests?'}
-          </h1>
-          <div className="w-6" /> {/* Spacer */}
+      <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
+        {/* Top spacing */}
+        <div className="h-5 flex-shrink-0"></div>
+        
+        {/* Header with integrated title bar */}
+        <div className="bg-white rounded-t-[3rem] shadow-lg">
+          <div className="p-4">
+            <div className="relative">
+              <button 
+                onClick={() => setFullscreenSection(null)}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <div className="flex items-center justify-center h-14">
+                <h1 className="text-lg font-semibold text-gray-900">
+                  {searchState.searchType === 'housemates' ? 'What help do you need?' : 'How many guests?'}
+                </h1>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto touch-pan-y p-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="flex-1 overflow-y-auto touch-pan-y p-4 bg-white rounded-b-3xl" style={{ WebkitOverflowScrolling: 'touch' }}>
           {searchState.searchType === 'housemates' ? (
-            <div className="space-y-4">
-              {helpOptions.map((option) => {
-                const Icon = option.icon;
-                const isSelected = searchState.helpTypes.includes(option.id);
-                
-                return (
-                  <div
-                    key={option.id}
-                    className={`flex items-center gap-4 p-4 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors ${
-                      isSelected ? 'bg-blue-50 border border-blue-200' : 'border border-gray-200'
-                    }`}
-                    onClick={() => toggleHelpType(option.id)}
-                  >
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                      isSelected ? 'bg-blue-600 text-white' : `${option.color} ${option.iconColor}`
-                    }`}>
-                      {isSelected ? (
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      ) : (
-                        <Icon className="w-6 h-6" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className={`font-medium text-lg ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>
-                        {option.label}
-                      </div>
-                      <div className="text-sm text-gray-500">Find helpers for {option.label.toLowerCase()}</div>
-                    </div>
+            <div>
+              {/* Recent selections */}
+              {searchState.helpTypes.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-sm font-medium text-gray-600 mb-4">Recent selections</h3>
+                  <div className="space-y-2">
+                    {helpOptions.filter(option => searchState.helpTypes.includes(option.id)).map((option) => {
+                      const Icon = option.icon;
+                      
+                      return (
+                        <button
+                          key={option.id}
+                          onClick={() => toggleHelpType(option.id)}
+                          className="w-full p-4 text-left hover:bg-gray-50 flex items-center space-x-3 rounded-lg transition-colors duration-200"
+                        >
+                          <div className="w-12 h-12 bg-gray-800 text-white rounded-lg flex items-center justify-center">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900">{option.label}</div>
+                            <div className="text-sm text-gray-500">Selected</div>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                </div>
+              )}
+              
+              {/* Popular help types */}
+              <div>
+                <h3 className="text-sm font-medium text-gray-600 mb-4">Popular help types</h3>
+                <div className="space-y-2">
+                  {helpOptions.map((option) => {
+                    const Icon = option.icon;
+                    const isSelected = searchState.helpTypes.includes(option.id);
+                    
+                    if (isSelected) return null; // Don't show in this section if already selected
+                    
+                    return (
+                      <button
+                        key={option.id}
+                        onClick={() => toggleHelpType(option.id)}
+                        className="w-full p-4 text-left hover:bg-gray-50 flex items-center space-x-3 rounded-lg transition-colors duration-200"
+                      >
+                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${option.color} ${option.iconColor}`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-900">{option.label}</div>
+                          <div className="text-sm text-gray-500">Find helpers for {option.label.toLowerCase()}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="max-w-sm mx-auto mt-8">
-              <div className="flex items-center justify-between p-6 border border-gray-200 rounded-lg">
-                <div>
-                  <div className="text-lg font-medium text-gray-900">Guests</div>
-                  <div className="text-sm text-gray-500">Number of people</div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <button 
-                    onClick={() => setSearchState(prev => ({ ...prev, guests: Math.max(1, prev.guests - 1) }))}
-                    className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors duration-200"
-                  >
-                    -
-                  </button>
-                  <span className="w-12 text-center font-medium text-lg">{searchState.guests}</span>
-                  <button 
-                    onClick={() => setSearchState(prev => ({ ...prev, guests: prev.guests + 1 }))}
-                    className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors duration-200"
-                  >
-                    +
-                  </button>
-                </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 mb-4">Number of guests</h3>
+              <div className="max-w-sm mx-auto">
+                <button className="w-full p-4 text-left hover:bg-gray-50 flex items-center justify-between rounded-lg transition-colors duration-200">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                      <Users className="w-5 h-5 text-gray-600" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900">Guests</div>
+                      <div className="text-sm text-gray-500">{searchState.guests} {searchState.guests === 1 ? 'person' : 'people'}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSearchState(prev => ({ ...prev, guests: Math.max(1, prev.guests - 1) }));
+                      }}
+                      className="w-8 h-8 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors duration-200"
+                    >
+                      -
+                    </button>
+                    <span className="w-8 text-center font-medium">{searchState.guests}</span>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSearchState(prev => ({ ...prev, guests: prev.guests + 1 }));
+                      }}
+                      className="w-8 h-8 border border-gray-300 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors duration-200"
+                    >
+                      +
+                    </button>
+                  </div>
+                </button>
               </div>
             </div>
           )}
@@ -488,7 +534,7 @@ export function MobileSearchModal({ isOpen, onClose, initialSearchType }: Mobile
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col">
       {/* Tabs positioned at very top with close button integrated */}
-      <div className="relative bg-gray-50 pt-4 pb-4 flex-shrink-0">
+      <div className="relative bg-gray-50 pt-4 pb-2 flex-shrink-0">
         {/* Close button positioned absolute in top right - centered with tabs */}
         <button 
           onClick={onClose} 
@@ -556,7 +602,7 @@ export function MobileSearchModal({ isOpen, onClose, initialSearchType }: Mobile
       >
         <div className="min-h-full pb-4">
           {/* Where Section - Preview with dropdown */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 m-4 mb-4 transition-all duration-300">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 mx-4 mt-2 mb-4 transition-all duration-300">
             {expandedSection === 'where' ? (
               // Expanded Where Section - Preview
               <div className="p-5">
@@ -568,7 +614,7 @@ export function MobileSearchModal({ isOpen, onClose, initialSearchType }: Mobile
                     placeholder="Search locations"
                     value={locationFilter}
                     onChange={(e) => setLocationFilter(e.target.value)}
-                    className="pl-12 h-12 text-base border-gray-300 focus:border-black focus:ring-1 focus:ring-black rounded-xl bg-gray-50 transition-all duration-200"
+                    className="pl-12 h-12 text-base border border-black focus:border-black focus:ring-0 rounded-xl bg-white transition-all duration-200"
                   />
                 </div>
 
@@ -723,12 +769,12 @@ export function MobileSearchModal({ isOpen, onClose, initialSearchType }: Mobile
                           <div
                             key={option.id}
                             className={`flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors ${
-                              isSelected ? 'bg-blue-50 border border-blue-200' : 'border border-gray-200'
+                              isSelected ? 'bg-gray-100' : ''
                             }`}
                             onClick={() => toggleHelpType(option.id)}
                           >
                             <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                              isSelected ? 'bg-blue-600 text-white' : `${option.color} ${option.iconColor}`
+                              isSelected ? 'bg-gray-800 text-white' : `${option.color} ${option.iconColor}`
                             }`}>
                               {isSelected ? (
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -739,7 +785,7 @@ export function MobileSearchModal({ isOpen, onClose, initialSearchType }: Mobile
                               )}
                             </div>
                             <div className="flex-1">
-                              <div className={`font-medium ${isSelected ? 'text-blue-900' : 'text-gray-900'}`}>
+                              <div className={`font-medium ${isSelected ? 'text-gray-900' : 'text-gray-900'}`}>
                                 {option.label}
                               </div>
                               <div className="text-sm text-gray-500">Find helpers for {option.label.toLowerCase()}</div>
@@ -811,26 +857,26 @@ export function MobileSearchModal({ isOpen, onClose, initialSearchType }: Mobile
         <div className="flex items-center justify-between">
           <button 
             onClick={handleClearAll}
-            className="text-lg font-medium text-gray-900 underline transition-colors duration-200 hover:text-gray-700"
+            className="text-xl font-medium text-gray-900 underline transition-colors duration-200 hover:text-gray-700"
           >
             Clear all
           </button>
           {expandedSection === 'when' ? (
             <Button 
               onClick={() => setExpandedSection('what')}
-              className="px-10 py-4 text-lg font-medium bg-black hover:bg-gray-800 text-white transition-all duration-200 hover:shadow-md"
+              className="px-20 py-6 text-xl font-normal bg-black hover:bg-gray-800 text-white transition-all duration-200 hover:shadow-md"
             >
               Next
             </Button>
           ) : (
             <Button 
               onClick={handleSearch}
-              className="px-10 py-4 text-lg font-medium text-white transition-all duration-200 hover:shadow-md"
+              className="px-20 py-6 text-xl font-normal text-white transition-all duration-200 hover:shadow-md"
               style={{ backgroundColor: '#c98f31' }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b8802c'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#c98f31'}
             >
-              <Search className="w-5 h-5 mr-2" />
+              <Search className="w-6 h-6 mr-3" />
               Search
             </Button>
           )}

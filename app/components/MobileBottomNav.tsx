@@ -2,10 +2,9 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { FileText, Search, MessageCircle, Loader2 } from "lucide-react";
+import { FileText, Search, MessageCircle, Loader2, Heart, UserCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { MobileConditionalSearchButton } from "./ConditionalSearchButton";
 
 interface MobileBottomNavProps {
   user: {
@@ -56,83 +55,80 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
 
   // Show bottom nav for both logged in and non-logged in users
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-6 pt-3 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] z-40 shadow-lg">
-      <div className="flex items-center justify-around max-w-sm mx-auto">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 pt-1 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] z-40 shadow-lg">
+      <div className="flex items-center justify-around w-full max-w-md mx-auto">
         {user ? (
           // Logged in user navigation
           <>
             {/* Messages */}
-            <div className="flex flex-col items-center min-w-0 flex-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent disabled:opacity-75 transition-all duration-200"
+            <div className="flex flex-col items-center">
+              <button
+                className="flex flex-col items-center gap-1 py-1 disabled:opacity-75 transition-all duration-200"
                 onClick={handleMessagesClick}
                 disabled={isNavigating}
               >
                 {isNavigating ? (
-                  <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                  <Loader2 className="w-5 h-5 animate-spin text-[#c98f31]" />
                 ) : (
-                  <MessageCircle className="w-6 h-6" />
+                  <MessageCircle className={`w-5 h-5 ${pathname.includes('/messages') ? "text-[#c98f31]" : "text-gray-500"}`} />
                 )}
-              </Button>
-              <span className="text-xs font-medium text-gray-600 mt-1 truncate">Messages</span>
+                <span className={`text-xs ${
+                  pathname.includes('/messages') ? "text-[#c98f31] font-medium" : "text-gray-600 font-normal"
+                }`}>Messages</span>
+              </button>
             </div>
 
             {/* Applications */}
-            <div className="flex flex-col items-center min-w-0 flex-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent"
-              >
-                <Link href={`/${user.userType?.toLowerCase() || 'housemate'}/applications`}>
-                  <FileText className="w-6 h-6" />
-                </Link>
-              </Button>
-              <span className="text-xs font-medium text-gray-600 mt-1 truncate">Applications</span>
+            <div className="flex flex-col items-center">
+              <Link href={`/${user.userType?.toLowerCase() || 'housemate'}/applications`} className="flex flex-col items-center gap-1 py-1">
+                <FileText className={`w-5 h-5 ${pathname.includes('/applications') ? "text-[#c98f31]" : "text-gray-500"}`} />
+                <span className={`text-xs ${
+                  pathname.includes('/applications') ? "text-[#c98f31] font-medium" : "text-gray-600 font-normal"
+                }`}>Applications</span>
+              </Link>
             </div>
 
             {/* Browse Homes/Housemates */}
-            <MobileConditionalSearchButton />
+            <div className="flex flex-col items-center">
+              <Link href={pathname === '/homes' ? "/products/template" : "/products/icon"} className="flex flex-col items-center gap-1 py-1">
+                <Search className={`w-5 h-5 ${pathname.includes('/products') ? "text-[#c98f31]" : "text-gray-500"}`} />
+                <span className={`text-xs ${
+                  pathname.includes('/products') ? "text-[#c98f31] font-medium" : "text-gray-600 font-normal"
+                }`}>Browse</span>
+              </Link>
+            </div>
           </>
         ) : (
           // Non-logged in user navigation
           <>
-            {/* Conditional Search based on current page */}
-            <MobileConditionalSearchButton />
-
-            {/* View Homes */}
-            <div className="flex flex-col items-center min-w-0 flex-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent"
-              >
-                <Link href="/products/template">
-                  <FileText className="w-6 h-6" />
-                </Link>
-              </Button>
-              <span className="text-xs font-medium text-gray-600 mt-1 truncate">Homes</span>
+            {/* Explore */}
+            <div className="flex flex-col items-center">
+              <Link href="/" className="flex flex-col items-center gap-1 py-1">
+                <Search className={`w-5 h-5 ${pathname === "/" ? "text-[#c98f31]" : "text-gray-500"}`} />
+                <span className={`text-xs ${
+                  pathname === "/" ? "text-[#c98f31] font-medium" : "text-gray-600 font-normal"
+                }`}>Explore</span>
+              </Link>
             </div>
 
-            {/* About */}
-            <div className="flex flex-col items-center min-w-0 flex-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="flex items-center justify-center p-2 h-10 w-10 rounded-full hover:bg-accent"
-              >
-                <Link href="/about">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </Link>
-              </Button>
-              <span className="text-xs font-medium text-gray-600 mt-1 truncate">About</span>
+            {/* Favorites */}
+            <div className="flex flex-col items-center">
+              <Link href="/favorites" className="flex flex-col items-center gap-1 py-1">
+                <Heart className={`w-5 h-5 ${pathname === "/favorites" ? "text-[#c98f31]" : "text-gray-500"}`} />
+                <span className={`text-xs ${
+                  pathname === "/favorites" ? "text-[#c98f31] font-medium" : "text-gray-600 font-normal"
+                }`}>Favorites</span>
+              </Link>
+            </div>
+
+            {/* Login */}
+            <div className="flex flex-col items-center">
+              <Link href="/onboarding" className="flex flex-col items-center gap-1 py-1">
+                <UserCircle className={`w-5 h-5 ${pathname === "/onboarding" || pathname.startsWith("/auth") ? "text-[#c98f31]" : "text-gray-500"}`} />
+                <span className={`text-xs ${
+                  pathname === "/onboarding" || pathname.startsWith("/auth") ? "text-[#c98f31] font-medium" : "text-gray-600 font-normal"
+                }`}>Log in</span>
+              </Link>
             </div>
           </>
         )}

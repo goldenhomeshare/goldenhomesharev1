@@ -20,13 +20,7 @@ export function NavbarLinks () {
             )}
           >
             <div className="flex items-center gap-6 pb-2">
-              <div className={cn(
-                "relative w-16 h-16 hover-vibrate",
-                location === "/" && "animate-vibrate"
-              )} 
-              style={{
-                animation: location === "/" ? "vibrate 0.6s ease-in-out 1" : undefined
-              }}>
+              <div className="relative w-20 h-20">
                 <Image 
                   src="/headr-helper.png" 
                   alt="Helper"
@@ -54,15 +48,9 @@ export function NavbarLinks () {
             )}
           >
             <div className="flex items-center gap-6 pb-2">
-              <div className={cn(
-                "relative w-16 h-16 hover-vibrate",
-                location === "/homes" && "animate-vibrate"
-              )}
-              style={{
-                animation: location === "/homes" ? "vibrate 0.6s ease-in-out 1" : undefined
-              }}>
+              <div className="relative w-20 h-20">
                 <Image 
-                  src="/header-homes.png" 
+                  src="/updated-home-icon-min.png" 
                   alt="Homes"
                   fill
                   className="object-contain"

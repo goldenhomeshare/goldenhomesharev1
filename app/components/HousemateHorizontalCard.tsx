@@ -106,12 +106,12 @@ export function HousemateHorizontalCard({
 
   return (
     <Link href={`/profile/${userId}`} className="block w-full">
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-full max-w-full min-h-[280px] lg:min-h-[350px]">
+      <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow cursor-pointer w-full max-w-full min-h-[220px] lg:min-h-[280px]">
         
         {/* Unified Layout - Responsive horizontal design */}
         <div className="p-3 pb-2 sm:p-4 sm:pb-3 lg:p-6 lg:pb-4">
           <div className="flex flex-col">
-            <div className="flex items-center sm:items-start gap-4 lg:gap-8 mb-3 sm:mb-4 lg:mb-6 relative">
+            <div className="flex items-center sm:items-center gap-4 lg:gap-8 mb-3 sm:mb-4 lg:mb-6 relative">
               {/* Profile Picture Section - Responsive sizing */}
               <div className="w-32 sm:w-48 lg:w-64 flex-shrink-0 flex flex-col items-center mt-4 sm:mt-0">
                 <div className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-48 lg:h-48 rounded-full overflow-hidden">
@@ -132,25 +132,6 @@ export function HousemateHorizontalCard({
                 {/* Name below profile image */}
                 <div className="mt-2 lg:mt-4 text-center w-full">
                   <h3 className="text-lg sm:text-2xl lg:text-4xl font-bold text-gray-900">{firstName}</h3>
-                  {/* Occupation with icon - responsive spacing */}
-                  <div className="h-10 sm:h-8 lg:h-12 flex items-center justify-center gap-1 lg:gap-2 text-gray-600 mt-1 lg:mt-2 px-1 lg:px-2">
-                    {occupationDisplay && (
-                      <div className="flex items-center gap-1 lg:gap-2">
-                        {isCurrentlyAttending ? (
-                          <GraduationCap size={14} className="text-gray-500 flex-shrink-0 sm:w-4 sm:h-4 lg:w-[18px] lg:h-[18px]" />
-                        ) : (
-                          <Briefcase size={14} className="text-gray-500 flex-shrink-0 sm:w-4 sm:h-4 lg:w-[18px] lg:h-[18px]" />
-                        )}
-                        {/* Single responsive span - mobile: 2-line left-aligned, desktop: truncated center-aligned */}
-                        <span 
-                          className="text-sm sm:text-sm lg:text-lg text-left sm:text-center line-clamp-2 sm:truncate max-w-[120px] sm:max-w-[140px] lg:max-w-[180px]" 
-                          title={occupationDisplay || undefined}
-                        >
-                          {occupationDisplay}
-                        </span>
-                      </div>
-                    )}
-                  </div>
                 </div>
               </div>
               {/* Verification Badge - Responsive positioning */}
@@ -161,8 +142,8 @@ export function HousemateHorizontalCard({
                 <ShieldCheck size={20} className="text-white sm:w-6 sm:h-6 lg:w-9 lg:h-9" />
               </div>
 
-              {/* Right Content - Responsive sizing */}
-              <div className="flex-1 flex flex-col justify-start min-w-0 mt-0 lg:mt-8">
+              {/* Right Content - Responsive sizing, centered next to profile */}
+              <div className="flex-1 flex flex-col justify-center min-w-0">
                 {/* Main pricing text */}
                 <div className="mb-2 sm:mb-4">
                   <div className="space-y-2 lg:space-y-4">
@@ -185,17 +166,25 @@ export function HousemateHorizontalCard({
               </div>
             </div>
 
-            {/* Bio section - spans full width, responsive text */}
-            <div className="mt-4 sm:mt-6 lg:mt-8 mb-0 sm:mb-0 lg:mb-0">
-              {bio ? (
-                <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-tight sm:leading-relaxed line-clamp-2 overflow-hidden">
-                  <span className="font-bold text-gray-900">About: </span>{bio}
-                </p>
-              ) : (
-                <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-tight sm:leading-relaxed">
-                  <span className="font-bold text-gray-900">About: </span>{firstName} hasn't added a bio yet.
-                </p>
-              )}
+            {/* Job title at bottom center of card */}
+            <div className="mt-1 sm:mt-2 lg:mt-4 text-center w-full">
+              <div className="flex items-center justify-center gap-1 lg:gap-2 text-gray-600">
+                {occupationDisplay && (
+                  <div className="flex items-center gap-1 lg:gap-2 max-w-full">
+                    {isCurrentlyAttending ? (
+                      <GraduationCap size={14} className="text-gray-500 flex-shrink-0 sm:w-4 sm:h-4 lg:w-[18px] lg:h-[18px]" />
+                    ) : (
+                      <Briefcase size={14} className="text-gray-500 flex-shrink-0 sm:w-4 sm:h-4 lg:w-[18px] lg:h-[18px]" />
+                    )}
+                    <span 
+                      className="text-sm sm:text-sm lg:text-lg text-center truncate max-w-[200px] sm:max-w-[250px] lg:max-w-[300px]" 
+                      title={occupationDisplay || undefined}
+                    >
+                      {occupationDisplay}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
           </div>

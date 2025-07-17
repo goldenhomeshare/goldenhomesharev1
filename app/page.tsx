@@ -262,53 +262,7 @@ export default async function Home() {
             </div>
           </div>
 
-          {/* Help With */}
-          <div className="max-w-5xl mx-auto mb-12 -mt-6">
-            <h3 className="text-3xl md:text-4xl font-bold text-gray-900 text-center mb-8">Help With:</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-              <div className="bg-gray-50 p-6 rounded-lg flex items-center space-x-4">
-                <Sparkles className="flex-shrink-0 w-8 h-8 text-gray-600" />
-                <span className="text-gray-700 font-semibold text-lg">Cleaning</span>
-              </div>
-              <div className="bg-gray-50 p-6 rounded-lg flex items-center space-x-4">
-                <ChefHat className="flex-shrink-0 w-8 h-8 text-gray-600" />
-                <span className="text-gray-700 font-semibold text-lg">Cooking</span>
-              </div>
-              <div className="bg-gray-50 p-6 rounded-lg flex items-center space-x-4">
-                <Trees className="flex-shrink-0 w-8 h-8 text-gray-600" />
-                <span className="text-gray-700 font-semibold text-lg">Yard Work</span>
-              </div>
-              <div className="bg-gray-50 p-6 rounded-lg flex items-center space-x-4">
-                <ShoppingBag className="flex-shrink-0 w-8 h-8 text-gray-600" />
-                <span className="text-gray-700 font-semibold text-lg">Shopping & Errands</span>
-              </div>
-              <div className="bg-gray-50 p-6 rounded-lg flex items-center space-x-4">
-                <Heart className="flex-shrink-0 w-8 h-8 text-gray-600" />
-                <span className="text-gray-700 font-semibold text-lg">Companionship</span>
-              </div>
-              <div className="bg-gray-50 p-6 rounded-lg flex items-center space-x-4">
-                <PawPrint className="flex-shrink-0 w-8 h-8 text-gray-600" />
-                <span className="text-gray-700 font-semibold text-lg">Pet Care</span>
-              </div>
-              <div className="bg-gray-50 p-6 rounded-lg flex items-center space-x-4">
-                <Monitor className="flex-shrink-0 w-8 h-8 text-gray-600" />
-                <span className="text-gray-700 font-semibold text-lg">Tech Support</span>
-              </div>
-              <div className="bg-gray-50 p-6 rounded-lg flex items-center space-x-4">
-                <Car className="flex-shrink-0 w-8 h-8 text-gray-600" />
-                <span className="text-gray-700 font-semibold text-lg">Transportation</span>
-              </div>
-            </div>
-          </div>
 
-          {/* Important Notice */}
-          <div className="max-w-4xl mx-auto mb-12">
-            <div className="bg-blue-50 rounded-xl p-8 text-center">
-              <p className="text-gray-700 text-lg leading-relaxed">
-                <span className="font-semibold text-gray-900">Important:</span> No medical care, personal hygiene assistance, or professional services are included. Housemates are not trained caregivers or medical professionals.
-              </p>
-            </div>
-          </div>
 
         </div>
       </section>

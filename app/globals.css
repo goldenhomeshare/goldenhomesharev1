@@ -182,6 +182,14 @@
   100% { filter: brightness(1) saturate(1); }
 }
 
+/* Prevent horizontal overflow */
+@layer base {
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+}
+
 /* Custom Animation Classes */
 @layer components {
   .animate-vibrate {

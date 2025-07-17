@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from "next/link";
 import Image from "next/image";
 import { Search, X, Sparkles, ChefHat, TreePine, ShoppingBag, Heart, PawPrint, Monitor, Car } from "lucide-react";
+import { MobileSearchModal } from './MobileSearchModal';
 
 interface ScrollResponsiveNavbarProps {
   showNavLinks: boolean;
@@ -33,6 +34,7 @@ export function ScrollResponsiveNavbar({
   const [selectedDemographic, setSelectedDemographic] = useState<string[]>([]);
   const [isCondensedExpanded, setIsCondensedExpanded] = useState(false);
   const [locationFilter, setLocationFilter] = useState('');
+  const [showMobileModal, setShowMobileModal] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -234,7 +236,7 @@ export function ScrollResponsiveNavbar({
   const getSelectedIcon = () => {
     if (pathname === '/homes' || pathname.startsWith('/homes/') || pathname === '/products/template') {
       return {
-        src: "/header-homes.png",
+        src: "/updated-home-icon-min.png",
         alt: "Homes"
       };
     }
@@ -581,11 +583,11 @@ export function ScrollResponsiveNavbar({
       <div className="max-w-7xl w-full mx-auto px-4 md:px-8">
         {/* Main Navbar Row */}
         <div className="flex items-center justify-between">
-          {/* Logo - Positioned further left like Airbnb */}
-          <div className={`flex-shrink-0 transition-all duration-500 ease-in-out pt-3 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
+          {/* Logo - Hidden on mobile for clean search interface */}
+          <div className={`hidden lg:block flex-shrink-0 transition-all duration-500 ease-in-out pt-3 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
             <Link href="/">
               {/* Full logo for larger screens - no size changes */}
-              <div className="hidden sm:flex items-center -ml-4 md:-ml-8 lg:-ml-12">
+              <div className="flex items-center -ml-4 md:-ml-8 lg:-ml-12">
                 <Image
                   src="/golden-logo.png"
                   alt="Golden HomeShare"
@@ -595,24 +597,94 @@ export function ScrollResponsiveNavbar({
                   priority
                 />
               </div>
-              {/* Logo for mobile - no size changes */}
-              <div className="sm:hidden flex items-center -ml-4">
-                <Image
-                  src="/golden-logo.png"
-                  alt="Golden HomeShare"
-                  width={240}
-                  height={72}
-                  className="w-auto h-20"
-                  priority
-                />
-              </div>
             </Link>
           </div>
 
           {/* Center Content Area - Same top padding, remove bottom when scrolled */}
           <div className={`flex-1 flex justify-center transition-all duration-500 ease-in-out pt-3 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
-            {/* Condensed Search Bar when scrolled (hide when expanded) */}
-            <div className={`transition-all duration-500 ease-in-out ${
+            {/* Mobile Search Trigger - Full width on mobile */}
+            <div className="lg:hidden w-full px-4">
+              <button
+                onClick={() => setShowMobileModal(true)}
+                className="w-full flex items-center justify-center bg-white rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 px-6 py-4 text-left"
+              >
+                <Search className="w-5 h-5 text-black mr-3" />
+                <span className="text-black text-base">
+                  {pathname === "/homes" || pathname.startsWith("/homes/") 
+                    ? "Find nearby homes" 
+                    : "Find nearby helpers"
+                  }
+                </span>
+              </button>
+              
+              {/* Mobile Home/Helper Options - Hide icons when condensed */}
+              <div className={`flex items-center justify-center gap-12 mt-4 transition-all duration-500 ease-in-out ${
+                isInCondensedMode ? 'mb-[7.375rem]' : '-mb-7.5'
+              }`}>
+                {/* Helpers Option */}
+                <Link 
+                  href="/" 
+                  className="flex flex-col items-center"
+                >
+                  <div className={`flex flex-col items-center transition-all duration-500 ease-in-out ${
+                    isInCondensedMode ? 'gap-0' : 'gap-2'
+                  }`}>
+                    <div className={`relative transition-all duration-500 ease-in-out overflow-hidden ${
+                      isInCondensedMode ? 'w-0 h-0 opacity-0' : 'w-20 h-20 opacity-100'
+                    }`}>
+                      <Image 
+                        src="/headr-helper.png" 
+                        alt="Helper"
+                        fill
+                        className="object-contain"
+                        priority
+                      />
+                    </div>
+                    <span className={`text-lg font-medium ${
+                      pathname === "/" 
+                        ? "text-black" 
+                        : "text-gray-600"
+                    }`}>
+                      Helpers
+                    </span>
+                  </div>
+                  {pathname === "/" && <div className="w-full h-[3px] bg-black rounded-full"></div>}
+                </Link>
+
+                {/* Homes Option */}
+                <Link 
+                  href="/homes" 
+                  className="flex flex-col items-center"
+                >
+                  <div className={`flex flex-col items-center transition-all duration-500 ease-in-out ${
+                    isInCondensedMode ? 'gap-0' : 'gap-2'
+                  }`}>
+                    <div className={`relative transition-all duration-500 ease-in-out overflow-hidden ${
+                      isInCondensedMode ? 'w-0 h-0 opacity-0' : 'w-20 h-20 opacity-100'
+                    }`}>
+                      <Image 
+                        src="/updated-home-icon-min.png" 
+                        alt="Homes"
+                        fill
+                        className="object-contain"
+                        priority
+                      />
+                    </div>
+                    <span className={`text-lg font-medium ${
+                      pathname === "/homes" 
+                        ? "text-black" 
+                        : "text-gray-600"
+                    }`}>
+                      Homes
+                    </span>
+                  </div>
+                  {pathname === "/homes" && <div className="w-full h-[3px] bg-black rounded-full"></div>}
+                </Link>
+              </div>
+            </div>
+
+            {/* Condensed Search Bar when scrolled (hide when expanded) - Hidden on mobile */}
+            <div className={`hidden lg:block transition-all duration-500 ease-in-out ${
               isInCondensedMode ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
             }`}>
               <div 
@@ -712,9 +784,12 @@ export function ScrollResponsiveNavbar({
                       e.stopPropagation(); // Prevent condensed bar expansion
                       handleSearch();
                     }}
-                    className={`bg-primary hover:bg-primary/90 text-white rounded-full transition-all duration-200 flex items-center gap-2 ${
+                    className={`text-white rounded-full transition-all duration-200 flex items-center gap-2 ${
                       activeField !== null ? 'px-5 py-3' : 'p-2.5'
                     }`}
+                    style={{ backgroundColor: '#c98f31' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b8802c'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#c98f31'}
                   >
                     {activeField !== null && (
                       <span className="text-lg font-medium">Search</span>
@@ -733,14 +808,14 @@ export function ScrollResponsiveNavbar({
             </div>
           </div>
 
-          {/* User Navigation - Same top padding, remove bottom when scrolled */}
-          <div className={`flex items-center gap-x-1 flex-shrink-0 transition-all duration-500 ease-in-out pt-3 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
+          {/* User Navigation - Hidden on mobile for clean search interface */}
+          <div className={`hidden lg:flex items-center gap-x-1 flex-shrink-0 transition-all duration-500 ease-in-out pt-3 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
             {userNavigation}
           </div>
         </div>
         
-        {/* Full Search Bar Row (only show when not scrolled or condensed is expanded) */}
-        <div className={`flex justify-center transition-all duration-500 ease-in-out ${
+        {/* Full Search Bar Row (only show when not scrolled or condensed is expanded) - Hidden on mobile */}
+        <div className={`hidden lg:flex justify-center transition-all duration-500 ease-in-out ${
           !isInCondensedMode || isCondensedExpanded ? 'pb-4 opacity-100 transform translate-y-0' : 'pb-0 opacity-0 transform -translate-y-4 pointer-events-none'
         }`}>
           <div className="relative max-w-5xl w-full z-[60]">
@@ -877,13 +952,16 @@ export function ScrollResponsiveNavbar({
               }`}>
                 <button 
                   onClick={handleSearch}
-                  className={`bg-primary hover:bg-primary/90 text-white transition-all duration-200 flex items-center gap-3 ${
+                  className={`text-white transition-all duration-200 flex items-center gap-3 ${
                     activeField === searchFields.full.length - 1 
                       ? 'px-6 py-4 rounded-full' 
                       : activeField !== null 
                         ? 'px-6 py-4 rounded-full' 
                         : 'p-4 rounded-full'
                   }`}
+                  style={{ backgroundColor: '#c98f31' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b8802c'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#c98f31'}
                 >
                   {activeField !== null && (
                     <span className="text-lg font-medium">Search</span>
@@ -957,7 +1035,8 @@ export function ScrollResponsiveNavbar({
                         ))}
                         {filteredCities.length === 0 && locationFilter && (
                           <div className="p-3 text-center text-gray-500">
-                            <div className="text-sm">No cities found matching "{locationFilter}"</div>
+                            <div className="text-sm text-gray-600 mb-2">We don't currently serve "{locationFilter}"</div>
+                <div className="text-xs text-gray-500">We're only operating in select Missouri locations at this time</div>
                             <div className="text-xs mt-1">We currently operate in Columbia, Jefferson City, Boonville, and other central Missouri cities.</div>
                           </div>
                         )}
@@ -1032,7 +1111,10 @@ export function ScrollResponsiveNavbar({
                         closeDropdown();
                         handleSearch();
                       }}
-                      className="px-6 py-3 text-sm bg-primary hover:bg-primary/90 text-white rounded-full transition-colors font-medium"
+                      className="px-6 py-3 text-sm text-white rounded-full transition-colors font-medium"
+                      style={{ backgroundColor: '#c98f31' }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b8802c'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#c98f31'}
                     >
                       Search
                     </button>
@@ -1201,6 +1283,19 @@ export function ScrollResponsiveNavbar({
           />
         )}
       </div>
+
+
+
+      {/* Mobile Search Modal */}
+      <MobileSearchModal 
+        isOpen={showMobileModal}
+        onClose={() => setShowMobileModal(false)}
+        initialSearchType={
+          pathname === '/homes' || pathname.startsWith('/homes/') || pathname === '/products/template' 
+            ? 'homes' 
+            : 'housemates' // Default to housemates for all other pages including homepage
+        }
+      />
     </nav>
   );
 } 

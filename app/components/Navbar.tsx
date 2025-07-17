@@ -91,9 +91,9 @@ export async function Navbar() {
                             <div className="p-4 border-b border-gray-100">
                                 <DropdownMenuItem asChild className="p-0 h-auto">
                                     <Link href="/homeowner/signup-wizard" className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                                        <div className="relative w-12 h-12 flex-shrink-0">
+                                        <div className="relative w-14 h-14 flex-shrink-0">
                                             <Image 
-                                                src="/header-homes.png" 
+                                                src="/updated-home-icon-min.png" 
                                                 alt="Become a host"
                                                 fill
                                                 className="object-contain"

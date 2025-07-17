@@ -65,7 +65,7 @@ export function MobileConditionalSearchButton({
   
   const isHomesMode = pathname === '/homes' || pathname.startsWith('/homes/');
   const targetUrl = isHomesMode ? "/products/template" : "/products/icon";
-  const buttonText = isHomesMode ? "Browse Homes" : "Browse Housemates";
+  const buttonText = isHomesMode ? "Homes" : "Helpers";
   
   return (
     <div className={`flex flex-col items-center min-w-0 flex-1 ${className}`}>

@@ -679,6 +679,9 @@ export function ScrollResponsiveNavbar({
                             setIsCondensedExpanded(true); // Expand to full search bar
                             // Immediately open the appropriate dropdown
                             if (index === 0) {
+                              // Auto-clear location field when clicked
+                              setSelectedWhere('');
+                              setLocationFilter('');
                               setOpenDropdown('location');
                               setActiveField(0);
                             } else if (index === 1) {
@@ -743,7 +746,7 @@ export function ScrollResponsiveNavbar({
           <div className="relative max-w-5xl w-full z-[60]">
             <div className={`flex items-center border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-all duration-200 ${
               activeField !== null ? 'bg-gray-100' : 'bg-white'
-            }`}>
+            } relative overflow-hidden`}>
               {searchFields.full.map((field, index) => {
                 const getFieldValue = () => {
                   if (isHelperMode) {
@@ -789,16 +792,23 @@ export function ScrollResponsiveNavbar({
                 return (
                   <div key={index} className="flex-1 relative">
                     <div 
-                      className={`px-6 py-6 relative cursor-pointer z-[75] ${
+                                            className={`py-6 relative cursor-pointer z-[75] ${
                         isActive 
-                          ? 'bg-white shadow-lg rounded-full' : 
-                          activeField !== null ? 'opacity-60' : ''
+                          ? `${
+                              index === searchFields.full.length - 1 
+                                ? 'bg-white rounded-l-full rounded-r-none pl-6 pr-6' 
+                                : 'bg-white shadow-lg rounded-full px-6'
+                            }` : 
+                          activeField !== null ? 'opacity-60 px-6' : 'px-6'
                       } transition-all duration-200`}
                       onMouseDown={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         // Immediate dropdown switching - no conflicts
                         if (index === 0) {
+                          // Auto-clear location field when clicked
+                          setSelectedWhere('');
+                          setLocationFilter('');
                           setOpenDropdown('location');
                           setActiveField(0);
                         } else if (index === 1) {
@@ -813,28 +823,45 @@ export function ScrollResponsiveNavbar({
                       <div className="flex items-center justify-between">
                         <div className="text-lg font-semibold text-gray-900 mb-1">{field.label}</div>
                       </div>
-                      <input 
-                        type="text" 
-                        value={fieldValue}
-                        onChange={(e) => {
-                          // Only allow changes for location field
-                          if (index === 0) {
-                            handleInputChange(index, e.target.value);
-                          }
-                        }}
-                        placeholder={field.placeholder} 
-                        className={`w-full text-xl bg-transparent border-none outline-none pointer-events-none ${
-                          fieldValue ? 'text-gray-900 font-medium' : 'text-gray-600 placeholder-gray-400'
-                        } ${index === 0 ? 'pointer-events-auto' : ''}`}
-                        readOnly={index !== 0} // Only location field is editable
-                        onFocus={index === 0 ? () => {
-                          // Only handle auto-clear for location field
-                          if (selectedWhere && !shouldShowCondensed()) {
-                            setSelectedWhere('');
-                            setLocationFilter('');
-                          }
-                        } : undefined}
-                      />
+                      <div className="relative">
+                        <input 
+                          type="text" 
+                          value={fieldValue}
+                          onChange={(e) => {
+                            // Only allow changes for location field
+                            if (index === 0) {
+                              handleInputChange(index, e.target.value);
+                            }
+                          }}
+                          placeholder={field.placeholder} 
+                          className={`w-full text-xl bg-transparent border-none outline-none pointer-events-none pr-10 ${
+                            fieldValue ? 'text-gray-900 font-medium' : 'text-gray-600 placeholder-gray-400'
+                          } ${index === 0 ? 'pointer-events-auto' : ''}`}
+                          readOnly={index !== 0} // Only location field is editable
+                          onFocus={index === 0 ? () => {
+                            // Location field - auto-clear is now handled in onMouseDown
+                          } : undefined}
+                        />
+                      </div>
+                      {/* Clear button - positioned relative to entire field bubble */}
+                      {isActive && fieldValue && index !== 0 && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            // Clear the respective field
+                            if (index === 1) {
+                              setSelectedDateRange({ start: null, end: null });
+                              setSelectedHelpStarts('');
+                            } else if (index === 2) {
+                              setSelectedTypeOfHelp([]);
+                            }
+                          }}
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors z-[80]"
+                        >
+                          <X className="w-4 h-4 text-gray-600 hover:text-gray-800" />
+                        </button>
+                      )}
                     </div>
                     {/* Divider - only show when this field and next field are both inactive */}
                     {index < searchFields.full.length - 1 && !isActive && activeField !== index + 1 && (
@@ -843,11 +870,19 @@ export function ScrollResponsiveNavbar({
                   </div>
                 );
               })}
-              <div className={`pr-2 z-[75] relative ${activeField !== null ? 'opacity-100' : ''} transition-opacity duration-200`}>
+              <div className={`z-[75] relative transition-all duration-200 ${
+                activeField === searchFields.full.length - 1 
+                  ? 'bg-white rounded-r-full pr-2 py-6' 
+                  : `pr-2 ${activeField !== null ? 'opacity-100' : ''}`
+              }`}>
                 <button 
                   onClick={handleSearch}
-                  className={`bg-primary hover:bg-primary/90 text-white rounded-full transition-all duration-200 flex items-center gap-3 ${
-                    activeField !== null ? 'px-6 py-4' : 'p-4'
+                  className={`bg-primary hover:bg-primary/90 text-white transition-all duration-200 flex items-center gap-3 ${
+                    activeField === searchFields.full.length - 1 
+                      ? 'px-6 py-4 rounded-full' 
+                      : activeField !== null 
+                        ? 'px-6 py-4 rounded-full' 
+                        : 'p-4 rounded-full'
                   }`}
                 >
                   {activeField !== null && (
@@ -955,14 +990,8 @@ export function ScrollResponsiveNavbar({
                 />
                 <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-200 max-h-[600px] overflow-hidden" style={{ zIndex: 80 }}>
                 <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">Type of help wanted (multi-select)</h3>
-                    <button
-                      onClick={closeDropdown}
-                      className="text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
                   </div>
                   <div className="space-y-3 max-h-60 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                     {helpOptions.map((option) => {

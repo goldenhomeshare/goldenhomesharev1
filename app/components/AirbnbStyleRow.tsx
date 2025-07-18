@@ -14,6 +14,11 @@ const PROFILE_CHAT_PRODUCT_ID = "cm2h3ofy000007e71twi83xsy";
 const MAX_RETRIES = 3;
 const BASE_DELAY = 1000; // 1 second
 
+// Helper function to convert string to title case
+function toTitleCase(str: string): string {
+  return str.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 // Simple in-memory cache
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -316,7 +321,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
 
         return {
           id: profile.user.id, // Use userId as the id for profile links
-          name: `${profile.user.firstName} ${profile.user.lastName?.charAt(0) || ''}.`,
+          name: toTitleCase(profile.user.firstName),
           price: profile.maxBudget || 0,
           smallDescription: profile.bio || 'No bio available',
           images: profile.profilePicture ? [profile.profilePicture] : [],
@@ -327,7 +332,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
           ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent" && amenity !== "social"), // Remove early-riser, independent, and social tags
           // Demographics information
           demographics: {
-            age: displayAgeRange,
+            ageRange: displayAgeRange,
             gender: profile.gender || undefined,
             occupation: profile.occupation || undefined,
             isCurrentlyAttending: isCurrentlyAttending,
@@ -402,7 +407,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
 
         return {
           id: profile.user.id, // Use userId as the id for profile links
-          name: `${profile.user.firstName} ${profile.user.lastName?.charAt(0) || ''}.`,
+          name: toTitleCase(profile.user.firstName),
           price: profile.maxBudget || 0,
           smallDescription: profile.bio || 'No bio available',
           images: profile.profilePicture ? [profile.profilePicture] : [],
@@ -413,7 +418,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
           ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent" && amenity !== "social"), // Remove early-riser, independent, and social tags
           // Demographics information
           demographics: {
-            age: displayAgeRange,
+            ageRange: displayAgeRange,
             gender: profile.gender || undefined,
             occupation: profile.occupation || undefined,
             isCurrentlyAttending: isCurrentlyAttending,
@@ -494,7 +499,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
 
         return {
           id: profile.user.id, // Use userId as the id for profile links
-          name: `${profile.user.firstName} ${profile.user.lastName?.charAt(0) || ''}.`,
+          name: toTitleCase(profile.user.firstName),
           price: profile.maxBudget || 0,
           smallDescription: profile.bio || 'No bio available',
           images: profile.profilePicture ? [profile.profilePicture] : [],
@@ -505,7 +510,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
           ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent" && amenity !== "social"), // Remove early-riser, independent, and social tags
           // Demographics information
           demographics: {
-            age: displayAgeRange,
+            ageRange: displayAgeRange,
             gender: profile.gender || undefined,
             occupation: profile.occupation || undefined,
             isCurrentlyAttending: isCurrentlyAttending,
@@ -596,7 +601,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
 
         return {
           id: profile.user.id, // Use userId as the id for profile links
-          name: `${profile.user.firstName} ${profile.user.lastName?.charAt(0) || ''}.`,
+          name: toTitleCase(profile.user.firstName),
           price: profile.maxBudget || 0,
           smallDescription: profile.bio || 'No bio available',
           images: profile.profilePicture ? [profile.profilePicture] : [],
@@ -607,7 +612,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
           ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent" && amenity !== "social"), // Remove early-riser, independent, and social tags
           // Demographics information
           demographics: {
-            age: displayAgeRange,
+            ageRange: displayAgeRange,
             gender: profile.gender || undefined,
             occupation: profile.occupation || undefined,
             isCurrentlyAttending: isCurrentlyAttending,
@@ -714,7 +719,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
 
         return {
           id: profile.user.id, // Use userId as the id for profile links
-          name: `${profile.user.firstName} ${profile.user.lastName?.charAt(0) || ''}.`,
+          name: toTitleCase(profile.user.firstName),
           price: profile.maxBudget || 0,
           smallDescription: profile.bio || 'No bio available',
           images: profile.profilePicture ? [profile.profilePicture] : [],
@@ -725,7 +730,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
           ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent" && amenity !== "social"), // Remove early-riser, independent, and social tags
           // Demographics information
           demographics: {
-            age: displayAgeRange,
+            ageRange: displayAgeRange,
             gender: profile.gender || undefined,
             occupation: profile.occupation || undefined,
             isCurrentlyAttending: isCurrentlyAttending,

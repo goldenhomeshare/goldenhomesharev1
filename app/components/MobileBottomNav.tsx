@@ -17,8 +17,42 @@ interface MobileBottomNavProps {
 
 export function MobileBottomNav({ user }: MobileBottomNavProps) {
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
+
+  // Scroll direction detection
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Only hide if scrolling down and past a minimum threshold
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down - hide nav
+        setIsVisible(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up - show nav
+        setIsVisible(true);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    // Add scroll event listener with throttling
+    let timeoutId: NodeJS.Timeout;
+    const throttledScroll = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleScroll, 10);
+    };
+
+    window.addEventListener('scroll', throttledScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', throttledScroll);
+      clearTimeout(timeoutId);
+    };
+  }, [lastScrollY]);
 
   const getMessagesLink = () => {
     switch (user?.userType) {
@@ -55,7 +89,11 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
 
   // Show bottom nav for both logged in and non-logged in users
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 pt-1 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] z-40 shadow-lg">
+    <div 
+      className={`lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 pt-1 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] z-40 shadow-lg transition-transform duration-300 ease-in-out ${
+        isVisible ? 'translate-y-0' : 'translate-y-full'
+      }`}
+    >
       <div className="flex items-center justify-around w-full max-w-md mx-auto">
         {user ? (
           // Logged in user navigation

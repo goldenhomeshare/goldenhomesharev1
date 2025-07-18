@@ -1,102 +1,62 @@
 import Link from "next/link";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Globe } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="bg-primary/95 text-white">
+    <footer className="bg-gray-50 border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
-        <div className="grid md:grid-cols-4 gap-8">
-          {/* Company Info & Service Description */}
-          <div className="md:col-span-2">
-            <h3 className="text-xl font-bold mb-4">Golden HomeShare</h3>
-            <p className="text-white/80 mb-4 leading-relaxed">
-              A secure homesharing marketplace connecting older adult homeowners with trusted housemates. 
-              We facilitate mutually beneficial living arrangements where housemates provide up to 10 hours 
-              weekly of light household support and companionship in exchange for affordable accommodation.
-            </p>
-            <div className="bg-primary/80 border border-white/20 p-4 rounded-lg">
-              <h4 className="font-semibold text-white mb-2">Payment Information</h4>
-              <p className="text-sm text-white/90">
-                All transactions are processed in <strong>USD (US Dollars)</strong>. We facilitate monthly rent payments and platform fees between homeowners and housemates.
-              </p>
-            </div>
-          </div>
-
-          {/* Customer Service Contact */}
+        {/* Main footer sections */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Support Section */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Customer Service</h4>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-white" />
-                <div>
-                  <p className="font-medium">(816) 433-2979</p>
-                  <p className="text-sm text-white/70">Mon-Fri 8AM-8PM CST</p>
-                </div>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">Support</h4>
+            <div className="space-y-3 text-sm">
+              <Link href="/help" className="block text-gray-700 hover:underline">Help Center</Link>
+              <Link href="/safety" className="block text-gray-700 hover:underline">Safety information</Link>
+              <Link href="/about/safety/background-checks" className="block text-gray-700 hover:underline">Background checks</Link>
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-gray-500" />
+                <a href="tel:8164332979" className="text-gray-700 hover:underline">(816) 433-2979</a>
               </div>
-              
-              <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-white" />
-                <div>
-                  <p className="font-medium">support@goldenhomeshare.com</p>
-                  <p className="text-sm text-white/70">24-hour response</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-white mt-1" />
-                <div>
-                  <p className="font-medium">Business Address:</p>
-                  <p className="text-sm text-white/70">
-                    Golden HomeShare LLC<br />
-                    1209 E Walnut St<br />
-                    Columbia, MO 65201<br />
-                    United States
-                  </p>
-                </div>
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-gray-500" />
+                <a href="mailto:support@goldenhomeshare.com" className="text-gray-700 hover:underline">Contact support</a>
               </div>
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Hosting Section */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-            <div className="space-y-2">
-              <Link href="/about" className="block text-white/80 hover:text-white transition-colors">
-                About Us
-              </Link>
-              <Link href="/help" className="block text-white/80 hover:text-white transition-colors">
-                Help & Support
-              </Link>
-              <Link href="/safety" className="block text-white/80 hover:text-white transition-colors">
-                Safety Information
-              </Link>
-              <Link href="/terms" className="block text-white/80 hover:text-white transition-colors">
-                Terms of Use
-              </Link>
-              <Link href="/privacy" className="block text-white/80 hover:text-white transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/cost-savings" className="block text-white/80 hover:text-white transition-colors">
-                Cost Calculator
-              </Link>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">Hosting</h4>
+            <div className="space-y-3 text-sm">
+              <Link href="/list" className="block text-gray-700 hover:underline">List your home</Link>
+              <Link href="/homeowner/signup-wizard" className="block text-gray-700 hover:underline">Become a host</Link>
+              <Link href="/cost-savings" className="block text-gray-700 hover:underline">Cost calculator</Link>
+              <Link href="/homeowner/applications" className="block text-gray-700 hover:underline">View applications</Link>
+              <Link href="/homeshare-agreement" className="block text-gray-700 hover:underline">Hosting agreements</Link>
+              <Link href="/help" className="block text-gray-700 hover:underline">Hosting resources</Link>
+            </div>
+          </div>
+
+          {/* Golden HomeShare Section */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">Golden HomeShare</h4>
+            <div className="space-y-3 text-sm">
+              <Link href="/about" className="block text-gray-700 hover:underline">About us</Link>
+              <Link href="/housemate/signup-wizard" className="block text-gray-700 hover:underline">Find a home</Link>
+              <Link href="/terms" className="block text-gray-700 hover:underline">Terms of service</Link>
+              <Link href="/privacy" className="block text-gray-700 hover:underline">Privacy policy</Link>
+              <Link href="/billing" className="block text-gray-700 hover:underline">Billing</Link>
+              <a href="mailto:support@goldenhomeshare.com" className="block text-gray-700 hover:underline">Contact us</a>
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-white/20 mt-12 pt-8">
-          <div className="md:flex md:items-center md:justify-between">
-            <div className="text-sm text-white/70">
-              <p>&copy; 2024 Golden HomeShare LLC. All rights reserved.</p>
-              <p className="mt-1">
-                Licensed homesharing platform. All payments processed securely in USD.
-              </p>
-            </div>
-            <div className="mt-4 md:mt-0">
-              <p className="text-sm text-white/70">
-                Regulated by applicable state and local housing authorities
-              </p>
-            </div>
+        {/* Bottom section */}
+        <div className="flex items-center justify-center pt-8 mt-8 border-t border-gray-200">
+          <div className="flex items-center gap-6 text-sm text-gray-600">
+            <Link href="/terms" className="hover:underline">Terms</Link>
+            <Link href="/privacy" className="hover:underline">Privacy</Link>
           </div>
         </div>
       </div>

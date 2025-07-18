@@ -459,7 +459,6 @@ export function MobileSearchModal({ isOpen, onClose, initialSearchType }: Mobile
               
               {/* Popular help types */}
               <div>
-                <h3 className="text-sm font-medium text-gray-600 mb-4">Popular help types</h3>
                 <div className="space-y-2">
                   {helpOptions.map((option) => {
                     const Icon = option.icon;

@@ -50,7 +50,7 @@ export function AirbnbStyleCard({
   const href = linkPath || `/product/${id}`;
   
   return (
-    <Link href={href} className="group cursor-pointer">
+    <Link href={href} className="cursor-pointer">
       <div className="relative w-full h-full flex flex-col">
         {/* Main Image */}
         <div className={`relative overflow-hidden flex-shrink-0 ${
@@ -62,51 +62,27 @@ export function AirbnbStyleCard({
             alt={name}
             src={mainImage}
             fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
-          
-          {/* Verification Badge - Only show for verified users with demographics (housemates) */}
-          {isVerified && demographics && (
-            <div 
-              className="absolute bottom-[15px] right-[-5px] w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-lg cursor-help z-10" 
-              title="This person has been background checked"
-            >
-              <ShieldCheck size={28} className="text-white" />
-            </div>
-          )}
         </div>
+        
+        {/* Verification Badge - Design element for helper profiles */}
+        {demographics && (
+          <div 
+            className="absolute top-[200px] right-[60px] w-16 h-16 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-xl cursor-help z-20" 
+            title="This person has been background checked"
+          >
+            <ShieldCheck size={36} className="text-white" />
+          </div>
+        )}
         
         {/* Card Content - Enhanced design for housemates */}
         {demographics ? (
           <div className="flex-1 pt-4 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <User size={16} className="text-gray-400" />
-              <h3 className="font-semibold text-lg text-gray-900 truncate">{name}</h3>
+              <h3 className="font-semibold text-2xl text-gray-900 truncate">{name}</h3>
             </div>
-            
-            <div className="flex flex-col items-center gap-1 mb-3">
-              {demographics.gender && (
-                <p className="text-sm text-gray-600">{demographics.gender}</p>
-              )}
-              {demographics.ageRange && (
-                <p className="text-sm text-gray-600">{demographics.ageRange}</p>
-              )}
-              {demographics.occupation && (
-                <p className="text-sm text-gray-700 font-medium bg-gray-100 px-2 py-1 rounded-md">
-                  {demographics.occupation}
-                </p>
-              )}
-            </div>
-
-            {/* About Section Preview */}
-            {smallDescription && (
-              <div className="mb-4 px-2">
-                <p className="text-xs text-gray-600 line-clamp-3 leading-relaxed">
-                  {smallDescription}
-                </p>
-              </div>
-            )}
             
             <div className="mt-auto">
               <p className="text-lg font-semibold text-gray-900">

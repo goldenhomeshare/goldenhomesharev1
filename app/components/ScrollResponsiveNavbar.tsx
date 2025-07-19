@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Search, X, Sparkles, ChefHat, TreePine, ShoppingBag, Heart, PawPrint, Monitor, Car } from "lucide-react";
 import { MobileSearchModal } from './MobileSearchModal';
 
+
 interface ScrollResponsiveNavbarProps {
   showNavLinks: boolean;
   navLinksComponent: React.ReactNode;
@@ -35,13 +36,66 @@ export function ScrollResponsiveNavbar({
   const [isCondensedExpanded, setIsCondensedExpanded] = useState(false);
   const [locationFilter, setLocationFilter] = useState('');
   const [showMobileModal, setShowMobileModal] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [justNavigatedToHelper, setJustNavigatedToHelper] = useState(false);
+  const [hasVideoCompleted, setHasVideoCompleted] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const pathname = usePathname();
   const router = useRouter();
+
+  // Play video when we navigate to helper page (if we just clicked helper)
+  useEffect(() => {
+    if (pathname === "/" && justNavigatedToHelper) {
+      setIsVideoPlaying(true);
+      setIsVideoLoaded(false);
+      setJustNavigatedToHelper(false);
+    }
+    // Reset video state when leaving helper page
+    else if (pathname !== "/" && isVideoPlaying) {
+      setIsVideoPlaying(false);
+      setIsVideoLoaded(false);
+      setHasVideoCompleted(false);
+    }
+  }, [pathname, justNavigatedToHelper, isVideoPlaying]);
 
   // Clean dropdown management - direct state setting
   const closeDropdown = () => {
     setOpenDropdown(null);
     setActiveField(null);
+  };
+
+  const handleHelperClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // If already on helper page, do nothing
+    if (pathname === "/") {
+      return;
+    }
+    
+    // Navigate to helper page first, then video will play
+    setJustNavigatedToHelper(true);
+    router.push("/");
+  };
+
+  const handleVideoEnd = () => {
+    // Video finished, show helper hand-up image if still on helper page
+    if (pathname === "/") {
+      setHasVideoCompleted(true);
+    }
+    // Small delay to ensure smooth transition
+    setTimeout(() => {
+      setIsVideoPlaying(false);
+      setIsVideoLoaded(false);
+    }, 50);
+  };
+
+  const handleVideoLoaded = () => {
+    setIsVideoLoaded(true);
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(console.error);
+    }
   };
 
   // Add a unified click outside handler
@@ -289,7 +343,7 @@ export function ScrollResponsiveNavbar({
     }
     // Default to helper icon for homepage and other pages
     return {
-      src: "/headr-helper.png",
+      src: "/updated-helper-7-18.png",
       alt: "Helper"
     };
   };
@@ -626,7 +680,7 @@ export function ScrollResponsiveNavbar({
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-gray-100 border-b border-gray-100 shadow-sm">
+    <nav className="sticky top-0 z-50 border-b shadow-sm" style={{ backgroundColor: '#f5f5f5', borderColor: '#f5f5f5' }}>
       <div className="max-w-7xl w-full mx-auto px-4 md:px-8">
         {/* Main Navbar Row */}
         <div className="flex items-center justify-between">
@@ -669,24 +723,76 @@ export function ScrollResponsiveNavbar({
                 isInCondensedMode ? 'mb-[7.375rem]' : '-mb-7.5'
               }`}>
                 {/* Helpers Option */}
-                <Link 
-                  href="/" 
-                  className="flex flex-col items-center"
+                <button 
+                  onClick={handleHelperClick}
+                  className="flex flex-col items-center cursor-pointer border-none p-0 outline-none focus:outline-none"
                   data-search-tab
+                  style={{ backgroundColor: '#f5f5f5', boxShadow: 'none' }}
                 >
                   <div className={`flex flex-col items-center transition-all duration-500 ease-in-out ${
                     isInCondensedMode ? 'gap-0' : 'gap-2'
-                  }`}>
+                  }`} style={{ backgroundColor: '#f5f5f5' }}>
                     <div className={`relative transition-all duration-500 ease-in-out overflow-hidden ${
                       isInCondensedMode ? 'w-0 h-0 opacity-0' : 'w-20 h-20 opacity-100'
-                    }`}>
-                      <Image 
-                        src="/headr-helper.png" 
-                        alt="Helper"
-                        fill
-                        className="object-contain"
-                        priority
-                      />
+                    }`} style={{ backgroundColor: '#f5f5f5' }}>
+                      {/* Helper Image - show when not playing video */}
+                      {!isVideoPlaying && (
+                        <Image 
+                          src={hasVideoCompleted && pathname === "/" ? "/helper-hand-up.png" : "/updated-helper-7-18.png"} 
+                          alt="Helper"
+                          fill
+                          className="object-contain transition-opacity duration-200"
+                          priority
+                          style={{ backgroundColor: '#f5f5f5' }}
+                        />
+                      )}
+                      
+                      {/* Preload hand-up image for seamless transition */}
+                      <div className="absolute inset-0 opacity-0 pointer-events-none">
+                        <Image 
+                          src="/helper-hand-up.png" 
+                          alt="Helper Hand Up"
+                          fill
+                          className="object-contain"
+                          style={{ backgroundColor: '#f5f5f5' }}
+                        />
+                      </div>
+                      
+                      {/* Video Replacement - show when playing on helper page */}
+                      {isVideoPlaying && pathname === "/" && (
+                        <>
+                          {/* Loading state */}
+                          {!isVideoLoaded && (
+                            <div className="absolute inset-0 flex items-center justify-center rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c98f31]"></div>
+                            </div>
+                          )}
+                          
+                          {/* Video element */}
+                          <video
+                            ref={videoRef}
+                            className={`w-full h-full object-contain transition-opacity duration-200 ${
+                              isVideoLoaded ? 'opacity-100' : 'opacity-0'
+                            }`}
+                            autoPlay
+                            muted
+                            onEnded={handleVideoEnd}
+                            onLoadedData={handleVideoLoaded}
+                            style={{ 
+                              width: '80px', 
+                              height: '80px', 
+                              backgroundColor: '#f5f5f5',
+                              borderRadius: '0px'
+                            }}
+                          >
+                            <source src="/helper-waving.mp4" type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                          
+                          {/* Subtle glow effect during video - made more subtle for gray background */}
+                          <div className="absolute inset-0 -z-10 bg-gray-300/10 rounded-lg blur-sm transform scale-105"></div>
+                        </>
+                      )}
                     </div>
                     <span className={`text-lg font-medium ${
                       pathname === "/" 
@@ -697,26 +803,28 @@ export function ScrollResponsiveNavbar({
                     </span>
                   </div>
                   {pathname === "/" && <div className="w-full h-[3px] bg-black rounded-full"></div>}
-                </Link>
+                </button>
 
                 {/* Homes Option */}
                 <Link 
                   href="/homes" 
                   className="flex flex-col items-center"
                   data-search-tab
+                  style={{ backgroundColor: '#f5f5f5', boxShadow: 'none' }}
                 >
                   <div className={`flex flex-col items-center transition-all duration-500 ease-in-out ${
                     isInCondensedMode ? 'gap-0' : 'gap-2'
-                  }`}>
+                  }`} style={{ backgroundColor: '#f5f5f5' }}>
                     <div className={`relative transition-all duration-500 ease-in-out overflow-hidden ${
                       isInCondensedMode ? 'w-0 h-0 opacity-0' : 'w-20 h-20 opacity-100'
-                    }`}>
+                    }`} style={{ backgroundColor: '#f5f5f5' }}>
                       <Image 
                         src="/updated-home-icon-min.png" 
                         alt="Homes"
                         fill
                         className="object-contain"
                         priority
+                        style={{ backgroundColor: '#f5f5f5' }}
                       />
                     </div>
                     <span className={`text-lg font-medium ${
@@ -1295,6 +1403,7 @@ export function ScrollResponsiveNavbar({
             : 'housemates' // Default to housemates for all other pages including homepage
         }
       />
+
     </nav>
   );
 } 

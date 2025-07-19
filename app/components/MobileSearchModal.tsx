@@ -555,7 +555,7 @@ export function MobileSearchModal({ isOpen, onClose, initialSearchType }: Mobile
             >
               <div className="relative w-12 h-12 mb-2">
                 <Image
-                  src="/headr-helper.png"
+                  src="/updated-helper-7-18.png"
                   alt="Helper"
                   fill
                   className="object-contain"

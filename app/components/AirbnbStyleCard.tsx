@@ -21,6 +21,8 @@ interface AirbnbStyleCardProps {
     gender?: string;
     ageRange?: string;
     occupation?: string;
+    isCurrentlyAttending?: boolean;
+    isRetired?: boolean;
   };
 }
 
@@ -83,6 +85,35 @@ export function AirbnbStyleCard({
             <div className="flex items-center justify-center gap-2 mb-2">
               <h3 className="font-semibold text-2xl text-gray-900 truncate">{name}</h3>
             </div>
+            
+            {/* Job Title with enhanced logic */}
+            {(() => {
+              // Enhanced occupation display logic matching HousemateHorizontalCard
+              const getOccupationDisplay = () => {
+                // Check if retired
+                if (demographics.isRetired) {
+                  return "Retired";
+                }
+                
+                // Check if currently a student
+                if (demographics.isCurrentlyAttending) {
+                  return "Student";
+                }
+                
+                // Fall back to basic occupation
+                if (demographics.occupation) {
+                  return demographics.occupation;
+                }
+                
+                return null;
+              };
+
+              const occupationDisplay = getOccupationDisplay();
+              
+              return occupationDisplay ? (
+                <p className="text-sm text-gray-600 mb-2">{occupationDisplay}</p>
+              ) : null;
+            })()}
             
             <div className="mt-auto">
               <p className="text-lg font-semibold text-gray-900">

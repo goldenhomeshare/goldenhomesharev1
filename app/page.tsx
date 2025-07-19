@@ -1,4 +1,5 @@
 import { AirbnbStyleRow } from "../app/components/AirbnbStyleRow";
+import { HelpersRowsContainer } from "../app/components/HelpersRowsContainer";
 import Image from "next/image";
 import Link from "next/link";
 import { VideoPlayButton } from "../components/VideoPlayButton";
@@ -309,54 +310,8 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Cooking Helpers Section */}
-      <section className="pt-8 pb-8 px-6">
-        <AirbnbStyleRow category="cooking-helpers" />
-      </section>
-
-      {/* Tech-Savvy Helpers Section */}
-      <section className="pt-8 pb-8 px-6">
-        <AirbnbStyleRow category="tech-helpers" />
-      </section>
-
-      {/* Pet-Friendly Helpers Section */}
-      <section className="pt-8 pb-8 px-6">
-        <AirbnbStyleRow category="pet-helpers" />
-      </section>
-
-      {/* Errands & Driving Helpers Section */}
-      <section className="pt-8 pb-8 px-6">
-        <AirbnbStyleRow category="errands-helpers" />
-      </section>
-
-      {/* Looking for Rooms Section */}
-      <section className="pt-8 pb-8 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-gray-50 rounded-3xl p-8 md:p-12 text-center border border-gray-200">
-            <div className="flex justify-center mb-6">
-              <div className="flex items-center justify-center h-16 w-16 rounded-full bg-white border border-gray-300 hover:bg-gray-100 transition-colors duration-200">
-                <Search className="h-8 w-8 text-gray-600" />
-              </div>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Looking for an Available Room?
-            </h2>
-            <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
-              Check out our homes tab to browse available rooms from verified homeowners in your area.
-            </p>
-            <Link href="/homes">
-              <div className="inline-flex flex-col items-center group cursor-pointer">
-                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-white border border-gray-300 hover:bg-gray-100 transition-colors duration-200 mb-2 group-hover:scale-105">
-                  <Search className="h-6 w-6 text-gray-600" />
-                </div>
-                <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900">
-                  Browse Homes
-                </span>
-              </div>
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* All Helper Categories - No Duplicates */}
+      <HelpersRowsContainer />
 
 
     </>

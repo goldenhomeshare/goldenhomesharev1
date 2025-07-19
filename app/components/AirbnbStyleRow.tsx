@@ -23,6 +23,14 @@ function toTitleCase(str: string): string {
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+// Cache for user IDs already shown in previous rows (per page load)
+const shownUserIds = new Set<string>();
+
+// Function to clear shown user IDs for a new page load
+function clearShownUsers() {
+  shownUserIds.clear();
+}
+
 // Cache utility functions
 function getCacheKey(category: string, limit: number): string {
   return `${category}-${limit}`;
@@ -101,6 +109,11 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
   const cached = getCachedData(cacheKey);
   if (cached) {
     return cached;
+  }
+
+  // Clear shown users for errands-helpers (first category on home page)
+  if (category === "errands-helpers") {
+    clearShownUsers();
   }
 
   switch (category) {
@@ -278,6 +291,12 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
       // Fetch real housemate profiles from the database
       const housemateProfiles = await retryDatabaseOperation(() =>
         prisma.housemateProfile.findMany({
+          where: {
+            // Exclude users already shown in previous rows
+            userId: {
+              notIn: Array.from(shownUserIds)
+            }
+          },
           include: {
             user: {
               select: {
@@ -319,6 +338,26 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
         // Check if retired
         const isRetired = lifestyleData.occupationDetails?.isRetired || false;
 
+        // Create detailed occupation display similar to HousemateHorizontalCard
+        const getDetailedOccupation = () => {
+          // If retired, that takes precedence
+          if (isRetired) {
+            return "Retired";
+          }
+          
+          // If currently attending, show student info with program if available
+          if (isCurrentlyAttending) {
+            const program = lifestyleData.education?.degreeProgram;
+            if (program) {
+              return `Studying ${program}`;
+            }
+            return "Student";
+          }
+          
+          // Fall back to occupation description or basic occupation
+          return lifestyleData.occupationDetails?.description || profile.occupation || undefined;
+        };
+
         return {
           id: profile.user.id, // Use userId as the id for profile links
           name: toTitleCase(profile.user.firstName),
@@ -334,11 +373,16 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
           demographics: {
             ageRange: displayAgeRange,
             gender: profile.gender || undefined,
-            occupation: profile.occupation || undefined,
+            occupation: getDetailedOccupation(),
             isCurrentlyAttending: isCurrentlyAttending,
             isRetired: isRetired,
           },
         };
+      });
+
+      // Add these user IDs to the shown set to prevent duplicates in later rows
+      transformedProfiles.forEach(profile => {
+        shownUserIds.add(profile.id);
       });
 
       setCachedData(cacheKey, {
@@ -362,98 +406,10 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
             canHelpWith: {
               path: [],
               array_contains: "cooking"
-            }
-          },
-          include: {
-            user: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-                email: true,
-              }
-            }
-          },
-          orderBy: {
-            createdAt: 'desc'
-          },
-          take: limit,
-        })
-      );
-
-      // Transform the data to work with AirbnbStyleCard (similar to other categories)
-      const transformedProfiles = housemateProfiles.map(profile => {
-        // Calculate age range based on date of birth
-        const dateOfBirth = extractDateOfBirth(profile.lifestyle);
-        const displayAgeRange = dateOfBirth ? calculateAgeRange(dateOfBirth) : (profile.ageRange || undefined);
-
-        // Parse lifestyle data to get education information
-        let lifestyleData: any = {};
-        if (profile.lifestyle) {
-          try {
-            lifestyleData = typeof profile.lifestyle === 'string' 
-              ? JSON.parse(profile.lifestyle) 
-              : profile.lifestyle;
-          } catch {
-            lifestyleData = {};
-          }
-        }
-
-        // Check if currently attending school
-        const isCurrentlyAttending = lifestyleData.education?.stillAttending || false;
-
-        // Check if retired
-        const isRetired = lifestyleData.occupationDetails?.isRetired || false;
-
-        return {
-          id: profile.user.id, // Use userId as the id for profile links
-          name: toTitleCase(profile.user.firstName),
-          price: profile.maxBudget || 0,
-          smallDescription: profile.bio || 'No bio available',
-          images: profile.profilePicture ? [profile.profilePicture] : [],
-          // Create amenities array from preferences and lifestyle attributes (not demographics)
-          amenities: [
-            ...(profile.schedule ? [profile.schedule] : []),
-            ...(profile.socialPreference ? [profile.socialPreference] : []),
-          ].filter(Boolean).filter(amenity => amenity !== "early-riser" && amenity !== "independent" && amenity !== "social"), // Remove early-riser, independent, and social tags
-          // Demographics information
-          demographics: {
-            ageRange: displayAgeRange,
-            gender: profile.gender || undefined,
-            occupation: profile.occupation || undefined,
-            isCurrentlyAttending: isCurrentlyAttending,
-            isRetired: isRetired,
-          },
-        };
-      });
-
-      setCachedData(cacheKey, {
-        data: transformedProfiles,
-        title: "Cooking Helpers in Columbia, MO",
-        link: "/products/icon",
-        isHousemates: true,
-      });
-      return {
-        data: transformedProfiles,
-        title: "Cooking Helpers in Columbia, MO",
-        link: "/products/icon",
-        isHousemates: true,
-      };
-    }
-    case "tech-helpers": {
-      // Fetch housemate profiles who can help with tech support (excluding cooking helpers)
-      const housemateProfiles = await retryDatabaseOperation(() =>
-        prisma.housemateProfile.findMany({
-          where: {
-            canHelpWith: {
-              path: [],
-              array_contains: "techSupport"
             },
-            NOT: {
-              canHelpWith: {
-                path: [],
-                array_contains: "cooking"
-              }
+            // Exclude users already shown in previous rows
+            userId: {
+              notIn: Array.from(shownUserIds)
             }
           },
           include: {
@@ -497,6 +453,26 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
         // Check if retired
         const isRetired = lifestyleData.occupationDetails?.isRetired || false;
 
+        // Create detailed occupation display similar to HousemateHorizontalCard
+        const getDetailedOccupation = () => {
+          // If retired, that takes precedence
+          if (isRetired) {
+            return "Retired";
+          }
+          
+          // If currently attending, show student info with program if available
+          if (isCurrentlyAttending) {
+            const program = lifestyleData.education?.degreeProgram;
+            if (program) {
+              return `Studying ${program}`;
+            }
+            return "Student";
+          }
+          
+          // Fall back to occupation description or basic occupation
+          return lifestyleData.occupationDetails?.description || profile.occupation || undefined;
+        };
+
         return {
           id: profile.user.id, // Use userId as the id for profile links
           name: toTitleCase(profile.user.firstName),
@@ -512,28 +488,33 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
           demographics: {
             ageRange: displayAgeRange,
             gender: profile.gender || undefined,
-            occupation: profile.occupation || undefined,
+            occupation: getDetailedOccupation(),
             isCurrentlyAttending: isCurrentlyAttending,
             isRetired: isRetired,
           },
         };
       });
 
+      // Add these user IDs to the shown set to prevent duplicates in later rows
+      transformedProfiles.forEach(profile => {
+        shownUserIds.add(profile.id);
+      });
+
       setCachedData(cacheKey, {
         data: transformedProfiles,
-        title: "Tech-Savvy Helpers in Columbia, MO",
+        title: "Cooking Helpers in Columbia, MO",
         link: "/products/icon",
         isHousemates: true,
       });
       return {
         data: transformedProfiles,
-        title: "Tech-Savvy Helpers in Columbia, MO",
+        title: "Cooking Helpers in Columbia, MO",
         link: "/products/icon",
         isHousemates: true,
       };
     }
     case "pet-helpers": {
-      // Fetch housemate profiles who can help with pet care (excluding cooking and tech helpers)
+      // Fetch housemate profiles who can help with pet care
       const housemateProfiles = await retryDatabaseOperation(() =>
         prisma.housemateProfile.findMany({
           where: {
@@ -541,21 +522,9 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
               path: [],
               array_contains: "petCare"
             },
-            NOT: {
-              OR: [
-                {
-                  canHelpWith: {
-                    path: [],
-                    array_contains: "cooking"
-                  }
-                },
-                {
-                  canHelpWith: {
-                    path: [],
-                    array_contains: "techSupport"
-                  }
-                }
-              ]
+            // Exclude users already shown in previous rows
+            userId: {
+              notIn: Array.from(shownUserIds)
             }
           },
           include: {
@@ -599,6 +568,26 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
         // Check if retired
         const isRetired = lifestyleData.occupationDetails?.isRetired || false;
 
+        // Create detailed occupation display similar to HousemateHorizontalCard
+        const getDetailedOccupation = () => {
+          // If retired, that takes precedence
+          if (isRetired) {
+            return "Retired";
+          }
+          
+          // If currently attending, show student info with program if available
+          if (isCurrentlyAttending) {
+            const program = lifestyleData.education?.degreeProgram;
+            if (program) {
+              return `Studying ${program}`;
+            }
+            return "Student";
+          }
+          
+          // Fall back to occupation description or basic occupation
+          return lifestyleData.occupationDetails?.description || profile.occupation || undefined;
+        };
+
         return {
           id: profile.user.id, // Use userId as the id for profile links
           name: toTitleCase(profile.user.firstName),
@@ -614,11 +603,16 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
           demographics: {
             ageRange: displayAgeRange,
             gender: profile.gender || undefined,
-            occupation: profile.occupation || undefined,
+            occupation: getDetailedOccupation(),
             isCurrentlyAttending: isCurrentlyAttending,
             isRetired: isRetired,
           },
         };
+      });
+
+      // Add these user IDs to the shown set to prevent duplicates in later rows
+      transformedProfiles.forEach(profile => {
+        shownUserIds.add(profile.id);
       });
 
       setCachedData(cacheKey, {
@@ -635,7 +629,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
       };
     }
     case "errands-helpers": {
-      // Fetch housemate profiles who can help with errands or transportation (excluding previous categories)
+      // Fetch housemate profiles who can help with errands or transportation
       const housemateProfiles = await retryDatabaseOperation(() =>
         prisma.housemateProfile.findMany({
           where: {
@@ -653,27 +647,9 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
                 }
               }
             ],
-            NOT: {
-              OR: [
-                {
-                  canHelpWith: {
-                    path: [],
-                    array_contains: "cooking"
-                  }
-                },
-                {
-                  canHelpWith: {
-                    path: [],
-                    array_contains: "techSupport"
-                  }
-                },
-                {
-                  canHelpWith: {
-                    path: [],
-                    array_contains: "petCare"
-                  }
-                }
-              ]
+            // Exclude users already shown in previous rows
+            userId: {
+              notIn: Array.from(shownUserIds)
             }
           },
           include: {
@@ -717,6 +693,26 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
         // Check if retired
         const isRetired = lifestyleData.occupationDetails?.isRetired || false;
 
+        // Create detailed occupation display similar to HousemateHorizontalCard
+        const getDetailedOccupation = () => {
+          // If retired, that takes precedence
+          if (isRetired) {
+            return "Retired";
+          }
+          
+          // If currently attending, show student info with program if available
+          if (isCurrentlyAttending) {
+            const program = lifestyleData.education?.degreeProgram;
+            if (program) {
+              return `Studying ${program}`;
+            }
+            return "Student";
+          }
+          
+          // Fall back to occupation description or basic occupation
+          return lifestyleData.occupationDetails?.description || profile.occupation || undefined;
+        };
+
         return {
           id: profile.user.id, // Use userId as the id for profile links
           name: toTitleCase(profile.user.firstName),
@@ -732,11 +728,16 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
           demographics: {
             ageRange: displayAgeRange,
             gender: profile.gender || undefined,
-            occupation: profile.occupation || undefined,
+            occupation: getDetailedOccupation(),
             isCurrentlyAttending: isCurrentlyAttending,
             isRetired: isRetired,
           },
         };
+      });
+
+      // Add these user IDs to the shown set to prevent duplicates in later rows
+      transformedProfiles.forEach(profile => {
+        shownUserIds.add(profile.id);
       });
 
       setCachedData(cacheKey, {
@@ -760,7 +761,7 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
 
 export function AirbnbStyleRow({ category, limit }: iAppProps) {
   return (
-    <section className="mt-16">
+    <section className="mt-2">
       <Suspense fallback={<LoadingState limit={limit} />}>
         <LoadRows category={category} limit={limit} />
       </Suspense>
@@ -774,7 +775,7 @@ async function LoadRows({ category, limit }: iAppProps) {
     
     return (
       <>
-        <div className="mb-8">
+        <div className="mb-4">
           <Link
             href={data.link}
             className="inline-flex items-center gap-3 hover:gap-4 transition-all duration-200 group cursor-pointer"

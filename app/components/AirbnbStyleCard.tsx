@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ShieldCheck, User } from "lucide-react";
+import { ShieldCheck, User, GraduationCap, Briefcase, Armchair } from "lucide-react";
 
 interface AirbnbStyleCardProps {
   images: string[];
@@ -57,7 +57,7 @@ export function AirbnbStyleCard({
         {/* Main Image */}
         <div className={`relative overflow-hidden flex-shrink-0 ${
           demographics 
-            ? "h-[280px] w-[280px] mx-auto rounded-full" 
+            ? "h-[200px] w-[200px] md:h-[280px] md:w-[280px] mx-auto rounded-full mt-6" 
             : "h-[280px] w-full rounded-xl"
         }`}>
           <Image
@@ -72,10 +72,10 @@ export function AirbnbStyleCard({
         {/* Verification Badge - Design element for helper profiles */}
         {demographics && (
           <div 
-            className="absolute top-[200px] right-[60px] w-16 h-16 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-xl cursor-help z-20" 
+            className="absolute bottom-[35%] right-[15%] w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-xl cursor-help z-20" 
             title="This person has been background checked"
           >
-            <ShieldCheck size={36} className="text-white" />
+            <ShieldCheck size={28} className="text-white md:w-10 md:h-10" />
           </div>
         )}
         
@@ -83,26 +83,26 @@ export function AirbnbStyleCard({
         {demographics ? (
           <div className="flex-1 pt-4 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <h3 className="font-semibold text-2xl text-gray-900 truncate">{name}</h3>
+              <h3 className="font-semibold text-xl md:text-3xl text-gray-900 truncate">{name}</h3>
             </div>
             
-            {/* Job Title with enhanced logic */}
+            {/* Job Title with enhanced logic matching HousemateHorizontalCard */}
             {(() => {
-              // Enhanced occupation display logic matching HousemateHorizontalCard
+              // Enhanced occupation display logic matching HousemateHorizontalCard exactly
               const getOccupationDisplay = () => {
                 // Check if retired
                 if (demographics.isRetired) {
-                  return "Retired";
+                  return { text: demographics.occupation || "Retired", icon: Armchair };
                 }
                 
-                // Check if currently a student
+                // Check if currently a student - use graduation cap for students
                 if (demographics.isCurrentlyAttending) {
-                  return "Student";
+                  return { text: demographics.occupation || "Student", icon: GraduationCap };
                 }
                 
-                // Fall back to basic occupation
+                // Fall back to briefcase for professionals
                 if (demographics.occupation) {
-                  return demographics.occupation;
+                  return { text: demographics.occupation, icon: Briefcase };
                 }
                 
                 return null;
@@ -110,17 +110,21 @@ export function AirbnbStyleCard({
 
               const occupationDisplay = getOccupationDisplay();
               
+              // Truncate text after 33 characters for consistent spacing
+              const truncateText = (text: string, maxLength: number = 33) => {
+                if (text.length <= maxLength) return text;
+                return text.slice(0, maxLength) + '...';
+              };
+              
               return occupationDisplay ? (
-                <p className="text-sm text-gray-600 mb-2">{occupationDisplay}</p>
+                <div className="flex items-center justify-center gap-1 md:gap-2 mb-2 max-w-full">
+                  <occupationDisplay.icon size={16} className="text-gray-600 flex-shrink-0 md:w-5 md:h-5" />
+                  <p className="text-sm md:text-lg text-gray-600 truncate" title={occupationDisplay.text}>
+                    {truncateText(occupationDisplay.text)}
+                  </p>
+                </div>
               ) : null;
             })()}
-            
-            <div className="mt-auto">
-              <p className="text-lg font-semibold text-gray-900">
-                ${price}
-                <span className="text-sm font-normal text-gray-600">/{priceLabel}</span>
-              </p>
-            </div>
           </div>
         ) : (
           // Standard listing card content

@@ -26,9 +26,9 @@ export async function Navbar() {
     const userNavigation = (
         <>
             {kindeUser ? (
-                <div className="flex items-center justify-center gap-x-2 lg:gap-x-6">
+                <div className="flex items-center justify-center gap-x-2 min-[744px]:gap-x-6">
                     {/* Desktop Navigation Icons - Hidden on Mobile */}
-                    <div className="hidden lg:flex items-center justify-center gap-x-6">
+                    <div className="hidden min-[744px]:flex items-center justify-center gap-x-6">
                         <div className="relative flex flex-col items-center w-20">
                             <MessagesIcon userType={(user as any)?.userType || null} />
                             <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
@@ -75,7 +75,7 @@ export async function Navbar() {
                 </div>
             ) : (
                 <div className="flex items-center gap-x-3">
-                    <Button asChild className="px-4 py-2.5 font-medium rounded-lg transition-all duration-200 ease-in-out bg-transparent hover:bg-gray-100 text-gray-900 border-0 hover:shadow-sm">
+                    <Button asChild className="hidden min-[1128px]:inline-flex px-4 py-2.5 font-medium rounded-lg transition-all duration-200 ease-in-out bg-transparent hover:bg-gray-100 text-gray-900 border-0 hover:shadow-sm">
                         <Link href="/homeowner/signup-wizard">Become a host</Link>
                     </Button>
                     
@@ -120,7 +120,7 @@ export async function Navbar() {
                 </div>
             )}
 
-            <div className="lg:hidden ml-1 flex-shrink-0">
+            <div className="max-[743px]:block hidden ml-1 flex-shrink-0">
                 <MobileMenu 
                     user={kindeUser ? {
                         email: kindeUser.email as string,

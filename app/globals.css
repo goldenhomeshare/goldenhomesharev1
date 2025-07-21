@@ -207,4 +207,65 @@
   .font-recoleta {
     font-family: 'Recoleta', serif;
   }
+
+  .host-helper-button {
+    background-color: #c98f31;
+    color: white;
+    min-width: 200px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(0);
+    transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
+  }
+
+  .host-helper-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .host-helper-button:active {
+    transform: translateY(0);
+  }
+
+  .become-helper-button {
+    background-color: transparent;
+    color: #c98f31;
+    border: 2px solid #c98f31;
+    min-width: 200px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(0);
+    transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
+  }
+
+  .become-helper-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .become-helper-button:active {
+    transform: translateY(0);
+  }
+
+  /* Desktop view - exact same dimensions regardless of text */
+  @media (min-width: 1024px) {
+    .host-helper-button,
+    .become-helper-button {
+      width: 220px !important;
+      height: 56px !important;
+      min-width: 220px !important;
+      max-width: 220px !important;
+      min-height: 56px !important;
+      max-height: 56px !important;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }

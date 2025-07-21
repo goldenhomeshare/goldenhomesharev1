@@ -1,5 +1,5 @@
 import { AirbnbStyleRow } from "../app/components/AirbnbStyleRow";
-import { HelpersRowsContainer } from "../app/components/HelpersRowsContainer";
+import { HelpersDataFetcher } from "../app/components/HelpersDataFetcher";
 import Image from "next/image";
 import Link from "next/link";
 import { VideoPlayButton } from "../components/VideoPlayButton";
@@ -71,8 +71,8 @@ export default async function Home() {
             
             {/* Right Content - Tilted Overlapping Images */}
             <div className="relative h-96 md:h-[500px]">
-              {/* Background Image - Tilted */}
-              <div className="absolute top-4 right-0 w-80 h-64 md:w-96 md:h-80 transform rotate-12 rounded-3xl overflow-hidden shadow-xl bg-white border border-gray-100">
+              {/* Background Image - Tilted - Only show on large screens */}
+              <div className="hidden xl:block absolute top-2 right-4 w-72 h-56 md:top-4 md:right-0 md:w-96 md:h-80 transform rotate-12 rounded-3xl overflow-hidden shadow-xl bg-white border border-gray-100">
                 <Image 
                   src="/helpful.jpg" 
                   alt="Helpful assistance" 
@@ -82,7 +82,7 @@ export default async function Home() {
               </div>
               
               {/* Foreground Image - Main Focus */}
-              <div className="absolute top-8 left-0 w-80 h-64 md:w-96 md:h-80 transform -rotate-6 rounded-3xl overflow-hidden shadow-2xl bg-white border border-gray-100 z-10">
+              <div className="absolute top-6 left-4 w-72 h-56 md:top-8 md:left-8 md:w-80 md:h-64 xl:left-0 xl:w-96 xl:h-80 transform -rotate-6 rounded-3xl overflow-hidden shadow-2xl bg-white border border-gray-100 z-10">
                 <Image 
                   src="/old-young-hero.jpg" 
                   alt="Caring intergenerational relationship" 
@@ -92,14 +92,14 @@ export default async function Home() {
               </div>
               
               {/* CTA Buttons - Positioned to align with second paragraph */}
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Link href="/homeowner/signup-wizard">
-                  <button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-semibold py-6 px-16 rounded-lg transition-colors duration-200 text-xl whitespace-nowrap">
+              <div className="absolute bottom-[-3rem] md:bottom-[0.5rem] xl:bottom-1 left-1/2 transform -translate-x-1/2 flex flex-col lg:flex-row gap-3 justify-center items-center px-4 w-full max-w-md lg:max-w-none">
+                <Link href="/homeowner/signup-wizard" className="w-full lg:w-auto lg:flex-shrink-0">
+                  <button className="w-full font-semibold py-4 px-8 lg:px-12 rounded-lg transition-colors duration-200 text-lg whitespace-nowrap host-helper-button">
                     Host a Helper
                   </button>
                 </Link>
-                <Link href="/housemate/signup-wizard">
-                  <button className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-16 rounded-lg transition-colors duration-200 text-xl whitespace-nowrap">
+                <Link href="/housemate/signup-wizard" className="w-full lg:w-auto lg:flex-shrink-0">
+                  <button className="w-full font-semibold py-4 px-8 lg:px-12 rounded-lg transition-colors duration-200 text-lg whitespace-nowrap become-helper-button">
                     Become a Helper
                   </button>
                 </Link>
@@ -177,7 +177,7 @@ export default async function Home() {
               {/* Host Signup Button */}
               <div className="pt-4">
                 <Link href="/homeowner/signup-wizard">
-                  <button className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                  <button className="w-full host-helper-button text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
                     Signup to Host
                   </button>
                 </Link>
@@ -255,7 +255,7 @@ export default async function Home() {
               {/* Helper Signup Button */}
               <div className="pt-4">
                 <Link href="/housemate/signup-wizard">
-                  <button className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                  <button className="w-full become-helper-button font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
                     Signup to Help
                   </button>
                 </Link>
@@ -278,7 +278,9 @@ export default async function Home() {
             className="absolute inset-0 bg-cover bg-no-repeat"
             style={{ 
               backgroundImage: "url('/mux-video-thumbnail.png')",
-              backgroundPosition: "center 20%"
+              backgroundPosition: "center 20%",
+              borderBottomLeftRadius: "70% 15%",
+              borderBottomRightRadius: "70% 15%"
             }}
           ></div>
           
@@ -311,7 +313,7 @@ export default async function Home() {
       </section>
 
       {/* All Helper Categories - No Duplicates */}
-      <HelpersRowsContainer />
+      <HelpersDataFetcher />
 
 
     </>

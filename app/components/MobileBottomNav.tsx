@@ -90,7 +90,7 @@ export function MobileBottomNav({ user }: MobileBottomNavProps) {
   // Show bottom nav for both logged in and non-logged in users
   return (
     <div 
-      className={`lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 pt-1 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] z-40 shadow-lg transition-transform duration-300 ease-in-out ${
+      className={`max-[743px]:block hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 pt-1 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] z-40 shadow-lg transition-transform duration-300 ease-in-out ${
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >

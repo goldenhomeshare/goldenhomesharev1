@@ -77,7 +77,7 @@ export default async function RootLayout({
       </head>
       <body className={inter.className}>
         <Navbar />
-        <div className="pb-24 lg:pb-0">
+        <div className="pb-24 min-[744px]:pb-0">
           {children}
         </div>
         <Footer />

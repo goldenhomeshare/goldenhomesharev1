@@ -680,31 +680,40 @@ export function ScrollResponsiveNavbar({
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b shadow-sm" style={{ backgroundColor: '#f5f5f5', borderColor: '#f5f5f5' }}>
-      <div className="max-w-7xl w-full mx-auto px-4 md:px-8">
+    <nav className={`sticky top-0 z-50 border-b shadow-sm transition-all duration-500 ease-in-out ${
+      isInCondensedMode ? 'min-h-[25px]' : 'min-h-[80px]'
+    }`} style={{ backgroundColor: '#f5f5f5', borderColor: '#f5f5f5' }}>
+      <div className="max-w-7xl w-full mx-auto px-3 lg:px-6 xl:px-8 relative">
         {/* Main Navbar Row */}
         <div className="flex items-center justify-between">
-          {/* Logo - Hidden on mobile for clean search interface */}
-          <div className={`hidden lg:block flex-shrink-0 transition-all duration-500 ease-in-out pt-3 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
+          {/* Logo - Fixed position, hidden on mobile */}
+          <div className={`hidden min-[744px]:block absolute left-2 lg:left-4 xl:left-6 z-40 transition-all duration-500 ease-in-out ${
+            isInCondensedMode ? 'top-1 lg:top-0.5 xl:top-0' : 'top-2 lg:top-1 xl:top-0'
+          }`}>
             <Link href="/">
-              {/* Full logo for larger screens - no size changes */}
-              <div className="flex items-center -ml-4 md:-ml-8 lg:-ml-12">
+              {/* Full logo for larger screens - fixed positioning */}
+              <div className="flex items-center">
                 <Image
                   src="/golden-logo.png"
                   alt="Golden HomeShare"
                   width={320}
                   height={96}
-                  className="w-auto h-24 md:h-28 lg:h-32"
+                  className="w-auto h-20 lg:h-24 xl:h-28"
                   priority
                 />
               </div>
             </Link>
           </div>
 
-          {/* Center Content Area - Same top padding, remove bottom when scrolled */}
+          {/* Logo Spacer - Maintains navbar height, smaller in condensed mode */}
+          <div className={`hidden min-[744px]:block flex-shrink-0 w-16 lg:w-20 xl:w-24 transition-all duration-500 ease-in-out ${
+            isInCondensedMode ? 'h-1 lg:h-2 xl:h-2' : 'h-20 lg:h-24 xl:h-28'
+          }`}></div>
+
+          {/* Center Content Area - Adjusted for fixed logo */}
           <div className={`flex-1 flex justify-center transition-all duration-500 ease-in-out pt-3 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
             {/* Mobile Search Trigger - Full width on mobile */}
-            <div className="lg:hidden w-full px-4">
+            <div className="max-[743px]:block hidden w-full px-4">
               <button
                 onClick={() => setShowMobileModal(true)}
                 className="w-full flex items-center justify-center bg-white rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 px-6 py-4 text-left"
@@ -841,18 +850,18 @@ export function ScrollResponsiveNavbar({
             </div>
 
             {/* Condensed Search Bar when scrolled (hide when expanded) - Hidden on mobile */}
-            <div className={`hidden lg:block transition-all duration-500 ease-in-out ${
-              isInCondensedMode ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
+            <div className={`hidden min-[744px]:flex justify-center transition-all duration-500 ease-in-out ${
+              isInCondensedMode ? 'opacity-100 transform translate-y-0 pb-0 -mt-12 -mb-6' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
             }`}>
               <div 
-                className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 max-w-2xl w-full h-18 cursor-pointer z-[9998]" 
+                className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow duration-200 max-w-lg lg:max-w-xl xl:max-w-2xl h-16 lg:h-18 cursor-pointer z-[9998]" 
                 onClick={handleCondensedClick}
                 data-search-container
                 data-condensed-nav
               >
                 {/* Selected Icon */}
-                                  <div className="flex items-center pl-4">
-                  <div className="relative w-14 h-14">
+                                  <div className="flex items-center pl-3 lg:pl-4">
+                  <div className="relative w-10 lg:w-12 xl:w-14 h-10 lg:h-12 xl:h-14">
                     <Image 
                       src={selectedIcon.src} 
                       alt={selectedIcon.alt}
@@ -903,7 +912,7 @@ export function ScrollResponsiveNavbar({
                     return (
                       <div key={index} className="flex items-center">
                         <div 
-                          className="px-5 py-4 cursor-pointer hover:bg-gray-50 rounded-md transition-colors flex items-center"
+                          className="px-3 lg:px-4 xl:px-5 py-3 lg:py-4 cursor-pointer hover:bg-gray-50 rounded-md transition-colors flex items-center"
                           onMouseDown={(e) => {
                             e.preventDefault();
                             e.stopPropagation(); // Prevent condensed bar expansion
@@ -924,7 +933,7 @@ export function ScrollResponsiveNavbar({
                             }
                           }}
                         >
-                          <span className={`text-xl ${hasValue ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
+                          <span className={`text-base lg:text-lg xl:text-xl ${hasValue ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
                             {displayValue}
                           </span>
                         </div>
@@ -943,15 +952,15 @@ export function ScrollResponsiveNavbar({
                       e.stopPropagation(); // Prevent condensed bar expansion
                       handleSearch();
                     }}
-                    className={`text-white rounded-full transition-all duration-200 flex items-center gap-2 ${
-                      activeField !== null ? 'px-5 py-3' : 'p-2.5'
+                    className={`text-white rounded-full transition-all duration-200 flex items-center gap-1 lg:gap-2 ${
+                      activeField !== null ? 'px-3 lg:px-4 xl:px-5 py-2 lg:py-2.5 xl:py-3' : 'p-2 lg:p-2.5'
                     }`}
                     style={{ backgroundColor: '#c98f31' }}
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b8802c'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#c98f31'}
                   >
                     {activeField !== null && (
-                      <span className="text-lg font-medium">Search</span>
+                      <span className="text-base lg:text-lg font-medium">Search</span>
                     )}
                     <Search className="w-4 h-4" />
                   </button>
@@ -960,7 +969,7 @@ export function ScrollResponsiveNavbar({
             </div>
 
             {/* Navigation Links (show when not scrolled OR when condensed is expanded) */}
-            <div className={`hidden lg:flex justify-center items-center transition-all duration-500 ease-in-out ${
+            <div className={`hidden min-[744px]:flex justify-center items-center transition-all duration-500 ease-in-out ${
               (!isInCondensedMode || isCondensedExpanded) && showNavLinks ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform -translate-y-2 pointer-events-none absolute'
             }`}>
               {navLinksComponent}
@@ -968,16 +977,18 @@ export function ScrollResponsiveNavbar({
           </div>
 
           {/* User Navigation - Hidden on mobile for clean search interface */}
-          <div className={`hidden lg:flex items-center gap-x-1 flex-shrink-0 transition-all duration-500 ease-in-out pt-3 ${isInCondensedMode ? '-mb-30' : 'pb-7'}`}>
+          <div className={`hidden min-[744px]:flex items-center gap-x-1 flex-shrink-0 transition-all duration-500 ease-in-out ${
+            isInCondensedMode ? 'pt-0 -mb-40 -mt-12' : 'pt-3 pb-7'
+          }`}>
             {userNavigation}
           </div>
         </div>
         
         {/* Full Search Bar Row (only show when not scrolled or condensed is expanded) - Hidden on mobile */}
-        <div className={`hidden lg:flex justify-center transition-all duration-500 ease-in-out ${
+        <div className={`hidden min-[744px]:flex justify-center transition-all duration-500 ease-in-out ${
           !isInCondensedMode || isCondensedExpanded ? 'pb-4 opacity-100 transform translate-y-0' : 'pb-0 opacity-0 transform -translate-y-4 pointer-events-none'
         }`}>
-          <div className="relative max-w-5xl w-full z-[60]" data-search-container>
+          <div className="relative max-w-3xl lg:max-w-4xl xl:max-w-5xl w-full z-[60] mx-4 lg:mx-8" data-search-container>
             <div className={`flex items-center border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-all duration-200 ${
               activeField !== null ? 'bg-gray-100' : 'bg-white'
             } relative overflow-hidden`}>
@@ -1026,14 +1037,14 @@ export function ScrollResponsiveNavbar({
                 return (
                   <div key={index} className="flex-1 relative">
                     <div 
-                                            className={`py-6 relative cursor-pointer z-[75] ${
+                                            className={`py-4 lg:py-5 xl:py-6 relative cursor-pointer z-[75] ${
                         isActive 
                           ? `${
                               index === searchFields.full.length - 1 
-                                ? 'bg-white rounded-l-full rounded-r-none pl-6 pr-6' 
-                                : 'bg-white shadow-lg rounded-full px-6'
+                                ? 'bg-white rounded-l-full rounded-r-none pl-4 lg:pl-5 xl:pl-6 pr-4 lg:pr-5 xl:pr-6' 
+                                : 'bg-white shadow-lg rounded-full px-4 lg:px-5 xl:px-6'
                             }` : 
-                          activeField !== null ? 'opacity-60 px-6' : 'px-6'
+                          activeField !== null ? 'opacity-60 px-4 lg:px-5 xl:px-6' : 'px-4 lg:px-5 xl:px-6'
                       } transition-all duration-200`}
                       onMouseDown={(e) => {
                         e.preventDefault();
@@ -1055,7 +1066,7 @@ export function ScrollResponsiveNavbar({
                       }}
                     >
                       <div className="flex items-center justify-between">
-                        <div className="text-lg font-semibold text-gray-900 mb-1">{field.label}</div>
+                        <div className="text-base lg:text-lg font-semibold text-gray-900 mb-1">{field.label}</div>
                       </div>
                       <div className="relative">
                         <input 
@@ -1135,24 +1146,24 @@ export function ScrollResponsiveNavbar({
               })}
               <div className={`z-[75] relative transition-all duration-200 ${
                 activeField === searchFields.full.length - 1 
-                  ? 'bg-white rounded-r-full pr-2 py-6' 
+                  ? 'bg-white rounded-r-full pr-2 py-4 lg:py-5 xl:py-6' 
                   : `pr-2 ${activeField !== null ? 'opacity-100' : ''}`
               }`}>
                 <button 
                   onClick={handleSearch}
-                  className={`text-white transition-all duration-200 flex items-center gap-3 ${
+                  className={`text-white transition-all duration-200 flex items-center gap-2 lg:gap-3 ${
                     activeField === searchFields.full.length - 1 
-                      ? 'px-6 py-4 rounded-full' 
+                      ? 'px-4 lg:px-5 xl:px-6 py-3 lg:py-3.5 xl:py-4 rounded-full' 
                       : activeField !== null 
-                        ? 'px-6 py-4 rounded-full' 
-                        : 'p-4 rounded-full'
+                        ? 'px-4 lg:px-5 xl:px-6 py-3 lg:py-3.5 xl:py-4 rounded-full' 
+                        : 'p-3 lg:p-3.5 xl:p-4 rounded-full'
                   }`}
                   style={{ backgroundColor: '#c98f31' }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b8802c'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#c98f31'}
                 >
                   {activeField !== null && (
-                    <span className="text-lg font-medium">Search</span>
+                    <span className="text-base lg:text-lg font-medium">Search</span>
                   )}
                   <Search className="w-4 h-4" />
                 </button>

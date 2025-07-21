@@ -72,7 +72,7 @@ export function AirbnbStyleCard({
         {/* Verification Badge - Design element for helper profiles */}
         {demographics && (
           <div 
-            className="absolute bottom-[35%] right-[15%] w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-xl cursor-help z-20" 
+            className="absolute bottom-[30%] right-[15%] w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center shadow-xl cursor-help z-20" 
             title="This person has been background checked"
           >
             <ShieldCheck size={28} className="text-white md:w-10 md:h-10" />
@@ -118,8 +118,8 @@ export function AirbnbStyleCard({
               
               return occupationDisplay ? (
                 <div className="flex items-center justify-center gap-1 md:gap-2 mb-2 max-w-full">
-                  <occupationDisplay.icon size={16} className="text-gray-600 flex-shrink-0 md:w-5 md:h-5" />
-                  <p className="text-sm md:text-lg text-gray-600 truncate" title={occupationDisplay.text}>
+                  <occupationDisplay.icon size={14} className="text-gray-600 flex-shrink-0 md:w-4 md:h-4" />
+                  <p className="text-xs md:text-base text-gray-600 truncate" title={occupationDisplay.text}>
                     {truncateText(occupationDisplay.text)}
                   </p>
                 </div>

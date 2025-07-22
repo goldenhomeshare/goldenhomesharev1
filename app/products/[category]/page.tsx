@@ -1381,18 +1381,18 @@ export default function CategoryPage() {
     return (
       <div className="h-screen flex flex-col">
         {/* Mobile View Toggle Buttons */}
-        <div className="md:hidden px-4 py-2 bg-white">
+        <div className="md:hidden pr-4 pl-8 pt-12 pb-8 bg-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">
+              <p className="text-base font-semibold text-black">
                 {visibleListings.length > 0
                   ? (visibleListings.length > 1000 
-                      ? `Over ${Math.floor(visibleListings.length / 1000) * 1000} listings in view` 
-                      : `${visibleListings.length} listing${visibleListings.length !== 1 ? 's' : ''} in view`
+                      ? <>Over {Math.floor(visibleListings.length / 1000) * 1000} rooms</> 
+                      : <>{visibleListings.length} rooms</>
                     )
                   : (listingData.length > 1000 
-                      ? `Over ${Math.floor(listingData.length / 1000) * 1000} total listings` 
-                      : `${listingData.length} total listing${listingData.length !== 1 ? 's' : ''}`
+                      ? <>Over {Math.floor(listingData.length / 1000) * 1000} total rooms</> 
+                      : <>{listingData.length} total rooms</>
                     )
                 }
               </p>
@@ -1440,13 +1440,13 @@ export default function CategoryPage() {
           
           {/* Mobile List View - Always mounted but hidden/shown */}
           <div className={`absolute inset-0 ${!showMobileMap ? 'block' : 'hidden'} overflow-y-auto`}>
-            <div className="p-4">
+            <div className="p-4 pt-6 pl-8">
               {visibleListings.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500">
                     {listingData.length === 0 
-                      ? "No listings available" 
-                      : "Switch to map view and pan around to see listings in different areas"
+                      ? "No rooms available" 
+                      : "Switch to map view and pan around to see rooms in different areas"
                     }
                   </p>
                 </div>
@@ -1474,29 +1474,29 @@ export default function CategoryPage() {
           {/* Listings Sidebar - Left side with grid layout - takes 3/5 of the space */}
           <div className="w-3/5 bg-white flex flex-col">
             {/* Desktop listing count header */}
-            <div className="p-4 bg-white">
-              <p className="text-sm text-gray-600">
+            <div className="pt-10 pr-4 pl-8 pb-10 bg-white">
+              <p className="text-base font-semibold text-black">
                 {visibleListings.length > 0 
                   ? (visibleListings.length > 1000 
-                      ? `Over ${Math.floor(visibleListings.length / 1000) * 1000} listings in this area` 
-                      : `${visibleListings.length} listing${visibleListings.length !== 1 ? 's' : ''} in this area`
+                      ? <>Over {Math.floor(visibleListings.length / 1000) * 1000} rooms</> 
+                      : <>{visibleListings.length} rooms</>
                     )
                   : (listingData.length > 1000 
-                      ? `Over ${Math.floor(listingData.length / 1000) * 1000} total listings` 
-                      : `${listingData.length} total listing${listingData.length !== 1 ? 's' : ''}`
+                      ? <>Over {Math.floor(listingData.length / 1000) * 1000} total rooms</> 
+                      : <>{listingData.length} total rooms</>
                     )
                 }
               </p>
             </div>
             
             <div className="flex-1 overflow-y-auto">
-              <div className="p-4">
+              <div className="p-4 pt-6 pl-8">
                 {visibleListings.length === 0 ? (
                   <div className="text-center py-8">
                     <p className="text-gray-500">
                       {listingData.length === 0 
-                        ? "No listings available" 
-                        : "Pan or zoom the map to see listings in this area"
+                        ? "No rooms available" 
+                        : "Pan or zoom the map to see rooms in this area"
                       }
                     </p>
                   </div>

@@ -41,6 +41,13 @@ export function ScrollResponsiveNavbar({
   const [justNavigatedToHelper, setJustNavigatedToHelper] = useState(false);
   const [hasVideoCompleted, setHasVideoCompleted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // House video states
+  const [isHouseVideoPlaying, setIsHouseVideoPlaying] = useState(false);
+  const [isHouseVideoLoaded, setIsHouseVideoLoaded] = useState(false);
+  const [justNavigatedToHouse, setJustNavigatedToHouse] = useState(false);
+  const [hasHouseVideoCompleted, setHasHouseVideoCompleted] = useState(false);
+  const houseVideoRef = useRef<HTMLVideoElement>(null);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -59,6 +66,21 @@ export function ScrollResponsiveNavbar({
     }
   }, [pathname, justNavigatedToHelper, isVideoPlaying]);
 
+  // Play house video when we navigate to homes page (if we just clicked homes)
+  useEffect(() => {
+    if (pathname === "/homes" && justNavigatedToHouse) {
+      setIsHouseVideoPlaying(true);
+      setIsHouseVideoLoaded(false);
+      setJustNavigatedToHouse(false);
+    }
+    // Reset house video state when leaving homes page
+    else if (pathname !== "/homes" && isHouseVideoPlaying) {
+      setIsHouseVideoPlaying(false);
+      setIsHouseVideoLoaded(false);
+      setHasHouseVideoCompleted(false);
+    }
+  }, [pathname, justNavigatedToHouse, isHouseVideoPlaying]);
+
   // Clean dropdown management - direct state setting
   const closeDropdown = () => {
     setOpenDropdown(null);
@@ -73,9 +95,24 @@ export function ScrollResponsiveNavbar({
       return;
     }
     
-    // Navigate to helper page first, then video will play
+    // Navigate immediately, don't wait for video states
     setJustNavigatedToHelper(true);
+    // Use router.push without awaiting to ensure fast navigation
     router.push("/");
+  };
+
+  const handleHouseClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // If already on homes page, do nothing
+    if (pathname === "/homes") {
+      return;
+    }
+    
+    // Navigate immediately, don't wait for video states
+    setJustNavigatedToHouse(true);
+    // Use router.push without awaiting to ensure fast navigation
+    router.push("/homes");
   };
 
   const handleVideoEnd = () => {
@@ -90,11 +127,37 @@ export function ScrollResponsiveNavbar({
     }, 50);
   };
 
+  const handleHouseVideoEnd = () => {
+    // Video finished, show house post-video image if still on homes page
+    if (pathname === "/homes") {
+      setHasHouseVideoCompleted(true);
+    }
+    // Shorter delay for faster navigation
+    setTimeout(() => {
+      setIsHouseVideoPlaying(false);
+      setIsHouseVideoLoaded(false);
+    }, 100);
+  };
+
   const handleVideoLoaded = () => {
     setIsVideoLoaded(true);
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(console.error);
+      // Small delay to ensure video is ready
+      setTimeout(() => {
+        videoRef.current?.play().catch(console.error);
+      }, 50);
+    }
+  };
+
+  const handleHouseVideoLoaded = () => {
+    setIsHouseVideoLoaded(true);
+    if (houseVideoRef.current) {
+      houseVideoRef.current.currentTime = 0;
+      // Small delay to ensure video is ready
+      setTimeout(() => {
+        houseVideoRef.current?.play().catch(console.error);
+      }, 50);
     }
   };
 
@@ -337,13 +400,13 @@ export function ScrollResponsiveNavbar({
   const getSelectedIcon = () => {
     if (pathname === '/homes' || pathname.startsWith('/homes/') || pathname === '/products/template') {
       return {
-        src: "/updated-home-icon-min.png",
+        src: "/updated-nav-house.png",
         alt: "Homes"
       };
     }
     // Default to helper icon for homepage and other pages
     return {
-      src: "/updated-helper-7-18.png",
+      src: "/helper-hand-up.png",
       alt: "Helper"
     };
   };
@@ -770,21 +833,14 @@ export function ScrollResponsiveNavbar({
                       {/* Video Replacement - show when playing on helper page */}
                       {isVideoPlaying && pathname === "/" && (
                         <>
-                          {/* Loading state */}
-                          {!isVideoLoaded && (
-                            <div className="absolute inset-0 flex items-center justify-center rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
-                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c98f31]"></div>
-                            </div>
-                          )}
-                          
-                          {/* Video element */}
+                          {/* Video element - no loading state, appears instantly */}
                           <video
                             ref={videoRef}
-                            className={`w-full h-full object-contain transition-opacity duration-200 ${
-                              isVideoLoaded ? 'opacity-100' : 'opacity-0'
-                            }`}
+                            className="w-full h-full object-contain opacity-100"
                             autoPlay
                             muted
+                            playsInline
+                            preload="auto"
                             onEnded={handleVideoEnd}
                             onLoadedData={handleVideoLoaded}
                             style={{ 
@@ -802,6 +858,16 @@ export function ScrollResponsiveNavbar({
                           <div className="absolute inset-0 -z-10 bg-gray-300/10 rounded-lg blur-sm transform scale-105"></div>
                         </>
                       )}
+                      
+                      {/* Hidden preload video for instant playback */}
+                      <video
+                        className="hidden"
+                        preload="auto"
+                        muted
+                        playsInline
+                      >
+                        <source src="/helper-waving.mp4" type="video/mp4" />
+                      </video>
                     </div>
                     <span className={`text-lg font-medium ${
                       pathname === "/" 
@@ -815,9 +881,9 @@ export function ScrollResponsiveNavbar({
                 </button>
 
                 {/* Homes Option */}
-                <Link 
-                  href="/homes" 
-                  className="flex flex-col items-center"
+                <button 
+                  onClick={handleHouseClick}
+                  className="flex flex-col items-center cursor-pointer border-none p-0 outline-none focus:outline-none"
                   data-search-tab
                   style={{ backgroundColor: '#f5f5f5', boxShadow: 'none' }}
                 >
@@ -827,14 +893,90 @@ export function ScrollResponsiveNavbar({
                     <div className={`relative transition-all duration-500 ease-in-out overflow-hidden ${
                       isInCondensedMode ? 'w-0 h-0 opacity-0' : 'w-20 h-20 opacity-100'
                     }`} style={{ backgroundColor: '#f5f5f5' }}>
-                      <Image 
-                        src="/updated-home-icon-min.png" 
-                        alt="Homes"
-                        fill
-                        className="object-contain"
-                        priority
-                        style={{ backgroundColor: '#f5f5f5' }}
-                      />
+                      {/* House Image - show when not playing video */}
+                      {!isHouseVideoPlaying && (
+                                                 hasHouseVideoCompleted && pathname === "/homes" ? (
+                          <Image 
+                            src="/updated-nav-house.png" 
+                            alt="Homes"
+                            fill
+                            className="object-contain transition-opacity duration-200"
+                            priority
+                            style={{ 
+                              backgroundColor: '#f5f5f5',
+                              transform: 'scale(1.1)',
+                              transformOrigin: 'center'
+                            }}
+                          />
+                        ) : (
+                          <Image 
+                            src="/updated-home-icon-min.png" 
+                            alt="Homes"
+                            fill
+                            className="object-contain transition-opacity duration-200"
+                            priority
+                            style={{ backgroundColor: '#f5f5f5' }}
+                          />
+                        )
+                      )}
+                      
+                      {/* Preload post-video image for seamless transition */}
+                      <div className="absolute inset-0 opacity-0 pointer-events-none">
+                        <Image 
+                          src="/updated-nav-house.png" 
+                          alt="House Post Video"
+                          fill
+                          className="object-contain"
+                          style={{ 
+                            backgroundColor: '#f5f5f5',
+                            transform: 'scale(1.1)',
+                            transformOrigin: 'center'
+                          }}
+                        />
+                      </div>
+                      
+                      {/* House Video Replacement - show when playing on homes page */}
+                      {isHouseVideoPlaying && pathname === "/homes" && (
+                        <>
+                          {/* Video element - no loading state, appears instantly */}
+                          <video
+                            ref={houseVideoRef}
+                            className="w-full h-full object-contain opacity-100"
+                            autoPlay
+                            muted
+                            playsInline
+                            preload="auto"
+                            onEnded={handleHouseVideoEnd}
+                            onLoadedData={handleHouseVideoLoaded}
+                            style={{ 
+                              width: '88px', 
+                              height: '88px', 
+                              backgroundColor: '#f5f5f5',
+                              borderRadius: '0px',
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              transform: 'translate(-50%, -50%)'
+                            }}
+                          >
+                            <source src="/house-video.mp4" type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                          
+                          {/* Subtle glow effect during video - made more subtle for gray background */}
+                          <div className="absolute inset-0 -z-10 bg-gray-300/10 rounded-lg blur-sm transform scale-105"></div>
+                        </>
+                      )}
+                      
+                      {/* Hidden preload video for instant playback */}
+                      <video
+                        className="hidden"
+                        preload="auto"
+                        muted
+                        playsInline
+                      >
+                        <source src="/house-video.mp4" type="video/mp4" />
+                      </video>
                     </div>
                     <span className={`text-lg font-medium ${
                       pathname === "/homes" 
@@ -845,7 +987,7 @@ export function ScrollResponsiveNavbar({
                     </span>
                   </div>
                   {pathname === "/homes" && <div className="w-full h-[3px] bg-black rounded-full"></div>}
-                </Link>
+                </button>
               </div>
             </div>
 
@@ -867,6 +1009,12 @@ export function ScrollResponsiveNavbar({
                       alt={selectedIcon.alt}
                       fill
                       className="object-contain"
+                      style={{
+                        ...(selectedIcon.src === "/updated-nav-house.png" ? {
+                          transform: 'scale(1.1)',
+                          transformOrigin: 'center'
+                        } : {})
+                      }}
                     />
                   </div>
 

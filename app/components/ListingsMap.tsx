@@ -153,18 +153,18 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange,
               const strokeColor = isHovered || isSelected ? 'black' : '#d1d5db';
               
               return {
-                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                  <svg xmlns="http://www.w3.org/2000/svg" width="80" height="40" viewBox="0 0 80 40">
-                    <rect x="2" y="2" width="76" height="36" rx="18" ry="18" 
+              url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="40" viewBox="0 0 80 40">
+                  <rect x="2" y="2" width="76" height="36" rx="18" ry="18" 
                           fill="${backgroundColor}" stroke="${strokeColor}" stroke-width="1"/>
                     <text x="40" y="27" text-anchor="middle" 
                           font-family="Arial, sans-serif" font-size="18" font-weight="900" 
                           fill="${textColor}">$${listing.price}</text>
-                  </svg>
-                `)}`,
-                scaledSize: new google.maps.Size(80, 40),
-                anchor: new google.maps.Point(40, 20),
-              };
+                </svg>
+              `)}`,
+              scaledSize: new google.maps.Size(80, 40),
+              anchor: new google.maps.Point(40, 20),
+            };
             };
 
             // Create initial marker icon
@@ -594,8 +594,8 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange,
         </svg>
       </button>
       
-      {/* Zoom Controls */}
-      <div className="absolute top-4 left-4 z-20 flex flex-col gap-1">
+      {/* Zoom Controls - positioned on far right below expand button */}
+      <div className="absolute top-16 right-4 z-20 flex flex-col gap-1">
         <button
           onClick={() => {
             if (mapInstanceRef.current) {

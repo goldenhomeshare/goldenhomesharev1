@@ -34,41 +34,7 @@ const amenityIcons: Record<string, any> = {
   workspace: { icon: Briefcase, label: "Desk/Workspace" },
 };
 
-// Utility function to extract city and state from full address
-function getCityState(fullAddress: string): string {
-  if (!fullAddress) return '';
-  
-  // Split address by commas and trim whitespace
-  const parts = fullAddress.split(',').map(part => part.trim()).filter(part => part.length > 0);
-  
-  // Common US address formats:
-  // "123 Main St, Springfield, IL 62701" -> ["123 Main St", "Springfield", "IL 62701"]
-  // "Springfield, IL 62701" -> ["Springfield", "IL 62701"]
-  // "Springfield, IL, USA" -> ["Springfield", "IL", "USA"]
-  
-  if (parts.length >= 3) {
-    // For format: "Street, City, State ZIP" or "City, State, Country"
-    const city = parts[parts.length - 3]; // Third from last is usually city
-    const stateOrStateZip = parts[parts.length - 2]; // Second from last is state/state+zip
-    
-    // Extract just the state part (remove ZIP code if present)
-    const state = stateOrStateZip.split(' ')[0];
-    
-    return `${city}, ${state}`;
-  } else if (parts.length === 2) {
-    // For format: "City, State ZIP" 
-    const city = parts[0];
-    const stateZip = parts[1];
-    const state = stateZip.split(' ')[0];
-    
-    return `${city}, ${state}`;
-  }
-  
-  // Fallback: return the original address if we can't parse it
-  return fullAddress;
-}
-
-// Utility function to extract just the city name from full address
+// Utility function to extract city from full address (matching AirbnbStyleCard approach)
 function getCityFromAddress(fullAddress?: string | null): string {
   if (!fullAddress) return '';
   
@@ -123,11 +89,9 @@ export function ListingCard({
   onHoverEnd,
   supportRequested
 }: ListingCardProps) {
-  const locationDisplay = address ? getCityState(address) : '';
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
-  // Calculate total hours from support requested data
+  const cityName = getCityFromAddress(address);
   const totalHours = getTotalHoursPerWeek(supportRequested);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -152,25 +116,28 @@ export function ListingCard({
   };
 
   return (
-    <Link href={`/product/${id}`} className="block">
+    <Link href={`/product/${id}`} className="cursor-pointer block">
       <div 
-        className="cursor-pointer transition-all duration-200 group"
+        className={`
+          relative flex flex-col transition-all hover:scale-[1.02] duration-200 group
+          ${isSelected ? 'transform scale-[1.02]' : ''}
+        `}
         onMouseEnter={onHover}
         onMouseLeave={onHoverEnd}
       >
-        {/* Large Image */}
-        <div className="relative aspect-square w-full bg-gray-100 rounded-xl overflow-hidden mb-3">
+        {/* Main Image - matching AirbnbStyleCard dimensions and style */}
+        <div className="relative h-[260px] w-[260px] md:h-[300px] md:w-[300px] rounded-3xl overflow-hidden">
           {images.length > 0 ? (
             <>
               <Image
                 src={images[currentImageIndex]}
-                alt={`${name} - Image ${currentImageIndex + 1}`}
+                alt={name}
                 fill
-                className="object-cover transition-opacity duration-300"
-                sizes="(max-width: 768px) 100vw, 320px"
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
               
-              {/* Heart Icon - positioned in top right */}
+              {/* Heart Icon - matching AirbnbStyleCard position and style */}
               <div className="absolute top-3 right-3 cursor-pointer z-10">
                 <Heart size={28} className="fill-gray-600 stroke-white stroke-2 hover:scale-110 transition-transform" />
               </div>
@@ -231,35 +198,23 @@ export function ListingCard({
           )}
         </div>
         
-        {/* Content below image */}
-        <div className="space-y-1">
-          {/* Title (property name) */}
-          <h3 className="font-medium text-gray-900 truncate">
-            {getCityFromAddress(address) ? `Private room in ${getCityFromAddress(address)}` : name}
+        {/* Content below image - matching AirbnbStyleCard format */}
+        <div className="mt-3">
+          <h3 className="font-medium text-base text-gray-900 line-clamp-1">
+            {cityName ? `Private room in ${cityName}` : name}
           </h3>
-          
-          {/* Original listing title below */}
-          {getCityFromAddress(address) && (
-            <p className="text-base text-gray-600 truncate">
+          {/* Show listing title as subtitle when we have a city */}
+          {cityName && (
+            <p className="text-sm text-gray-600 mt-1 line-clamp-1">
               {name}
             </p>
           )}
-          
-          {/* Price only (removed location) */}
-          <div className="flex items-center gap-2 pt-1">
-            {totalHours > 0 ? (
-              <div className="flex items-baseline gap-1">
-                <span className="line-through text-gray-400 text-sm">${price + (15 * totalHours * 4)}</span>
-                <span className="font-semibold text-gray-900 underline">${price}/mo</span>
-                <span className="text-gray-600 text-sm">with {totalHours}hrs support/week</span>
-              </div>
-            ) : (
-              <div className="flex items-baseline gap-1">
-                <span className="font-semibold text-gray-900 underline">${price}</span>
-                <span className="text-gray-600 text-sm"> per month</span>
-              </div>
-            )}
-          </div>
+          {totalHours > 0 && (
+            <p className="text-sm text-gray-600 mt-1">
+              <span className="line-through text-gray-400">${price + (15 * totalHours * 4)}</span>{" "}
+              <span className="font-medium">${price}/mo</span> with {totalHours}hrs support/week
+            </p>
+          )}
         </div>
       </div>
     </Link>

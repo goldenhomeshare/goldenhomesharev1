@@ -16,6 +16,9 @@ interface ListingsMapProps {
   listings: Listing[];
   className?: string;
   onVisibleListingsChange?: (visibleListings: Listing[]) => void;
+  selectedListing?: string | null;
+  onListingSelect?: (listingId: string | null) => void;
+  hoveredListing?: string | null;
 }
 
 // Simple hash function for consistent offset generation
@@ -29,14 +32,18 @@ function simpleHash(str: string): number {
   return Math.abs(hash);
 }
 
-export function ListingsMap({ listings, className = "", onVisibleListingsChange }: ListingsMapProps) {
+export function ListingsMap({ listings, className = "", onVisibleListingsChange, selectedListing, onListingSelect, hoveredListing }: ListingsMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapError, setMapError] = useState<string | null>(null);
-  const [selectedListing, setSelectedListing] = useState<string | null>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const infoWindowsRef = useRef<google.maps.InfoWindow[]>([]);
   const listingsWithPositionsRef = useRef<(Listing & { position: google.maps.LatLng })[]>([]);
+  const markersByListingIdRef = useRef<Map<string, { 
+    marker: google.maps.Marker; 
+    infoWindow: google.maps.InfoWindow;
+    updateMarkerIcon: (isHovered: boolean, isSelected: boolean) => void;
+  }>>(new Map());
 
   // Function to check if a position is within map bounds and notify parent
   const updateVisibleListings = () => {
@@ -70,6 +77,7 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
         markersRef.current = [];
         infoWindowsRef.current = [];
         listingsWithPositionsRef.current = [];
+        markersByListingIdRef.current.clear();
 
         // Default center (can be updated based on listings)
         const defaultCenter = { lat: 38.9517, lng: -92.3341 }; // Columbia, MO
@@ -81,7 +89,8 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
             zoom: 12,
             mapTypeControl: false,
             streetViewControl: false,
-            fullscreenControl: true,
+            fullscreenControl: false,
+            zoomControl: false,
             styles: [
               {
                 featureType: "poi",
@@ -137,20 +146,29 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
               position: offsetPosition
             });
 
-            // Create custom marker icon with price
-            const markerIcon = {
-              url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="40" viewBox="0 0 80 40">
-                  <rect x="2" y="2" width="76" height="36" rx="18" ry="18" 
-                        fill="white" stroke="#d1d5db" stroke-width="2"/>
-                  <text x="40" y="24" text-anchor="middle" 
-                        font-family="Arial, sans-serif" font-size="14" font-weight="bold" 
-                        fill="#374151">$${listing.price}</text>
-                </svg>
-              `)}`,
-              scaledSize: new google.maps.Size(80, 40),
-              anchor: new google.maps.Point(40, 20),
+            // Function to create marker icon based on state
+            const createMarkerIcon = (isHovered: boolean, isSelected: boolean) => {
+              const backgroundColor = isHovered || isSelected ? 'black' : 'white';
+              const textColor = isHovered || isSelected ? 'white' : '#374151';
+              const strokeColor = isHovered || isSelected ? 'black' : '#d1d5db';
+              
+              return {
+                url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+                  <svg xmlns="http://www.w3.org/2000/svg" width="80" height="40" viewBox="0 0 80 40">
+                    <rect x="2" y="2" width="76" height="36" rx="18" ry="18" 
+                          fill="${backgroundColor}" stroke="${strokeColor}" stroke-width="1"/>
+                    <text x="40" y="27" text-anchor="middle" 
+                          font-family="Arial, sans-serif" font-size="18" font-weight="900" 
+                          fill="${textColor}">$${listing.price}</text>
+                  </svg>
+                `)}`,
+                scaledSize: new google.maps.Size(80, 40),
+                anchor: new google.maps.Point(40, 20),
+              };
             };
+
+            // Create initial marker icon
+            const markerIcon = createMarkerIcon(false, false);
 
             // Create marker
             const marker = new google.maps.Marker({
@@ -159,6 +177,11 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
               icon: markerIcon,
               title: listing.name,
             });
+
+            // Store marker update function for later use
+            const updateMarkerIcon = (isHovered: boolean, isSelected: boolean) => {
+              marker.setIcon(createMarkerIcon(isHovered, isSelected));
+            };
 
             // Create info window content with image carousel and translucent X
             const imageHtml = listing.images.length > 0 
@@ -172,12 +195,12 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
                      ).join('')}
                    </div>
                    ${listing.images.length > 1 ? `
-                     <div id="prev-btn-${listing.id}" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; background: rgba(0,0,0,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                     <div id="prev-btn-${listing.id}" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; background: rgba(0,0,0,0.8); border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer;">
                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
                          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
                        </svg>
                      </div>
-                     <div id="next-btn-${listing.id}" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; background: rgba(0,0,0,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                     <div id="next-btn-${listing.id}" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; background: rgba(0,0,0,0.8); border-radius: 50%; display: ${listing.images.length > 1 ? 'flex' : 'none'}; align-items: center; justify-content: center; cursor: pointer;">
                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
                          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
                        </svg>
@@ -225,23 +248,80 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
                   </div>
                 </div>
               `,
-              disableAutoPan: false,
+              disableAutoPan: true,
               headerDisabled: true,
               pixelOffset: new google.maps.Size(0, 0),
             });
 
-            // Add click listener to marker
+            // Add click listener to marker with dynamic positioning
             marker.addListener('click', () => {
               // Close all other info windows
               infoWindowsRef.current.forEach(iw => iw.close());
               
-              // Open this info window
+              // Calculate if popup would be hidden under navbar
+              const projection = map.getProjection();
+              if (projection) {
+                const markerScreenPos = projection.fromLatLngToPoint(offsetPosition);
+                const mapBounds = map.getBounds();
+                const mapDiv = map.getDiv();
+                
+                if (markerScreenPos && mapBounds && mapDiv) {
+                  // Get the marker's pixel position within the map viewport
+                  const mapProjection = map.getProjection();
+                  const worldCoordinate = mapProjection?.fromLatLngToPoint(offsetPosition);
+                  const currentZoom = map.getZoom();
+                  
+                  if (worldCoordinate && currentZoom) {
+                    const scale = Math.pow(2, currentZoom);
+                    const worldPoint = new google.maps.Point(
+                      worldCoordinate.x * scale,
+                      worldCoordinate.y * scale
+                    );
+                    
+                    const mapCenter = map.getCenter();
+                    const mapCenterWorldCoord = mapProjection?.fromLatLngToPoint(mapCenter!);
+                    
+                    if (mapCenterWorldCoord) {
+                      const mapCenterWorldPoint = new google.maps.Point(
+                        mapCenterWorldCoord.x * scale,
+                        mapCenterWorldCoord.y * scale
+                      );
+                      
+                      const mapRect = mapDiv.getBoundingClientRect();
+                      const mapCenterX = mapRect.width / 2;
+                      const mapCenterY = mapRect.height / 2;
+                      
+                      const markerX = mapCenterX + (worldPoint.x - mapCenterWorldPoint.x);
+                      const markerY = mapCenterY + (worldPoint.y - mapCenterWorldPoint.y);
+                      
+                      // If marker is in top 30% of viewport (where navbar interference occurs)
+                      const navbarHeight = 80; // Approximate navbar height
+                      const popupHeight = 280; // Approximate popup height
+                      const threshold = navbarHeight + popupHeight / 2;
+                      
+                      if (markerY < threshold) {
+                        // Position popup below the marker instead of above
+                        infoWindow.setOptions({
+                          pixelOffset: new google.maps.Size(0, 50)
+                        });
+                      } else {
+                        // Use default positioning (above the marker)
+                        infoWindow.setOptions({
+                          pixelOffset: new google.maps.Size(0, 0)
+                        });
+                      }
+                    }
+                  }
+                }
+              }
+              
+              // Open the info window
               infoWindow.open(map, marker);
               
-              // Update selected listing
-              setSelectedListing(listing.id);
-              map.setCenter(offsetPosition);
-              map.setZoom(15);
+              // Update selected listing via callback (no zoom/pan)
+              if (onListingSelect) {
+                onListingSelect(listing.id);
+              }
             });
 
             // Add event listener for close button after info window is added to DOM
@@ -283,6 +363,18 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
                 dots.forEach((dot, i) => {
                   (dot as HTMLElement).style.background = i === index ? 'white' : 'rgba(255,255,255,0.5)';
                 });
+                
+                // Update navigation button visibility
+                const prevBtn = document.getElementById(`prev-btn-${listing.id}`);
+                const nextBtn = document.getElementById(`next-btn-${listing.id}`);
+                
+                if (prevBtn) {
+                  prevBtn.style.display = index > 0 ? 'flex' : 'none';
+                }
+                
+                if (nextBtn) {
+                  nextBtn.style.display = index < totalImages - 1 ? 'flex' : 'none';
+                }
                 
                 currentImageIndex = index;
               };
@@ -332,6 +424,7 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
 
             markersRef.current.push(marker);
             infoWindowsRef.current.push(infoWindow);
+            markersByListingIdRef.current.set(listing.id, { marker, infoWindow, updateMarkerIcon });
             bounds.extend(offsetPosition);
 
           } catch (error) {
@@ -357,7 +450,9 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
         // Add map click listener to close info windows
         google.maps.event.addListener(map, 'click', () => {
           infoWindowsRef.current.forEach(infoWindow => infoWindow.close());
-          setSelectedListing(null);
+          if (onListingSelect) {
+            onListingSelect(null);
+          }
         });
 
       } catch (error) {
@@ -371,11 +466,98 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
     }
   }, [listings]);
 
+  // Effect to handle selectedListing changes from parent component
+  useEffect(() => {
+    if (!selectedListing) {
+      // Close all info windows if no listing is selected
+      infoWindowsRef.current.forEach(infoWindow => infoWindow.close());
+      return;
+    }
+
+    const markerData = markersByListingIdRef.current.get(selectedListing);
+    if (markerData && mapInstanceRef.current) {
+      // Close all other info windows
+      infoWindowsRef.current.forEach(infoWindow => infoWindow.close());
+      
+      // Calculate positioning for programmatically opened info window
+      const map = mapInstanceRef.current;
+      const marker = markerData.marker;
+      const infoWindow = markerData.infoWindow;
+      const markerPosition = marker.getPosition();
+      
+      if (markerPosition) {
+        const projection = map.getProjection();
+        if (projection) {
+          const mapDiv = map.getDiv();
+          
+          if (mapDiv) {
+            const mapProjection = map.getProjection();
+            const worldCoordinate = mapProjection?.fromLatLngToPoint(markerPosition);
+            const currentZoom = map.getZoom();
+            
+            if (worldCoordinate && currentZoom) {
+              const scale = Math.pow(2, currentZoom);
+              const worldPoint = new google.maps.Point(
+                worldCoordinate.x * scale,
+                worldCoordinate.y * scale
+              );
+              
+              const mapCenter = map.getCenter();
+              const mapCenterWorldCoord = mapProjection?.fromLatLngToPoint(mapCenter!);
+              
+              if (mapCenterWorldCoord) {
+                const mapCenterWorldPoint = new google.maps.Point(
+                  mapCenterWorldCoord.x * scale,
+                  mapCenterWorldCoord.y * scale
+                );
+                
+                const mapRect = mapDiv.getBoundingClientRect();
+                const mapCenterX = mapRect.width / 2;
+                const mapCenterY = mapRect.height / 2;
+                
+                const markerY = mapCenterY + (worldPoint.y - mapCenterWorldPoint.y);
+                
+                // If marker is in top area where navbar interference occurs
+                const navbarHeight = 80;
+                const popupHeight = 280;
+                const threshold = navbarHeight + popupHeight / 2;
+                
+                if (markerY < threshold) {
+                  infoWindow.setOptions({
+                    pixelOffset: new google.maps.Size(0, 50)
+                  });
+                } else {
+                  infoWindow.setOptions({
+                    pixelOffset: new google.maps.Size(0, 0)
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Open the selected listing's info window (without zooming)
+      infoWindow.open(map, marker);
+    }
+  }, [selectedListing]);
+
+  // Effect to handle hoveredListing changes and update marker styling
+  useEffect(() => {
+    // Update all markers based on current hover and selection state
+    markersByListingIdRef.current.forEach((markerData, listingId) => {
+      const isHovered = hoveredListing === listingId;
+      const isSelected = selectedListing === listingId;
+      markerData.updateMarkerIcon(isHovered, isSelected);
+    });
+  }, [hoveredListing, selectedListing]);
+
   // Clean up on unmount
   useEffect(() => {
     return () => {
       markersRef.current.forEach(marker => marker.setMap(null));
       infoWindowsRef.current.forEach(infoWindow => infoWindow.close());
+      markersByListingIdRef.current.clear();
     };
   }, []);
 
@@ -391,7 +573,65 @@ export function ListingsMap({ listings, className = "", onVisibleListingsChange 
   }
 
   return (
-    <div className={`bg-gray-100 rounded-lg overflow-hidden ${className}`}>
+    <div className={`bg-white rounded-[2rem] overflow-hidden relative shadow-xl border border-gray-100 ${className}`}>
+      {/* Fullscreen/Expand Button */}
+      <button
+        onClick={() => {
+          const mapElement = mapRef.current;
+          if (mapElement) {
+            if (document.fullscreenElement) {
+              document.exitFullscreen();
+            } else {
+              mapElement.requestFullscreen();
+            }
+          }
+        }}
+        className="absolute top-4 right-4 z-20 bg-white hover:bg-gray-50 rounded-lg p-2 shadow-lg border border-gray-200 transition-colors"
+        title="Expand map"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+      </button>
+      
+      {/* Zoom Controls */}
+      <div className="absolute top-4 left-4 z-20 flex flex-col gap-1">
+        <button
+          onClick={() => {
+            if (mapInstanceRef.current) {
+              const currentZoom = mapInstanceRef.current.getZoom();
+              if (currentZoom) {
+                mapInstanceRef.current.setZoom(currentZoom + 1);
+              }
+            }
+          }}
+          className="bg-white hover:bg-gray-50 rounded-lg w-10 h-10 flex items-center justify-center shadow-lg border border-gray-200 transition-colors"
+          title="Zoom in"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+        
+        <button
+          onClick={() => {
+            if (mapInstanceRef.current) {
+              const currentZoom = mapInstanceRef.current.getZoom();
+              if (currentZoom && currentZoom > 1) {
+                mapInstanceRef.current.setZoom(currentZoom - 1);
+              }
+            }
+          }}
+          className="bg-white hover:bg-gray-50 rounded-lg w-10 h-10 flex items-center justify-center shadow-lg border border-gray-200 transition-colors"
+          title="Zoom out"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </button>
+      </div>
+      
       <div ref={mapRef} className="w-full h-full min-h-[500px]" />
     </div>
   );

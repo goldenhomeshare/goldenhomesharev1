@@ -1037,7 +1037,7 @@ export function ScrollResponsiveNavbar({
                 return (
                   <div key={index} className="flex-1 relative">
                     <div 
-                                            className={`py-4 lg:py-5 xl:py-6 relative cursor-pointer z-[75] ${
+                                            className={`py-2 lg:py-3 xl:py-4 relative cursor-pointer z-[75] ${
                         isActive 
                           ? `${
                               index === searchFields.full.length - 1 
@@ -1146,17 +1146,17 @@ export function ScrollResponsiveNavbar({
               })}
               <div className={`z-[75] relative transition-all duration-200 ${
                 activeField === searchFields.full.length - 1 
-                  ? 'bg-white rounded-r-full pr-2 py-4 lg:py-5 xl:py-6' 
+                  ? 'bg-white rounded-r-full pr-2 py-2 lg:py-3 xl:py-4' 
                   : `pr-2 ${activeField !== null ? 'opacity-100' : ''}`
               }`}>
                 <button 
                   onClick={handleSearch}
                   className={`text-white transition-all duration-200 flex items-center gap-2 lg:gap-3 ${
                     activeField === searchFields.full.length - 1 
-                      ? 'px-4 lg:px-5 xl:px-6 py-3 lg:py-3.5 xl:py-4 rounded-full' 
+                      ? 'px-4 lg:px-5 xl:px-6 py-2 lg:py-3 xl:py-4 rounded-full' 
                       : activeField !== null 
-                        ? 'px-4 lg:px-5 xl:px-6 py-3 lg:py-3.5 xl:py-4 rounded-full' 
-                        : 'p-3 lg:p-3.5 xl:p-4 rounded-full'
+                        ? 'px-4 lg:px-5 xl:px-6 py-2 lg:py-2.5 xl:py-3 rounded-full' 
+                        : 'p-2.5 lg:p-3 xl:p-3.5 rounded-full'
                   }`}
                   style={{ backgroundColor: '#c98f31' }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#b8802c'}

@@ -21,6 +21,7 @@ interface Listing {
   images: string[];
   address?: string;
   amenities?: string[];
+  supportRequested?: any;
 }
 
 interface HousemateProfile {
@@ -86,6 +87,7 @@ export default function CategoryPage() {
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
   const [visibleListings, setVisibleListings] = useState<Listing[]>([]);
   const [showMobileMap, setShowMobileMap] = useState(true);
+  const [hoveredListing, setHoveredListing] = useState<string | null>(null);
   
   // Applied filters state (used for actual filtering)
   const [appliedLocation, setAppliedLocation] = useState("");
@@ -1430,6 +1432,9 @@ export default function CategoryPage() {
               listings={listingData} 
               className="w-full h-full"
               onVisibleListingsChange={handleVisibleListingsChange}
+              selectedListing={selectedListing}
+              onListingSelect={setSelectedListing}
+              hoveredListing={hoveredListing}
             />
           </div>
           
@@ -1453,6 +1458,9 @@ export default function CategoryPage() {
                       {...listing}
                       isSelected={selectedListing === listing.id}
                       onClick={() => setSelectedListing(listing.id)}
+                      onHover={() => setHoveredListing(listing.id)}
+                      onHoverEnd={() => setHoveredListing(null)}
+                      supportRequested={listing.supportRequested}
                     />
                   ))}
                 </div>
@@ -1463,17 +1471,8 @@ export default function CategoryPage() {
         
         {/* Desktop View - Side by Side Layout */}
         <div className="flex-1 hidden md:flex">
-          {/* Map - takes 1/3 of the space */}
-          <div className="w-1/3">
-            <ListingsMap 
-              listings={listingData} 
-              className="w-full h-full"
-              onVisibleListingsChange={handleVisibleListingsChange}
-            />
-          </div>
-          
-          {/* Listings Sidebar - Right side with grid layout - takes 2/3 of the space */}
-          <div className="flex-1 bg-white border-l border-gray-200 flex flex-col">
+          {/* Listings Sidebar - Left side with grid layout - takes 3/5 of the space */}
+          <div className="w-3/5 bg-white flex flex-col">
             {/* Desktop listing count header */}
             <div className="p-4 bg-white">
               <p className="text-sm text-gray-600">
@@ -1509,12 +1508,27 @@ export default function CategoryPage() {
                         {...listing}
                         isSelected={selectedListing === listing.id}
                         onClick={() => setSelectedListing(listing.id)}
+                        onHover={() => setHoveredListing(listing.id)}
+                        onHoverEnd={() => setHoveredListing(null)}
+                        supportRequested={listing.supportRequested}
                       />
                     ))}
                   </div>
                 )}
               </div>
             </div>
+          </div>
+          
+          {/* Map - takes 2/5 of the space */}
+          <div className="w-2/5 p-4 py-6 bg-white">
+            <ListingsMap 
+              listings={listingData} 
+              className="w-full h-[calc(100vh-12rem)]"
+              onVisibleListingsChange={handleVisibleListingsChange}
+              selectedListing={selectedListing}
+              onListingSelect={setSelectedListing}
+              hoveredListing={hoveredListing}
+            />
           </div>
         </div>
       </div>

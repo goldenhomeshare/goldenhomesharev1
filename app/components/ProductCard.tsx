@@ -57,10 +57,6 @@ export function ProductCard({
         </h3>
       </div>
 
-      <p className="text-gray-600 line-clamp-2 text-sm mt-2">
-        {smallDescription}
-      </p>
-
       {showEditButton ? (
         <div className="flex gap-2 mt-5">
           <Button asChild className="flex-1">

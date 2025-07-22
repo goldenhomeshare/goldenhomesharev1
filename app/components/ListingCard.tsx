@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, ChevronLeft, ChevronRight } from "lucide-react";
+import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, ChevronLeft, ChevronRight, Heart } from "lucide-react";
 
 interface ListingCardProps {
   id: string;
@@ -13,6 +13,9 @@ interface ListingCardProps {
   amenities?: string[];
   isSelected?: boolean;
   onClick?: () => void;
+  onHover?: () => void;
+  onHoverEnd?: () => void;
+  supportRequested?: any;
 }
 
 // Amenity icons mapping
@@ -65,6 +68,47 @@ function getCityState(fullAddress: string): string {
   return fullAddress;
 }
 
+// Utility function to extract just the city name from full address
+function getCityFromAddress(fullAddress?: string | null): string {
+  if (!fullAddress) return '';
+  
+  // Split address by commas and trim whitespace
+  const parts = fullAddress.split(',').map(part => part.trim()).filter(part => part.length > 0);
+  
+  // Common US address formats:
+  // "123 Main St, Springfield, IL 62701" -> ["123 Main St", "Springfield", "IL 62701"]
+  // "Springfield, IL 62701" -> ["Springfield", "IL 62701"]
+  
+  if (parts.length >= 3) {
+    // For format: "Street, City, State ZIP" - city is third from last
+    return parts[parts.length - 3];
+  } else if (parts.length === 2) {
+    // For format: "City, State ZIP" - city is first part
+    return parts[0];
+  }
+  
+  // Fallback: return empty string if we can't parse
+  return '';
+}
+
+// Utility function to calculate total hours from supportRequested data
+function getTotalHoursPerWeek(supportRequested?: any): number {
+  if (!supportRequested) return 0;
+  
+  // Handle if it's already an array
+  if (Array.isArray(supportRequested)) {
+    let totalHours = 0;
+    supportRequested.forEach((item: any) => {
+      if (typeof item === 'object' && item.hoursPerWeek) {
+        totalHours += item.hoursPerWeek;
+      }
+    });
+    return totalHours;
+  }
+  
+  return 0;
+}
+
 export function ListingCard({
   id,
   name,
@@ -74,10 +118,16 @@ export function ListingCard({
   address,
   amenities = [],
   isSelected = false,
-  onClick
+  onClick,
+  onHover,
+  onHoverEnd,
+  supportRequested
 }: ListingCardProps) {
   const locationDisplay = address ? getCityState(address) : '';
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Calculate total hours from support requested data
+  const totalHours = getTotalHoursPerWeek(supportRequested);
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -104,11 +154,9 @@ export function ListingCard({
   return (
     <Link href={`/product/${id}`} className="block">
       <div 
-        className={`
-          cursor-pointer transition-all hover:scale-[1.02] duration-200 group
-          ${isSelected ? 'transform scale-[1.02]' : ''}
-        `}
-        onMouseEnter={onClick} // Trigger selection on hover for map highlighting
+        className="cursor-pointer transition-all duration-200 group"
+        onMouseEnter={onHover}
+        onMouseLeave={onHoverEnd}
       >
         {/* Large Image */}
         <div className="relative aspect-square w-full bg-gray-100 rounded-xl overflow-hidden mb-3">
@@ -121,6 +169,11 @@ export function ListingCard({
                 className="object-cover transition-opacity duration-300"
                 sizes="(max-width: 768px) 100vw, 320px"
               />
+              
+              {/* Heart Icon - positioned in top right */}
+              <div className="absolute top-3 right-3 cursor-pointer z-10">
+                <Heart size={28} className="fill-gray-600 stroke-white stroke-2 hover:scale-110 transition-transform" />
+              </div>
               
               {/* Navigation arrows - show on hover of entire card */}
               {images.length > 1 && (
@@ -182,27 +235,28 @@ export function ListingCard({
         <div className="space-y-1">
           {/* Title (property name) */}
           <h3 className="font-medium text-gray-900 truncate">
-            {name}
+            {getCityFromAddress(address) ? `Private room in ${getCityFromAddress(address)}` : name}
           </h3>
           
-          {/* Summary - truncated to maintain consistent card height */}
-          <p className="text-sm text-gray-600 truncate leading-relaxed">
-            {smallDescription}
-          </p>
+          {/* Original listing title below */}
+          {getCityFromAddress(address) && (
+            <p className="text-base text-gray-600 truncate">
+              {name}
+            </p>
+          )}
           
-          {/* Price + Location on same line (like home page) */}
+          {/* Price only (removed location) */}
           <div className="flex items-center gap-2 pt-1">
-            <div className="flex items-baseline gap-1">
-              <span className="font-semibold text-gray-900 underline">${price}</span>
-              <span className="text-gray-600 text-sm"> per month</span>
-            </div>
-            {locationDisplay && (
-              <div className="flex items-center gap-1">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-600">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                  <circle cx="12" cy="10" r="3"/>
-                </svg>
-                <p className="text-gray-600 text-sm truncate">{locationDisplay}</p>
+            {totalHours > 0 ? (
+              <div className="flex items-baseline gap-1">
+                <span className="line-through text-gray-400 text-sm">${price + (15 * totalHours * 4)}</span>
+                <span className="font-semibold text-gray-900 underline">${price}/mo</span>
+                <span className="text-gray-600 text-sm">with {totalHours}hrs support/week</span>
+              </div>
+            ) : (
+              <div className="flex items-baseline gap-1">
+                <span className="font-semibold text-gray-900 underline">${price}</span>
+                <span className="text-gray-600 text-sm"> per month</span>
               </div>
             )}
           </div>

@@ -7,8 +7,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronRight } from "lucide-react";
 import { calculateAgeRange, extractDateOfBirth } from "@/lib/age-utils";
 
-// Constants
-const PROFILE_CHAT_PRODUCT_ID = "cm2h3ofy000007e71twi83xsy";
+// Constants - Profile chat product IDs to exclude from listings
+const PROFILE_CHAT_PRODUCT_IDS = ["cm2h3ofy000007e71twi83xsy", "profile-chat-placeholder"];
 
 // Retry configuration
 const MAX_RETRIES = 3;
@@ -88,6 +88,8 @@ interface ProductData {
   smallDescription: string;
   images: string[];
   amenities?: any;
+  address?: string | null;
+  supportRequested?: any;
   demographics?: {
     age?: string;
     gender?: string;
@@ -125,9 +127,9 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
             category: {
               in: ["template", "uikit", "icon"]
             },
-            // Exclude the profile chat placeholder
+            // Exclude profile chat placeholders
             id: {
-              not: PROFILE_CHAT_PRODUCT_ID,
+              notIn: PROFILE_CHAT_PRODUCT_IDS,
             },
           },
           select: {
@@ -137,6 +139,8 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
             id: true,
             images: true,
             amenities: true,
+            address: true,
+            supportRequested: true,
           },
           take: limit,
         })
@@ -144,12 +148,12 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
 
       setCachedData(cacheKey, {
         data: data,
-        title: "Rooms Available",
+        title: "Rooms in Columbia",
         link: "/products/template",
       });
       return {
         data: data,
-        title: "Rooms Available",
+        title: "Rooms in Columbia",
         link: "/products/template",
       };
     }
@@ -158,9 +162,9 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
         prisma.product.findMany({
           where: {
             category: "icon",
-            // Exclude the profile chat placeholder
+            // Exclude profile chat placeholders
             id: {
-              not: PROFILE_CHAT_PRODUCT_ID,
+              notIn: PROFILE_CHAT_PRODUCT_IDS,
             },
           },
           select: {
@@ -170,6 +174,8 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
             id: true,
             images: true,
             amenities: true,
+            address: true,
+            supportRequested: true,
           },
           take: limit,
         })
@@ -190,9 +196,9 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
       const data = await retryDatabaseOperation(() =>
         prisma.product.findMany({
           where: {
-            // Exclude the profile chat placeholder
+            // Exclude profile chat placeholders
             id: {
-              not: PROFILE_CHAT_PRODUCT_ID,
+              notIn: PROFILE_CHAT_PRODUCT_IDS,
             },
           },
           select: {
@@ -202,6 +208,8 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
             id: true,
             images: true,
             amenities: true,
+            address: true,
+            supportRequested: true,
           },
           orderBy: {
             createdAt: "desc",
@@ -226,9 +234,9 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
         prisma.product.findMany({
           where: {
             category: "template",
-            // Exclude the profile chat placeholder
+            // Exclude profile chat placeholders
             id: {
-              not: PROFILE_CHAT_PRODUCT_ID,
+              notIn: PROFILE_CHAT_PRODUCT_IDS,
             },
           },
           select: {
@@ -238,6 +246,8 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
             smallDescription: true,
             images: true,
             amenities: true,
+            address: true,
+            supportRequested: true,
           },
           take: limit,
         })
@@ -259,9 +269,9 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
         prisma.product.findMany({
           where: {
             category: "uikit",
-            // Exclude the profile chat placeholder
+            // Exclude profile chat placeholders
             id: {
-              not: PROFILE_CHAT_PRODUCT_ID,
+              notIn: PROFILE_CHAT_PRODUCT_IDS,
             },
           },
           select: {
@@ -271,6 +281,8 @@ async function getData({ category, limit = 4 }: iAppProps): Promise<GetDataResul
             smallDescription: true,
             images: true,
             amenities: true,
+            address: true,
+            supportRequested: true,
           },
           take: limit,
         })
@@ -780,7 +792,7 @@ async function LoadRows({ category, limit }: iAppProps) {
             href={data.link}
             className="inline-flex items-center gap-3 hover:gap-4 transition-all duration-200 group cursor-pointer"
           >
-            <h2 className="text-5xl font-bold text-gray-900 group-hover:text-gray-700 transition-colors duration-200">
+            <h2 className="text-2xl font-bold text-gray-900 group-hover:text-gray-700 transition-colors duration-200">
               {data.title}
             </h2>
             <ChevronRight 
@@ -790,10 +802,10 @@ async function LoadRows({ category, limit }: iAppProps) {
           </Link>
         </div>
 
-        {/* Mobile: Horizontal scroll, Desktop: Grid */}
-        <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:overflow-x-visible sm:pb-0">
+        {/* Mobile: Horizontal scroll, Desktop: Flex wrap */}
+        <div className="flex gap-3.5 overflow-x-auto scrollbar-hide pb-4 sm:flex sm:flex-wrap sm:gap-3.5 sm:overflow-x-visible sm:pb-0">
           {data.data.map((product) => (
-            <div key={product.id} className={`flex-shrink-0 w-[280px] sm:w-auto ${data.isHousemates ? "h-[420px]" : "h-[450px]"}`}>
+            <div key={product.id} className={`flex-shrink-0 w-[260px] md:w-[300px] ${data.isHousemates ? "h-[420px]" : ""}`}>
               <AirbnbStyleCard
                 images={product.images}
                 id={product.id}
@@ -805,8 +817,9 @@ async function LoadRows({ category, limit }: iAppProps) {
                     ? (product.amenities as string[])
                     : []
                 }
+                supportRequested={product.supportRequested}
                 linkPath={data.isHousemates ? `/profile/${product.id}` : undefined}
-                location={data.isHousemates ? "Seeking housing" : undefined}
+                location={data.isHousemates ? "Seeking housing" : product.address}
                 availabilityText={data.isHousemates ? "Looking for housing" : undefined}
                 priceLabel={data.isHousemates ? "budget" : undefined}
                 demographics={data.isHousemates ? (product as any).demographics : undefined}
@@ -841,9 +854,9 @@ function LoadingState({ limit = 4 }: { limit?: number }) {
           <Skeleton className="h-5 w-5 rounded" />
         </div>
       </div>
-      <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:overflow-x-visible sm:pb-0">
+      <div className="flex gap-3.5 overflow-x-auto scrollbar-hide pb-4 sm:flex sm:flex-wrap sm:gap-3.5 sm:overflow-x-visible sm:pb-0">
         {[...Array(limit)].map((_, index) => (
-          <div key={index} className="flex-shrink-0 w-[280px] sm:w-auto h-[450px]">
+          <div key={index} className="flex-shrink-0 w-[260px] md:w-[300px]">
             <LoadingAirbnbCard />
           </div>
         ))}

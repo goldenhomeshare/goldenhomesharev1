@@ -91,8 +91,14 @@ export function ApproximateLocationMap({ address, className = "" }: ApproximateL
         // Minimum 250m radius, or offset distance + 100m buffer, whichever is larger
         const circleRadius = Math.max(250, offsetDistance + 100);
 
+        // Check if map div is ready before initializing
+        if (!mapRef.current) {
+          setMapError("Map container not ready");
+          return;
+        }
+
         // Initialize map
-        const map = new google.maps.Map(mapRef.current!, {
+        const map = new google.maps.Map(mapRef.current, {
           center: mapCenter,
           zoom: 15, // Slightly zoomed out for better neighborhood context
           mapTypeControl: false,

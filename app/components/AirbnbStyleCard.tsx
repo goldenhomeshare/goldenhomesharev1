@@ -2,7 +2,48 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ShieldCheck, User, GraduationCap, Briefcase, Armchair } from "lucide-react";
+import { ShieldCheck, User, GraduationCap, Briefcase, Armchair, Heart } from "lucide-react";
+
+// Utility function to extract city from full address
+function getCityFromAddress(fullAddress?: string | null): string {
+  if (!fullAddress) return '';
+  
+  // Split address by commas and trim whitespace
+  const parts = fullAddress.split(',').map(part => part.trim()).filter(part => part.length > 0);
+  
+  // Common US address formats:
+  // "123 Main St, Springfield, IL 62701" -> ["123 Main St", "Springfield", "IL 62701"]
+  // "Springfield, IL 62701" -> ["Springfield", "IL 62701"]
+  
+  if (parts.length >= 3) {
+    // For format: "Street, City, State ZIP" - city is third from last
+    return parts[parts.length - 3];
+  } else if (parts.length === 2) {
+    // For format: "City, State ZIP" - city is first part
+    return parts[0];
+  }
+  
+  // Fallback: return empty string if we can't parse
+  return '';
+}
+
+// Utility function to calculate total hours from supportRequested data
+function getTotalHoursPerWeek(supportRequested?: any): number {
+  if (!supportRequested) return 0;
+  
+  // Handle if it's already an array
+  if (Array.isArray(supportRequested)) {
+    let totalHours = 0;
+    supportRequested.forEach((item: any) => {
+      if (typeof item === 'object' && item.hoursPerWeek) {
+        totalHours += item.hoursPerWeek;
+      }
+    });
+    return totalHours;
+  }
+  
+  return 0;
+}
 
 interface AirbnbStyleCardProps {
   images: string[];
@@ -11,9 +52,10 @@ interface AirbnbStyleCardProps {
   smallDescription: string;
   name: string;
   showEditButton?: boolean;
-  location?: string;
+  location?: string | null;
   amenities?: string[];
   linkPath?: string;
+  supportRequested?: any;
   availabilityText?: string;
   priceLabel?: string;
   isVerified?: boolean;
@@ -39,10 +81,14 @@ export function AirbnbStyleCard({
   availabilityText = "Available now",
   priceLabel = "month",
   isVerified = false,
+  supportRequested,
   demographics
 }: AirbnbStyleCardProps) {
   // Use the first image as the main image
   const mainImage = images[0] || "/placeholder-house.svg";
+  
+  // Calculate total hours from support requested data
+  const totalHours = getTotalHoursPerWeek(supportRequested);
   
   // Get the first 3 amenities for display
   const displayAmenities = amenities.slice(0, 3);
@@ -52,13 +98,13 @@ export function AirbnbStyleCard({
   const href = linkPath || `/product/${id}`;
   
   return (
-    <Link href={href} className="cursor-pointer">
-      <div className="relative w-full h-full flex flex-col">
+    <Link href={href} className="cursor-pointer block">
+      <div className="relative flex flex-col">
         {/* Main Image */}
-        <div className={`relative overflow-hidden flex-shrink-0 ${
+        <div className={`relative overflow-hidden ${
           demographics 
             ? "h-[200px] w-[200px] md:h-[280px] md:w-[280px] mx-auto rounded-full mt-6" 
-            : "h-[280px] w-full rounded-xl"
+            : "h-[260px] w-[260px] md:h-[300px] md:w-[300px] rounded-3xl"
         }`}>
           <Image
             alt={name}
@@ -67,6 +113,13 @@ export function AirbnbStyleCard({
             className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
+          
+          {/* Heart Icon - Only for room listings (not profile cards) */}
+          {!demographics && (
+            <div className="absolute top-3 right-3 cursor-pointer z-10">
+              <Heart size={28} className="fill-gray-600 stroke-white stroke-2 hover:scale-110 transition-transform" />
+            </div>
+          )}
         </div>
         
         {/* Verification Badge - Design element for helper profiles */}
@@ -127,41 +180,17 @@ export function AirbnbStyleCard({
             })()}
           </div>
         ) : (
-          // Standard listing card content
-          <div className="flex-1 pt-3">
-            <div className="flex justify-between items-start mb-2">
-              <h3 className="font-semibold text-lg text-gray-900 line-clamp-1">{name}</h3>
-            </div>
-            
-            <p className="text-sm text-gray-600 mb-1">{location}</p>
-            <p className="text-sm text-gray-600 mb-2">{availabilityText}</p>
-            
-            {/* Amenities */}
-            {displayAmenities.length > 0 && (
-              <div className="flex flex-wrap gap-1 mb-3">
-                {displayAmenities.map((amenity, index) => (
-                  <span 
-                    key={index}
-                    className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-md"
-                  >
-                    {amenity}
-                  </span>
-                ))}
-                {remainingCount > 0 && (
-                  <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-md">
-                    +{remainingCount} more
-                  </span>
-                )}
-              </div>
-            )}
-            
-            <div className="flex justify-between items-center">
-              <p className="text-sm text-gray-600 line-clamp-2">{smallDescription}</p>
-              <p className="text-lg font-semibold text-gray-900 ml-2">
-                ${price}
-                <span className="text-sm font-normal">/{priceLabel}</span>
+          // Standard listing card content - show "Private room in City" format with help hours
+          <div className="mt-3">
+            <h3 className="font-medium text-base text-gray-900 line-clamp-2">
+              {getCityFromAddress(location) ? `Private room in ${getCityFromAddress(location)}` : name}
+            </h3>
+            {totalHours > 0 && (
+              <p className="text-sm text-gray-600 mt-1">
+                <span className="line-through text-gray-400">${price + (15 * totalHours * 4)}</span>{" "}
+                <span className="font-medium">${price}/mo</span> with {totalHours}hrs support/week
               </p>
-            </div>
+            )}
           </div>
         )}
       </div>
@@ -171,23 +200,8 @@ export function AirbnbStyleCard({
 
 export function LoadingAirbnbCard() {
   return (
-    <div className="animate-pulse h-full flex flex-col">
-      <div className="h-[280px] w-full bg-gray-200 rounded-xl flex-shrink-0" />
-      <div className="mt-3 flex-1 flex flex-col min-h-[120px]">
-        <div className="flex justify-between mb-1">
-          <div className="h-4 bg-gray-200 rounded w-3/4" />
-        </div>
-        <div className="h-3 bg-gray-200 rounded w-full mb-1" />
-        <div className="flex-1 min-h-[40px] flex items-start mb-2">
-          <div className="flex gap-1">
-            <div className="h-6 bg-gray-200 rounded-full w-16" />
-            <div className="h-6 bg-gray-200 rounded-full w-20" />
-            <div className="h-6 bg-gray-200 rounded-full w-14" />
-          </div>
-        </div>
-        <div className="h-3 bg-gray-200 rounded w-2/3 mb-1" />
-        <div className="h-4 bg-gray-200 rounded w-20" />
-      </div>
+    <div className="animate-pulse flex flex-col">
+      <div className="h-[260px] w-[260px] md:h-[300px] md:w-[300px] bg-gray-200 rounded-3xl" />
     </div>
   );
 } 

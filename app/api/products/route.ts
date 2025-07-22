@@ -101,6 +101,7 @@ export async function GET(request: NextRequest) {
         id: true,
         address: true,
         amenities: true,
+        supportRequested: true,
       },
       orderBy: {
         createdAt: "desc",

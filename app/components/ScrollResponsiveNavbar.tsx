@@ -40,6 +40,7 @@ export function ScrollResponsiveNavbar({
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [justNavigatedToHelper, setJustNavigatedToHelper] = useState(false);
   const [hasVideoCompleted, setHasVideoCompleted] = useState(false);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false); // New state to track user interaction
   const videoRef = useRef<HTMLVideoElement>(null);
   
   // House video states
@@ -57,12 +58,14 @@ export function ScrollResponsiveNavbar({
       setIsVideoPlaying(true);
       setIsVideoLoaded(false);
       setJustNavigatedToHelper(false);
+      setHasUserInteracted(true); // Mark that user has interacted
     }
     // Reset video state when leaving helper page
     else if (pathname !== "/" && isVideoPlaying) {
       setIsVideoPlaying(false);
       setIsVideoLoaded(false);
       setHasVideoCompleted(false);
+      setHasUserInteracted(false); // Reset interaction state
     }
   }, [pathname, justNavigatedToHelper, isVideoPlaying]);
 
@@ -742,6 +745,24 @@ export function ScrollResponsiveNavbar({
     }
   };
 
+  // Helper function to determine which helper image to show
+  const getHelperImageSrc = () => {
+    if (pathname === "/") {
+      if (hasVideoCompleted) {
+        // After video completes, show waving image
+        return "/helper-hand-up.png";
+      } else if (hasUserInteracted && !isVideoPlaying) {
+        // User has interacted but video isn't playing (pre-video state)
+        return "/updated-helper-7-18.png";
+      } else {
+        // Default state (first load) - show waving image
+        return "/helper-hand-up.png";
+      }
+    }
+    // On other pages, show original image
+    return "/updated-helper-7-18.png";
+  };
+
   return (
     <nav className={`sticky top-0 z-50 border-b shadow-sm transition-all duration-500 ease-in-out ${
       isInCondensedMode ? 'min-h-[25px]' : 'min-h-[80px]'
@@ -810,7 +831,7 @@ export function ScrollResponsiveNavbar({
                       {/* Helper Image - show when not playing video */}
                       {!isVideoPlaying && (
                         <Image 
-                          src={hasVideoCompleted && pathname === "/" ? "/helper-hand-up.png" : "/updated-helper-7-18.png"} 
+                          src={getHelperImageSrc()} 
                           alt="Helper"
                           fill
                           className="object-contain transition-opacity duration-200"

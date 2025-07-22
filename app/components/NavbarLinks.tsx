@@ -15,6 +15,7 @@ export function NavbarLinks () {
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
     const [justNavigatedToHelper, setJustNavigatedToHelper] = useState(false);
     const [hasVideoCompleted, setHasVideoCompleted] = useState(false);
+    const [hasUserInteracted, setHasUserInteracted] = useState(false); // New state to track user interaction
     const videoRef = useRef<HTMLVideoElement>(null);
 
     // House video states
@@ -30,12 +31,14 @@ export function NavbarLinks () {
             setIsVideoPlaying(true);
             setIsVideoLoaded(false);
             setJustNavigatedToHelper(false);
+            setHasUserInteracted(true); // Mark that user has interacted
         }
         // Reset helper video state when leaving helper page
         else if (location !== "/" && isVideoPlaying) {
             setIsVideoPlaying(false);
             setIsVideoLoaded(false);
             setHasVideoCompleted(false);
+            setHasUserInteracted(false); // Reset interaction state
         }
     }, [location, justNavigatedToHelper, isVideoPlaying]);
 
@@ -128,6 +131,24 @@ export function NavbarLinks () {
         }
     };
 
+    // Helper function to determine which helper image to show
+    const getHelperImageSrc = () => {
+        if (location === "/") {
+            if (hasVideoCompleted) {
+                // After video completes, show waving image
+                return "/helper-hand-up.png";
+            } else if (hasUserInteracted && !isVideoPlaying) {
+                // User has interacted but video isn't playing (pre-video state)
+                return "/updated-helper-7-18.png";
+            } else {
+                // Default state (first load) - show waving image
+                return "/helper-hand-up.png";
+            }
+        }
+        // On other pages, show original image
+        return "/updated-helper-7-18.png";
+    };
+
     return (
         <div className="flex justify-center items-center gap-x-6" style={{ backgroundColor: '#f5f5f5' }}>
             {/* Helpers and Homes Navigation */}
@@ -146,7 +167,7 @@ export function NavbarLinks () {
                       {/* Helper Image - show when not playing video */}
                       {!isVideoPlaying && (
                           <Image 
-                            src={hasVideoCompleted && location === "/" ? "/helper-hand-up.png" : "/updated-helper-7-18.png"} 
+                            src={getHelperImageSrc()} 
                             alt="Helper"
                             fill
                             className="object-contain transition-opacity duration-200"

@@ -108,26 +108,29 @@ export function ApproximateLocationMap({ address, className = "" }: ApproximateL
 
         // Add a circle to show approximate area that includes the actual location
         new google.maps.Circle({
-          strokeColor: '#2563eb',
-          strokeOpacity: 0.8,
-          strokeWeight: 2,
-          fillColor: '#3b82f6',
-          fillOpacity: 0.2,
+          strokeColor: '#6b7280',
+          strokeOpacity: 0,
+          strokeWeight: 0,
+          fillColor: '#9ca3af',
+          fillOpacity: 0.3,
           map: map,
           center: mapCenter,
           radius: circleRadius,
         });
 
-        // Add a center dot at the offset location
+        // Add a home icon marker at the center location
         new google.maps.Marker({
           position: mapCenter,
           map: map,
           icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            scale: 4,
-            fillColor: '#1d4ed8',
-            fillOpacity: 1,
-            strokeWeight: 0,
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="-12 -12 48 48">
+                <circle cx="12" cy="12" r="22" fill="#000000"/>
+                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="#ffffff"/>
+              </svg>
+            `),
+            scaledSize: new google.maps.Size(48, 48),
+            anchor: new google.maps.Point(24, 24),
           },
         });
 

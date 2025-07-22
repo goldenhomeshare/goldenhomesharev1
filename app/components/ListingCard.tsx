@@ -34,12 +34,15 @@ const amenityIcons: Record<string, any> = {
   workspace: { icon: Briefcase, label: "Desk/Workspace" },
 };
 
-// Utility function to extract city from full address (matching AirbnbStyleCard approach)
-function getCityFromAddress(fullAddress?: string | null): string {
-  if (!fullAddress) return '';
+// Utility function to extract city and state from full address
+function getCityStateFromAddress(fullAddress?: string | null): { city: string; state: string; cityState: string } {
+  if (!fullAddress) return { city: '', state: '', cityState: '' };
   
   // Split address by commas and trim whitespace
   const parts = fullAddress.split(',').map(part => part.trim()).filter(part => part.length > 0);
+  
+  let city = '';
+  let state = '';
   
   // Common US address formats:
   // "123 Main St, Springfield, IL 62701" -> ["123 Main St", "Springfield", "IL 62701"]
@@ -47,14 +50,25 @@ function getCityFromAddress(fullAddress?: string | null): string {
   
   if (parts.length >= 3) {
     // For format: "Street, City, State ZIP" - city is third from last
-    return parts[parts.length - 3];
+    city = parts[parts.length - 3];
+    const stateZip = parts[parts.length - 2];
+    state = stateZip.split(' ')[0]; // Extract state from "IL 62701"
   } else if (parts.length === 2) {
     // For format: "City, State ZIP" - city is first part
-    return parts[0];
+    city = parts[0];
+    const stateZip = parts[1];
+    state = stateZip.split(' ')[0]; // Extract state from "IL 62701"
   }
   
-  // Fallback: return empty string if we can't parse
-  return '';
+  // Create full city, state string
+  const cityState = city && state ? `${city}, ${state}` : city || '';
+  
+  return { city, state, cityState };
+}
+
+// Legacy function for backward compatibility
+function getCityFromAddress(fullAddress?: string | null): string {
+  return getCityStateFromAddress(fullAddress).city;
 }
 
 // Utility function to calculate total hours from supportRequested data
@@ -89,7 +103,7 @@ export function ListingCard({
   onHoverEnd,
   supportRequested
 }: ListingCardProps) {
-  const cityName = getCityFromAddress(address);
+  const { cityState } = getCityStateFromAddress(address);
   const totalHours = getTotalHoursPerWeek(supportRequested);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -201,10 +215,10 @@ export function ListingCard({
         {/* Content below image - matching AirbnbStyleCard format */}
         <div className="mt-3">
           <h3 className="font-medium text-base text-gray-900 line-clamp-1">
-            {cityName ? `Private room in ${cityName}` : name}
+            {cityState ? `Private room in ${cityState}` : name}
           </h3>
           {/* Show listing title as subtitle when we have a city */}
-          {cityName && (
+          {cityState && (
             <p className="text-sm text-gray-600 mt-1 line-clamp-1">
               {name}
             </p>

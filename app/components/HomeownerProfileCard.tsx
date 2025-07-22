@@ -1,13 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { User, UserCircle, CircleDashed, GraduationCap, Briefcase, UserCheck, Users, Crown, Sunrise, Moon, Clock, CircleDot, Flower, ChefHat, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Dice6, Heart, Cigarette, CigaretteOff, Dog, Star, Shield, MessageCircle, MapPin, Armchair, Sparkles, Salad, ShoppingBag, Cat, Wrench } from "lucide-react";
-import { Instagram, Facebook, Linkedin } from "lucide-react";
-import { MessageHostButton } from "./chat/MessageHostButton";
 import { useState } from "react";
+import { Shield, User, Clock, MapPin, Users, CircleDashed, GraduationCap, Briefcase, UserCheck, Crown, Sunrise, Moon, CircleDot, Flower, ChefHat, Book, Tv, HandHeart, Dumbbell, Church, Palette, Music, Laptop, PawPrint, Dice6, Heart, Cigarette, CigaretteOff, Dog, Star, MessageCircle, Armchair, Sparkles, Salad, ShoppingBag, Cat, Wrench, Instagram, Facebook, Linkedin } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { MessageHostButton } from "./chat/MessageHostButton";
 
 interface HomeownerProfile {
   profilePicture?: string | null;
@@ -53,7 +51,7 @@ interface HomeownerProfileCardProps {
 }
 
 const genderIcons = {
-  male: { icon: UserCircle, label: "Male" },
+  male: { icon: User, label: "Male" },
   female: { icon: User, label: "Female" },
   other: { icon: CircleDashed, label: "Other" },
 };
@@ -145,75 +143,61 @@ export function HomeownerProfileCard({ homeowner, canMessageHost, messageProps, 
   
   return (
     <div className="space-y-6">
-      <Card className="border-0 shadow-sm">
-        <CardContent className="p-6">
-          {/* Header Section */}
-          <div className="flex items-start gap-4 mb-6">
-            {/* Host Avatar with Verification Badge */}
-            <div className="relative">
-              <div className="relative w-16 h-16 rounded-full overflow-hidden">
-                {profile?.profilePicture ? (
-                  <Image
-                    src={profile.profilePicture}
-                    alt={`${homeowner.firstName}'s profile`}
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <User size={24} className="text-gray-400" />
-                  </div>
-                )}
-              </div>
-              {/* Verification Badge */}
-              <div 
-                className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ring-2 ring-white cursor-help" 
-                title="This host has been background checked"
-              >
-                <Shield size={12} className="text-white" />
-              </div>
-            </div>
-
-            {/* Host Info */}
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  {homeowner.firstName}
-                </h2>
-                <Badge variant="secondary" className="text-xs font-medium">
-                  Homeowner
-                </Badge>
-              </div>
-              
-              {/* Basic Demographics */}
-              {(profile?.gender || profile?.ageRange) && (
-                <div className="flex items-center gap-4 text-sm text-gray-600">
-                  {profile?.gender && (
-                    <span className="capitalize">{profile.gender}</span>
-                  )}
-                  {profile?.ageRange && (
-                    <span>{profile.ageRange} years old</span>
-                  )}
+      <div>
+        {/* Header Section */}
+        <div className="flex items-start gap-4 mb-6">
+          {/* Host Avatar with Verification Badge */}
+          <div className="relative">
+            <div className="relative w-16 h-16 rounded-full overflow-hidden">
+              {profile?.profilePicture ? (
+                <Image
+                  src={profile.profilePicture}
+                  alt={`${homeowner.firstName}'s profile`}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                  <User size={24} className="text-gray-400" />
                 </div>
               )}
             </div>
+            {/* Verification Badge */}
+            <div 
+              className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center ring-2 ring-white cursor-help" 
+              title="This host has been background checked"
+            >
+              <Shield size={12} className="text-white" />
+            </div>
+          </div>
 
-            {/* Desktop: Message Button - Positioned to the right */}
-            {canMessageHost && messageProps && (
-              <div className="hidden lg:flex flex-shrink-0">
-                <MessageHostButton 
-                  productId={messageProps.productId}
-                  hostId={messageProps.hostId}
-                  hostName={homeowner.firstName}
-                  productName={messageProps.productName}
-                />
+          {/* Host Info */}
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-2">
+              <h2 className="text-2xl font-semibold text-gray-900">
+                {homeowner.firstName}
+              </h2>
+              <Badge variant="secondary" className="text-xs font-medium">
+                Homeowner
+              </Badge>
+            </div>
+            
+            {/* Basic Demographics */}
+            {(profile?.gender || profile?.ageRange) && (
+              <div className="flex items-center gap-4 text-sm text-gray-600">
+                {profile?.gender && (
+                  <span className="capitalize">{profile.gender}</span>
+                )}
+                {profile?.ageRange && (
+                  <span>{profile.ageRange} years old</span>
+                )}
               </div>
             )}
           </div>
 
-          {/* Mobile: Message Button - Positioned below header */}
+          {/* Desktop: Message Button - Positioned to the right */}
           {canMessageHost && messageProps && (
-            <div className="lg:hidden mb-6">
+            <div className="hidden lg:flex flex-shrink-0">
               <MessageHostButton 
                 productId={messageProps.productId}
                 hostId={messageProps.hostId}
@@ -222,105 +206,185 @@ export function HomeownerProfileCard({ homeowner, canMessageHost, messageProps, 
               />
             </div>
           )}
+        </div>
 
-          {/* Bio Section */}
-          {profile?.bio && (
-            <div className="pt-4 mb-8">
-              <div className="relative">
-                <div 
-                  className={`text-sm text-gray-700 leading-relaxed whitespace-pre-line ${
-                    !showFullBio ? 'line-clamp-7' : ''
-                  }`}
-                  style={{
-                    display: '-webkit-box',
-                    WebkitLineClamp: !showFullBio ? 7 : 'unset',
-                    WebkitBoxOrient: 'vertical',
-                    overflow: !showFullBio ? 'hidden' : 'visible'
-                  }}
+        {/* Mobile: Message Button - Positioned below header */}
+        {canMessageHost && messageProps && (
+          <div className="lg:hidden mb-6">
+            <MessageHostButton 
+              productId={messageProps.productId}
+              hostId={messageProps.hostId}
+              hostName={homeowner.firstName}
+              productName={messageProps.productName}
+            />
+          </div>
+        )}
+
+        {/* Bio Section */}
+        {profile?.bio && (
+          <div className="mb-6">
+            <div className="text-gray-700 text-base leading-relaxed">
+              {showFullBio ? (
+                <p className="whitespace-pre-line">{profile.bio}</p>
+              ) : (
+                <p className="whitespace-pre-line">
+                  {profile.bio.length > 300 
+                    ? `${profile.bio.substring(0, 300)}...` 
+                    : profile.bio
+                  }
+                </p>
+              )}
+              {profile.bio.length > 300 && (
+                <button
+                  onClick={() => setShowFullBio(!showFullBio)}
+                  className="text-blue-600 hover:text-blue-800 font-medium mt-2 text-sm underline"
                 >
-                  {profile.bio}
-                </div>
-                
-                {/* Show More/Less Button */}
-                {(profile.bio.split('\n').length > 7 || profile.bio.length > 400) && (
-                  <button
-                    onClick={() => setShowFullBio(!showFullBio)}
-                    className="mt-3 text-sm font-medium text-gray-900 underline hover:no-underline focus:outline-none"
-                  >
-                    {showFullBio ? 'Show less' : 'Show more'}
-                  </button>
-                )}
-              </div>
+                  {showFullBio ? 'Show less' : 'Show more'}
+                </button>
+              )}
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        )}
+
+        {/* Support Services Requested */}
+        {supportRequested && supportRequested.length > 0 && (
+          <div className="mt-6">
+            <h4 className="text-sm font-medium text-gray-700 mb-3">Looking for help with</h4>
+            <div className="grid grid-cols-2 gap-3">
+              {supportRequested.map((supportItem: any, index: number) => {
+                const supportId = typeof supportItem === 'string' ? supportItem : supportItem.id;
+                const hoursPerWeek = typeof supportItem === 'string' ? null : supportItem.hoursPerWeek;
+                const support = supportIcons[supportId as keyof typeof supportIcons];
+                if (!support) return null;
+                
+                const Icon = support.icon;
+                return (
+                  <div key={index} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                      <Icon size={16} className="text-gray-600" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-700">{support.label}</span>
+                      {hoursPerWeek && (
+                        <span className="block text-xs text-gray-500">{hoursPerWeek} hours/week</span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Lifestyle Info */}
+        {profile && (
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            {profile.lifestyle.numberOfPeople && (
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                  <Users size={16} className="text-gray-600" />
+                </div>
+                <span className="text-sm text-gray-700">
+                  {profile.lifestyle.numberOfPeople === "1" ? "Lives alone" : `Lives with ${profile.lifestyle.numberOfPeople} people`}
+                </span>
+              </div>
+            )}
+            
+            {profile.lifestyle.hasPets && (
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mt-0.5">
+                  <PawPrint size={16} className="text-gray-600" />
+                </div>
+                <div>
+                  <span className="text-sm text-gray-700">Has pets</span>
+                  {profile.lifestyle.petDescription && (
+                    <p className="text-xs text-gray-500 mt-1">{profile.lifestyle.petDescription}</p>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {profile.lifestyle.smokingStatus && (
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                  {profile.lifestyle.smokingStatus === 'no-smoking' ? (
+                    <CigaretteOff size={16} className="text-gray-600" />
+                  ) : (
+                    <Cigarette size={16} className="text-gray-600" />
+                  )}
+                </div>
+                <span className="text-sm text-gray-700 capitalize">
+                  {profile.lifestyle.smokingStatus.replace('-', ' ')}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* More About Host Section */}
-      <Card className="border-0 shadow-sm">
-        <CardContent className="p-6">
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
-              More about {homeowner.firstName}
-            </h3>
+      <div>
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+            More about {homeowner.firstName}
+          </h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Demographics */}
-              {(profile?.preferredGender || profile?.preferredCareerStage) && (
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-700">Looking for housemates who are</h4>
-                  
-                  {profile?.preferredGender && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                        <User size={16} className="text-gray-600" />
-                      </div>
-                      <span className="text-sm text-gray-700 capitalize">{profile.preferredGender}</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Demographics */}
+            {(profile?.preferredGender || profile?.preferredCareerStage) && (
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-gray-700">Looking for housemates who are</h4>
+                
+                {profile?.preferredGender && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                      <User size={16} className="text-gray-600" />
                     </div>
-                  )}
-                  
-                  {profile?.preferredCareerStage && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                        {profile.preferredCareerStage === 'student' && <GraduationCap size={16} className="text-gray-600" />}
-                        {profile.preferredCareerStage === 'professional' && <Briefcase size={16} className="text-gray-600" />}
-                        {profile.preferredCareerStage === 'retired' && <Armchair size={16} className="text-gray-600" />}
-                        {profile.preferredCareerStage === 'no-preference' && <Users size={16} className="text-gray-600" />}
-                      </div>
-                      <span className="text-sm text-gray-700 capitalize">
-                        {profile.preferredCareerStage.replace('-', ' ')}
-                      </span>
+                    <span className="text-sm text-gray-700 capitalize">{profile.preferredGender}</span>
+                  </div>
+                )}
+                
+                {profile?.preferredCareerStage && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                      {profile.preferredCareerStage === 'student' && <GraduationCap size={16} className="text-gray-600" />}
+                      {profile.preferredCareerStage === 'professional' && <Briefcase size={16} className="text-gray-600" />}
+                      {profile.preferredCareerStage === 'retired' && <Armchair size={16} className="text-gray-600" />}
+                      {profile.preferredCareerStage === 'no-preference' && <Users size={16} className="text-gray-600" />}
                     </div>
-                  )}
-                </div>
-              )}
+                    <span className="text-sm text-gray-700 capitalize">
+                      {profile.preferredCareerStage.replace('-', ' ')}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
 
-              {(profile?.schedule || profile?.socialPreference) && (
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-700">Prefers housemates who are</h4>
-                  
-                  {profile?.schedule && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                        <Clock size={16} className="text-gray-600" />
-                      </div>
-                      <span className="text-sm text-gray-700 capitalize">
-                        {profile.schedule.replace('-', ' ')}
-                      </span>
+            {(profile?.schedule || profile?.socialPreference) && (
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-gray-700">Prefers housemates who are</h4>
+                
+                {profile?.schedule && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                      <Clock size={16} className="text-gray-600" />
                     </div>
-                  )}
-                  
-                  {profile?.socialPreference && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                        <Users size={16} className="text-gray-600" />
-                      </div>
-                      <span className="text-sm text-gray-700 capitalize">{profile.socialPreference}</span>
+                    <span className="text-sm text-gray-700 capitalize">
+                      {profile.schedule.replace('-', ' ')}
+                    </span>
+                  </div>
+                )}
+                
+                {profile?.socialPreference && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                      <Users size={16} className="text-gray-600" />
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
+                    <span className="text-sm text-gray-700 capitalize">{profile.socialPreference}</span>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Hobbies with Icons */}
             {profile?.hobbies && (
@@ -354,83 +418,6 @@ export function HomeownerProfileCard({ homeowner, canMessageHost, messageProps, 
                     });
                   })()}
                 </div>
-              </div>
-            )}
-
-            {/* Support Requested */}
-            {supportRequested && supportRequested.length > 0 && (
-              <div className="mt-6">
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Looking for help with</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  {supportRequested.map((supportItem: any, index: number) => {
-                    const supportId = typeof supportItem === 'string' ? supportItem : supportItem.id;
-                    const hoursPerWeek = typeof supportItem === 'string' ? null : supportItem.hoursPerWeek;
-                    const support = supportIcons[supportId as keyof typeof supportIcons];
-                    if (!support) return null;
-                    
-                    const Icon = support.icon;
-                    return (
-                      <div key={index} className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                          <Icon size={16} className="text-gray-600" />
-                        </div>
-                        <div>
-                          <span className="text-sm font-medium text-gray-700">{support.label}</span>
-                          {hoursPerWeek && (
-                            <span className="block text-xs text-gray-500">{hoursPerWeek} hours/week</span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Lifestyle Info */}
-            {profile?.lifestyle && (
-              <div className="space-y-3">
-                <h4 className="text-sm font-medium text-gray-700">Living situation</h4>
-                
-                {profile.lifestyle.numberOfPeople && (
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                      <Users size={16} className="text-gray-600" />
-                    </div>
-                    <span className="text-sm text-gray-700">
-                      {profile.lifestyle.numberOfPeople === "1" ? "Lives alone" : `Lives with ${profile.lifestyle.numberOfPeople} people`}
-                    </span>
-                  </div>
-                )}
-                
-                {profile.lifestyle.hasPets && (
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mt-0.5">
-                      <PawPrint size={16} className="text-gray-600" />
-                    </div>
-                    <div>
-                      <span className="text-sm text-gray-700">Has pets</span>
-                      {profile.lifestyle.petDescription && (
-                        <p className="text-xs text-gray-500 mt-1">{profile.lifestyle.petDescription}</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-                
-                {profile.lifestyle.smokingStatus && (
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                      {profile.lifestyle.smokingStatus === 'no-smoking' ? (
-                        <CigaretteOff size={16} className="text-gray-600" />
-                      ) : (
-                        <Cigarette size={16} className="text-gray-600" />
-                      )}
-                    </div>
-                    <span className="text-sm text-gray-700 capitalize">
-                      {profile.lifestyle.smokingStatus.replace('-', ' ')}
-                    </span>
-                  </div>
-                )}
               </div>
             )}
 
@@ -473,8 +460,8 @@ export function HomeownerProfileCard({ homeowner, canMessageHost, messageProps, 
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 } 

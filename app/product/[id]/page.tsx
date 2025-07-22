@@ -20,12 +20,15 @@ import Image from "next/image";
 import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, Clock, VolumeX, Cigarette, CigaretteOff, Wine, GlassWater, Users, UserMinus, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-// Utility function to extract city from full address (matching card approach)
-function getCityFromAddress(fullAddress?: string | null): string {
-  if (!fullAddress) return '';
+// Utility function to extract city and state from full address
+function getCityStateFromAddress(fullAddress?: string | null): { city: string; state: string; cityState: string } {
+  if (!fullAddress) return { city: '', state: '', cityState: '' };
   
   // Split address by commas and trim whitespace
   const parts = fullAddress.split(',').map(part => part.trim()).filter(part => part.length > 0);
+  
+  let city = '';
+  let state = '';
   
   // Common US address formats:
   // "123 Main St, Springfield, IL 62701" -> ["123 Main St", "Springfield", "IL 62701"]
@@ -33,14 +36,25 @@ function getCityFromAddress(fullAddress?: string | null): string {
   
   if (parts.length >= 3) {
     // For format: "Street, City, State ZIP" - city is third from last
-    return parts[parts.length - 3];
+    city = parts[parts.length - 3];
+    const stateZip = parts[parts.length - 2];
+    state = stateZip.split(' ')[0]; // Extract state from "IL 62701"
   } else if (parts.length === 2) {
     // For format: "City, State ZIP" - city is first part
-    return parts[0];
+    city = parts[0];
+    const stateZip = parts[1];
+    state = stateZip.split(' ')[0]; // Extract state from "IL 62701"
   }
   
-  // Fallback: return empty string if we can't parse
-  return '';
+  // Create full city, state string
+  const cityState = city && state ? `${city}, ${state}` : city || '';
+  
+  return { city, state, cityState };
+}
+
+// Legacy function for backward compatibility
+function getCityFromAddress(fullAddress?: string | null): string {
+  return getCityStateFromAddress(fullAddress).city;
 }
 
 const amenityIcons: Record<string, any> = {
@@ -266,8 +280,16 @@ export default async function ProductPage({
   const isHousemate = currentUser && (currentUser as any).userType === "HOUSEMATE";
 
   // Generate display title using same logic as cards
-  const cityName = getCityFromAddress(data.address);
-  const displayTitle = cityName ? `Private room in ${cityName}` : data.name;
+  const { cityState } = getCityStateFromAddress(data.address);
+  const displayTitle = cityState ? `Private room in ${cityState}` : data.name;
+  
+  // Generate bedroom/bathroom info - for now using default values
+  // TODO: Add bedroom/bathroom fields to Product schema
+  const getBedBathInfo = () => {
+    // Default to private bathroom unless specifically indicated otherwise
+    const bathroomText = 'Private bathroom';
+    return `1 bedroom · ${bathroomText}`;
+  };
 
   return (
     <>
@@ -281,39 +303,167 @@ export default async function ProductPage({
       <section className="mx-auto lg:px-4 max-w-7xl lg:px-8">
         <ImageGallery images={data.images as string[]} />
 
-        {/* Mobile: Title and description below images */}
-        <div className="lg:hidden -mt-6 pt-10 pb-6 px-4 bg-white relative z-10 rounded-t-3xl text-center">
-          <h1 className="text-2xl font-semibold tracking-tight text-gray-900 mb-3">
-            {data.name}
-          </h1>
-          <p className="text-xl text-gray-600 leading-relaxed font-medium">{displayTitle}</p>
-        </div>
+                  {/* Mobile: Title and description below images */}
+          <div className="lg:hidden -mt-6 pt-10 pb-6 px-4 bg-white relative z-10 rounded-t-3xl text-center">
+            <h1 className="text-2xl font-semibold tracking-tight text-gray-900 mb-3">
+              {data.name}
+            </h1>
+            <p className="text-xl text-gray-600 leading-relaxed font-medium">{displayTitle}</p>
+            <p className="text-base text-gray-900 mt-2">{getBedBathInfo()}</p>
+          </div>
 
         {/* Desktop: Short description below images */}
         <div className="hidden lg:block mt-4">
           <p className="text-2xl text-gray-900 font-medium">{displayTitle}</p>
+          <p className="text-base text-gray-900 mt-2">{getBedBathInfo()}</p>
         </div>
       </section>
 
-      {/* Host profile and payment section side by side */}
+      {/* Property details and host profile section */}
       <section className="mx-auto px-4 max-w-7xl lg:px-8 lg:grid lg:grid-cols-7 lg:gap-x-8 xl:gap-x-16 mt-4 min-h-screen">
-        <div className="w-full max-w-2xl mx-auto lg:max-w-none lg:col-span-4">
+        <div className="w-full max-w-2xl mx-auto lg:max-w-none lg:col-span-4 space-y-8">
+          
+          {/* Property Information Section */}
+          <div className="space-y-8">
+            {/* Description */}
+            <ProductDescription content={data.description as JSONContent} />
+
+            {/* Amenities */}
+            {amenities.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">What this place offers</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {amenities.map((amenityId: string) => {
+                    const amenity = amenityIcons[amenityId];
+                    if (!amenity) return null;
+                    
+                    const Icon = amenity.icon;
+                    return (
+                      <div key={amenityId} className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                          <Icon size={16} className="text-slate-600" />
+                        </div>
+                        <span className="text-base">{amenity.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* House Rules */}
+            {combinedHouseRules.length > 0 && (
+              <div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-6">House rules</h2>
+                <div className="space-y-4">
+                  {combinedHouseRules.map((ruleItem: any) => {
+                    const ruleId = typeof ruleItem === 'string' ? ruleItem : ruleItem.id;
+                    const ruleValue = typeof ruleItem === 'string' ? null : ruleItem.value;
+                    const rule = houseRulesIcons[ruleId];
+                    
+                    // Skip additional rules here - they'll be displayed separately below
+                    if (ruleId === 'additionalRules') {
+                      return null;
+                    }
+                    
+                    // Handle unknown rule types gracefully
+                    if (!rule) {
+                      return (
+                        <div key={ruleId} className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                            <FileText size={16} className="text-slate-600" />
+                          </div>
+                          <div className="flex-1">
+                            <span className="text-base font-medium capitalize">{ruleId.replace(/([A-Z])/g, ' $1')}</span>
+                            {ruleValue && (
+                              <span className="block text-sm text-gray-600">{ruleValue}</span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    const Icon = rule.icon;
+                    let displayValue = ruleValue;
+                    
+                    // Get human-readable label for dropdown values
+                    if (ruleValue && houseRulesValueLabels[ruleId] && houseRulesValueLabels[ruleId][ruleValue]) {
+                      displayValue = houseRulesValueLabels[ruleId][ruleValue];
+                    }
+                    
+                    return (
+                      <div key={ruleId} className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                          <Icon size={16} className="text-slate-600" />
+                        </div>
+                        <div className="flex-1">
+                          <span className="text-base font-medium">{rule.label}</span>
+                          {displayValue && (
+                            <span className="block text-sm text-gray-600">{displayValue}</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Display additional rules separately */}
+                {combinedHouseRules.some((rule: any) => {
+                  const ruleId = typeof rule === 'string' ? rule : rule.id;
+                  return ruleId === 'additionalRules';
+                }) && (
+                  <div className="mt-6">
+                    {combinedHouseRules.map((ruleItem: any) => {
+                      const ruleId = typeof ruleItem === 'string' ? ruleItem : ruleItem.id;
+                      const ruleValue = typeof ruleItem === 'string' ? null : ruleItem.value;
+                      
+                      if (ruleId !== 'additionalRules' || !ruleValue) return null;
+                      
+                      const rule = houseRulesIcons[ruleId];
+                      const Icon = rule.icon;
+                      
+                      return (
+                        <div key={ruleId} className="border border-gray-200 rounded-lg p-4 bg-white">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                              <Icon size={16} className="text-slate-600" />
+                            </div>
+                            <span className="text-base font-medium">{rule.label}</span>
+                          </div>
+                          <div className="pl-11">
+                            <p className="text-base text-gray-700 leading-relaxed whitespace-pre-line">
+                              {ruleValue}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Host Profile Section */}
           {data.User && (
-            <HomeownerProfileCard 
-              homeowner={{
-                firstName: data.User.firstName,
-                lastName: data.User.lastName,
-                profileImage: data.User.profileImage,
-                homeownerProfile: data.User.homeownerProfile,
-              }}
-              canMessageHost={!!canMessageHost}
-              messageProps={canMessageHost && data.User && data.id && data.name ? {
-                productId: data.id,
-                hostId: data.User.id,
-                productName: data.name,
-              } : undefined}
-              supportRequested={supportRequested}
-            />
+            <div>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">More about {data.User.firstName}</h2>
+              <HomeownerProfileCard 
+                homeowner={{
+                  firstName: data.User.firstName,
+                  lastName: data.User.lastName,
+                  profileImage: data.User.profileImage,
+                  homeownerProfile: data.User.homeownerProfile,
+                }}
+                canMessageHost={!!canMessageHost}
+                messageProps={canMessageHost && data.User && data.id && data.name ? {
+                  productId: data.id,
+                  hostId: data.User.id,
+                  productName: data.name,
+                } : undefined}
+                supportRequested={supportRequested}
+              />
+            </div>
           )}
 
           {/* Mobile: Application Form right after HomeownerProfileCard */}
@@ -342,127 +492,6 @@ export default async function ProductPage({
               </Card>
             ) : null}
           </div>
-          
-          <ProductDescription content={data.description as JSONContent} />
-
-          {/* Desktop: Amenities moved to left column */}
-          {amenities.length > 0 && (
-            <>
-              <div className="border-t border-gray-200 mt-6 pt-6">
-                <h3 className="text-base font-medium mb-4">Amenities</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  {amenities.map((amenityId: string) => {
-                    const amenity = amenityIcons[amenityId];
-                    if (!amenity) return null;
-                    
-                    const Icon = amenity.icon;
-                    return (
-                      <div key={amenityId} className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                          <Icon size={16} className="text-slate-600" />
-                        </div>
-                        <span className="text-sm">{amenity.label}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Desktop: House Rules moved to left column */}
-          {combinedHouseRules.length > 0 && (
-            <>
-              <div className="border-t border-gray-200 mt-6 pt-6">
-                <h3 className="text-base font-medium mb-4">House Rules</h3>
-                <div className="grid grid-cols-1 gap-4">
-                  {combinedHouseRules.map((ruleItem: any) => {
-                    const ruleId = typeof ruleItem === 'string' ? ruleItem : ruleItem.id;
-                    const ruleValue = typeof ruleItem === 'string' ? null : ruleItem.value;
-                    const rule = houseRulesIcons[ruleId];
-                    
-                    // Skip additional rules here - they'll be displayed separately below
-                    if (ruleId === 'additionalRules') {
-                      return null;
-                    }
-                    
-                    // Handle unknown rule types gracefully
-                    if (!rule) {
-                      return (
-                        <div key={ruleId} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-                            <FileText size={16} className="text-slate-600" />
-                          </div>
-                          <div className="flex-1">
-                            <span className="text-sm font-medium capitalize">{ruleId.replace(/([A-Z])/g, ' $1')}</span>
-                            {ruleValue && (
-                              <span className="block text-sm text-muted-foreground">{ruleValue}</span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    }
-                    
-                    const Icon = rule.icon;
-                    let displayValue = ruleValue;
-                    
-                    // Get human-readable label for dropdown values
-                    if (ruleValue && houseRulesValueLabels[ruleId] && houseRulesValueLabels[ruleId][ruleValue]) {
-                      displayValue = houseRulesValueLabels[ruleId][ruleValue];
-                    }
-                    
-                    return (
-                      <div key={ruleId} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center">
-                          <Icon size={16} className="text-slate-600" />
-                        </div>
-                        <div className="flex-1">
-                          <span className="text-sm font-medium">{rule.label}</span>
-                          {displayValue && (
-                            <span className="block text-sm text-muted-foreground">{displayValue}</span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Display additional rules separately below other rules */}
-                {combinedHouseRules.some((rule: any) => {
-                  const ruleId = typeof rule === 'string' ? rule : rule.id;
-                  return ruleId === 'additionalRules';
-                }) && (
-                  <div className="mt-6">
-                    {combinedHouseRules.map((ruleItem: any) => {
-                      const ruleId = typeof ruleItem === 'string' ? ruleItem : ruleItem.id;
-                      const ruleValue = typeof ruleItem === 'string' ? null : ruleItem.value;
-                      
-                      if (ruleId !== 'additionalRules' || !ruleValue) return null;
-                      
-                      const rule = houseRulesIcons[ruleId];
-                      const Icon = rule.icon;
-                      
-                      return (
-                        <div key={ruleId} className="border border-gray-200 rounded-lg p-4 bg-white">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                              <Icon size={16} className="text-slate-600" />
-                            </div>
-                            <span className="text-sm font-medium">{rule.label}</span>
-                          </div>
-                          <div className="pl-11">
-                            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-                              {ruleValue}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </>
-          )}
         </div>
 
         <div className="lg:col-span-3">

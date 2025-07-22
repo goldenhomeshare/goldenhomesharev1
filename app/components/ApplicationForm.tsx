@@ -4,9 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
-import { Send, Loader2, CheckCircle, CalendarIcon } from "lucide-react";
+import { Loader2, CheckCircle, CalendarIcon } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -23,6 +22,25 @@ interface ApplicationFormProps {
   hasExistingApplication?: boolean;
   existingApplicationStatus?: string;
   applicationId?: string;
+  supportRequested?: any;
+}
+
+// Utility function to calculate total hours from supportRequested data
+function getTotalHoursPerWeek(supportRequested?: any): number {
+  if (!supportRequested) return 0;
+  
+  // Handle if it's already an array
+  if (Array.isArray(supportRequested)) {
+    let totalHours = 0;
+    supportRequested.forEach((item: any) => {
+      if (typeof item === 'object' && item.hoursPerWeek) {
+        totalHours += item.hoursPerWeek;
+      }
+    });
+    return totalHours;
+  }
+  
+  return 0;
 }
 
 async function submitApplication(
@@ -58,13 +76,17 @@ export function ApplicationForm({
   price,
   hasExistingApplication = false,
   existingApplicationStatus,
-  applicationId
+  applicationId,
+  supportRequested
 }: ApplicationFormProps) {
   const [message, setMessage] = useState("");
   const [moveInDate, setMoveInDate] = useState<Date>();
   const [moveOutDate, setMoveOutDate] = useState<Date>();
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(hasExistingApplication);
+  const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date());
+  const [openCalendar, setOpenCalendar] = useState<boolean>(false);
+  const [selectingType, setSelectingType] = useState<'moveIn' | 'moveOut'>('moveIn');
 
   // Calculate minimum move-out date (one month after move-in)
   const getMinimumMoveOutDate = (moveIn: Date) => {
@@ -78,6 +100,89 @@ export function ApplicationForm({
     const maxDate = new Date(moveIn);
     maxDate.setFullYear(maxDate.getFullYear() + 1);
     return maxDate;
+  };
+
+  // Custom calendar helper functions (matching search bar style)
+  const navigateCalendar = (direction: 'prev' | 'next') => {
+    const newMonth = new Date(currentCalendarMonth);
+    newMonth.setMonth(currentCalendarMonth.getMonth() + (direction === 'next' ? 1 : -1));
+    setCurrentCalendarMonth(newMonth);
+  };
+
+  const getDaysInMonth = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+    
+    const days = [];
+    
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    
+    // Add all days in the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+    
+    return days;
+  };
+
+  const isDateInPast = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dateToCheck = new Date(date);
+    dateToCheck.setHours(0, 0, 0, 0);
+    return dateToCheck < today;
+  };
+
+  const isDateSelected = (date: Date, selectedDate: Date | undefined) => {
+    if (!selectedDate) return false;
+    return date.getTime() === selectedDate.getTime();
+  };
+
+  const handleDateSelect = (date: Date) => {
+    if (isDateInPast(date)) return;
+    
+    if (selectingType === 'moveIn') {
+      setMoveInDate(date);
+      // Reset move-out date if it's invalid with new move-in date
+      if (moveOutDate && moveOutDate <= date) {
+        setMoveOutDate(undefined);
+      }
+      // Auto-switch to selecting move-out date
+      setSelectingType('moveOut');
+    } else {
+      // Check move-out date constraints
+      if (moveInDate) {
+        if (date <= moveInDate) return;
+        const minimumMoveOutDate = getMinimumMoveOutDate(moveInDate);
+        if (date < minimumMoveOutDate) return;
+        const maximumMoveOutDate = getMaximumMoveOutDate(moveInDate);
+        if (date > maximumMoveOutDate) return;
+      }
+      setMoveOutDate(date);
+      // Close calendar after selecting move-out date
+      setOpenCalendar(false);
+    }
+  };
+
+  const isDateDisabled = (date: Date, type: 'moveIn' | 'moveOut') => {
+    if (isDateInPast(date)) return true;
+    
+    if (type === 'moveOut' && moveInDate) {
+      if (date <= moveInDate) return true;
+      const minimumMoveOutDate = getMinimumMoveOutDate(moveInDate);
+      if (date < minimumMoveOutDate) return true;
+      const maximumMoveOutDate = getMaximumMoveOutDate(moveInDate);
+      if (date > maximumMoveOutDate) return true;
+    }
+    
+    return false;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -166,106 +271,184 @@ export function ApplicationForm({
       <CardHeader>
         {/* Price Display */}
         {price && (
-          <div className="text-center py-2 border-b border-gray-200 mb-4">
-            <div className="text-3xl font-bold text-gray-900 mb-1">
-              ${price.toLocaleString()}
-              <span className="text-lg font-normal text-gray-600">/month</span>
-            </div>
+          <div className="text-center py-2 mb-2">
+            {(() => {
+              const totalHours = getTotalHoursPerWeek(supportRequested);
+              if (totalHours > 0) {
+                const originalPrice = price + (15 * totalHours * 4);
+                                 return (
+                   <div className="text-3xl font-bold text-gray-900 mb-1">
+                     <span className="text-lg line-through text-gray-400 mr-2">${originalPrice.toLocaleString()}</span>
+                     <span className="text-2xl font-bold underline">${price.toLocaleString()}</span>
+                     <span className="text-lg font-normal text-gray-600">/mo with {totalHours}hrs support/wk</span>
+                   </div>
+                 );
+              } else {
+                return (
+                  <div className="text-3xl font-bold text-gray-900 mb-1">
+                    ${price.toLocaleString()}
+                    <span className="text-lg font-normal text-gray-600">/month</span>
+                  </div>
+                );
+              }
+            })()}
           </div>
         )}
         
-        <CardTitle className="text-lg font-normal">Apply to {productName}</CardTitle>
-        <CardDescription>
-          Submit an application to express your interest in this property. 
-          Include your intended stay dates and a personal message to introduce yourself to the homeowner.
-        </CardDescription>
+
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Stay Duration Information */}
-          <div className="bg-primary/5 border border-primary/20 rounded-xl p-6">
-            <h4 className="font-medium text-primary mb-3">Stay Duration Terms</h4>
-            <ul className="space-y-2 text-sm text-gray-700">
-              <li className="flex items-start gap-2">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-                <span>Minimum stay: one month</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-                <span>Initial agreement term: up to one year</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></span>
-                <span>Longer stays welcome! Agreements can be renewed after the first year.</span>
-              </li>
-            </ul>
-          </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+
 
           {/* Date Selection */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="moveInDate">Move-in Date *</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !moveInDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {moveInDate ? format(moveInDate, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={moveInDate}
-                    onSelect={setMoveInDate}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
+          <div className="space-y-4">
+            <div>
+              <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
+                <div className="border border-gray-300 rounded-xl overflow-hidden bg-white">
+                  <div className="grid grid-cols-2">
+                    {/* Move-in Date */}
+                    <PopoverTrigger asChild>
+                      <button
+                        className="p-4 text-left hover:bg-gray-50 transition-colors border-r border-gray-300"
+                        onClick={() => {
+                          setSelectingType('moveIn');
+                          setOpenCalendar(true);
+                        }}
+                      >
+                        <div className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
+                          MOVE-IN
+                        </div>
+                        <div className="text-sm text-gray-900">
+                          {moveInDate ? format(moveInDate, "MMM d") : "Add date"}
+                        </div>
+                      </button>
+                    </PopoverTrigger>
 
-            <div className="space-y-2">
-              <Label htmlFor="moveOutDate">Move-out Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !moveOutDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {moveOutDate ? format(moveOutDate, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={moveOutDate}
-                    onSelect={setMoveOutDate}
-                    disabled={(date) => {
-                      if (date < new Date()) return true;
-                      if (moveInDate) {
-                        // Disable dates before or equal to move-in date
-                        if (date <= moveInDate) return true;
-                        // Disable dates less than one month after move-in
-                        const minimumMoveOutDate = getMinimumMoveOutDate(moveInDate);
-                        if (date < minimumMoveOutDate) return true;
-                        // Disable dates more than one year after move-in
-                        const maximumMoveOutDate = getMaximumMoveOutDate(moveInDate);
-                        if (date > maximumMoveOutDate) return true;
-                      }
-                      return false;
-                    }}
-                    initialFocus
-                  />
+                    {/* Move-out Date */}
+                    <PopoverTrigger asChild>
+                      <button
+                        className="p-4 text-left hover:bg-gray-50 transition-colors"
+                        onClick={() => {
+                          setSelectingType('moveOut');
+                          setOpenCalendar(true);
+                        }}
+                      >
+                        <div className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
+                          MOVE-OUT
+                        </div>
+                        <div className="text-sm text-gray-900">
+                          {moveOutDate ? format(moveOutDate, "MMM d") : "Add date"}
+                        </div>
+                      </button>
+                    </PopoverTrigger>
+                  </div>
+                </div>
+
+                <PopoverContent className="w-[800px] p-0" align="end">
+                  <div className="p-6">
+                    {/* Header showing current selection mode */}
+                    <div className="mb-6 text-center">
+                      <p className="text-sm text-gray-600">
+                        {selectingType === 'moveIn' ? 'Select move-in date' : 'Select move-out date'}
+                      </p>
+                    </div>
+
+                    {/* Dual Month Calendar */}
+                    <div className="grid grid-cols-2 gap-8">
+                      {/* Current Month */}
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <button
+                            onClick={() => navigateCalendar('prev')}
+                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {currentCalendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                          </h3>
+                          <div className="w-8 h-8" />
+                        </div>
+                        <div className="grid grid-cols-7 gap-1 mb-2">
+                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+                            <div key={index} className="text-center text-sm font-medium text-gray-500 py-2">
+                              {day}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-7 gap-1">
+                          {getDaysInMonth(currentCalendarMonth).map((date, index) => (
+                            <div key={index} className="aspect-square">
+                              {date && (
+                                <button
+                                  onClick={() => handleDateSelect(date)}
+                                  disabled={isDateDisabled(date, selectingType)}
+                                  className={`w-full h-full flex items-center justify-center text-base rounded-full transition-colors ${
+                                    isDateDisabled(date, selectingType)
+                                      ? 'text-gray-300 cursor-not-allowed'
+                                      : isDateSelected(date, moveInDate) || isDateSelected(date, moveOutDate)
+                                      ? 'bg-black text-white'
+                                      : 'hover:bg-gray-100 text-gray-900'
+                                  }`}
+                                >
+                                  {date.getDate()}
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Next Month */}
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="w-8 h-8" />
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {new Date(currentCalendarMonth.getFullYear(), currentCalendarMonth.getMonth() + 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                          </h3>
+                          <button
+                            onClick={() => navigateCalendar('next')}
+                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-7 gap-1 mb-2">
+                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+                            <div key={index} className="text-center text-sm font-medium text-gray-500 py-2">
+                              {day}
+                            </div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-7 gap-1">
+                          {getDaysInMonth(new Date(currentCalendarMonth.getFullYear(), currentCalendarMonth.getMonth() + 1)).map((date, index) => (
+                            <div key={index} className="aspect-square">
+                              {date && (
+                                <button
+                                  onClick={() => handleDateSelect(date)}
+                                  disabled={isDateDisabled(date, selectingType)}
+                                  className={`w-full h-full flex items-center justify-center text-base rounded-full transition-colors ${
+                                    isDateDisabled(date, selectingType)
+                                      ? 'text-gray-300 cursor-not-allowed'
+                                      : isDateSelected(date, moveInDate) || isDateSelected(date, moveOutDate)
+                                      ? 'bg-black text-white'
+                                      : 'hover:bg-gray-100 text-gray-900'
+                                  }`}
+                                >
+                                  {date.getDate()}
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>
@@ -282,22 +465,17 @@ export function ApplicationForm({
               rows={4}
               className="resize-none mt-2"
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              A thoughtful message can help your application stand out.
-            </p>
+
           </div>
           
-          <Button type="submit" disabled={isLoading || !moveInDate} className="w-full">
+          <Button type="submit" disabled={isLoading || !moveInDate} className="w-full rounded-full py-4">
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Submitting Application...
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Applying...
               </>
             ) : (
-              <>
-                <Send className="h-4 w-4 mr-2" />
-                Submit Application
-              </>
+              "Apply"
             )}
           </Button>
         </form>

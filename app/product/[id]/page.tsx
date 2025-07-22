@@ -20,6 +20,29 @@ import Image from "next/image";
 import { Bath, Car, Wifi, Utensils, Tv, Snowflake, Sun, Home, DoorOpen, WashingMachine, Armchair, Briefcase, Sparkles, Salad, Flower, ShoppingBag, HeartHandshake, Cat, Wrench, Shield, Clock, VolumeX, Cigarette, CigaretteOff, Wine, GlassWater, Users, UserMinus, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
+// Utility function to extract city from full address (matching card approach)
+function getCityFromAddress(fullAddress?: string | null): string {
+  if (!fullAddress) return '';
+  
+  // Split address by commas and trim whitespace
+  const parts = fullAddress.split(',').map(part => part.trim()).filter(part => part.length > 0);
+  
+  // Common US address formats:
+  // "123 Main St, Springfield, IL 62701" -> ["123 Main St", "Springfield", "IL 62701"]
+  // "Springfield, IL 62701" -> ["Springfield", "IL 62701"]
+  
+  if (parts.length >= 3) {
+    // For format: "Street, City, State ZIP" - city is third from last
+    return parts[parts.length - 3];
+  } else if (parts.length === 2) {
+    // For format: "City, State ZIP" - city is first part
+    return parts[0];
+  }
+  
+  // Fallback: return empty string if we can't parse
+  return '';
+}
+
 const amenityIcons: Record<string, any> = {
   parking: { icon: Car, label: "Parking" },
   wifi: { icon: Wifi, label: "WiFi" },
@@ -242,6 +265,10 @@ export default async function ProductPage({
   const isOwner = currentUser?.id === data.User?.id;
   const isHousemate = currentUser && (currentUser as any).userType === "HOUSEMATE";
 
+  // Generate display title using same logic as cards
+  const cityName = getCityFromAddress(data.address);
+  const displayTitle = cityName ? `Private room in ${cityName}` : data.name;
+
   return (
     <>
       {/* Desktop: Listing Title above images */}
@@ -259,17 +286,17 @@ export default async function ProductPage({
           <h1 className="text-2xl font-semibold tracking-tight text-gray-900 mb-3">
             {data.name}
           </h1>
-          <p className="text-lg text-gray-600 leading-relaxed">{data.smallDescription}</p>
+          <p className="text-xl text-gray-600 leading-relaxed font-medium">{displayTitle}</p>
         </div>
 
         {/* Desktop: Short description below images */}
         <div className="hidden lg:block mt-4">
-          <p className="text-xl text-gray-900 font-medium">{data.smallDescription}</p>
+          <p className="text-2xl text-gray-900 font-medium">{displayTitle}</p>
         </div>
       </section>
 
       {/* Host profile and payment section side by side */}
-      <section className="mx-auto px-4 max-w-7xl lg:px-8 lg:grid lg:grid-cols-7 lg:gap-x-8 xl:gap-x-16 mt-4">
+      <section className="mx-auto px-4 max-w-7xl lg:px-8 lg:grid lg:grid-cols-7 lg:gap-x-8 xl:gap-x-16 mt-4 min-h-screen">
         <div className="w-full max-w-2xl mx-auto lg:max-w-none lg:col-span-4">
           {data.User && (
             <HomeownerProfileCard 
@@ -299,6 +326,7 @@ export default async function ProductPage({
                 hasExistingApplication={!!existingApplication}
                 existingApplicationStatus={existingApplication?.status || undefined}
                 applicationId={existingApplication?.id}
+                supportRequested={supportRequested}
               />
             ) : isOwner ? (
               <Card>
@@ -316,38 +344,11 @@ export default async function ProductPage({
           </div>
           
           <ProductDescription content={data.description as JSONContent} />
-        </div>
 
-        <div className="max-w-2xl mx-auto mt-4 lg:max-w-none lg:mt-0 lg:col-span-3">
-          {/* Desktop: Application Form for all users except owners */}
-          <div className="hidden lg:block">
-            {!isOwner && data.id ? (
-              <ApplicationForm
-                productId={data.id}
-                productName={data.name || 'Property'}
-                price={data.price}
-                hasExistingApplication={!!existingApplication}
-                existingApplicationStatus={existingApplication?.status || undefined}
-                applicationId={existingApplication?.id}
-              />
-            ) : isOwner ? (
-              <Card>
-                <CardContent className="py-6 text-center">
-                  <h3 className="text-lg font-medium mb-2">This is your listing</h3>
-                  <p className="text-muted-foreground mb-4">
-                    You can view and manage applications from interested housemates in your dashboard.
-                  </p>
-                  <Button asChild variant="outline">
-                    <a href="/applications">View Applications</a>
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : null}
-          </div>
-
+          {/* Desktop: Amenities moved to left column */}
           {amenities.length > 0 && (
             <>
-              <div className="border-t border-gray-200 mt-4 pt-4">
+              <div className="border-t border-gray-200 mt-6 pt-6">
                 <h3 className="text-base font-medium mb-4">Amenities</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {amenities.map((amenityId: string) => {
@@ -369,9 +370,10 @@ export default async function ProductPage({
             </>
           )}
 
+          {/* Desktop: House Rules moved to left column */}
           {combinedHouseRules.length > 0 && (
             <>
-              <div className="border-t border-gray-200 mt-4 pt-4">
+              <div className="border-t border-gray-200 mt-6 pt-6">
                 <h3 className="text-base font-medium mb-4">House Rules</h3>
                 <div className="grid grid-cols-1 gap-4">
                   {combinedHouseRules.map((ruleItem: any) => {
@@ -461,8 +463,35 @@ export default async function ProductPage({
               </div>
             </>
           )}
+        </div>
 
-          <div className="border-t border-gray-200 mt-6"></div>
+        <div className="lg:col-span-3">
+          {/* Desktop: Application Form for all users except owners */}
+          <div className="hidden lg:block sticky top-40 z-10">
+            {!isOwner && data.id ? (
+              <ApplicationForm
+                productId={data.id}
+                productName={data.name || 'Property'}
+                price={data.price}
+                hasExistingApplication={!!existingApplication}
+                existingApplicationStatus={existingApplication?.status || undefined}
+                applicationId={existingApplication?.id}
+                supportRequested={supportRequested}
+              />
+            ) : isOwner ? (
+              <Card>
+                <CardContent className="py-6 text-center">
+                  <h3 className="text-lg font-medium mb-2">This is your listing</h3>
+                  <p className="text-muted-foreground mb-4">
+                    You can view and manage applications from interested housemates in your dashboard.
+                  </p>
+                  <Button asChild variant="outline">
+                    <a href="/applications">View Applications</a>
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : null}
+          </div>
         </div>
       </section>
 

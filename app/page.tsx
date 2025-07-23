@@ -126,144 +126,324 @@ export default async function Home() {
         </svg>
       </div>
       
-      {/* Host and Helper Layout with Exchange in Middle */}
+      {/* What Helpers Can Help With Section */}
       <section className="bg-amber-100 -mt-1 pt-2 pb-24">
         <div className="max-w-7xl mx-auto px-6 md:px-12">
-          {/* Main Section Title */}
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
-              How Golden Works
+          
+          {/* Mobile Title - Show on mobile only */}
+          <div className="text-center mb-12 lg:hidden">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Get Help With
             </h2>
             <div className="flex justify-center">
               <ChevronDown className="w-8 h-8 text-gray-600" />
             </div>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8 md:gap-12 items-start mb-16">
-            {/* Host Section */}
-            <div className="text-center space-y-4 flex flex-col h-full">
-              <h3 className="text-3xl md:text-4xl font-bold text-gray-900">Host</h3>
+                    {/* Desktop Layout - Text Left, Grid Right */}
+          <div className="hidden lg:block mb-16">
+            {/* Top Row - Title, Companionship and Transportation */}
+            <div className="grid grid-cols-3 gap-8 mb-8">
+              {/* Get Help With Title */}
+              <div className="flex items-center justify-start">
+                <h2 className="text-3xl md:text-4xl lg:text-6xl font-bold text-gray-900 leading-tight text-left ml-28 -mt-16">
+                  Get Help<br/>With
+                </h2>
+              </div>
               
-              {/* Host Illustration */}
-              <div className="flex justify-center py-3">
-                <div className="relative w-56 h-42 md:w-64 md:h-48">
+              {/* Companionship - positioned over Tech Help */}
+              <div className="text-center">
+                <div className="flex justify-center items-center mb-6 h-24">
                   <Image 
-                    src="/host-hero.png" 
-                    alt="Host hero image" 
-                    fill
+                    src="/Companionship icon without bottom.png" 
+                    alt="Companionship" 
+                    width={100}
+                    height={100}
                     className="object-contain"
                   />
                 </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Companionship</h3>
+                <p className="text-lg text-gray-600 leading-relaxed max-w-xs mx-auto">
+                  Friendly conversation, shared activities, or simply having someone around.
+                </p>
               </div>
-              
-              {/* What Host Provides */}
-              <div className="space-y-4 flex-1">
-                <h4 className="text-lg font-semibold text-gray-600 mb-4">
-                  What You'll Get From Hosting
-                </h4>
-                <div className="space-y-3">
-                  <div className="bg-gray-50 p-5 rounded-lg min-h-[80px] flex items-center justify-center">
-                    <p className="text-gray-700 text-base font-medium">Up to 10 hours of weekly household support</p>
-                  </div>
-                  <div className="bg-gray-50 p-5 rounded-lg min-h-[80px] flex items-center justify-center">
-                    <p className="text-gray-700 text-base font-medium">5–6 nights of weekly overnight presence</p>
-                  </div>
-                  <div className="bg-gray-50 p-5 rounded-lg min-h-[80px] flex items-center justify-center">
-                    <p className="text-gray-700 text-base font-medium">Monthly rental income</p>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Host Signup Button */}
-              <div className="pt-4">
-                <Link href="/homeowner/signup-wizard">
-                  <button className="w-full host-helper-button text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
-                    Signup to Host
-                  </button>
-                </Link>
-              </div>
-            </div>
 
-            {/* Exchange Section - Now in the middle */}
-            <div className="flex items-center justify-center h-full relative">
-              {/* Curved Arrow - Top */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-24 hidden md:block">
-                <svg width="160" height="60" viewBox="0 0 160 60" className="text-gray-500">
-                  <path d="M15 45 Q80 15 145 45" stroke="currentColor" strokeWidth="2.5" fill="none" markerEnd="url(#arrowhead)" />
-                  <defs>
-                    <marker id="arrowhead" markerWidth="12" markerHeight="8" 
-                      refX="11" refY="4" orient="auto">
-                      <polygon points="0 0, 12 4, 0 8" fill="currentColor" />
-                    </marker>
-                  </defs>
-                </svg>
-              </div>
-              
-              <div className="text-center px-8">
-                <h4 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Live Well at Home</h4>
-                <p className="text-xl md:text-2xl text-gray-700 font-medium">Live Well for Less</p>
-              </div>
-              
-              {/* Curved Arrow - Bottom */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 translate-y-12 hidden md:block">
-                <svg width="160" height="60" viewBox="0 0 160 60" className="text-gray-500">
-                  <path d="M145 15 Q80 45 15 15" stroke="currentColor" strokeWidth="2.5" fill="none" markerEnd="url(#arrowhead2)" />
-                  <defs>
-                    <marker id="arrowhead2" markerWidth="12" markerHeight="8" 
-                      refX="11" refY="4" orient="auto">
-                      <polygon points="0 0, 12 4, 0 8" fill="currentColor" />
-                    </marker>
-                  </defs>
-                </svg>
-              </div>
-            </div>
-
-            {/* Helper Section */}
-            <div className="text-center space-y-4 flex flex-col h-full">
-              <h3 className="text-3xl md:text-4xl font-bold text-gray-900">Helper</h3>
-              
-              {/* Helper Illustration */}
-              <div className="flex justify-center py-3">
-                <div className="relative w-56 h-42 md:w-64 md:h-48">
+              {/* Transportation - positioned over Meal Prep */}
+              <div className="text-center">
+                <div className="flex justify-center items-center mb-6 h-24">
                   <Image 
-                    src="/Housemate-Onboarding.png" 
-                    alt="Housemate helper onboarding" 
-                    fill
+                    src="/Transportation icon bottom removed .png" 
+                    alt="Transportation" 
+                    width={100}
+                    height={100}
                     className="object-contain"
                   />
                 </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Transportation</h3>
+                <p className="text-lg text-gray-600 leading-relaxed max-w-xs mx-auto">
+                  Rides to appointments, grocery runs, or social activities when needed.
+                </p>
               </div>
-              
-              {/* What Helper Provides */}
-              <div className="space-y-4 flex-1">
-                <h4 className="text-lg font-semibold text-gray-600 mb-4">
-                  What You'll Get From Helping
-                </h4>
-                <div className="space-y-3">
-                  <div className="bg-gray-50 p-5 rounded-lg min-h-[80px] flex items-center justify-center">
-                    <p className="text-gray-700 text-base font-medium">Access to private room and shared spaces</p>
-                  </div>
-                  <div className="bg-gray-50 p-5 rounded-lg min-h-[80px] flex items-center justify-center">
-                    <p className="text-gray-700 text-base font-medium">Affordable housing for help</p>
-                  </div>
-                  <div className="bg-gray-50 p-5 rounded-lg min-h-[80px] flex items-center justify-center">
-                    <p className="text-gray-700 text-base font-medium">Flexible housing arrangement</p>
-                  </div>
+            </div>
+
+            {/* Second Row - 3 columns spanning entire section */}
+            <div className="grid grid-cols-3 gap-8 mb-8">
+              {/* Household Tasks */}
+              <div className="text-center">
+                <div className="flex justify-center items-center mb-6 h-24">
+                  <Image 
+                    src="/Cleaning-icon.png" 
+                    alt="Household Tasks" 
+                    width={100}
+                    height={100}
+                    className="object-contain"
+                  />
                 </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Household Tasks</h3>
+                <p className="text-lg text-gray-600 leading-relaxed max-w-xs mx-auto">
+                  Light cleaning, organizing, or maintaining your home's daily upkeep.
+                </p>
               </div>
-              
-              {/* Helper Signup Button */}
-              <div className="pt-4">
-                <Link href="/housemate/signup-wizard">
-                  <button className="w-full become-helper-button font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
-                    Signup to Help
-                  </button>
-                </Link>
+
+              {/* Tech Help */}
+              <div className="text-center">
+                <div className="flex justify-center items-center mb-6 h-24">
+                  <Image 
+                    src="/Tech-help-icon.png" 
+                    alt="Tech Help" 
+                    width={100}
+                    height={100}
+                    className="object-contain"
+                  />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Tech Help</h3>
+                <p className="text-lg text-gray-600 leading-relaxed max-w-xs mx-auto">
+                  Setting up devices, troubleshooting technology, or helping with digital tasks.
+                </p>
+              </div>
+
+              {/* Meal Preparation */}
+              <div className="text-center">
+                <div className="flex justify-center items-center mb-6 h-24">
+                  <Image 
+                    src="/Meal-prep icon.png" 
+                    alt="Meal Preparation" 
+                    width={100}
+                    height={100}
+                    className="object-contain"
+                  />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Meal Preparation</h3>
+                <p className="text-lg text-gray-600 leading-relaxed max-w-xs mx-auto">
+                  Cooking together, meal planning, or sharing kitchen responsibilities.
+                </p>
+              </div>
+            </div>
+
+                        {/* Third Row - 3 columns spanning entire section */}
+            <div className="grid grid-cols-3 gap-8">
+              {/* Pet Care */}
+              <div className="text-center">
+                <div className="flex justify-center items-center mb-6 h-24">
+                  <Image 
+                    src="/Pet-care-icon.png" 
+                    alt="Pet Care" 
+                    width={100}
+                    height={100}
+                    className="object-contain"
+                  />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Pet Care</h3>
+                <p className="text-lg text-gray-600 leading-relaxed max-w-xs mx-auto">
+                  Walking dogs, feeding pets, or providing companionship for your furry friends.
+                </p>
+              </div>
+
+              {/* Errands & Shopping */}
+              <div className="text-center">
+                <div className="flex justify-center items-center mb-6 h-24">
+                  <Image 
+                    src="/Errands icon bottom removed.png" 
+                    alt="Errands & Shopping" 
+                    width={100}
+                    height={100}
+                    className="object-contain"
+                  />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Errands & Shopping</h3>
+                <p className="text-lg text-gray-600 leading-relaxed max-w-xs mx-auto">
+                  Grocery shopping, pharmacy visits, or picking up essentials around town.
+                </p>
+              </div>
+
+              {/* Garden & Yard Care */}
+              <div className="text-center">
+                <div className="flex justify-center items-center mb-6 h-24">
+                  <Image 
+                    src="/Yard work icon.png" 
+                    alt="Garden & Yard Care" 
+                    width={100}
+                    height={100}
+                    className="object-contain"
+                  />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Garden & Yard Care</h3>
+                <p className="text-lg text-gray-600 leading-relaxed max-w-xs mx-auto">
+                  Tending to plants, light gardening, or maintaining outdoor spaces.
+                </p>
               </div>
             </div>
           </div>
 
+          {/* Mobile Layout - Keep original for mobile/tablet */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 lg:hidden">
+            {/* Household Tasks */}
+            <div className="text-center">
+              <div className="flex justify-center items-center mb-6 h-24">
+                <Image 
+                  src="/Cleaning-icon.png" 
+                  alt="Household Tasks" 
+                  width={96}
+                  height={96}
+                  className="object-contain"
+                />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Household Tasks</h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Light cleaning, organizing, or maintaining your home's daily upkeep.
+              </p>
+            </div>
 
+            {/* Meal Preparation */}
+            <div className="text-center">
+              <div className="flex justify-center items-center mb-6 h-24">
+                <Image 
+                  src="/Meal-prep icon.png" 
+                  alt="Meal Preparation" 
+                  width={96}
+                  height={96}
+                  className="object-contain"
+                />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Meal Preparation</h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Cooking together, meal planning, or sharing kitchen responsibilities.
+              </p>
+            </div>
+
+            {/* Companionship */}
+            <div className="text-center">
+              <div className="flex justify-center items-center mb-6 h-24">
+                <Image 
+                  src="/Companionship icon without bottom.png" 
+                  alt="Companionship" 
+                  width={96}
+                  height={96}
+                  className="object-contain"
+                />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Companionship</h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Friendly conversation, shared activities, or simply having someone around.
+              </p>
+            </div>
+
+            {/* Errands & Shopping */}
+            <div className="text-center">
+              <div className="flex justify-center items-center mb-6 h-24">
+                <Image 
+                  src="/Errands icon bottom removed.png" 
+                  alt="Errands & Shopping" 
+                  width={96}
+                  height={96}
+                  className="object-contain"
+                />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Errands & Shopping</h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Grocery shopping, pharmacy visits, or picking up essentials around town.
+              </p>
+            </div>
+
+            {/* Pet Care */}
+            <div className="text-center">
+              <div className="flex justify-center items-center mb-6 h-24">
+                <Image 
+                  src="/Pet-care-icon.png" 
+                  alt="Pet Care" 
+                  width={96}
+                  height={96}
+                  className="object-contain"
+                />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Pet Care</h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Walking dogs, feeding pets, or providing companionship for your furry friends.
+              </p>
+            </div>
+
+            {/* Transportation */}
+            <div className="text-center">
+              <div className="flex justify-center items-center mb-6 h-24">
+                <Image 
+                  src="/Transportation icon bottom removed .png" 
+                  alt="Transportation" 
+                  width={96}
+                  height={96}
+                  className="object-contain"
+                />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Transportation</h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Rides to appointments, grocery runs, or social activities when needed.
+              </p>
+            </div>
+
+            {/* Garden & Yard Care */}
+            <div className="text-center">
+              <div className="flex justify-center items-center mb-6 h-24">
+                <Image 
+                  src="/Yard work icon.png" 
+                  alt="Garden & Yard Care" 
+                  width={96}
+                  height={96}
+                  className="object-contain"
+                />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Garden & Yard Care</h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Tending to plants, light gardening, or maintaining outdoor spaces.
+              </p>
+            </div>
+
+            {/* Tech Help */}
+            <div className="text-center">
+              <div className="flex justify-center items-center mb-6 h-24">
+                <Image 
+                  src="/Tech-help-icon.png" 
+                  alt="Tech Help" 
+                  width={96}
+                  height={96}
+                  className="object-contain"
+                />
+              </div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4">Tech Help</h3>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Setting up devices, troubleshooting technology, or helping with digital tasks.
+              </p>
+            </div>
+          </div>
+
+          {/* Call to Action */}
+          <div className="text-center">
+            <div className="flex justify-center">
+              <Link href="/homeowner/signup-wizard" className="w-full lg:w-auto lg:flex-shrink-0">
+                <button className="w-full font-semibold py-4 px-8 lg:px-12 rounded-lg transition-colors duration-200 text-lg whitespace-nowrap become-helper-button">
+                  Find a Helper
+                </button>
+              </Link>
+            </div>
+          </div>
 
         </div>
       </section>
